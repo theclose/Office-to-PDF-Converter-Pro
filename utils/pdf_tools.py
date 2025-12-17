@@ -70,7 +70,7 @@ def post_process_pdf(pdf_path: str, password: str = None,
         try:
             if os.path.exists(pdf_path + ".tmp"):
                 os.remove(pdf_path + ".tmp")
-        except:
+        except Exception:
             pass
         return False
 
@@ -116,7 +116,7 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
         try:
             if os.path.exists(pdf_path + ".raster.tmp"):
                 os.remove(pdf_path + ".raster.tmp")
-        except:
+        except Exception:
             pass
         return False
 
@@ -195,7 +195,7 @@ def extract_pdf_pages(pdf_path: str, page_indices: List[int]) -> bool:
         try:
             if os.path.exists(pdf_path + ".tmp"):
                 os.remove(pdf_path + ".tmp")
-        except:
+        except Exception:
             pass
         return False
 

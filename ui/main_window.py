@@ -115,7 +115,7 @@ class ConverterApp:
         
         try:
             style.theme_use('clam')
-        except:
+        except Exception:
             pass
         
         # === EYE-FRIENDLY COLOR PALETTES ===
@@ -595,7 +595,7 @@ class ConverterApp:
         for file_path in self.file_list:
             try:
                 total_seconds += estimate_conversion_time(file_path)
-            except:
+            except Exception:
                 total_seconds += 10  # Default fallback
         
         # Format with translations
@@ -1254,7 +1254,7 @@ class ConverterApp:
                         # Log conversion for adaptive learning
                         try:
                             log_conversion_result(file_path, file_duration, success=True)
-                        except:
+                        except Exception:
                             pass
                         
                         # Post-processing (all done, then jump to 100%)
@@ -1290,7 +1290,7 @@ class ConverterApp:
                         # Log failed conversion
                         try:
                             log_conversion_result(file_path, file_duration, success=False)
-                        except:
+                        except Exception:
                             pass
                         self.root.after(0, lambda: self.log(f"   ❌ Conversion failed"))
                         update_progress(100)  # Move to next file

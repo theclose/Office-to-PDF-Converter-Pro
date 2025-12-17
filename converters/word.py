@@ -1,6 +1,5 @@
 """
 Word Converter - Converts Word documents to PDF using COM automation.
-Uses COM Pool for connection reuse and memory optimization.
 """
 
 import os
@@ -8,6 +7,7 @@ import time
 import logging
 import shutil
 import gc
+import uuid
 from typing import Optional, Callable
 
 import pythoncom
@@ -32,7 +32,7 @@ class WordConverter(BaseConverter):
                  progress_callback: Optional[Callable[[float], None]] = None):
         super().__init__(log_callback, progress_callback)
         self._word = None
-        self._use_pool = False  # Disabled pool due to COM corruption issues
+        self._use_pool = False
     
     def initialize(self) -> bool:
         """Get Word COM from pool."""
@@ -55,41 +55,43 @@ class WordConverter(BaseConverter):
     
     def _configure_standalone(self):
         """Configure standalone Word instance."""
-        self._word.Visible = False
-        self._word.DisplayAlerts = 0
         try:
+            self._word.Visible = False
+            self._word.DisplayAlerts = 0
             self._word.Options.CheckSpellingAsYouType = False
             self._word.Options.CheckGrammarAsYouType = False
             self._word.AutomationSecurity = 3
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"Word configure warning: {e}")
     
     def cleanup(self):
         """Release Word resources."""
         if not self._use_pool and self._word:
             try:
                 self._word.Quit()
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Word quit error: {e}")
             self._word = None
-        # Note: Don't set to None when using pool
+        
+        try:
+            pythoncom.CoUninitialize()
+        except Exception:
+            pass
+        
         gc.collect()
         logger.info("Word cleanup done")
     
     def convert(self, input_path: str, output_path: str, 
                 quality: int = 0) -> bool:
-        """
-        Convert Word document to PDF.
-        """
+        """Convert Word document to PDF."""
         if not self._word:
             if not self.initialize():
                 return False
         
         doc = None
         temp_dir = os.environ.get("TEMP", os.path.expanduser("~"))
-        safe_id = str(int(time.time() * 1000))
+        safe_id = uuid.uuid4().hex
         
-        # Preserve original extension for proper handling
         ext = os.path.splitext(input_path)[1].lower()
         com_input_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}{ext}"))
         com_pdf_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}.pdf"))
@@ -119,22 +121,21 @@ class WordConverter(BaseConverter):
             doc.Close(False)
             doc = None
             
-            # Move to final destination with retry for locked files
             if os.path.exists(com_pdf_path):
-                # Try to remove existing output with retries
                 for attempt in range(3):
                     try:
                         if os.path.exists(output_path):
                             os.remove(output_path)
                         break
                     except PermissionError:
-                        time.sleep(0.3)  # Wait and retry
+                        time.sleep(0.3)
                 
                 shutil.move(com_pdf_path, output_path)
             
             try:
-                os.remove(com_input_path)
-            except:
+                if os.path.exists(com_input_path):
+                    os.remove(com_input_path)
+            except Exception:
                 pass
             
             logger.info(f"Word converted: {os.path.basename(input_path)}")
@@ -145,9 +146,13 @@ class WordConverter(BaseConverter):
             if doc:
                 try:
                     doc.Close(False)
-                except:
+                except Exception:
                     pass
             return False
         finally:
+            if os.path.exists(com_pdf_path):
+                try:
+                    os.remove(com_pdf_path)
+                except Exception:
+                    pass
             gc.collect()
-

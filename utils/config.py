@@ -4,6 +4,7 @@ Configuration Management - Centralized settings handling.
 
 import os
 import json
+import copy
 import logging
 from typing import Any, Dict, Optional
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_CONFIG = {
     "language": "vi",
     "theme": "light",
-    "pdf_quality": 0,  # 0 = High, 1 = Minimum
+    "pdf_quality": 0,
     "last_folder": "",
     "output_folder": "",
     "metadata": {
@@ -31,6 +32,7 @@ class Config:
     _instance = None
     _config_path = None
     _data: Dict[str, Any] = {}
+    _initialized = False
     
     def __new__(cls, config_path: Optional[str] = None):
         """Singleton pattern - only one config instance."""
@@ -46,11 +48,11 @@ class Config:
         if config_path:
             self._config_path = config_path
         else:
-            # Default to same directory as script
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             self._config_path = os.path.join(base_dir, "config.json")
         
-        self._data = DEFAULT_CONFIG.copy()
+        # Use deepcopy to prevent nested dict mutation
+        self._data = copy.deepcopy(DEFAULT_CONFIG)
         self.load()
         self._initialized = True
     
@@ -60,8 +62,7 @@ class Config:
             if os.path.exists(self._config_path):
                 with open(self._config_path, "r", encoding="utf-8") as f:
                     loaded = json.load(f)
-                    # Merge with defaults (keeps new keys)
-                    self._data = {**DEFAULT_CONFIG, **loaded}
+                    self._data = {**copy.deepcopy(DEFAULT_CONFIG), **loaded}
                     logger.info(f"Config loaded from {self._config_path}")
                     return True
         except Exception as e:

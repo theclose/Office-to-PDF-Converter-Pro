@@ -84,7 +84,7 @@ class SystemProfiler:
                 try:
                     import platform
                     profile.cpu_name = platform.processor() or "Unknown CPU"
-                except:
+                except Exception:
                     pass
                 
                 # RAM info
@@ -98,7 +98,7 @@ class SystemProfiler:
                     if disk_info:
                         # Simple heuristic: SSDs typically have faster read speeds
                         profile.disk_type = "SSD"  # Assume SSD for modern systems
-                except:
+                except Exception:
                     pass
                     
             except Exception as e:
@@ -134,7 +134,7 @@ class SystemProfiler:
                     'cpu_percent': psutil.cpu_percent(interval=0.1),
                     'ram_percent': psutil.virtual_memory().percent
                 }
-            except:
+            except Exception:
                 pass
         return {'cpu_percent': 50.0, 'ram_percent': 50.0}
 

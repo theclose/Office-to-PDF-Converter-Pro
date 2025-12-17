@@ -1,13 +1,12 @@
 """
 PowerPoint Converter - Converts presentations to PDF using COM automation.
-Uses COM Pool for connection reuse and memory optimization.
 """
 
 import os
-import time
 import logging
 import shutil
 import gc
+import uuid
 from typing import Optional, Callable
 
 import pythoncom
@@ -30,7 +29,7 @@ class PPTConverter(BaseConverter):
                  progress_callback: Optional[Callable[[float], None]] = None):
         super().__init__(log_callback, progress_callback)
         self._ppt = None
-        self._use_pool = False  # Disabled pool due to COM corruption issues
+        self._use_pool = False
     
     def initialize(self) -> bool:
         """Get PowerPoint COM from pool."""
@@ -55,35 +54,37 @@ class PPTConverter(BaseConverter):
         """Configure standalone PowerPoint instance."""
         try:
             self._ppt.DisplayAlerts = 0
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"PPT configure warning: {e}")
     
     def cleanup(self):
         """Release PowerPoint resources."""
         if not self._use_pool and self._ppt:
             try:
                 self._ppt.Quit()
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"PPT quit error: {e}")
             self._ppt = None
-        # Note: Don't set to None when using pool
+        
+        try:
+            pythoncom.CoUninitialize()
+        except Exception:
+            pass
+        
         gc.collect()
         logger.info("PowerPoint cleanup done")
     
     def convert(self, input_path: str, output_path: str, 
                 quality: int = 0) -> bool:
-        """
-        Convert PowerPoint presentation to PDF.
-        """
+        """Convert PowerPoint presentation to PDF."""
         if not self._ppt:
             if not self.initialize():
                 return False
         
         presentation = None
         temp_dir = os.environ.get("TEMP", os.path.expanduser("~"))
-        safe_id = str(int(time.time() * 1000))
+        safe_id = uuid.uuid4().hex
         
-        # Preserve original extension
         ext = os.path.splitext(input_path)[1].lower()
         com_input_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}{ext}"))
         com_pdf_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}.pdf"))
@@ -109,8 +110,9 @@ class PPTConverter(BaseConverter):
                 shutil.move(com_pdf_path, output_path)
             
             try:
-                os.remove(com_input_path)
-            except:
+                if os.path.exists(com_input_path):
+                    os.remove(com_input_path)
+            except Exception:
                 pass
             
             logger.info(f"PowerPoint converted: {os.path.basename(input_path)}")
@@ -121,8 +123,13 @@ class PPTConverter(BaseConverter):
             if presentation:
                 try:
                     presentation.Close()
-                except:
+                except Exception:
                     pass
             return False
         finally:
+            if os.path.exists(com_pdf_path):
+                try:
+                    os.remove(com_pdf_path)
+                except Exception:
+                    pass
             gc.collect()

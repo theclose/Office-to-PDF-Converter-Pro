@@ -328,7 +328,7 @@ class PDFToolsDialog:
                     display = f"{i:02d}. {filename} [{size_str}] → [{comp/1024:.0f} KB] (-{reduction:.0f}%)"
                 else:
                     display = f"{i:02d}. {filename} [{size_str}]"
-            except:
+            except Exception:
                 display = f"{i:02d}. {filename}"
             
             self.listbox.insert("end", display)

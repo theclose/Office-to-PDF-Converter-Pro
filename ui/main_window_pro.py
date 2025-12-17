@@ -48,6 +48,15 @@ from office_converter.converters import get_converter_for_file, ExcelConverter
 # Setup logging
 logger = setup_logging()
 
+# Drag and drop support
+HAS_WINDND = False
+try:
+    import windnd
+    HAS_WINDND = True
+    logger.info("windnd available for drag-drop")
+except ImportError:
+    logger.warning("windnd not installed - drag drop disabled")
+
 # Import fitz (PyMuPDF) at module level with proper fallback
 fitz = None
 if HAS_PYMUPDF:
@@ -868,16 +877,20 @@ class ConverterProApp(ctk.CTk):
         # Keyboard shortcuts
         self._setup_shortcuts()
         
+        # Setup drag and drop
+        self._setup_drag_drop()
+        
         # Cleanup
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         # Initial log
         self._log(f"🚀 Office to PDF Converter Pro v{self.VERSION}")
-        self._log("✅ Fixed: converter instantiation, error handling")
         if fitz:
             self._log("📄 PyMuPDF: Hỗ trợ đầy đủ PDF tools")
         else:
             self._log("⚠️ PyMuPDF không có: PDF preview disabled")
+        if HAS_WINDND:
+            self._log("📁 Drag & Drop: Kéo thả file hoạt động")
         
         # Check for updates on startup
         self._check_for_updates()
@@ -914,6 +927,57 @@ class ConverterProApp(ctk.CTk):
             self.bind('<F1>', lambda e: self._show_shortcuts())
         except Exception as e:
             logger.error(f"Setup shortcuts error: {e}")
+    
+    def _setup_drag_drop(self):
+        """Setup drag and drop support using windnd."""
+        if not HAS_WINDND:
+            logger.info("windnd not available, drag drop disabled")
+            return
+        
+        try:
+            # Register the main window for drag and drop
+            windnd.hook_dropfiles(self, func=self._handle_drop)
+            logger.info("Drag and drop enabled for main window")
+        except Exception as e:
+            logger.error(f"Setup drag drop error: {e}")
+    
+    def _handle_drop(self, files):
+        """Handle dropped files."""
+        try:
+            if not files:
+                return
+            
+            # Get all supported extensions
+            all_extensions = set()
+            for ext_set in FILE_EXTENSIONS.values():
+                all_extensions.update(ext_set)
+            
+            added_count = 0
+            for file_path in files:
+                # Decode if bytes
+                if isinstance(file_path, bytes):
+                    file_path = file_path.decode('utf-8')
+                
+                # Check extension
+                ext = os.path.splitext(file_path)[1].lower()
+                if ext in all_extensions:
+                    # Add to file panel
+                    if self.file_panel:
+                        # Create ConversionFile and add
+                        conv_file = ConversionFile(path=file_path)
+                        if conv_file not in self.file_panel.files:
+                            self.file_panel.files.append(conv_file)
+                            added_count += 1
+            
+            if added_count > 0:
+                # Refresh display
+                if self.file_panel:
+                    self.file_panel._refresh_listbox()
+                self._log(f"📁 Thả thêm {added_count} file(s)")
+                self._on_files_changed(self.file_panel.files if self.file_panel else [])
+        except Exception as e:
+            logger.error(f"Handle drop error: {e}")
+            self._log(f"❌ Lỗi kéo thả: {e}")
     
     def _create_layout(self):
         """Create the main layout."""

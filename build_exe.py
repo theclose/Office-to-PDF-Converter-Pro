@@ -15,7 +15,7 @@ from pathlib import Path
 
 # Project info
 APP_NAME = "OfficeToPDF_Pro"
-VERSION = "4.0.0"
+VERSION = "4.0.2"
 MAIN_SCRIPT = "ui/main_window_pro.py"
 
 # Directories
@@ -176,6 +176,29 @@ def build():
         f"--name={APP_NAME}",
         f"--distpath={DIST_DIR}",
         f"--workpath={BUILD_DIR}",
+        # Exclude large packages we don't need
+        "--exclude-module=torch",
+        "--exclude-module=scipy",
+        "--exclude-module=numpy",
+        "--exclude-module=pandas",
+        "--exclude-module=matplotlib",
+        "--exclude-module=sklearn",
+        "--exclude-module=tensorflow",
+        "--exclude-module=keras",
+        "--exclude-module=cv2",
+        "--exclude-module=opencv",
+        "--exclude-module=IPython",
+        "--exclude-module=notebook",
+        "--exclude-module=jupyter",
+        "--exclude-module=pytest",
+        "--exclude-module=unittest",
+        "--exclude-module=setuptools",
+        "--exclude-module=pip",
+        "--exclude-module=wheel",
+        "--exclude-module=cryptography",
+        "--exclude-module=nacl",
+        "--exclude-module=cffi",
+        "--exclude-module=pycparser",
     ]
     
     # Add hidden imports

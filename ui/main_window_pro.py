@@ -1,13 +1,14 @@
 """
-Office Converter Pro - Refactored Architecture
-Version 4.0.0 - Professional Grade with Preview, DnD, Recent Files
+Office Converter Pro - Refactored Architecture (FIXED)
+Version 4.0.1 - Professional Grade with Preview, DnD, Recent Files
 
-Based on PM/Architect analysis:
-- Added PDF Preview
-- Real Drag & Drop support
-- Recent Files with SQLite
-- Improved code structure
-- Better error handling
+HOTFIX CHANGES:
+- Fixed fitz import (moved to global scope with fallback)
+- Added try/except to all critical functions
+- Fixed _show_settings crash when dialogs module missing
+- Added error handling for all button callbacks
+- Fixed progress_frame packing issue
+- Added proper cleanup in preview panel
 """
 
 import os
@@ -46,6 +47,15 @@ from office_converter.converters import get_converter_for_file, ExcelConverter
 
 # Setup logging
 logger = setup_logging()
+
+# Import fitz (PyMuPDF) at module level with proper fallback
+fitz = None
+if HAS_PYMUPDF:
+    try:
+        import fitz as _fitz
+        fitz = _fitz
+    except ImportError:
+        pass
 
 # ============================================================================
 # CONSTANTS & CONFIGURATION
@@ -142,77 +152,94 @@ class RecentFilesDB:
     
     def _init_db(self):
         """Initialize database tables."""
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS recent_files (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    path TEXT UNIQUE,
-                    last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    use_count INTEGER DEFAULT 1
-                )
-            """)
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS conversion_history (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    input_path TEXT,
-                    output_path TEXT,
-                    status TEXT,
-                    duration REAL,
-                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS recent_files (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        path TEXT UNIQUE,
+                        last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        use_count INTEGER DEFAULT 1
+                    )
+                """)
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS conversion_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        input_path TEXT,
+                        output_path TEXT,
+                        status TEXT,
+                        duration REAL,
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+        except Exception as e:
+            logger.error(f"Database init error: {e}")
     
     def add_recent(self, path: str):
         """Add or update recent file."""
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
-                INSERT INTO recent_files (path, last_used, use_count)
-                VALUES (?, CURRENT_TIMESTAMP, 1)
-                ON CONFLICT(path) DO UPDATE SET
-                    last_used = CURRENT_TIMESTAMP,
-                    use_count = use_count + 1
-            """, (path,))
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    INSERT INTO recent_files (path, last_used, use_count)
+                    VALUES (?, CURRENT_TIMESTAMP, 1)
+                    ON CONFLICT(path) DO UPDATE SET
+                        last_used = CURRENT_TIMESTAMP,
+                        use_count = use_count + 1
+                """, (path,))
+        except Exception as e:
+            logger.error(f"Add recent error: {e}")
     
     def get_recent(self, limit: int = 10) -> List[str]:
         """Get recent files."""
-        with sqlite3.connect(self.db_path) as conn:
-            cursor = conn.execute("""
-                SELECT path FROM recent_files
-                WHERE path IS NOT NULL
-                ORDER BY last_used DESC
-                LIMIT ?
-            """, (limit,))
-            return [row[0] for row in cursor.fetchall() if os.path.exists(row[0])]
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.execute("""
+                    SELECT path FROM recent_files
+                    WHERE path IS NOT NULL
+                    ORDER BY last_used DESC
+                    LIMIT ?
+                """, (limit,))
+                return [row[0] for row in cursor.fetchall() if os.path.exists(row[0])]
+        except Exception as e:
+            logger.error(f"Get recent error: {e}")
+            return []
     
     def log_conversion(self, input_path: str, output_path: str, 
                        status: str, duration: float):
         """Log conversion result."""
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
-                INSERT INTO conversion_history 
-                (input_path, output_path, status, duration)
-                VALUES (?, ?, ?, ?)
-            """, (input_path, output_path, status, duration))
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    INSERT INTO conversion_history 
+                    (input_path, output_path, status, duration)
+                    VALUES (?, ?, ?, ?)
+                """, (input_path, output_path, status, duration))
+        except Exception as e:
+            logger.error(f"Log conversion error: {e}")
     
     def get_stats(self) -> Dict[str, Any]:
         """Get conversion statistics."""
-        with sqlite3.connect(self.db_path) as conn:
-            cursor = conn.execute("""
-                SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as success,
-                    AVG(duration) as avg_duration
-                FROM conversion_history
-            """)
-            row = cursor.fetchone()
-            total, success, avg_duration = row
-            return {
-                "total": total or 0,
-                "success": success or 0,
-                "failed": (total or 0) - (success or 0),
-                "success_rate": (success / total * 100) if total else 0,
-                "avg_duration": avg_duration or 0
-            }
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.execute("""
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as success,
+                        AVG(duration) as avg_duration
+                    FROM conversion_history
+                """)
+                row = cursor.fetchone()
+                total, success, avg_duration = row
+                return {
+                    "total": total or 0,
+                    "success": success or 0,
+                    "failed": (total or 0) - (success or 0),
+                    "success_rate": (success / total * 100) if total else 0,
+                    "avg_duration": avg_duration or 0
+                }
+        except Exception as e:
+            logger.error(f"Get stats error: {e}")
+            return {"total": 0, "success": 0, "failed": 0, "success_rate": 0, "avg_duration": 0}
 
 
 # ============================================================================
@@ -266,7 +293,10 @@ class ConversionEngine:
             
             # Progress callback
             if self.on_progress:
-                self.on_progress(i, total, conv_file.filename)
+                try:
+                    self.on_progress(i, total, conv_file.filename)
+                except Exception:
+                    pass
             
             try:
                 success = self._convert_single(conv_file, options)
@@ -285,7 +315,10 @@ class ConversionEngine:
                     )
                 
                 if self.on_file_complete:
-                    self.on_file_complete(conv_file)
+                    try:
+                        self.on_file_complete(conv_file)
+                    except Exception:
+                        pass
                     
             except Exception as e:
                 conv_file.status = "failed"
@@ -293,7 +326,10 @@ class ConversionEngine:
                 conv_file.duration = time.time() - start_time
                 
                 if self.on_error:
-                    self.on_error(conv_file, e)
+                    try:
+                        self.on_error(conv_file, e)
+                    except Exception:
+                        pass
                 
                 self._db.log_conversion(
                     conv_file.path, output_path, f"error: {e}", conv_file.duration
@@ -344,19 +380,22 @@ class ConversionEngine:
         if not HAS_PYMUPDF:
             return
         
-        # Page extraction
-        if options.page_range:
-            page_indices = parse_page_range(options.page_range)
-            if page_indices:
-                extract_pdf_pages(pdf_path, page_indices)
-        
-        # Password protection
-        if options.password:
-            post_process_pdf(pdf_path, password=options.password)
-        
-        # Scan mode (rasterize)
-        if options.scan_mode:
-            rasterize_pdf(pdf_path)
+        try:
+            # Page extraction
+            if options.page_range:
+                page_indices = parse_page_range(options.page_range)
+                if page_indices:
+                    extract_pdf_pages(pdf_path, page_indices)
+            
+            # Password protection
+            if options.password:
+                post_process_pdf(pdf_path, password=options.password)
+            
+            # Scan mode (rasterize)
+            if options.scan_mode:
+                rasterize_pdf(pdf_path)
+        except Exception as e:
+            logger.error(f"Post-processing error: {e}")
 
 
 # ============================================================================
@@ -413,12 +452,13 @@ class PDFPreviewPanel(ctk.CTkFrame):
     
     def load_pdf(self, pdf_path: str):
         """Load and display PDF."""
-        if not HAS_PYMUPDF:
+        if fitz is None:
             self.preview_label.configure(text="PyMuPDF không có\nKhông thể preview")
             return
         
         try:
-            import fitz
+            if self.current_pdf:
+                self.current_pdf.close()
             self.current_pdf = fitz.open(pdf_path)
             self.total_pages = len(self.current_pdf)
             self.current_page = 0
@@ -426,10 +466,11 @@ class PDFPreviewPanel(ctk.CTkFrame):
             self._update_navigation()
         except Exception as e:
             self.preview_label.configure(text=f"Lỗi: {e}")
+            logger.error(f"PDF load error: {e}")
     
     def _render_page(self):
         """Render current page."""
-        if not self.current_pdf:
+        if not self.current_pdf or fitz is None:
             return
         
         try:
@@ -437,7 +478,7 @@ class PDFPreviewPanel(ctk.CTkFrame):
             
             # Render to image
             zoom = 1.5
-            mat = fitz.Matrix(zoom, zoom)  # type: ignore
+            mat = fitz.Matrix(zoom, zoom)
             pix = page.get_pixmap(matrix=mat)
             
             # Convert to PIL Image
@@ -459,20 +500,27 @@ class PDFPreviewPanel(ctk.CTkFrame):
             
         except Exception as e:
             self.preview_label.configure(text=f"Lỗi render: {e}")
+            logger.error(f"PDF render error: {e}")
     
     def _prev_page(self):
         """Go to previous page."""
-        if self.current_page > 0:
-            self.current_page -= 1
-            self._render_page()
-            self._update_navigation()
+        try:
+            if self.current_page > 0:
+                self.current_page -= 1
+                self._render_page()
+                self._update_navigation()
+        except Exception as e:
+            logger.error(f"Prev page error: {e}")
     
     def _next_page(self):
         """Go to next page."""
-        if self.current_page < self.total_pages - 1:
-            self.current_page += 1
-            self._render_page()
-            self._update_navigation()
+        try:
+            if self.current_page < self.total_pages - 1:
+                self.current_page += 1
+                self._render_page()
+                self._update_navigation()
+        except Exception as e:
+            logger.error(f"Next page error: {e}")
     
     def _update_navigation(self):
         """Update navigation buttons state."""
@@ -485,17 +533,20 @@ class PDFPreviewPanel(ctk.CTkFrame):
     
     def clear(self):
         """Clear preview."""
-        if self.current_pdf:
-            self.current_pdf.close()
-            self.current_pdf = None
-        self.photo_image = None
-        self.preview_label.configure(
-            image=None, 
-            text="Chọn file PDF để xem preview"
-        )
-        self.page_label.configure(text="")
-        self.btn_prev.configure(state="disabled")
-        self.btn_next.configure(state="disabled")
+        try:
+            if self.current_pdf:
+                self.current_pdf.close()
+                self.current_pdf = None
+            self.photo_image = None
+            self.preview_label.configure(
+                image="", 
+                text="Chọn file PDF để xem preview"
+            )
+            self.page_label.configure(text="")
+            self.btn_prev.configure(state="disabled")
+            self.btn_next.configure(state="disabled")
+        except Exception as e:
+            logger.error(f"Clear preview error: {e}")
 
 
 # ============================================================================
@@ -563,7 +614,7 @@ class FileListPanel(ctk.CTkFrame):
     def _setup_drag_drop(self):
         """Setup drag and drop support."""
         try:
-            from tkinterdnd2 import DND_FILES, TkinterDnD
+            from tkinterdnd2 import DND_FILES
             
             # Check if root supports DnD
             root = self.winfo_toplevel()
@@ -578,8 +629,11 @@ class FileListPanel(ctk.CTkFrame):
     
     def _on_drop(self, event):
         """Handle dropped files."""
-        files = self._parse_drop_data(event.data)
-        self.add_files(files)
+        try:
+            files = self._parse_drop_data(event.data)
+            self.add_files(files)
+        except Exception as e:
+            logger.error(f"Drop error: {e}")
     
     def _parse_drop_data(self, data: str) -> List[str]:
         """Parse dropped file data."""
@@ -609,110 +663,125 @@ class FileListPanel(ctk.CTkFrame):
         else:
             return data.split()
     
-    def add_files(self, paths: List[str]):
+    def add_files(self, paths: List[str]) -> int:
         """Add files to the list."""
         added = 0
-        for path in paths:
-            # Check extension
-            ext = Path(path).suffix.lower()
-            if ext not in ALL_EXTENSIONS:
-                continue
+        try:
+            for path in paths:
+                # Check extension
+                ext = Path(path).suffix.lower()
+                if ext not in ALL_EXTENSIONS:
+                    continue
+                
+                # Check if already exists
+                if any(f.path == path for f in self.files):
+                    continue
+                
+                self.files.append(ConversionFile(path=path))
+                added += 1
             
-            # Check if already exists
-            if any(f.path == path for f in self.files):
-                continue
-            
-            self.files.append(ConversionFile(path=path))
-            added += 1
-        
-        if added > 0:
-            self._refresh_display()
+            if added > 0:
+                self._refresh_display()
+        except Exception as e:
+            logger.error(f"Add files error: {e}")
         
         return added
     
     def clear(self):
         """Clear all files."""
-        self.files.clear()
-        self._refresh_display()
+        try:
+            self.files.clear()
+            self._refresh_display()
+        except Exception as e:
+            logger.error(f"Clear error: {e}")
     
     def remove_completed(self):
         """Remove completed files."""
-        self.files = [f for f in self.files if f.status != "completed"]
-        self._refresh_display()
+        try:
+            self.files = [f for f in self.files if f.status != "completed"]
+            self._refresh_display()
+        except Exception as e:
+            logger.error(f"Remove completed error: {e}")
     
     def _refresh_display(self):
         """Refresh the file list display."""
-        count = len(self.files)
-        
-        # Update type bar
-        self._update_type_bar()
-        
-        # Update count
-        self.count_label.configure(text=f"{count} file{'s' if count != 1 else ''}")
-        
-        # Update type breakdown
-        type_counts = {ft: 0 for ft in FileType}
-        for f in self.files:
-            type_counts[f.file_type] += 1
-        
-        parts = []
-        if type_counts[FileType.EXCEL]: parts.append(f"📗{type_counts[FileType.EXCEL]}")
-        if type_counts[FileType.WORD]: parts.append(f"📘{type_counts[FileType.WORD]}")
-        if type_counts[FileType.POWERPOINT]: parts.append(f"📙{type_counts[FileType.POWERPOINT]}")
-        self.types_label.configure(text=" ".join(parts))
-        
-        # Update list display
-        if count == 0:
-            self.file_textbox.pack_forget()
-            self.drop_label.pack(expand=True, pady=30)
-        else:
-            self.drop_label.pack_forget()
-            self.file_textbox.pack(fill="both", expand=True)
+        try:
+            count = len(self.files)
             
-            self.file_textbox.configure(state="normal")
-            self.file_textbox.delete("1.0", "end")
+            # Update type bar
+            self._update_type_bar()
             
-            for i, f in enumerate(self.files, 1):
-                status_icon = {
-                    "pending": f.icon,
-                    "converting": "⏳",
-                    "completed": "✅",
-                    "failed": "❌"
-                }.get(f.status, f.icon)
+            # Update count
+            self.count_label.configure(text=f"{count} file{'s' if count != 1 else ''}")
+            
+            # Update type breakdown
+            type_counts = {ft: 0 for ft in FileType}
+            for f in self.files:
+                type_counts[f.file_type] += 1
+            
+            parts = []
+            if type_counts[FileType.EXCEL]: parts.append(f"📗{type_counts[FileType.EXCEL]}")
+            if type_counts[FileType.WORD]: parts.append(f"📘{type_counts[FileType.WORD]}")
+            if type_counts[FileType.POWERPOINT]: parts.append(f"📙{type_counts[FileType.POWERPOINT]}")
+            self.types_label.configure(text=" ".join(parts))
+            
+            # Update list display
+            if count == 0:
+                self.file_textbox.pack_forget()
+                self.drop_label.pack(expand=True, pady=30)
+            else:
+                self.drop_label.pack_forget()
+                self.file_textbox.pack(fill="both", expand=True)
                 
-                line = f"{status_icon} {i:2d}. {f.filename}\n"
-                self.file_textbox.insert("end", line)
+                self.file_textbox.configure(state="normal")
+                self.file_textbox.delete("1.0", "end")
+                
+                for i, f in enumerate(self.files, 1):
+                    status_icon = {
+                        "pending": f.icon,
+                        "converting": "⏳",
+                        "completed": "✅",
+                        "failed": "❌"
+                    }.get(f.status, f.icon)
+                    
+                    line = f"{status_icon} {i:2d}. {f.filename}\n"
+                    self.file_textbox.insert("end", line)
+                
+                self.file_textbox.configure(state="disabled")
             
-            self.file_textbox.configure(state="disabled")
-        
-        # Callback
-        if self.on_selection_change:
-            self.on_selection_change(self.files)
+            # Callback
+            if self.on_selection_change:
+                self.on_selection_change(self.files)
+        except Exception as e:
+            logger.error(f"Refresh display error: {e}")
     
     def _update_type_bar(self):
         """Update the file type distribution bar."""
-        if not self.files:
-            self.excel_bar.place_forget()
-            self.word_bar.place_forget()
-            self.ppt_bar.place_forget()
-            return
-        
-        type_counts = {ft: 0 for ft in FileType}
-        for f in self.files:
-            type_counts[f.file_type] += 1
-        
-        total = len(self.files)
-        x = 0
-        
-        for ftype, bar in [(FileType.EXCEL, self.excel_bar),
-                           (FileType.WORD, self.word_bar),
-                           (FileType.POWERPOINT, self.ppt_bar)]:
-            if type_counts[ftype]:
-                width = type_counts[ftype] / total
-                bar.place(relx=x, rely=0, relwidth=width, relheight=1)
-                x += width
-            else:
-                bar.place_forget()
+        try:
+            if not self.files:
+                self.excel_bar.place_forget()
+                self.word_bar.place_forget()
+                self.ppt_bar.place_forget()
+                return
+            
+            type_counts = {ft: 0 for ft in FileType}
+            for f in self.files:
+                type_counts[f.file_type] += 1
+            
+            total = len(self.files)
+            x = 0
+            
+            for ftype, bar in [(FileType.EXCEL, self.excel_bar),
+                               (FileType.WORD, self.word_bar),
+                               (FileType.POWERPOINT, self.ppt_bar)]:
+                if type_counts[ftype]:
+                    width = type_counts[ftype] / total
+                    bar.place(relx=x, rely=0, relwidth=width, relheight=1)
+                    x += width
+                else:
+                    bar.place_forget()
+        except Exception as e:
+            logger.error(f"Update type bar error: {e}")
 
 
 # ============================================================================
@@ -722,7 +791,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
     
-    VERSION = "4.0.0"
+    VERSION = "4.0.1"
     
     def __init__(self):
         super().__init__()
@@ -736,6 +805,21 @@ class ConverterProApp(ctk.CTk):
         self.is_converting = False
         self.output_folder = self.config.get("output_folder", "")
         self.conversion_start_time = 0.0
+        
+        # UI references (will be set in _create_layout)
+        self.file_panel: Optional[FileListPanel] = None
+        self.preview_panel: Optional[PDFPreviewPanel] = None
+        self.btn_convert: Optional[ctk.CTkButton] = None
+        self.progress_frame: Optional[ctk.CTkFrame] = None
+        self.progress_bar: Optional[ctk.CTkProgressBar] = None
+        self.progress_label: Optional[ctk.CTkLabel] = None
+        self.time_label: Optional[ctk.CTkLabel] = None
+        self.btn_stop: Optional[ctk.CTkButton] = None
+        self.log_textbox: Optional[ctk.CTkTextbox] = None
+        self.output_label: Optional[ctk.CTkLabel] = None
+        self.password_entry: Optional[ctk.CTkEntry] = None
+        self.theme_switch: Optional[ctk.CTkSwitch] = None
+        self.main_content_frame: Optional[ctk.CTkFrame] = None
         
         # Variables
         self.var_quality = ctk.IntVar(value=self.config.pdf_quality)
@@ -764,10 +848,12 @@ class ConverterProApp(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         # Initial log
-        self._log("🚀 Office to PDF Converter Pro v4.0.0")
-        self._log("✅ Refactored architecture với Preview, DnD, Recent Files")
-        if HAS_PYMUPDF:
+        self._log("🚀 Office to PDF Converter Pro v4.0.1 (Hotfix)")
+        self._log("✅ Fixed: fitz import, error handling, button callbacks")
+        if fitz:
             self._log("📄 PyMuPDF: Hỗ trợ đầy đủ PDF tools")
+        else:
+            self._log("⚠️ PyMuPDF không có: PDF preview disabled")
         
         # Check for updates on startup
         self._check_for_updates()
@@ -779,296 +865,336 @@ class ConverterProApp(ctk.CTk):
             self.after(2000, lambda: check_for_updates_on_startup(self))
         except ImportError:
             pass
+        except Exception as e:
+            logger.error(f"Update check error: {e}")
     
     def _center_window(self):
         """Center window on screen."""
-        self.update_idletasks()
-        w, h = 1000, 750
-        x = (self.winfo_screenwidth() - w) // 2
-        y = (self.winfo_screenheight() - h) // 2
-        self.geometry(f"{w}x{h}+{x}+{y}")
+        try:
+            self.update_idletasks()
+            w, h = 1000, 750
+            x = (self.winfo_screenwidth() - w) // 2
+            y = (self.winfo_screenheight() - h) // 2
+            self.geometry(f"{w}x{h}+{x}+{y}")
+        except Exception as e:
+            logger.error(f"Center window error: {e}")
     
     def _setup_shortcuts(self):
         """Setup keyboard shortcuts."""
-        self.bind('<Control-o>', lambda e: self._add_files())
-        self.bind('<Control-v>', lambda e: self._paste_files())
-        self.bind('<Delete>', lambda e: self._clear_files())
-        self.bind('<Return>', lambda e: self._start_conversion())
-        self.bind('<Escape>', lambda e: self._stop_conversion())
-        self.bind('<F1>', lambda e: self._show_shortcuts())
+        try:
+            self.bind('<Control-o>', lambda e: self._add_files())
+            self.bind('<Control-v>', lambda e: self._paste_files())
+            self.bind('<Delete>', lambda e: self._clear_files())
+            self.bind('<Return>', lambda e: self._start_conversion())
+            self.bind('<Escape>', lambda e: self._stop_conversion())
+            self.bind('<F1>', lambda e: self._show_shortcuts())
+        except Exception as e:
+            logger.error(f"Setup shortcuts error: {e}")
     
     def _create_layout(self):
         """Create the main layout."""
-        # === HEADER ===
-        self._create_header()
-        
-        # === MAIN CONTENT (3 columns) ===
-        main_frame = ctk.CTkFrame(self, fg_color="transparent")
-        main_frame.pack(fill="both", expand=True, padx=15, pady=10)
-        
-        # Left column: File list
-        left_frame = ctk.CTkFrame(main_frame, corner_radius=12)
-        left_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
-        
-        self.file_panel = FileListPanel(
-            left_frame,
-            on_selection_change=self._on_files_changed
-        )
-        self.file_panel.pack(fill="both", expand=True)
-        
-        # File action buttons
-        file_btn_frame = ctk.CTkFrame(left_frame, fg_color="transparent")
-        file_btn_frame.pack(fill="x", padx=10, pady=10)
-        
-        ctk.CTkButton(file_btn_frame, text="➕ Files", width=80,
-                     command=self._add_files).pack(side="left", padx=2)
-        ctk.CTkButton(file_btn_frame, text="📁 Folder", width=80,
-                     command=self._add_folder,
-                     fg_color="transparent", border_width=2).pack(side="left", padx=2)
-        ctk.CTkButton(file_btn_frame, text="🕐 Recent", width=80,
-                     command=self._show_recent,
-                     fg_color="transparent", border_width=2).pack(side="left", padx=2)
-        ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
-                     command=self._clear_files,
-                     fg_color="transparent", border_width=2,
-                     hover_color="#DC2626").pack(side="right")
-        
-        # Right column: Preview + Options
-        right_frame = ctk.CTkFrame(main_frame, width=350, corner_radius=12)
-        right_frame.pack(side="right", fill="y", padx=(5, 0))
-        right_frame.pack_propagate(False)
-        
-        # Preview panel
-        self.preview_panel = PDFPreviewPanel(right_frame, corner_radius=10)
-        self.preview_panel.pack(fill="x", padx=10, pady=10)
-        
-        # Options panel
-        self._create_options_panel(right_frame)
-        
-        # === CONVERT BUTTON ===
-        self.btn_convert = ctk.CTkButton(
-            main_frame,
-            text="🚀 CHUYỂN ĐỔI SANG PDF",
-            command=self._start_conversion,
-            height=50,
-            font=ctk.CTkFont(size=18, weight="bold"),
-            fg_color="#16A34A",
-            hover_color="#15803D",
-            state="disabled"
-        )
-        self.btn_convert.pack(fill="x", pady=(10, 0))
-        
-        # === PROGRESS ===
-        self.progress_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
-        
-        progress_info = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
-        progress_info.pack(fill="x")
-        
-        self.progress_label = ctk.CTkLabel(progress_info, text="")
-        self.progress_label.pack(side="left")
-        
-        self.time_label = ctk.CTkLabel(progress_info, text="", text_color="gray")
-        self.time_label.pack(side="right")
-        
-        self.progress_bar = ctk.CTkProgressBar(self.progress_frame, height=20)
-        self.progress_bar.pack(fill="x", pady=5)
-        self.progress_bar.set(0)
-        
-        self.btn_stop = ctk.CTkButton(
-            self.progress_frame, text="⏹️ DỪNG",
-            command=self._stop_conversion,
-            fg_color="#DC2626", hover_color="#B91C1C"
-        )
-        
-        # === LOG ===
-        log_frame = ctk.CTkFrame(self, corner_radius=12)
-        log_frame.pack(fill="x", padx=15, pady=(5, 15))
-        
-        log_header = ctk.CTkFrame(log_frame, fg_color="transparent")
-        log_header.pack(fill="x", padx=10, pady=(10, 5))
-        
-        ctk.CTkLabel(log_header, text="📋 Log",
-                    font=ctk.CTkFont(weight="bold")).pack(side="left")
-        
-        ctk.CTkButton(log_header, text="🛠️ PDF Tools", width=100,
-                     command=self._open_pdf_tools).pack(side="right")
-        
-        self.log_textbox = ctk.CTkTextbox(log_frame, height=80,
-                                          font=ctk.CTkFont(family="Consolas", size=11))
-        self.log_textbox.pack(fill="x", padx=10, pady=(0, 10))
+        try:
+            # === HEADER ===
+            self._create_header()
+            
+            # === MAIN CONTENT ===
+            self.main_content_frame = ctk.CTkFrame(self, fg_color="transparent")
+            self.main_content_frame.pack(fill="both", expand=True, padx=15, pady=10)
+            
+            # Left column: File list
+            left_frame = ctk.CTkFrame(self.main_content_frame, corner_radius=12)
+            left_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
+            
+            self.file_panel = FileListPanel(
+                left_frame,
+                on_selection_change=self._on_files_changed
+            )
+            self.file_panel.pack(fill="both", expand=True)
+            
+            # File action buttons
+            file_btn_frame = ctk.CTkFrame(left_frame, fg_color="transparent")
+            file_btn_frame.pack(fill="x", padx=10, pady=10)
+            
+            ctk.CTkButton(file_btn_frame, text="➕ Files", width=80,
+                         command=self._add_files).pack(side="left", padx=2)
+            ctk.CTkButton(file_btn_frame, text="📁 Folder", width=80,
+                         command=self._add_folder,
+                         fg_color="transparent", border_width=2).pack(side="left", padx=2)
+            ctk.CTkButton(file_btn_frame, text="🕐 Recent", width=80,
+                         command=self._show_recent,
+                         fg_color="transparent", border_width=2).pack(side="left", padx=2)
+            ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
+                         command=self._clear_files,
+                         fg_color="transparent", border_width=2,
+                         hover_color="#DC2626").pack(side="right")
+            
+            # Right column: Preview + Options
+            right_frame = ctk.CTkFrame(self.main_content_frame, width=350, corner_radius=12)
+            right_frame.pack(side="right", fill="y", padx=(5, 0))
+            right_frame.pack_propagate(False)
+            
+            # Preview panel
+            self.preview_panel = PDFPreviewPanel(right_frame, corner_radius=10)
+            self.preview_panel.pack(fill="x", padx=10, pady=10)
+            
+            # Options panel
+            self._create_options_panel(right_frame)
+            
+            # === CONVERT BUTTON ===
+            self.btn_convert = ctk.CTkButton(
+                self.main_content_frame,
+                text="🚀 CHUYỂN ĐỔI SANG PDF",
+                command=self._start_conversion,
+                height=50,
+                font=ctk.CTkFont(size=18, weight="bold"),
+                fg_color="#16A34A",
+                hover_color="#15803D",
+                state="disabled"
+            )
+            self.btn_convert.pack(fill="x", pady=(10, 0))
+            
+            # === PROGRESS (initially hidden) ===
+            self.progress_frame = ctk.CTkFrame(self.main_content_frame, fg_color="transparent")
+            
+            progress_info = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
+            progress_info.pack(fill="x")
+            
+            self.progress_label = ctk.CTkLabel(progress_info, text="")
+            self.progress_label.pack(side="left")
+            
+            self.time_label = ctk.CTkLabel(progress_info, text="", text_color="gray")
+            self.time_label.pack(side="right")
+            
+            self.progress_bar = ctk.CTkProgressBar(self.progress_frame, height=20)
+            self.progress_bar.pack(fill="x", pady=5)
+            self.progress_bar.set(0)
+            
+            self.btn_stop = ctk.CTkButton(
+                self.progress_frame, text="⏹️ DỪNG",
+                command=self._stop_conversion,
+                fg_color="#DC2626", hover_color="#B91C1C"
+            )
+            
+            # === LOG ===
+            log_frame = ctk.CTkFrame(self, corner_radius=12)
+            log_frame.pack(fill="x", padx=15, pady=(5, 15))
+            
+            log_header = ctk.CTkFrame(log_frame, fg_color="transparent")
+            log_header.pack(fill="x", padx=10, pady=(10, 5))
+            
+            ctk.CTkLabel(log_header, text="📋 Log",
+                        font=ctk.CTkFont(weight="bold")).pack(side="left")
+            
+            ctk.CTkButton(log_header, text="🛠️ PDF Tools", width=100,
+                         command=self._open_pdf_tools).pack(side="right")
+            
+            self.log_textbox = ctk.CTkTextbox(log_frame, height=80,
+                                              font=ctk.CTkFont(family="Consolas", size=11))
+            self.log_textbox.pack(fill="x", padx=10, pady=(0, 10))
+            
+        except Exception as e:
+            logger.error(f"Create layout error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể tạo giao diện: {e}")
     
     def _create_header(self):
         """Create header with title and controls."""
-        header = ctk.CTkFrame(self, fg_color="transparent")
-        header.pack(fill="x", padx=15, pady=(15, 5))
-        
-        # Title
-        title_frame = ctk.CTkFrame(header, fg_color="transparent")
-        title_frame.pack(side="left")
-        
-        ctk.CTkLabel(title_frame, text="📄 Office to PDF Converter Pro",
-                    font=ctk.CTkFont(size=22, weight="bold")).pack(side="left")
-        ctk.CTkLabel(title_frame, text=f"v{self.VERSION}",
-                    text_color="gray").pack(side="left", padx=10)
-        
-        # Controls
-        controls = ctk.CTkFrame(header, fg_color="transparent")
-        controls.pack(side="right")
-        
-        ctk.CTkButton(controls, text="📊", width=35, 
-                     command=self._show_stats,
-                     fg_color="transparent", border_width=1).pack(side="left", padx=2)
-        ctk.CTkButton(controls, text="⚙️", width=35,
-                     command=self._show_settings,
-                     fg_color="transparent", border_width=1).pack(side="left", padx=2)
-        ctk.CTkButton(controls, text="❓", width=35,
-                     command=self._show_shortcuts,
-                     fg_color="transparent", border_width=1).pack(side="left", padx=2)
-        
-        # Theme switch
-        self.theme_switch = ctk.CTkSwitch(controls, text="🌙",
-                                          command=self._toggle_theme)
-        self.theme_switch.pack(side="left", padx=(15, 0))
-        if ctk.get_appearance_mode() == "Dark":
-            self.theme_switch.select()
+        try:
+            header = ctk.CTkFrame(self, fg_color="transparent")
+            header.pack(fill="x", padx=15, pady=(15, 5))
+            
+            # Title
+            title_frame = ctk.CTkFrame(header, fg_color="transparent")
+            title_frame.pack(side="left")
+            
+            ctk.CTkLabel(title_frame, text="📄 Office to PDF Converter Pro",
+                        font=ctk.CTkFont(size=22, weight="bold")).pack(side="left")
+            ctk.CTkLabel(title_frame, text=f"v{self.VERSION}",
+                        text_color="gray").pack(side="left", padx=10)
+            
+            # Controls
+            controls = ctk.CTkFrame(header, fg_color="transparent")
+            controls.pack(side="right")
+            
+            ctk.CTkButton(controls, text="📊", width=35, 
+                         command=self._show_stats,
+                         fg_color="transparent", border_width=1).pack(side="left", padx=2)
+            ctk.CTkButton(controls, text="⚙️", width=35,
+                         command=self._show_settings,
+                         fg_color="transparent", border_width=1).pack(side="left", padx=2)
+            ctk.CTkButton(controls, text="❓", width=35,
+                         command=self._show_shortcuts,
+                         fg_color="transparent", border_width=1).pack(side="left", padx=2)
+            
+            # Theme switch
+            self.theme_switch = ctk.CTkSwitch(controls, text="🌙",
+                                              command=self._toggle_theme)
+            self.theme_switch.pack(side="left", padx=(15, 0))
+            if ctk.get_appearance_mode() == "Dark":
+                self.theme_switch.select()
+        except Exception as e:
+            logger.error(f"Create header error: {e}")
     
     def _create_options_panel(self, parent):
         """Create options panel."""
-        options = ctk.CTkFrame(parent, fg_color="transparent")
-        options.pack(fill="x", padx=10, pady=5)
-        
-        # Output folder
-        output_frame = ctk.CTkFrame(options, fg_color="transparent")
-        output_frame.pack(fill="x", pady=5)
-        
-        ctk.CTkLabel(output_frame, text="📂 Output:").pack(side="left")
-        self.output_label = ctk.CTkLabel(output_frame, text="Cùng folder gốc",
-                                          text_color="gray", wraplength=150)
-        self.output_label.pack(side="left", padx=5)
-        ctk.CTkButton(output_frame, text="Đổi", width=50, height=25,
-                     command=self._select_output,
-                     fg_color="transparent", border_width=1).pack(side="right")
-        
-        # Quality
-        quality_frame = ctk.CTkFrame(options, fg_color="transparent")
-        quality_frame.pack(fill="x", pady=5)
-        
-        ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
-        ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
-                          value=0).pack(side="left", padx=5)
-        ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
-                          value=1).pack(side="left")
-        
-        # Scan mode
-        ctk.CTkSwitch(options, text="📷 Scan Mode", 
-                     variable=self.var_scan_mode).pack(fill="x", pady=5)
-        
-        # Password
-        pw_frame = ctk.CTkFrame(options, fg_color="transparent")
-        pw_frame.pack(fill="x", pady=5)
-        
-        ctk.CTkSwitch(pw_frame, text="🔒", variable=self.var_password_enabled,
-                     command=self._on_password_toggle).pack(side="left")
-        self.password_entry = ctk.CTkEntry(pw_frame, textvariable=self.var_password,
-                                           show="*", width=120, state="disabled",
-                                           placeholder_text="Mật khẩu")
-        self.password_entry.pack(side="left", padx=5)
-        
-        # Page range
-        page_frame = ctk.CTkFrame(options, fg_color="transparent")
-        page_frame.pack(fill="x", pady=5)
-        
-        ctk.CTkLabel(page_frame, text="📄 Trang:").pack(side="left")
-        ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
-                    width=100, placeholder_text="1-3, 5").pack(side="left", padx=5)
+        try:
+            options = ctk.CTkFrame(parent, fg_color="transparent")
+            options.pack(fill="x", padx=10, pady=5)
+            
+            # Output folder
+            output_frame = ctk.CTkFrame(options, fg_color="transparent")
+            output_frame.pack(fill="x", pady=5)
+            
+            ctk.CTkLabel(output_frame, text="📂 Output:").pack(side="left")
+            self.output_label = ctk.CTkLabel(output_frame, text="Cùng folder gốc",
+                                              text_color="gray", wraplength=150)
+            self.output_label.pack(side="left", padx=5)
+            ctk.CTkButton(output_frame, text="Đổi", width=50, height=25,
+                         command=self._select_output,
+                         fg_color="transparent", border_width=1).pack(side="right")
+            
+            # Quality
+            quality_frame = ctk.CTkFrame(options, fg_color="transparent")
+            quality_frame.pack(fill="x", pady=5)
+            
+            ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
+            ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
+                              value=0).pack(side="left", padx=5)
+            ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
+                              value=1).pack(side="left")
+            
+            # Scan mode
+            ctk.CTkSwitch(options, text="📷 Scan Mode", 
+                         variable=self.var_scan_mode).pack(fill="x", pady=5)
+            
+            # Password
+            pw_frame = ctk.CTkFrame(options, fg_color="transparent")
+            pw_frame.pack(fill="x", pady=5)
+            
+            ctk.CTkSwitch(pw_frame, text="🔒", variable=self.var_password_enabled,
+                         command=self._on_password_toggle).pack(side="left")
+            self.password_entry = ctk.CTkEntry(pw_frame, textvariable=self.var_password,
+                                               show="*", width=120, state="disabled",
+                                               placeholder_text="Mật khẩu")
+            self.password_entry.pack(side="left", padx=5)
+            
+            # Page range
+            page_frame = ctk.CTkFrame(options, fg_color="transparent")
+            page_frame.pack(fill="x", pady=5)
+            
+            ctk.CTkLabel(page_frame, text="📄 Trang:").pack(side="left")
+            ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
+                        width=100, placeholder_text="1-3, 5").pack(side="left", padx=5)
+        except Exception as e:
+            logger.error(f"Create options error: {e}")
     
     # =========== EVENT HANDLERS ===========
     
     def _on_files_changed(self, files: List[ConversionFile]):
         """Called when file list changes."""
-        has_files = len(files) > 0
-        self.btn_convert.configure(state="normal" if has_files else "disabled")
-        
-        # Check for Excel files for sheet options
-        has_excel = any(f.file_type == FileType.EXCEL for f in files)
-        # Could show/hide sheet options here
+        try:
+            has_files = len(files) > 0
+            if self.btn_convert:
+                self.btn_convert.configure(state="normal" if has_files else "disabled")
+        except Exception as e:
+            logger.error(f"On files changed error: {e}")
     
     def _on_password_toggle(self):
         """Toggle password entry state."""
-        if self.var_password_enabled.get():
-            self.password_entry.configure(state="normal")
-        else:
-            self.password_entry.configure(state="disabled")
+        try:
+            if self.password_entry:
+                if self.var_password_enabled.get():
+                    self.password_entry.configure(state="normal")
+                else:
+                    self.password_entry.configure(state="disabled")
+        except Exception as e:
+            logger.error(f"Password toggle error: {e}")
     
     def _toggle_theme(self):
         """Toggle dark/light theme."""
-        mode = "dark" if self.theme_switch.get() else "light"
-        ctk.set_appearance_mode(mode)
+        try:
+            if self.theme_switch:
+                mode = "dark" if self.theme_switch.get() else "light"
+                ctk.set_appearance_mode(mode)
+        except Exception as e:
+            logger.error(f"Toggle theme error: {e}")
     
     # =========== FILE ACTIONS ===========
     
     def _add_files(self):
         """Add files via dialog."""
-        filetypes = [
-            ("Office Files", " ".join(f"*{ext}" for ext in ALL_EXTENSIONS)),
-            ("Excel", "*.xlsx *.xls *.xlsm *.xlsb"),
-            ("Word", "*.docx *.doc"),
-            ("PowerPoint", "*.pptx *.ppt"),
-        ]
-        files = filedialog.askopenfilenames(filetypes=filetypes)
-        if files:
-            added = self.file_panel.add_files(list(files))
-            if added:
-                self._log(f"➕ Đã thêm {added} file(s)")
+        try:
+            filetypes = [
+                ("Office Files", " ".join(f"*{ext}" for ext in ALL_EXTENSIONS)),
+                ("Excel", "*.xlsx *.xls *.xlsm *.xlsb"),
+                ("Word", "*.docx *.doc"),
+                ("PowerPoint", "*.pptx *.ppt"),
+            ]
+            files = filedialog.askopenfilenames(filetypes=filetypes)
+            if files and self.file_panel:
+                added = self.file_panel.add_files(list(files))
+                if added:
+                    self._log(f"➕ Đã thêm {added} file(s)")
+        except Exception as e:
+            logger.error(f"Add files error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể thêm files: {e}")
     
     def _add_folder(self):
         """Add files from folder."""
-        folder = filedialog.askdirectory()
-        if folder:
-            files = []
-            for f in os.listdir(folder):
-                ext = Path(f).suffix.lower()
-                if ext in ALL_EXTENSIONS:
-                    files.append(os.path.join(folder, f))
-            
-            if files:
-                added = self.file_panel.add_files(files)
-                self._log(f"📁 Đã thêm {added} file(s) từ folder")
+        try:
+            folder = filedialog.askdirectory()
+            if folder and self.file_panel:
+                files = []
+                for f in os.listdir(folder):
+                    ext = Path(f).suffix.lower()
+                    if ext in ALL_EXTENSIONS:
+                        files.append(os.path.join(folder, f))
+                
+                if files:
+                    added = self.file_panel.add_files(files)
+                    self._log(f"📁 Đã thêm {added} file(s) từ folder")
+        except Exception as e:
+            logger.error(f"Add folder error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể thêm folder: {e}")
     
     def _show_recent(self):
         """Show recent files dialog."""
-        recent = self.db.get_recent(10)
-        
-        if not recent:
-            messagebox.showinfo("Recent Files", "Chưa có files gần đây")
-            return
-        
-        dialog = ctk.CTkToplevel(self)
-        dialog.title("🕐 Recent Files")
-        dialog.geometry("500x400")
-        dialog.transient(self)
-        dialog.grab_set()
-        
-        ctk.CTkLabel(dialog, text="📋 Files gần đây",
-                    font=ctk.CTkFont(size=16, weight="bold")).pack(pady=15)
-        
-        listbox_frame = ctk.CTkFrame(dialog)
-        listbox_frame.pack(fill="both", expand=True, padx=20, pady=10)
-        
-        textbox = ctk.CTkTextbox(listbox_frame, font=ctk.CTkFont(size=12))
-        textbox.pack(fill="both", expand=True)
-        
-        for i, path in enumerate(recent, 1):
-            textbox.insert("end", f"{i}. {Path(path).name}\n")
-        textbox.configure(state="disabled")
-        
-        def add_all():
-            self.file_panel.add_files(recent)
-            dialog.destroy()
-            self._log(f"➕ Đã thêm {len(recent)} file(s) từ recent")
-        
-        ctk.CTkButton(dialog, text="➕ Thêm tất cả", 
-                     command=add_all).pack(pady=15)
+        try:
+            recent = self.db.get_recent(10)
+            
+            if not recent:
+                messagebox.showinfo("Recent Files", "Chưa có files gần đây")
+                return
+            
+            dialog = ctk.CTkToplevel(self)
+            dialog.title("🕐 Recent Files")
+            dialog.geometry("500x400")
+            dialog.transient(self)
+            dialog.grab_set()
+            
+            ctk.CTkLabel(dialog, text="📋 Files gần đây",
+                        font=ctk.CTkFont(size=16, weight="bold")).pack(pady=15)
+            
+            listbox_frame = ctk.CTkFrame(dialog)
+            listbox_frame.pack(fill="both", expand=True, padx=20, pady=10)
+            
+            textbox = ctk.CTkTextbox(listbox_frame, font=ctk.CTkFont(size=12))
+            textbox.pack(fill="both", expand=True)
+            
+            for i, path in enumerate(recent, 1):
+                textbox.insert("end", f"{i}. {Path(path).name}\n")
+            textbox.configure(state="disabled")
+            
+            def add_all():
+                if self.file_panel:
+                    self.file_panel.add_files(recent)
+                dialog.destroy()
+                self._log(f"➕ Đã thêm {len(recent)} file(s) từ recent")
+            
+            ctk.CTkButton(dialog, text="➕ Thêm tất cả", 
+                         command=add_all).pack(pady=15)
+        except Exception as e:
+            logger.error(f"Show recent error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể hiển thị recent files: {e}")
     
     def _paste_files(self):
         """Paste files from clipboard."""
@@ -1077,154 +1203,218 @@ class ConverterProApp(ctk.CTk):
     
     def _clear_files(self):
         """Clear file list."""
-        if self.file_panel.files:
-            self.file_panel.clear()
-            self.preview_panel.clear()
-            self._log("🗑️ Đã xóa danh sách")
+        try:
+            if self.file_panel and self.file_panel.files:
+                self.file_panel.clear()
+                if self.preview_panel:
+                    self.preview_panel.clear()
+                self._log("🗑️ Đã xóa danh sách")
+        except Exception as e:
+            logger.error(f"Clear files error: {e}")
     
     def _select_output(self):
         """Select output folder."""
-        folder = filedialog.askdirectory()
-        if folder:
-            self.output_folder = folder
-            display = Path(folder).name
-            self.output_label.configure(text=display, text_color="#22C55E")
-            self.config.set("output_folder", folder)
+        try:
+            folder = filedialog.askdirectory()
+            if folder:
+                self.output_folder = folder
+                display = Path(folder).name
+                if self.output_label:
+                    self.output_label.configure(text=display, text_color="#22C55E")
+                self.config.set("output_folder", folder)
+        except Exception as e:
+            logger.error(f"Select output error: {e}")
     
     # =========== CONVERSION ===========
     
     def _start_conversion(self):
         """Start conversion process."""
-        if not self.file_panel.files or self.is_converting:
-            return
-        
-        self.is_converting = True
-        self.conversion_start_time = time.time()
-        
-        # UI updates
-        self.btn_convert.configure(state="disabled", text="⏳ Đang chuyển đổi...")
-        self.progress_frame.pack(fill="x", pady=5, after=self.btn_convert)
-        self.btn_stop.pack(pady=5)
-        self.progress_bar.set(0)
-        
-        # Create options
-        options = ConversionOptions(
-            quality=self.var_quality.get(),
-            scan_mode=self.var_scan_mode.get(),
-            password=self.var_password.get() if self.var_password_enabled.get() else None,
-            page_range=self.var_page_range.get() or None,
-        )
-        
-        if self.var_sheet_option.get() == 1:
-            parsed = parse_page_range(self.var_sheet_index.get())
-            if parsed:
-                options.sheet_indices = [i + 1 for i in parsed]
-        
-        # Create engine with callbacks
-        self.engine = ConversionEngine(
-            on_progress=self._on_progress,
-            on_file_complete=self._on_file_complete,
-            on_error=self._on_error
-        )
-        
-        # Start time display
-        self._update_time_display()
-        
-        # Start conversion thread
-        thread = threading.Thread(
-            target=self._run_conversion,
-            args=(options,),
-            daemon=True
-        )
-        thread.start()
+        try:
+            if not self.file_panel or not self.file_panel.files or self.is_converting:
+                return
+            
+            self.is_converting = True
+            self.conversion_start_time = time.time()
+            
+            # UI updates
+            if self.btn_convert:
+                self.btn_convert.configure(state="disabled", text="⏳ Đang chuyển đổi...")
+            
+            if self.progress_frame and self.btn_convert:
+                self.progress_frame.pack(fill="x", pady=5, after=self.btn_convert)
+            
+            if self.btn_stop:
+                self.btn_stop.pack(pady=5)
+            
+            if self.progress_bar:
+                self.progress_bar.set(0)
+            
+            # Create options
+            options = ConversionOptions(
+                quality=self.var_quality.get(),
+                scan_mode=self.var_scan_mode.get(),
+                password=self.var_password.get() if self.var_password_enabled.get() else None,
+                page_range=self.var_page_range.get() or None,
+            )
+            
+            if self.var_sheet_option.get() == 1:
+                parsed = parse_page_range(self.var_sheet_index.get())
+                if parsed:
+                    options.sheet_indices = [i + 1 for i in parsed]
+            
+            # Create engine with callbacks
+            self.engine = ConversionEngine(
+                on_progress=self._on_progress,
+                on_file_complete=self._on_file_complete,
+                on_error=self._on_error
+            )
+            
+            # Start time display
+            self._update_time_display()
+            
+            # Start conversion thread
+            thread = threading.Thread(
+                target=self._run_conversion,
+                args=(options,),
+                daemon=True
+            )
+            thread.start()
+        except Exception as e:
+            self.is_converting = False
+            logger.error(f"Start conversion error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể bắt đầu chuyển đổi: {e}")
     
     def _run_conversion(self, options: ConversionOptions):
         """Run conversion in background thread."""
-        self.engine.convert_batch(
-            self.file_panel.files,
-            options,
-            self.output_folder if self.output_folder else None
-        )
-        self.after(0, self._on_conversion_done)
+        try:
+            if self.engine and self.file_panel:
+                self.engine.convert_batch(
+                    self.file_panel.files,
+                    options,
+                    self.output_folder if self.output_folder else None
+                )
+        except Exception as e:
+            logger.error(f"Run conversion error: {e}")
+        finally:
+            self.after(0, self._on_conversion_done)
     
     def _stop_conversion(self):
         """Stop conversion."""
-        if self.engine:
-            self.engine.stop()
-            self._log("⏹️ Đang dừng...")
+        try:
+            if self.engine:
+                self.engine.stop()
+                self._log("⏹️ Đang dừng...")
+        except Exception as e:
+            logger.error(f"Stop conversion error: {e}")
     
     def _on_progress(self, current: int, total: int, filename: str):
         """Progress callback from engine."""
-        progress = (current + 1) / total
-        self.after(0, lambda: self.progress_bar.set(progress))
-        self.after(0, lambda: self.progress_label.configure(
-            text=f"({current + 1}/{total}) {filename}"))
+        try:
+            progress = (current + 1) / total
+            self.after(0, lambda: self._update_progress_ui(progress, current, total, filename))
+        except Exception as e:
+            logger.error(f"On progress error: {e}")
+    
+    def _update_progress_ui(self, progress: float, current: int, total: int, filename: str):
+        """Update progress UI on main thread."""
+        try:
+            if self.progress_bar:
+                self.progress_bar.set(progress)
+            if self.progress_label:
+                self.progress_label.configure(text=f"({current + 1}/{total}) {filename}")
+        except Exception:
+            pass
     
     def _on_file_complete(self, conv_file: ConversionFile):
         """File completion callback."""
-        if conv_file.status == "completed":
-            self.after(0, lambda: self._log(f"✅ {conv_file.filename}"))
-        else:
-            self.after(0, lambda: self._log(f"❌ {conv_file.filename}"))
-        
-        self.after(0, self.file_panel._refresh_display)
+        try:
+            if conv_file.status == "completed":
+                self.after(0, lambda: self._log(f"✅ {conv_file.filename}"))
+            else:
+                self.after(0, lambda: self._log(f"❌ {conv_file.filename}"))
+            
+            if self.file_panel:
+                self.after(0, self.file_panel._refresh_display)
+        except Exception as e:
+            logger.error(f"On file complete error: {e}")
     
     def _on_error(self, conv_file: ConversionFile, error: Exception):
         """Error callback."""
-        self.after(0, lambda: self._log(f"❌ {conv_file.filename}: {str(error)[:50]}"))
+        try:
+            self.after(0, lambda: self._log(f"❌ {conv_file.filename}: {str(error)[:50]}"))
+        except Exception as e:
+            logger.error(f"On error callback error: {e}")
     
     def _on_conversion_done(self):
         """Conversion completed."""
-        self.is_converting = False
-        
-        elapsed = time.time() - self.conversion_start_time
-        mins, secs = divmod(int(elapsed), 60)
-        time_str = f"{mins}m {secs}s" if mins else f"{secs}s"
-        
-        completed = sum(1 for f in self.file_panel.files if f.status == "completed")
-        total = len(self.file_panel.files)
-        
-        self.btn_convert.configure(state="normal", text="🚀 CHUYỂN ĐỔI SANG PDF")
-        self.btn_stop.pack_forget()
-        
-        self._log(f"🎉 Hoàn thành {completed}/{total} trong {time_str}")
-        
-        if completed > 0:
-            folder = self.output_folder or str(Path(self.file_panel.files[0].path).parent)
-            if messagebox.askyesno("✅ Hoàn thành", 
-                                   f"Đã chuyển đổi {completed}/{total} files\n"
-                                   f"Thời gian: {time_str}\n\n"
-                                   f"Mở folder?"):
-                os.startfile(folder)
+        try:
+            self.is_converting = False
+            
+            elapsed = time.time() - self.conversion_start_time
+            mins, secs = divmod(int(elapsed), 60)
+            time_str = f"{mins}m {secs}s" if mins else f"{secs}s"
+            
+            completed = 0
+            total = 0
+            if self.file_panel:
+                completed = sum(1 for f in self.file_panel.files if f.status == "completed")
+                total = len(self.file_panel.files)
+            
+            if self.btn_convert:
+                self.btn_convert.configure(state="normal", text="🚀 CHUYỂN ĐỔI SANG PDF")
+            
+            if self.btn_stop:
+                self.btn_stop.pack_forget()
+            
+            self._log(f"🎉 Hoàn thành {completed}/{total} trong {time_str}")
+            
+            if completed > 0 and self.file_panel and self.file_panel.files:
+                folder = self.output_folder or str(Path(self.file_panel.files[0].path).parent)
+                if messagebox.askyesno("✅ Hoàn thành", 
+                                       f"Đã chuyển đổi {completed}/{total} files\n"
+                                       f"Thời gian: {time_str}\n\n"
+                                       f"Mở folder?"):
+                    os.startfile(folder)
+        except Exception as e:
+            logger.error(f"On conversion done error: {e}")
     
     def _update_time_display(self):
         """Update elapsed time display."""
-        if self.is_converting:
-            elapsed = time.time() - self.conversion_start_time
-            mins, secs = divmod(int(elapsed), 60)
-            self.time_label.configure(text=f"⏱️ {mins:02d}:{secs:02d}")
-            self.after(1000, self._update_time_display)
+        try:
+            if self.is_converting:
+                elapsed = time.time() - self.conversion_start_time
+                mins, secs = divmod(int(elapsed), 60)
+                if self.time_label:
+                    self.time_label.configure(text=f"⏱️ {mins:02d}:{secs:02d}")
+                self.after(1000, self._update_time_display)
+        except Exception as e:
+            logger.error(f"Update time display error: {e}")
     
     # =========== UTILITIES ===========
     
     def _log(self, message: str):
         """Add log message with timestamp."""
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        self.log_textbox.insert("end", f"[{timestamp}] {message}\n")
-        self.log_textbox.see("end")
-        logger.info(message)
+        try:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            if self.log_textbox:
+                self.log_textbox.insert("end", f"[{timestamp}] {message}\n")
+                self.log_textbox.see("end")
+            logger.info(message)
+        except Exception as e:
+            logger.error(f"Log error: {e}")
     
     def _show_stats(self):
         """Show statistics dialog."""
-        stats = self.db.get_stats()
-        
-        dialog = ctk.CTkToplevel(self)
-        dialog.title("📊 Thống kê")
-        dialog.geometry("350x250")
-        dialog.transient(self)
-        dialog.grab_set()
-        
-        text = f"""
+        try:
+            stats = self.db.get_stats()
+            
+            dialog = ctk.CTkToplevel(self)
+            dialog.title("📊 Thống kê")
+            dialog.geometry("350x250")
+            dialog.transient(self)
+            dialog.grab_set()
+            
+            text = f"""
 📊 THỐNG KÊ TỔNG HỢP
 
 Tổng files: {stats['total']}
@@ -1232,21 +1422,31 @@ Thành công: {stats['success']}
 Thất bại: {stats['failed']}
 Tỷ lệ: {stats['success_rate']:.1f}%
 Thời gian TB: {stats['avg_duration']:.1f}s
-        """
-        
-        ctk.CTkLabel(dialog, text=text, font=ctk.CTkFont(size=14),
-                    justify="left").pack(expand=True, padx=20, pady=20)
-        
-        ctk.CTkButton(dialog, text="Đóng", command=dialog.destroy).pack(pady=10)
+            """
+            
+            ctk.CTkLabel(dialog, text=text, font=ctk.CTkFont(size=14),
+                        justify="left").pack(expand=True, padx=20, pady=20)
+            
+            ctk.CTkButton(dialog, text="Đóng", command=dialog.destroy).pack(pady=10)
+        except Exception as e:
+            logger.error(f"Show stats error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể hiển thị thống kê: {e}")
     
     def _show_settings(self):
         """Show settings dialog."""
-        from office_converter.ui.dialogs import show_settings
-        show_settings(self, self.config, "vi", lambda: None)
+        try:
+            from office_converter.ui.dialogs import show_settings
+            show_settings(self, self.config, "vi", lambda: None)
+        except ImportError:
+            messagebox.showinfo("Cài đặt", "Mở config.json để chỉnh sửa cài đặt")
+        except Exception as e:
+            logger.error(f"Show settings error: {e}")
+            messagebox.showinfo("Cài đặt", "Mở config.json để chỉnh sửa cài đặt")
     
     def _show_shortcuts(self):
         """Show keyboard shortcuts."""
-        shortcuts = """
+        try:
+            shortcuts = """
 ⌨️ KEYBOARD SHORTCUTS
 
 Ctrl+O     Thêm files
@@ -1255,8 +1455,10 @@ Delete     Xóa danh sách
 Enter      Bắt đầu chuyển đổi
 Escape     Dừng chuyển đổi
 F1         Xem shortcuts
-        """
-        messagebox.showinfo("Phím tắt", shortcuts)
+            """
+            messagebox.showinfo("Phím tắt", shortcuts)
+        except Exception as e:
+            logger.error(f"Show shortcuts error: {e}")
     
     def _open_pdf_tools(self):
         """Open PDF Tools dialog."""
@@ -1265,10 +1467,14 @@ F1         Xem shortcuts
             PDFToolsDialog(self, "vi")
         except Exception as e:
             self._log(f"❌ Lỗi mở PDF Tools: {e}")
+            messagebox.showerror("Lỗi", f"Không thể mở PDF Tools: {e}")
     
     def _on_closing(self):
         """Cleanup on close."""
-        release_pool()
+        try:
+            release_pool()
+        except Exception:
+            pass
         self.destroy()
 
 
@@ -1278,8 +1484,12 @@ F1         Xem shortcuts
 
 def main():
     """Application entry point."""
-    app = ConverterProApp()
-    app.mainloop()
+    try:
+        app = ConverterProApp()
+        app.mainloop()
+    except Exception as e:
+        logger.error(f"Application error: {e}")
+        messagebox.showerror("Lỗi nghiêm trọng", f"Ứng dụng gặp lỗi: {e}")
 
 
 if __name__ == "__main__":

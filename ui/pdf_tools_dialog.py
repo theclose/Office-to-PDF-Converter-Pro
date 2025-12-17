@@ -11,6 +11,7 @@ from tkinter import ttk, filedialog, messagebox
 from typing import List
 
 from office_converter.core import pdf_tools
+from office_converter.utils.config import Config
 
 
 class PDFToolsDialog:
@@ -32,12 +33,19 @@ class PDFToolsDialog:
         ("ocr", "🔍 OCR"),
     ]
     
+    # All valid operations for validation
+    ALL_OPS = ["merge", "split", "compress", "protect", "rotate", "extract", 
+               "delete", "reverse", "watermark", "pdf_to_img", "img_to_pdf", "ocr"]
+    
     def __init__(self, parent, lang: str = "vi"):
         self.parent = parent
         self.lang = lang
         self.files: List[str] = []
         self.is_processing = False
         self.stop_requested = False
+        
+        # Load config for remembering last operation
+        self.config = Config()
         
         self._create_dialog()
     
@@ -50,8 +58,13 @@ class PDFToolsDialog:
         self.dialog.transient(self.parent)
         self.dialog.grab_set()
         
+        # Get last used operation (default to compress)
+        last_op = self.config.get("pdf_tools_last_operation", "compress")
+        if last_op not in self.ALL_OPS:
+            last_op = "compress"
+        
         # Variables
-        self.var_operation = tk.StringVar(value="compress")
+        self.var_operation = tk.StringVar(value=last_op)
         self.var_quality = tk.StringVar(value="medium")
         self.var_rotation = tk.IntVar(value=90)
         self.var_page_range = tk.StringVar(value="1-3")
@@ -65,7 +78,16 @@ class PDFToolsDialog:
         # Store compression results for display
         self.compression_results = {}  # {filepath: (original_size, compressed_size)}
         
+        # Save on close
+        self.dialog.protocol("WM_DELETE_WINDOW", self._on_close)
+        
         self._build_ui()
+    
+    def _on_close(self):
+        """Save last operation and close."""
+        self.config.set("pdf_tools_last_operation", self.var_operation.get())
+        self.config.save()
+        self.dialog.destroy()
     
     def _build_ui(self):
         """Build the dialog UI with compact layout."""

@@ -365,11 +365,21 @@ class PDFToolsDialog:
         
         # Special case: Merge needs output file selection
         if op == "merge":
-            output = filedialog.asksaveasfilename(
-                defaultextension=".pdf", filetypes=[("PDF", "*.pdf")], initialfile="merged.pdf"
-            )
-            if not output:
-                return
+            # If "same folder" is selected, auto-generate output path
+            if self.var_output_same.get():
+                first_file_dir = os.path.dirname(self.files[0])
+                output = os.path.join(first_file_dir, "merged.pdf")
+                # Avoid overwrite: add number if exists
+                counter = 1
+                while os.path.exists(output):
+                    output = os.path.join(first_file_dir, f"merged_{counter}.pdf")
+                    counter += 1
+            else:
+                output = filedialog.asksaveasfilename(
+                    defaultextension=".pdf", filetypes=[("PDF", "*.pdf")], initialfile="merged.pdf"
+                )
+                if not output:
+                    return
             self._do_merge(output)
             return
         

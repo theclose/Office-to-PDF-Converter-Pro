@@ -768,6 +768,17 @@ class ConverterProApp(ctk.CTk):
         self._log("✅ Refactored architecture với Preview, DnD, Recent Files")
         if HAS_PYMUPDF:
             self._log("📄 PyMuPDF: Hỗ trợ đầy đủ PDF tools")
+        
+        # Check for updates on startup
+        self._check_for_updates()
+    
+    def _check_for_updates(self):
+        """Check for updates asynchronously."""
+        try:
+            from office_converter.utils.updater import check_for_updates_on_startup
+            self.after(2000, lambda: check_for_updates_on_startup(self))
+        except ImportError:
+            pass
     
     def _center_window(self):
         """Center window on screen."""

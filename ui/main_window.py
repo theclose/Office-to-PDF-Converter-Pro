@@ -60,6 +60,7 @@ class ConverterApp:
         
         # State
         self.file_list: List[str] = []
+        self.completed_files: set = set()  # Track completed file paths
         self.is_converting = False
         self.stop_requested = False      # Flag to request stop
         self.stopped_at_index = 0        # Track where we stopped for resume
@@ -544,15 +545,20 @@ class ConverterApp:
             self._update_status()
     
     def _refresh_listbox(self):
-        """Refresh listbox with numbered file list."""
+        """Refresh listbox with numbered file list and completion status."""
         self.listbox.delete(0, "end")
         for i, file_path in enumerate(self.file_list, 1):
             file_name = os.path.basename(file_path)
-            self.listbox.insert("end", f"{i}. {file_name}")
+            if file_path in self.completed_files:
+                display = f"✅ {i}. {file_name}"
+            else:
+                display = f"    {i}. {file_name}"
+            self.listbox.insert("end", display)
     
     def clear_list(self):
         """Clear file list."""
         self.file_list.clear()
+        self.completed_files.clear()
         self.listbox.delete(0, "end")
         self._update_status()
     
@@ -1285,6 +1291,11 @@ class ConverterApp:
                         # JUMP TO 100% - FILE COMPLETE!
                         update_progress(100)
                         self.root.after(0, lambda: self.log(f"   {get_text('complete_log', self.current_lang)}"))
+                        
+                        # Mark file as completed and refresh listbox with tick
+                        self.completed_files.add(file_path)
+                        self.root.after(0, self._refresh_listbox)
+                        
                         completed += 1
                     else:
                         # Log failed conversion

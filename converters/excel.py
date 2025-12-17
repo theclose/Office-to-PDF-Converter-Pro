@@ -1,0 +1,265 @@
+"""
+Excel Converter - Converts Excel files to PDF using COM automation.
+Uses COM Pool for connection reuse and memory optimization.
+"""
+
+import os
+import time
+import logging
+import shutil
+import gc
+from typing import Optional, Callable, List
+
+import pythoncom
+
+from .base import BaseConverter
+from ..utils.com_pool import get_pool
+
+logger = logging.getLogger(__name__)
+
+
+class ExcelConverter(BaseConverter):
+    """Converter for Excel files (.xlsx, .xls, .xlsm, .xlsb)."""
+    
+    SUPPORTED_EXTENSIONS = [".xlsx", ".xls", ".xlsm", ".xlsb"]
+    
+    def __init__(self, log_callback: Optional[Callable[[str], None]] = None,
+                 progress_callback: Optional[Callable[[float], None]] = None):
+        super().__init__(log_callback, progress_callback)
+        self._excel = None
+        self._use_pool = False  # Disabled pool due to COM corruption issues
+    
+    def initialize(self) -> bool:
+        """Get Excel COM from pool."""
+        try:
+            pythoncom.CoInitialize()
+            if self._use_pool:
+                self._excel = get_pool().get_excel()
+            else:
+                # Fallback to standalone instance
+                import win32com.client
+                self._excel = win32com.client.Dispatch("Excel.Application")
+                self._configure_standalone()
+            
+            if self._excel:
+                logger.info("Excel ready (pooled)" if self._use_pool else "Excel ready (standalone)")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Failed to initialize Excel: {e}")
+            return False
+    
+    def _configure_standalone(self):
+        """Configure standalone Excel instance."""
+        self._excel.Visible = False
+        self._excel.DisplayAlerts = False
+        self._excel.ScreenUpdating = False
+        try:
+            self._excel.EnableEvents = False
+            self._excel.AskToUpdateLinks = False
+        except:
+            pass
+    
+    def cleanup(self):
+        """Release Excel resources (pool handles actual cleanup)."""
+        if not self._use_pool and self._excel:
+            try:
+                self._excel.Quit()
+            except:
+                pass
+            self._excel = None
+        # Note: Don't set to None when using pool - pool manages lifecycle
+        gc.collect()  # Force garbage collection
+        logger.info("Excel cleanup done")
+    
+    def convert(self, input_path: str, output_path: str, 
+                quality: int = 0, 
+                sheet_indices: Optional[List[int]] = None) -> bool:
+        """
+        Convert Excel file to PDF.
+        
+        Args:
+            input_path: Path to Excel file
+            output_path: Path for output PDF
+            quality: 0 = High quality, 1 = Minimum size
+            sheet_indices: Optional list of 1-indexed sheet numbers to export
+            
+        Returns:
+            True if successful
+        """
+        if not self._excel:
+            if not self.initialize():
+                return False
+        
+        wb = None
+        temp_dir = os.environ.get("TEMP", os.path.expanduser("~"))
+        safe_id = str(int(time.time() * 1000))
+        
+        # Get original extension to preserve file format
+        original_ext = os.path.splitext(input_path)[1].lower()
+        if original_ext not in self.SUPPORTED_EXTENSIONS:
+            original_ext = ".xlsx"  # Default fallback
+        
+        # Safe paths for COM (avoid unicode issues) - preserve original extension!
+        com_excel_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}{original_ext}"))
+        com_pdf_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}.pdf"))
+        
+        try:
+            # Copy to safe temp location
+            shutil.copyfile(input_path, com_excel_path)
+            
+            # Open workbook
+            wb = self._excel.Workbooks.Open(com_excel_path)
+            
+            # Sanitize sheet names (prevent COM errors with special chars)
+            try:
+                for i, sheet in enumerate(wb.Sheets):
+                    sheet.Name = f"Tmp_ID_{i}_{int(time.time())}"
+            except:
+                pass
+            
+            # Export based on sheet selection
+            if sheet_indices and len(sheet_indices) > 0:
+                if len(sheet_indices) == 1:
+                    self._safe_export(wb.Worksheets(sheet_indices[0]), com_pdf_path, quality)
+                else:
+                    self._safe_export(wb, com_pdf_path, quality)
+            else:
+                self._safe_export(wb, com_pdf_path, quality)
+            
+            wb.Close(False)
+            wb = None
+            
+            # Move result to final destination
+            if os.path.exists(com_pdf_path):
+                if os.path.exists(output_path):
+                    os.remove(output_path)
+                shutil.move(com_pdf_path, output_path)
+            
+            # Cleanup temp Excel
+            try:
+                os.remove(com_excel_path)
+            except:
+                pass
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Excel conversion failed: {e}")
+            if wb:
+                try:
+                    wb.Close(False)
+                except:
+                    pass
+            return False
+        finally:
+            # Memory optimization: force cleanup after each file
+            gc.collect()
+    
+    def _safe_export(self, obj, path: str, quality: int):
+        """
+        Robust export with multiple fallback strategies.
+        """
+        # Activate object
+        try:
+            obj.Activate()
+        except:
+            pass
+        
+        # Delete existing target
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+        except:
+            pass
+        
+        # Attempt 1: Standard Export
+        try:
+            obj.ExportAsFixedFormat(0, path, Quality=quality, 
+                                    IncludeDocProperties=False,
+                                    IgnorePrintAreas=False, 
+                                    OpenAfterPublish=False)
+            return
+        except:
+            pass
+        
+        # Attempt 2: Ignore Print Areas
+        try:
+            obj.ExportAsFixedFormat(0, path, Quality=quality,
+                                    IncludeDocProperties=False,
+                                    IgnorePrintAreas=True,
+                                    OpenAfterPublish=False)
+            return
+        except:
+            pass
+        
+        # Attempt 3: Clear Print Area
+        try:
+            if hasattr(obj, "PageSetup"):
+                obj.PageSetup.PrintArea = ""
+            if hasattr(obj, "ResetAllPageBreaks"):
+                obj.ResetAllPageBreaks()
+            
+            obj.ExportAsFixedFormat(0, path, Quality=quality,
+                                    IncludeDocProperties=False,
+                                    IgnorePrintAreas=False,
+                                    OpenAfterPublish=False)
+            return
+        except:
+            pass
+        
+        # Attempt 4: SaveAs PDF
+        try:
+            obj.SaveAs(Filename=path, FileFormat=57)
+            return
+        except:
+            pass
+        
+        # Attempt 5: Nuclear - Copy to new workbook
+        try:
+            app = obj.Application
+            if hasattr(obj, "Sheets") and not hasattr(obj, "Range"):
+                obj.Sheets.Copy()
+            else:
+                obj.Copy()
+            
+            new_wb = app.ActiveWorkbook
+            try:
+                new_wb.Sheets(1).Name = "SafeSheet_Export"
+            except:
+                pass
+            
+            try:
+                new_wb.ExportAsFixedFormat(0, path, Quality=quality,
+                                           IncludeDocProperties=False,
+                                           IgnorePrintAreas=False,
+                                           OpenAfterPublish=False)
+                new_wb.Close(False)
+                return
+            except:
+                new_wb.Close(False)
+        except:
+            pass
+        
+        # Attempt 6: Ultimate - Raw data copy
+        try:
+            if hasattr(obj, "UsedRange"):
+                app = obj.Application
+                new_wb = app.Workbooks.Add()
+                target_sheet = new_wb.Sheets(1)
+                
+                obj.UsedRange.Copy()
+                target_sheet.Range("A1").PasteSpecial(Paste=-4163)  # Values
+                target_sheet.Range("A1").PasteSpecial(Paste=-4122)  # Formats
+                target_sheet.Range("A1").PasteSpecial(Paste=8)      # ColumnWidths
+                
+                new_wb.ExportAsFixedFormat(0, path, Quality=quality,
+                                           IncludeDocProperties=False,
+                                           IgnorePrintAreas=False,
+                                           OpenAfterPublish=False)
+                new_wb.Close(False)
+                return
+        except:
+            pass
+        
+        raise Exception(f"All 6 export methods failed for: {path}")

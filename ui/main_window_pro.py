@@ -807,7 +807,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
     
-    VERSION = "4.0.5"
+    VERSION = "4.0.6"
     
     def __init__(self):
         super().__init__()
@@ -944,9 +944,9 @@ class ConverterProApp(ctk.CTk):
             ctk.CTkButton(file_btn_frame, text="📁 Folder", width=80,
                          command=self._add_folder,
                          fg_color="transparent", border_width=2).pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text="🕐 Recent", width=80,
-                         command=self._show_recent,
-                         fg_color="transparent", border_width=2).pack(side="left", padx=2)
+            ctk.CTkButton(file_btn_frame, text="�️ PDF Tools", width=90,
+                         command=self._open_pdf_tools,
+                         fg_color="#3B82F6", hover_color="#2563EB").pack(side="left", padx=2)
             ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
                          command=self._clear_files,
                          fg_color="transparent", border_width=2,
@@ -1385,6 +1385,15 @@ class ConverterProApp(ctk.CTk):
         """Paste files from clipboard."""
         # Future: implement clipboard paste
         pass
+    
+    def _open_pdf_tools(self):
+        """Open PDF Tools Pro dialog."""
+        try:
+            from office_converter.ui.pdf_tools_pro import PDFToolsDialogPro
+            PDFToolsDialogPro(self, "vi")
+        except Exception as e:
+            logger.error(f"Open PDF Tools error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể mở PDF Tools: {e}")
     
     def _clear_files(self):
         """Clear file list."""

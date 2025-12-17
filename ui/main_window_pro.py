@@ -816,7 +816,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
     
-    VERSION = "4.0.6"
+    VERSION = "4.0.7"
     
     def __init__(self):
         super().__init__()
@@ -1234,6 +1234,29 @@ class ConverterProApp(ctk.CTk):
             ctk.CTkLabel(log_header, text="📋 Log",
                         font=ctk.CTkFont(weight="bold")).pack(side="left")
             
+            # Language selector
+            lang_frame = ctk.CTkFrame(log_header, fg_color="transparent")
+            lang_frame.pack(side="right", padx=10)
+            
+            ctk.CTkLabel(lang_frame, text="🌐", 
+                        font=ctk.CTkFont(size=14)).pack(side="left", padx=(0, 5))
+            
+            # Get language names for dropdown
+            from office_converter.utils.localization import get_language_names, get_current_language
+            lang_names = get_language_names()
+            current_lang = self.config.get("language", "vi")
+            current_lang_name = lang_names.get(current_lang, "Tiếng Việt")
+            
+            self.lang_dropdown = ctk.CTkComboBox(
+                lang_frame,
+                values=list(lang_names.values()),
+                width=100,
+                state="readonly",
+                command=self._change_language
+            )
+            self.lang_dropdown.set(current_lang_name)
+            self.lang_dropdown.pack(side="left")
+            
             ctk.CTkButton(log_header, text="🛠️ PDF Tools", width=100,
                          command=self._open_pdf_tools).pack(side="right")
             
@@ -1449,6 +1472,44 @@ class ConverterProApp(ctk.CTk):
         """Paste files from clipboard."""
         # Future: implement clipboard paste
         pass
+    
+    def _change_language(self, selected_name: str):
+        """Change application language."""
+        try:
+            from office_converter.utils.localization import get_language_names, set_language
+            
+            # Find language code from name
+            lang_names = get_language_names()
+            lang_code = None
+            for code, name in lang_names.items():
+                if name == selected_name:
+                    lang_code = code
+                    break
+            
+            if lang_code:
+                # Save to config
+                self.config.set("language", lang_code)
+                self.config.save()
+                set_language(lang_code)
+                
+                # Notify user to restart
+                self._log(f"🌐 Ngôn ngữ: {selected_name}")
+                
+                # Show restart dialog
+                result = messagebox.askyesno(
+                    "Restart Required / Cần khởi động lại",
+                    f"Đã chuyển sang {selected_name}.\n"
+                    f"Changed to {selected_name}.\n\n"
+                    "Khởi động lại ứng dụng để áp dụng?\n"
+                    "Restart application to apply?"
+                )
+                if result:
+                    self.destroy()
+                    import sys
+                    import subprocess
+                    subprocess.Popen([sys.executable] + sys.argv)
+        except Exception as e:
+            logger.error(f"Change language error: {e}")
     
     def _open_pdf_tools(self):
         """Open PDF Tools Pro dialog."""

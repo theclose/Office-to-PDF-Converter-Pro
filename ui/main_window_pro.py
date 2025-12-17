@@ -807,7 +807,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
     
-    VERSION = "4.0.3"
+    VERSION = "4.0.4"
     
     def __init__(self):
         super().__init__()
@@ -830,6 +830,8 @@ class ConverterProApp(ctk.CTk):
         self.progress_bar: Optional[ctk.CTkProgressBar] = None
         self.progress_label: Optional[ctk.CTkLabel] = None
         self.progress_percent: Optional[ctk.CTkLabel] = None
+        self.progress_title: Optional[ctk.CTkLabel] = None
+        self.status_badge: Optional[ctk.CTkLabel] = None
         self.elapsed_label: Optional[ctk.CTkLabel] = None
         self.remaining_label: Optional[ctk.CTkLabel] = None
         self.estimated_label: Optional[ctk.CTkLabel] = None
@@ -975,83 +977,188 @@ class ConverterProApp(ctk.CTk):
             )
             self.btn_convert.pack(fill="x", pady=(10, 0))
             
-            # === PROGRESS (initially hidden) ===
-            self.progress_frame = ctk.CTkFrame(self.main_content_frame, corner_radius=10)
-            
-            # Progress header with file info
-            progress_header = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
-            progress_header.pack(fill="x", padx=15, pady=(10, 5))
-            
-            self.progress_label = ctk.CTkLabel(
-                progress_header, 
-                text="Đang xử lý...",
-                font=ctk.CTkFont(weight="bold")
+            # === PROGRESS PANEL (initially hidden) ===
+            self.progress_frame = ctk.CTkFrame(
+                self.main_content_frame, 
+                corner_radius=15,
+                border_width=2,
+                border_color="#374151"
             )
-            self.progress_label.pack(side="left")
+            
+            # ─── HEADER: Title + Status ───
+            header_frame = ctk.CTkFrame(self.progress_frame, fg_color="#1F2937", corner_radius=10)
+            header_frame.pack(fill="x", padx=15, pady=(15, 10))
+            
+            header_inner = ctk.CTkFrame(header_frame, fg_color="transparent")
+            header_inner.pack(fill="x", padx=15, pady=12)
+            
+            # Icon + Title
+            title_frame = ctk.CTkFrame(header_inner, fg_color="transparent")
+            title_frame.pack(side="left")
+            
+            ctk.CTkLabel(
+                title_frame,
+                text="⏳",
+                font=ctk.CTkFont(size=24)
+            ).pack(side="left", padx=(0, 10))
+            
+            self.progress_title = ctk.CTkLabel(
+                title_frame,
+                text="Đang chuyển đổi...",
+                font=ctk.CTkFont(size=16, weight="bold")
+            )
+            self.progress_title.pack(side="left")
+            
+            # Status badge
+            self.status_badge = ctk.CTkLabel(
+                header_inner,
+                text="ĐANG XỬ LÝ",
+                font=ctk.CTkFont(size=11, weight="bold"),
+                fg_color="#3B82F6",
+                corner_radius=5,
+                padx=10,
+                pady=3
+            )
+            self.status_badge.pack(side="right")
+            
+            # ─── MAIN: Big Percent + Progress Bar ───
+            main_section = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
+            main_section.pack(fill="x", padx=20, pady=10)
+            
+            # Large centered percentage
+            percent_frame = ctk.CTkFrame(main_section, fg_color="transparent")
+            percent_frame.pack(fill="x", pady=(0, 10))
             
             self.progress_percent = ctk.CTkLabel(
-                progress_header, 
+                percent_frame,
                 text="0%",
-                font=ctk.CTkFont(size=18, weight="bold"),
+                font=ctk.CTkFont(size=48, weight="bold"),
                 text_color="#22C55E"
             )
-            self.progress_percent.pack(side="right")
+            self.progress_percent.pack()
             
-            # Progress bar
-            self.progress_bar = ctk.CTkProgressBar(self.progress_frame, height=25, corner_radius=5)
-            self.progress_bar.pack(fill="x", padx=15, pady=5)
+            self.progress_label = ctk.CTkLabel(
+                percent_frame,
+                text="Đang xử lý 0/0 files",
+                font=ctk.CTkFont(size=13),
+                text_color="#9CA3AF"
+            )
+            self.progress_label.pack()
+            
+            # Progress bar with glow effect
+            progress_container = ctk.CTkFrame(main_section, fg_color="#1F2937", corner_radius=8)
+            progress_container.pack(fill="x", pady=5)
+            
+            self.progress_bar = ctk.CTkProgressBar(
+                progress_container, 
+                height=12, 
+                corner_radius=6,
+                progress_color="#22C55E",
+                fg_color="#374151"
+            )
+            self.progress_bar.pack(fill="x", padx=8, pady=8)
             self.progress_bar.set(0)
             
-            # Time info row
-            time_info = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
-            time_info.pack(fill="x", padx=15, pady=(0, 5))
+            # ─── TIME CARDS: Elapsed | Estimated | Remaining ───
+            time_cards = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
+            time_cards.pack(fill="x", padx=15, pady=10)
             
-            # Elapsed time (left)
+            # Configure grid columns
+            time_cards.grid_columnconfigure(0, weight=1)
+            time_cards.grid_columnconfigure(1, weight=1)
+            time_cards.grid_columnconfigure(2, weight=1)
+            
+            # Elapsed time card
+            elapsed_card = ctk.CTkFrame(time_cards, fg_color="#1F2937", corner_radius=8)
+            elapsed_card.grid(row=0, column=0, padx=5, sticky="ew")
+            
+            ctk.CTkLabel(
+                elapsed_card,
+                text="⏱️ Đã chạy",
+                font=ctk.CTkFont(size=11),
+                text_color="#9CA3AF"
+            ).pack(pady=(8, 2))
+            
             self.elapsed_label = ctk.CTkLabel(
-                time_info, 
-                text="⏱️ Đã: 00:00",
-                text_color="gray"
+                elapsed_card,
+                text="00:00",
+                font=ctk.CTkFont(size=20, weight="bold"),
+                text_color="#60A5FA"
             )
-            self.elapsed_label.pack(side="left")
+            self.elapsed_label.pack(pady=(0, 8))
             
-            # Estimated total (center)
+            # Estimated time card
+            est_card = ctk.CTkFrame(time_cards, fg_color="#1F2937", corner_radius=8)
+            est_card.grid(row=0, column=1, padx=5, sticky="ew")
+            
+            ctk.CTkLabel(
+                est_card,
+                text="📊 Ước tính",
+                font=ctk.CTkFont(size=11),
+                text_color="#9CA3AF"
+            ).pack(pady=(8, 2))
+            
             self.estimated_label = ctk.CTkLabel(
-                time_info, 
-                text="",
-                text_color="gray"
+                est_card,
+                text="--:--",
+                font=ctk.CTkFont(size=20, weight="bold"),
+                text_color="#FBBF24"
             )
-            self.estimated_label.pack(side="left", padx=20)
+            self.estimated_label.pack(pady=(0, 8))
             
-            # Remaining time (right)
+            # Remaining time card
+            remaining_card = ctk.CTkFrame(time_cards, fg_color="#1F2937", corner_radius=8)
+            remaining_card.grid(row=0, column=2, padx=5, sticky="ew")
+            
+            ctk.CTkLabel(
+                remaining_card,
+                text="⏳ Còn lại",
+                font=ctk.CTkFont(size=11),
+                text_color="#9CA3AF"
+            ).pack(pady=(8, 2))
+            
             self.remaining_label = ctk.CTkLabel(
-                time_info, 
-                text="⏳ Còn: --:--",
-                text_color="gray"
+                remaining_card,
+                text="--:--",
+                font=ctk.CTkFont(size=20, weight="bold"),
+                text_color="#F472B6"
             )
-            self.remaining_label.pack(side="right")
+            self.remaining_label.pack(pady=(0, 8))
             
-            # Current file progress (sub-progress)
-            file_progress_frame = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
-            file_progress_frame.pack(fill="x", padx=15, pady=(0, 5))
+            # ─── CURRENT FILE ───
+            file_section = ctk.CTkFrame(self.progress_frame, fg_color="#1F2937", corner_radius=8)
+            file_section.pack(fill="x", padx=15, pady=(5, 10))
+            
+            file_inner = ctk.CTkFrame(file_section, fg_color="transparent")
+            file_inner.pack(fill="x", padx=12, pady=10)
+            
+            ctk.CTkLabel(
+                file_inner,
+                text="📄",
+                font=ctk.CTkFont(size=16)
+            ).pack(side="left", padx=(0, 8))
             
             self.current_file_label = ctk.CTkLabel(
-                file_progress_frame,
-                text="",
-                text_color="gray",
-                font=ctk.CTkFont(size=11)
+                file_inner,
+                text="Đang chờ...",
+                font=ctk.CTkFont(size=12),
+                text_color="#D1D5DB",
+                anchor="w"
             )
-            self.current_file_label.pack(side="left")
+            self.current_file_label.pack(side="left", fill="x", expand=True)
             
-            # Stop button
+            # ─── STOP BUTTON ───
             self.btn_stop = ctk.CTkButton(
-                self.progress_frame, 
-                text="⏹️ DỪNG",
+                self.progress_frame,
+                text="⏹️  DỪNG CHUYỂN ĐỔI",
                 command=self._stop_conversion,
-                fg_color="#DC2626", 
+                font=ctk.CTkFont(size=14, weight="bold"),
+                fg_color="#DC2626",
                 hover_color="#B91C1C",
-                height=35
+                height=45,
+                corner_radius=8
             )
-            self.btn_stop.pack(fill="x", padx=15, pady=(5, 10))
+            self.btn_stop.pack(fill="x", padx=15, pady=(5, 15))
             
             # === LOG ===
             log_frame = ctk.CTkFrame(self, corner_radius=12)
@@ -1325,24 +1432,28 @@ class ConverterProApp(ctk.CTk):
             if self.progress_bar:
                 self.progress_bar.set(0)
             if self.progress_percent:
-                self.progress_percent.configure(text="0%")
+                self.progress_percent.configure(text="0%", text_color="#22C55E")
             if self.progress_label:
                 total = len(self.file_panel.files)
-                self.progress_label.configure(text=f"Đang xử lý 0/{total} files...")
+                self.progress_label.configure(text=f"Đang xử lý 0/{total} files")
+            if self.progress_title:
+                self.progress_title.configure(text="Đang chuyển đổi...")
+            if self.status_badge:
+                self.status_badge.configure(text="ĐANG XỬ LÝ", fg_color="#3B82F6")
             if self.elapsed_label:
-                self.elapsed_label.configure(text="⏱️ Đã: 00:00")
+                self.elapsed_label.configure(text="00:00")
             if self.remaining_label:
                 est_mins, est_secs = divmod(int(self.total_estimated_time), 60)
-                self.remaining_label.configure(text=f"⏳ Còn: ~{est_mins:02d}:{est_secs:02d}")
+                self.remaining_label.configure(text=f"{est_mins:02d}:{est_secs:02d}")
             if self.estimated_label:
                 est_mins, est_secs = divmod(int(self.total_estimated_time), 60)
-                self.estimated_label.configure(text=f"📊 Ước tính: ~{est_mins}m {est_secs}s")
+                self.estimated_label.configure(text=f"{est_mins:02d}:{est_secs:02d}")
             if self.current_file_label:
-                self.current_file_label.configure(text="")
+                self.current_file_label.configure(text="Đang chờ...")
             
             # Show progress frame
             if self.progress_frame and self.btn_convert:
-                self.progress_frame.pack(fill="x", pady=10, after=self.btn_convert)
+                self.progress_frame.pack(fill="x", pady=15, after=self.btn_convert)
             
             # Create options
             options = ConversionOptions(
@@ -1435,30 +1546,37 @@ class ConverterProApp(ctk.CTk):
             if self.progress_bar:
                 self.progress_bar.set(progress)
             
-            # Update percent label
+            # Update percent label with color change
             if self.progress_percent:
-                self.progress_percent.configure(text=f"{percent}%")
+                # Color changes as progress increases
+                if percent < 30:
+                    color = "#22C55E"  # Green
+                elif percent < 70:
+                    color = "#3B82F6"  # Blue
+                else:
+                    color = "#22C55E"  # Green again for near completion
+                self.progress_percent.configure(text=f"{percent}%", text_color=color)
             
             # Update file count label  
             if self.progress_label:
-                self.progress_label.configure(text=f"Đang xử lý {current + 1}/{total} files...")
+                self.progress_label.configure(text=f"Đang xử lý {current + 1}/{total} files")
             
-            # Update current file name
+            # Update current file name (truncate if too long)
             if self.current_file_label:
-                self.current_file_label.configure(text=f"📄 {filename}")
+                display_name = filename if len(filename) <= 50 else filename[:47] + "..."
+                self.current_file_label.configure(text=display_name)
             
             # Update remaining time estimate based on progress
-            if self.remaining_label and self.total_estimated_time > 0:
+            if self.remaining_label:
                 elapsed = time.time() - self.conversion_start_time
-                if progress > 0:
-                    # Calculate based on actual progress rate
+                if progress > 0.05:  # Only calculate after 5% progress
                     estimated_total = elapsed / progress
                     remaining = max(0, estimated_total - elapsed)
                 else:
-                    remaining = self.total_estimated_time
+                    remaining = self.total_estimated_time - elapsed
                 
-                rem_mins, rem_secs = divmod(int(remaining), 60)
-                self.remaining_label.configure(text=f"⏳ Còn: ~{rem_mins:02d}:{rem_secs:02d}")
+                rem_mins, rem_secs = divmod(int(max(0, remaining)), 60)
+                self.remaining_label.configure(text=f"{rem_mins:02d}:{rem_secs:02d}")
                 
         except Exception as e:
             logger.error(f"Update progress UI error: {e}")
@@ -1504,20 +1622,24 @@ class ConverterProApp(ctk.CTk):
             if self.progress_percent:
                 self.progress_percent.configure(text="100%", text_color="#22C55E")
             if self.progress_label:
-                self.progress_label.configure(text=f"✅ Hoàn thành {completed}/{total} files!")
+                self.progress_label.configure(text=f"Hoàn thành {completed}/{total} files")
+            if self.progress_title:
+                self.progress_title.configure(text="Chuyển đổi hoàn tất!")
+            if self.status_badge:
+                self.status_badge.configure(text="XONG", fg_color="#22C55E")
             if self.elapsed_label:
-                self.elapsed_label.configure(text=f"⏱️ Tổng: {mins:02d}:{secs:02d}")
+                self.elapsed_label.configure(text=f"{mins:02d}:{secs:02d}")
             if self.remaining_label:
-                self.remaining_label.configure(text="⏳ Còn: 00:00")
+                self.remaining_label.configure(text="00:00")
             if self.current_file_label:
-                self.current_file_label.configure(text="")
+                self.current_file_label.configure(text="Tất cả files đã hoàn thành!")
             
             # Reset convert button
             if self.btn_convert:
                 self.btn_convert.configure(state="normal", text="🚀 CHUYỂN ĐỔI SANG PDF")
             
             # Hide progress frame after delay
-            self.after(3000, self._hide_progress_frame)
+            self.after(5000, self._hide_progress_frame)
             
             self._log(f"🎉 Hoàn thành {completed}/{total} trong {time_str}")
             
@@ -1546,11 +1668,11 @@ class ConverterProApp(ctk.CTk):
                 elapsed = time.time() - self.conversion_start_time
                 mins, secs = divmod(int(elapsed), 60)
                 
-                # Update elapsed label
+                # Update elapsed label (clean format, no icon)
                 if self.elapsed_label:
-                    self.elapsed_label.configure(text=f"⏱️ Đã: {mins:02d}:{secs:02d}")
+                    self.elapsed_label.configure(text=f"{mins:02d}:{secs:02d}")
                 
-                # Schedule next update
+                # Schedule next update (faster for smoother display)
                 self.after(500, self._update_time_display)
         except Exception as e:
             logger.error(f"Update time display error: {e}")

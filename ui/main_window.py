@@ -28,6 +28,7 @@ from office_converter.utils.pdf_tools import (
 )
 from office_converter.utils.com_pool import release_pool
 from office_converter.utils.history import get_history
+from office_converter import __version__
 from office_converter.utils.progress_estimator import estimate_conversion_time, log_conversion_result
 from office_converter.converters import get_converter_for_file, ExcelConverter, WordConverter, PPTConverter
 from office_converter.ui.dialogs import show_settings
@@ -67,7 +68,7 @@ class ConverterApp:
         self.output_folder = self.config.get("output_folder", "")
         
         # Setup window
-        self.root.title(get_text("app_title", self.current_lang))
+        self.root.title(f"{get_text('app_title', self.current_lang)} - v{__version__}")
         self.root.geometry("700x800")
         self.root.minsize(680, 750)
         
@@ -636,7 +637,7 @@ class ConverterApp:
         lang = self.current_lang
         
         # Window title
-        self.root.title(get_text("app_title", lang))
+        self.root.title(f"{get_text('app_title', lang)} - v{__version__}")
         
         # File list frame
         self.frame_files.config(text=get_text("file_list_title", lang))
@@ -973,7 +974,7 @@ class ConverterApp:
         def on_save():
             # Refresh UI after settings change
             self._apply_theme()
-            self.root.title(get_text("app_title", self.config.language))
+            self.root.title(f"{get_text('app_title', self.config.language)} - v{__version__}")
         
         show_settings(self.root, self.config, self.current_lang, on_save)
     

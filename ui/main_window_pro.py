@@ -1756,15 +1756,6 @@ F1         Xem shortcuts
         except Exception as e:
             logger.error(f"Show shortcuts error: {e}")
     
-    def _open_pdf_tools(self):
-        """Open PDF Tools dialog."""
-        try:
-            from office_converter.ui.pdf_tools_dialog import PDFToolsDialog
-            PDFToolsDialog(self, "vi")
-        except Exception as e:
-            self._log(f"❌ Lỗi mở PDF Tools: {e}")
-            messagebox.showerror("Lỗi", f"Không thể mở PDF Tools: {e}")
-    
     def _on_closing(self):
         """Cleanup on close."""
         try:

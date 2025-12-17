@@ -11,6 +11,7 @@ from typing import List, Optional
 import logging
 
 from office_converter.core import pdf_tools
+from office_converter.utils.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,10 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         ],
     }
     
+    # All operation keys for validation
+    ALL_OPERATIONS = ["merge", "split", "extract", "delete", "rotate", "reverse",
+                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark"]
+    
     def __init__(self, parent, lang: str = "vi"):
         super().__init__(parent)
         
@@ -49,6 +54,9 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.is_processing = False
         self.stop_requested = False
         self.compression_results = {}
+        
+        # Load config for remembering last operation
+        self.config = Config()
         
         # Window setup
         self.title("🛠️ PDF Tools Pro")
@@ -61,8 +69,13 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         y = (self.winfo_screenheight() - 700) // 2
         self.geometry(f"+{x}+{y}")
         
+        # Get last used operation from config (default to compress)
+        last_op = self.config.get("pdf_tools_last_operation", "compress")
+        if last_op not in self.ALL_OPERATIONS:
+            last_op = "compress"
+        
         # Variables
-        self.var_operation = ctk.StringVar(value="compress")
+        self.var_operation = ctk.StringVar(value=last_op)
         self.var_quality = ctk.StringVar(value="medium")
         self.var_rotation = ctk.IntVar(value=90)
         self.var_page_range = ctk.StringVar(value="1-3")
@@ -75,9 +88,33 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         
         self._create_ui()
         
+        # Set the correct tab based on last operation
+        self._switch_to_operation_tab(last_op)
+        
         # Modal behavior
         self.transient(parent)
         self.grab_set()
+        
+        # Save operation when closing
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
+    
+    def _on_close(self):
+        """Save last operation and close."""
+        self.config.set("pdf_tools_last_operation", self.var_operation.get())
+        self.config.save()
+        self.destroy()
+    
+    def _switch_to_operation_tab(self, op: str):
+        """Switch to the tab containing the given operation."""
+        try:
+            if op in ["merge", "split", "extract", "delete", "rotate", "reverse"]:
+                self.tab_view.set("✏️ Chỉnh sửa")
+            elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
+                self.tab_view.set("🔄 Chuyển đổi")
+            elif op in ["compress", "protect", "watermark"]:
+                self.tab_view.set("⚡ Tối ưu")
+        except Exception:
+            pass  # Tab may not exist yet
     
     def _create_ui(self):
         """Build the modern UI."""

@@ -343,11 +343,21 @@ class ConversionEngine:
     def _convert_single(self, conv_file: ConversionFile, 
                         options: ConversionOptions) -> bool:
         """Convert a single file."""
-        converter = get_converter_for_file(conv_file.path)
-        if not converter:
+        # get_converter_for_file returns a CLASS, not an instance!
+        converter_class = get_converter_for_file(conv_file.path)
+        if not converter_class:
+            logger.error(f"No converter found for: {conv_file.path}")
             return False
         
+        # Create instance of the converter
+        converter = converter_class()
+        
         try:
+            # Initialize COM application
+            if not converter.initialize():
+                logger.error(f"Failed to initialize converter for: {conv_file.path}")
+                return False
+            
             # Excel with sheet indices
             if isinstance(converter, ExcelConverter) and options.sheet_indices:
                 success = converter.convert(
@@ -363,6 +373,7 @@ class ConversionEngine:
                     options.quality
                 )
             
+            # Cleanup converter
             converter.cleanup()
             
             if success and conv_file.output_path:
@@ -373,6 +384,11 @@ class ConversionEngine:
             
         except Exception as e:
             logger.error(f"Conversion error: {e}")
+            # Make sure to cleanup even on error
+            try:
+                converter.cleanup()
+            except Exception:
+                pass
             raise
     
     def _apply_post_processing(self, pdf_path: str, options: ConversionOptions):
@@ -791,7 +807,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
     
-    VERSION = "4.0.1"
+    VERSION = "4.0.2"
     
     def __init__(self):
         super().__init__()
@@ -848,8 +864,8 @@ class ConverterProApp(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         # Initial log
-        self._log("🚀 Office to PDF Converter Pro v4.0.1 (Hotfix)")
-        self._log("✅ Fixed: fitz import, error handling, button callbacks")
+        self._log(f"🚀 Office to PDF Converter Pro v{self.VERSION}")
+        self._log("✅ Fixed: converter instantiation, error handling")
         if fitz:
             self._log("📄 PyMuPDF: Hỗ trợ đầy đủ PDF tools")
         else:

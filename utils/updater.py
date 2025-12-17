@@ -56,8 +56,8 @@ class UpdateChecker:
         try:
             update_info = self.check()
             callback(update_info)
-        except Exception as e:
-            print(f"Update check failed: {e}")
+        except Exception:
+            # Silent fail - don't bother user with update check errors
             callback(None)
     
     def check(self) -> Optional[UpdateInfo]:
@@ -105,8 +105,17 @@ class UpdateChecker:
             
             return None
             
-        except (URLError, HTTPError, json.JSONDecodeError) as e:
-            print(f"Update check error: {e}")
+        except HTTPError as e:
+            # 404 = no releases yet, not an error
+            if e.code == 404:
+                return None
+            # Other HTTP errors - log but don't show to user
+            return None
+        except (URLError, json.JSONDecodeError):
+            # Network/parsing errors - silent fail
+            return None
+        except Exception:
+            # Any other error - silent fail
             return None
     
     def _is_newer(self, latest: str, current: str) -> bool:

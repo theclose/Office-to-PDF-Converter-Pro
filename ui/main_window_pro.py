@@ -1,0 +1,1275 @@
+"""
+Office Converter Pro - Refactored Architecture
+Version 4.0.0 - Professional Grade with Preview, DnD, Recent Files
+
+Based on PM/Architect analysis:
+- Added PDF Preview
+- Real Drag & Drop support
+- Recent Files with SQLite
+- Improved code structure
+- Better error handling
+"""
+
+import os
+import sys
+import time
+import json
+import sqlite3
+import threading
+from pathlib import Path
+from datetime import datetime
+from typing import List, Optional, Set, Dict, Any, Callable
+from dataclasses import dataclass, field
+from enum import Enum, auto
+
+import customtkinter as ctk
+from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk
+
+# Add parent directories to path for imports
+ui_dir = os.path.dirname(os.path.abspath(__file__))
+package_dir = os.path.dirname(ui_dir)
+root_dir = os.path.dirname(package_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from office_converter.utils.logging_setup import setup_logging
+from office_converter.utils.config import Config
+from office_converter.utils.localization import get_text, LANGUAGES
+from office_converter.utils.pdf_tools import (
+    post_process_pdf, rasterize_pdf, parse_page_range, extract_pdf_pages, HAS_PYMUPDF
+)
+from office_converter.utils.com_pool import release_pool
+from office_converter import __version__
+from office_converter.utils.progress_estimator import log_conversion_result
+from office_converter.converters import get_converter_for_file, ExcelConverter
+
+# Setup logging
+logger = setup_logging()
+
+# ============================================================================
+# CONSTANTS & CONFIGURATION
+# ============================================================================
+
+class FileType(Enum):
+    EXCEL = auto()
+    WORD = auto()
+    POWERPOINT = auto()
+    UNKNOWN = auto()
+
+FILE_EXTENSIONS: Dict[FileType, Set[str]] = {
+    FileType.EXCEL: {".xlsx", ".xls", ".xlsm", ".xlsb"},
+    FileType.WORD: {".docx", ".doc", ".docm", ".rtf"},
+    FileType.POWERPOINT: {".pptx", ".ppt", ".pptm", ".ppsx", ".pps"},
+}
+
+ALL_EXTENSIONS = set().union(*FILE_EXTENSIONS.values())
+
+FILE_TYPE_COLORS = {
+    FileType.EXCEL: "#217346",      # Excel green
+    FileType.WORD: "#2B579A",       # Word blue
+    FileType.POWERPOINT: "#D24726", # PPT orange
+}
+
+FILE_TYPE_ICONS = {
+    FileType.EXCEL: "📗",
+    FileType.WORD: "📘",
+    FileType.POWERPOINT: "📙",
+}
+
+# CustomTkinter theme
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
+
+# ============================================================================
+# DATA MODELS
+# ============================================================================
+
+@dataclass
+class ConversionFile:
+    """Represents a file to be converted."""
+    path: str
+    file_type: FileType = field(init=False)
+    status: str = "pending"  # pending, converting, completed, failed
+    output_path: Optional[str] = None
+    error: Optional[str] = None
+    duration: float = 0.0
+    
+    def __post_init__(self):
+        self.file_type = self._detect_type()
+    
+    def _detect_type(self) -> FileType:
+        ext = Path(self.path).suffix.lower()
+        for ftype, extensions in FILE_EXTENSIONS.items():
+            if ext in extensions:
+                return ftype
+        return FileType.UNKNOWN
+    
+    @property
+    def filename(self) -> str:
+        return Path(self.path).name
+    
+    @property
+    def icon(self) -> str:
+        return FILE_TYPE_ICONS.get(self.file_type, "📄")
+
+
+@dataclass
+class ConversionOptions:
+    """Conversion settings."""
+    quality: int = 0  # 0=high, 1=compact
+    scan_mode: bool = False
+    password: Optional[str] = None
+    page_range: Optional[str] = None
+    sheet_indices: Optional[List[int]] = None
+    author: Optional[str] = None
+    title: Optional[str] = None
+
+
+# ============================================================================
+# DATABASE LAYER (Recent Files)
+# ============================================================================
+
+class RecentFilesDB:
+    """SQLite database for recent files and history."""
+    
+    def __init__(self, db_path: Optional[str] = None):
+        if db_path is None:
+            db_path = os.path.join(package_dir, "converter_history.db")
+        self.db_path = db_path
+        self._init_db()
+    
+    def _init_db(self):
+        """Initialize database tables."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS recent_files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    path TEXT UNIQUE,
+                    last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    use_count INTEGER DEFAULT 1
+                )
+            """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS conversion_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    input_path TEXT,
+                    output_path TEXT,
+                    status TEXT,
+                    duration REAL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+    
+    def add_recent(self, path: str):
+        """Add or update recent file."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                INSERT INTO recent_files (path, last_used, use_count)
+                VALUES (?, CURRENT_TIMESTAMP, 1)
+                ON CONFLICT(path) DO UPDATE SET
+                    last_used = CURRENT_TIMESTAMP,
+                    use_count = use_count + 1
+            """, (path,))
+    
+    def get_recent(self, limit: int = 10) -> List[str]:
+        """Get recent files."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                SELECT path FROM recent_files
+                WHERE path IS NOT NULL
+                ORDER BY last_used DESC
+                LIMIT ?
+            """, (limit,))
+            return [row[0] for row in cursor.fetchall() if os.path.exists(row[0])]
+    
+    def log_conversion(self, input_path: str, output_path: str, 
+                       status: str, duration: float):
+        """Log conversion result."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                INSERT INTO conversion_history 
+                (input_path, output_path, status, duration)
+                VALUES (?, ?, ?, ?)
+            """, (input_path, output_path, status, duration))
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get conversion statistics."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("""
+                SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as success,
+                    AVG(duration) as avg_duration
+                FROM conversion_history
+            """)
+            row = cursor.fetchone()
+            total, success, avg_duration = row
+            return {
+                "total": total or 0,
+                "success": success or 0,
+                "failed": (total or 0) - (success or 0),
+                "success_rate": (success / total * 100) if total else 0,
+                "avg_duration": avg_duration or 0
+            }
+
+
+# ============================================================================
+# CONVERSION ENGINE
+# ============================================================================
+
+class ConversionEngine:
+    """Handles file conversion with progress callbacks."""
+    
+    def __init__(self, on_progress: Optional[Callable] = None,
+                 on_file_complete: Optional[Callable] = None,
+                 on_error: Optional[Callable] = None):
+        self.on_progress = on_progress
+        self.on_file_complete = on_file_complete
+        self.on_error = on_error
+        self._stop_requested = False
+        self._db = RecentFilesDB()
+    
+    def stop(self):
+        """Request conversion stop."""
+        self._stop_requested = True
+    
+    def reset(self):
+        """Reset stop flag."""
+        self._stop_requested = False
+    
+    def convert_batch(self, files: List[ConversionFile], 
+                      options: ConversionOptions,
+                      output_folder: Optional[str] = None):
+        """Convert a batch of files."""
+        import pythoncom
+        pythoncom.CoInitialize()
+        
+        total = len(files)
+        
+        for i, conv_file in enumerate(files):
+            if self._stop_requested:
+                break
+            
+            conv_file.status = "converting"
+            start_time = time.time()
+            
+            # Determine output path
+            if output_folder:
+                pdf_name = Path(conv_file.path).stem + ".pdf"
+                output_path = os.path.join(output_folder, pdf_name)
+            else:
+                output_path = str(Path(conv_file.path).with_suffix(".pdf"))
+            
+            conv_file.output_path = output_path
+            
+            # Progress callback
+            if self.on_progress:
+                self.on_progress(i, total, conv_file.filename)
+            
+            try:
+                success = self._convert_single(conv_file, options)
+                conv_file.duration = time.time() - start_time
+                
+                if success:
+                    conv_file.status = "completed"
+                    self._db.add_recent(conv_file.path)
+                    self._db.log_conversion(
+                        conv_file.path, output_path, "completed", conv_file.duration
+                    )
+                else:
+                    conv_file.status = "failed"
+                    self._db.log_conversion(
+                        conv_file.path, output_path, "failed", conv_file.duration
+                    )
+                
+                if self.on_file_complete:
+                    self.on_file_complete(conv_file)
+                    
+            except Exception as e:
+                conv_file.status = "failed"
+                conv_file.error = str(e)
+                conv_file.duration = time.time() - start_time
+                
+                if self.on_error:
+                    self.on_error(conv_file, e)
+                
+                self._db.log_conversion(
+                    conv_file.path, output_path, f"error: {e}", conv_file.duration
+                )
+        
+        try:
+            pythoncom.CoUninitialize()
+        except Exception:
+            pass
+    
+    def _convert_single(self, conv_file: ConversionFile, 
+                        options: ConversionOptions) -> bool:
+        """Convert a single file."""
+        converter = get_converter_for_file(conv_file.path)
+        if not converter:
+            return False
+        
+        try:
+            # Excel with sheet indices
+            if isinstance(converter, ExcelConverter) and options.sheet_indices:
+                success = converter.convert(
+                    conv_file.path, 
+                    conv_file.output_path, 
+                    options.quality,
+                    options.sheet_indices
+                )
+            else:
+                success = converter.convert(
+                    conv_file.path, 
+                    conv_file.output_path, 
+                    options.quality
+                )
+            
+            converter.cleanup()
+            
+            if success and conv_file.output_path:
+                # Post-processing
+                self._apply_post_processing(conv_file.output_path, options)
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Conversion error: {e}")
+            raise
+    
+    def _apply_post_processing(self, pdf_path: str, options: ConversionOptions):
+        """Apply post-processing to PDF."""
+        if not HAS_PYMUPDF:
+            return
+        
+        # Page extraction
+        if options.page_range:
+            page_indices = parse_page_range(options.page_range)
+            if page_indices:
+                extract_pdf_pages(pdf_path, page_indices)
+        
+        # Password protection
+        if options.password:
+            post_process_pdf(pdf_path, password=options.password)
+        
+        # Scan mode (rasterize)
+        if options.scan_mode:
+            rasterize_pdf(pdf_path)
+
+
+# ============================================================================
+# PDF PREVIEW COMPONENT
+# ============================================================================
+
+class PDFPreviewPanel(ctk.CTkFrame):
+    """PDF preview panel using PyMuPDF."""
+    
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        
+        self.current_pdf = None
+        self.current_page = 0
+        self.total_pages = 0
+        self.photo_image = None
+        
+        self._create_widgets()
+    
+    def _create_widgets(self):
+        """Create preview widgets."""
+        # Header
+        header = ctk.CTkFrame(self, fg_color="transparent")
+        header.pack(fill="x", padx=10, pady=5)
+        
+        ctk.CTkLabel(header, text="👁️ Preview", 
+                    font=ctk.CTkFont(weight="bold")).pack(side="left")
+        
+        self.page_label = ctk.CTkLabel(header, text="", text_color="gray")
+        self.page_label.pack(side="right")
+        
+        # Preview canvas
+        self.canvas_frame = ctk.CTkFrame(self)
+        self.canvas_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        self.preview_label = ctk.CTkLabel(
+            self.canvas_frame, 
+            text="Chọn file PDF để xem preview",
+            text_color="gray"
+        )
+        self.preview_label.pack(expand=True)
+        
+        # Navigation
+        nav_frame = ctk.CTkFrame(self, fg_color="transparent")
+        nav_frame.pack(fill="x", padx=10, pady=5)
+        
+        self.btn_prev = ctk.CTkButton(nav_frame, text="◀", width=40,
+                                       command=self._prev_page, state="disabled")
+        self.btn_prev.pack(side="left", padx=5)
+        
+        self.btn_next = ctk.CTkButton(nav_frame, text="▶", width=40,
+                                       command=self._next_page, state="disabled")
+        self.btn_next.pack(side="left", padx=5)
+    
+    def load_pdf(self, pdf_path: str):
+        """Load and display PDF."""
+        if not HAS_PYMUPDF:
+            self.preview_label.configure(text="PyMuPDF không có\nKhông thể preview")
+            return
+        
+        try:
+            import fitz
+            self.current_pdf = fitz.open(pdf_path)
+            self.total_pages = len(self.current_pdf)
+            self.current_page = 0
+            self._render_page()
+            self._update_navigation()
+        except Exception as e:
+            self.preview_label.configure(text=f"Lỗi: {e}")
+    
+    def _render_page(self):
+        """Render current page."""
+        if not self.current_pdf:
+            return
+        
+        try:
+            page = self.current_pdf[self.current_page]
+            
+            # Render to image
+            zoom = 1.5
+            mat = fitz.Matrix(zoom, zoom)  # type: ignore
+            pix = page.get_pixmap(matrix=mat)
+            
+            # Convert to PIL Image
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            
+            # Resize to fit
+            max_width = 300
+            max_height = 400
+            img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+            
+            # Convert to PhotoImage
+            self.photo_image = ImageTk.PhotoImage(img)
+            
+            # Update label
+            self.preview_label.configure(image=self.photo_image, text="")
+            self.page_label.configure(
+                text=f"Trang {self.current_page + 1}/{self.total_pages}"
+            )
+            
+        except Exception as e:
+            self.preview_label.configure(text=f"Lỗi render: {e}")
+    
+    def _prev_page(self):
+        """Go to previous page."""
+        if self.current_page > 0:
+            self.current_page -= 1
+            self._render_page()
+            self._update_navigation()
+    
+    def _next_page(self):
+        """Go to next page."""
+        if self.current_page < self.total_pages - 1:
+            self.current_page += 1
+            self._render_page()
+            self._update_navigation()
+    
+    def _update_navigation(self):
+        """Update navigation buttons state."""
+        self.btn_prev.configure(
+            state="normal" if self.current_page > 0 else "disabled"
+        )
+        self.btn_next.configure(
+            state="normal" if self.current_page < self.total_pages - 1 else "disabled"
+        )
+    
+    def clear(self):
+        """Clear preview."""
+        if self.current_pdf:
+            self.current_pdf.close()
+            self.current_pdf = None
+        self.photo_image = None
+        self.preview_label.configure(
+            image=None, 
+            text="Chọn file PDF để xem preview"
+        )
+        self.page_label.configure(text="")
+        self.btn_prev.configure(state="disabled")
+        self.btn_next.configure(state="disabled")
+
+
+# ============================================================================
+# FILE LIST COMPONENT
+# ============================================================================
+
+class FileListPanel(ctk.CTkFrame):
+    """Enhanced file list with drag & drop and type indicators."""
+    
+    def __init__(self, parent, on_selection_change: Optional[Callable] = None, **kwargs):
+        super().__init__(parent, **kwargs)
+        
+        self.files: List[ConversionFile] = []
+        self.on_selection_change = on_selection_change
+        
+        self._create_widgets()
+        self._setup_drag_drop()
+    
+    def _create_widgets(self):
+        """Create file list widgets."""
+        # Type indicator bar
+        self.type_bar = ctk.CTkFrame(self, height=6, corner_radius=3)
+        self.type_bar.pack(fill="x", padx=10, pady=(10, 5))
+        
+        self.excel_bar = ctk.CTkFrame(self.type_bar, fg_color=FILE_TYPE_COLORS[FileType.EXCEL])
+        self.word_bar = ctk.CTkFrame(self.type_bar, fg_color=FILE_TYPE_COLORS[FileType.WORD])
+        self.ppt_bar = ctk.CTkFrame(self.type_bar, fg_color=FILE_TYPE_COLORS[FileType.POWERPOINT])
+        
+        # Drop zone / File list
+        self.drop_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.drop_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        self.drop_label = ctk.CTkLabel(
+            self.drop_frame,
+            text="📁 Kéo thả files vào đây\n\n💡 Ctrl+O: Thêm files\n⌫ Delete: Xóa files",
+            font=ctk.CTkFont(size=14),
+            text_color="gray"
+        )
+        self.drop_label.pack(expand=True, pady=30)
+        
+        self.file_textbox = ctk.CTkTextbox(
+            self.drop_frame, 
+            font=ctk.CTkFont(family="Consolas", size=12),
+            state="disabled"
+        )
+        
+        # Stats row
+        stats_frame = ctk.CTkFrame(self, fg_color="transparent")
+        stats_frame.pack(fill="x", padx=10, pady=5)
+        
+        self.count_label = ctk.CTkLabel(
+            stats_frame, 
+            text="0 files",
+            font=ctk.CTkFont(weight="bold")
+        )
+        self.count_label.pack(side="left")
+        
+        self.types_label = ctk.CTkLabel(
+            stats_frame,
+            text="",
+            text_color="gray"
+        )
+        self.types_label.pack(side="left", padx=10)
+    
+    def _setup_drag_drop(self):
+        """Setup drag and drop support."""
+        try:
+            from tkinterdnd2 import DND_FILES, TkinterDnD
+            
+            # Check if root supports DnD
+            root = self.winfo_toplevel()
+            if hasattr(root, 'drop_target_register'):
+                self.drop_frame.drop_target_register(DND_FILES)
+                self.drop_frame.dnd_bind('<<Drop>>', self._on_drop)
+                self.drop_label.configure(text="📁 Kéo thả files vào đây\n✅ Drag & Drop đã bật")
+        except ImportError:
+            logger.info("TkinterDnD2 not available, drag & drop disabled")
+        except Exception as e:
+            logger.warning(f"Could not setup drag & drop: {e}")
+    
+    def _on_drop(self, event):
+        """Handle dropped files."""
+        files = self._parse_drop_data(event.data)
+        self.add_files(files)
+    
+    def _parse_drop_data(self, data: str) -> List[str]:
+        """Parse dropped file data."""
+        # Handle different drop formats
+        if data.startswith('{'):
+            # Windows format with braces
+            files = []
+            current = ""
+            in_brace = False
+            for char in data:
+                if char == '{':
+                    in_brace = True
+                elif char == '}':
+                    in_brace = False
+                    if current:
+                        files.append(current)
+                        current = ""
+                elif char == ' ' and not in_brace:
+                    if current:
+                        files.append(current)
+                        current = ""
+                else:
+                    current += char
+            if current:
+                files.append(current)
+            return files
+        else:
+            return data.split()
+    
+    def add_files(self, paths: List[str]):
+        """Add files to the list."""
+        added = 0
+        for path in paths:
+            # Check extension
+            ext = Path(path).suffix.lower()
+            if ext not in ALL_EXTENSIONS:
+                continue
+            
+            # Check if already exists
+            if any(f.path == path for f in self.files):
+                continue
+            
+            self.files.append(ConversionFile(path=path))
+            added += 1
+        
+        if added > 0:
+            self._refresh_display()
+        
+        return added
+    
+    def clear(self):
+        """Clear all files."""
+        self.files.clear()
+        self._refresh_display()
+    
+    def remove_completed(self):
+        """Remove completed files."""
+        self.files = [f for f in self.files if f.status != "completed"]
+        self._refresh_display()
+    
+    def _refresh_display(self):
+        """Refresh the file list display."""
+        count = len(self.files)
+        
+        # Update type bar
+        self._update_type_bar()
+        
+        # Update count
+        self.count_label.configure(text=f"{count} file{'s' if count != 1 else ''}")
+        
+        # Update type breakdown
+        type_counts = {ft: 0 for ft in FileType}
+        for f in self.files:
+            type_counts[f.file_type] += 1
+        
+        parts = []
+        if type_counts[FileType.EXCEL]: parts.append(f"📗{type_counts[FileType.EXCEL]}")
+        if type_counts[FileType.WORD]: parts.append(f"📘{type_counts[FileType.WORD]}")
+        if type_counts[FileType.POWERPOINT]: parts.append(f"📙{type_counts[FileType.POWERPOINT]}")
+        self.types_label.configure(text=" ".join(parts))
+        
+        # Update list display
+        if count == 0:
+            self.file_textbox.pack_forget()
+            self.drop_label.pack(expand=True, pady=30)
+        else:
+            self.drop_label.pack_forget()
+            self.file_textbox.pack(fill="both", expand=True)
+            
+            self.file_textbox.configure(state="normal")
+            self.file_textbox.delete("1.0", "end")
+            
+            for i, f in enumerate(self.files, 1):
+                status_icon = {
+                    "pending": f.icon,
+                    "converting": "⏳",
+                    "completed": "✅",
+                    "failed": "❌"
+                }.get(f.status, f.icon)
+                
+                line = f"{status_icon} {i:2d}. {f.filename}\n"
+                self.file_textbox.insert("end", line)
+            
+            self.file_textbox.configure(state="disabled")
+        
+        # Callback
+        if self.on_selection_change:
+            self.on_selection_change(self.files)
+    
+    def _update_type_bar(self):
+        """Update the file type distribution bar."""
+        if not self.files:
+            self.excel_bar.place_forget()
+            self.word_bar.place_forget()
+            self.ppt_bar.place_forget()
+            return
+        
+        type_counts = {ft: 0 for ft in FileType}
+        for f in self.files:
+            type_counts[f.file_type] += 1
+        
+        total = len(self.files)
+        x = 0
+        
+        for ftype, bar in [(FileType.EXCEL, self.excel_bar),
+                           (FileType.WORD, self.word_bar),
+                           (FileType.POWERPOINT, self.ppt_bar)]:
+            if type_counts[ftype]:
+                width = type_counts[ftype] / total
+                bar.place(relx=x, rely=0, relwidth=width, relheight=1)
+                x += width
+            else:
+                bar.place_forget()
+
+
+# ============================================================================
+# MAIN APPLICATION
+# ============================================================================
+
+class ConverterProApp(ctk.CTk):
+    """Professional-grade Office to PDF Converter."""
+    
+    VERSION = "4.0.0"
+    
+    def __init__(self):
+        super().__init__()
+        
+        # Core components
+        self.config = Config()
+        self.db = RecentFilesDB()
+        self.engine: Optional[ConversionEngine] = None
+        
+        # State
+        self.is_converting = False
+        self.output_folder = self.config.get("output_folder", "")
+        self.conversion_start_time = 0.0
+        
+        # Variables
+        self.var_quality = ctk.IntVar(value=self.config.pdf_quality)
+        self.var_scan_mode = ctk.BooleanVar(value=False)
+        self.var_password = ctk.StringVar()
+        self.var_password_enabled = ctk.BooleanVar(value=False)
+        self.var_page_range = ctk.StringVar()
+        self.var_sheet_option = ctk.IntVar(value=0)
+        self.var_sheet_index = ctk.StringVar(value="1")
+        
+        # Setup window
+        self.title(f"Office to PDF Converter Pro - v{self.VERSION}")
+        self.geometry("1000x750")
+        self.minsize(900, 700)
+        
+        # Center window
+        self._center_window()
+        
+        # Build UI
+        self._create_layout()
+        
+        # Keyboard shortcuts
+        self._setup_shortcuts()
+        
+        # Cleanup
+        self.protocol("WM_DELETE_WINDOW", self._on_closing)
+        
+        # Initial log
+        self._log("🚀 Office to PDF Converter Pro v4.0.0")
+        self._log("✅ Refactored architecture với Preview, DnD, Recent Files")
+        if HAS_PYMUPDF:
+            self._log("📄 PyMuPDF: Hỗ trợ đầy đủ PDF tools")
+    
+    def _center_window(self):
+        """Center window on screen."""
+        self.update_idletasks()
+        w, h = 1000, 750
+        x = (self.winfo_screenwidth() - w) // 2
+        y = (self.winfo_screenheight() - h) // 2
+        self.geometry(f"{w}x{h}+{x}+{y}")
+    
+    def _setup_shortcuts(self):
+        """Setup keyboard shortcuts."""
+        self.bind('<Control-o>', lambda e: self._add_files())
+        self.bind('<Control-v>', lambda e: self._paste_files())
+        self.bind('<Delete>', lambda e: self._clear_files())
+        self.bind('<Return>', lambda e: self._start_conversion())
+        self.bind('<Escape>', lambda e: self._stop_conversion())
+        self.bind('<F1>', lambda e: self._show_shortcuts())
+    
+    def _create_layout(self):
+        """Create the main layout."""
+        # === HEADER ===
+        self._create_header()
+        
+        # === MAIN CONTENT (3 columns) ===
+        main_frame = ctk.CTkFrame(self, fg_color="transparent")
+        main_frame.pack(fill="both", expand=True, padx=15, pady=10)
+        
+        # Left column: File list
+        left_frame = ctk.CTkFrame(main_frame, corner_radius=12)
+        left_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
+        
+        self.file_panel = FileListPanel(
+            left_frame,
+            on_selection_change=self._on_files_changed
+        )
+        self.file_panel.pack(fill="both", expand=True)
+        
+        # File action buttons
+        file_btn_frame = ctk.CTkFrame(left_frame, fg_color="transparent")
+        file_btn_frame.pack(fill="x", padx=10, pady=10)
+        
+        ctk.CTkButton(file_btn_frame, text="➕ Files", width=80,
+                     command=self._add_files).pack(side="left", padx=2)
+        ctk.CTkButton(file_btn_frame, text="📁 Folder", width=80,
+                     command=self._add_folder,
+                     fg_color="transparent", border_width=2).pack(side="left", padx=2)
+        ctk.CTkButton(file_btn_frame, text="🕐 Recent", width=80,
+                     command=self._show_recent,
+                     fg_color="transparent", border_width=2).pack(side="left", padx=2)
+        ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
+                     command=self._clear_files,
+                     fg_color="transparent", border_width=2,
+                     hover_color="#DC2626").pack(side="right")
+        
+        # Right column: Preview + Options
+        right_frame = ctk.CTkFrame(main_frame, width=350, corner_radius=12)
+        right_frame.pack(side="right", fill="y", padx=(5, 0))
+        right_frame.pack_propagate(False)
+        
+        # Preview panel
+        self.preview_panel = PDFPreviewPanel(right_frame, corner_radius=10)
+        self.preview_panel.pack(fill="x", padx=10, pady=10)
+        
+        # Options panel
+        self._create_options_panel(right_frame)
+        
+        # === CONVERT BUTTON ===
+        self.btn_convert = ctk.CTkButton(
+            main_frame,
+            text="🚀 CHUYỂN ĐỔI SANG PDF",
+            command=self._start_conversion,
+            height=50,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            fg_color="#16A34A",
+            hover_color="#15803D",
+            state="disabled"
+        )
+        self.btn_convert.pack(fill="x", pady=(10, 0))
+        
+        # === PROGRESS ===
+        self.progress_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        
+        progress_info = ctk.CTkFrame(self.progress_frame, fg_color="transparent")
+        progress_info.pack(fill="x")
+        
+        self.progress_label = ctk.CTkLabel(progress_info, text="")
+        self.progress_label.pack(side="left")
+        
+        self.time_label = ctk.CTkLabel(progress_info, text="", text_color="gray")
+        self.time_label.pack(side="right")
+        
+        self.progress_bar = ctk.CTkProgressBar(self.progress_frame, height=20)
+        self.progress_bar.pack(fill="x", pady=5)
+        self.progress_bar.set(0)
+        
+        self.btn_stop = ctk.CTkButton(
+            self.progress_frame, text="⏹️ DỪNG",
+            command=self._stop_conversion,
+            fg_color="#DC2626", hover_color="#B91C1C"
+        )
+        
+        # === LOG ===
+        log_frame = ctk.CTkFrame(self, corner_radius=12)
+        log_frame.pack(fill="x", padx=15, pady=(5, 15))
+        
+        log_header = ctk.CTkFrame(log_frame, fg_color="transparent")
+        log_header.pack(fill="x", padx=10, pady=(10, 5))
+        
+        ctk.CTkLabel(log_header, text="📋 Log",
+                    font=ctk.CTkFont(weight="bold")).pack(side="left")
+        
+        ctk.CTkButton(log_header, text="🛠️ PDF Tools", width=100,
+                     command=self._open_pdf_tools).pack(side="right")
+        
+        self.log_textbox = ctk.CTkTextbox(log_frame, height=80,
+                                          font=ctk.CTkFont(family="Consolas", size=11))
+        self.log_textbox.pack(fill="x", padx=10, pady=(0, 10))
+    
+    def _create_header(self):
+        """Create header with title and controls."""
+        header = ctk.CTkFrame(self, fg_color="transparent")
+        header.pack(fill="x", padx=15, pady=(15, 5))
+        
+        # Title
+        title_frame = ctk.CTkFrame(header, fg_color="transparent")
+        title_frame.pack(side="left")
+        
+        ctk.CTkLabel(title_frame, text="📄 Office to PDF Converter Pro",
+                    font=ctk.CTkFont(size=22, weight="bold")).pack(side="left")
+        ctk.CTkLabel(title_frame, text=f"v{self.VERSION}",
+                    text_color="gray").pack(side="left", padx=10)
+        
+        # Controls
+        controls = ctk.CTkFrame(header, fg_color="transparent")
+        controls.pack(side="right")
+        
+        ctk.CTkButton(controls, text="📊", width=35, 
+                     command=self._show_stats,
+                     fg_color="transparent", border_width=1).pack(side="left", padx=2)
+        ctk.CTkButton(controls, text="⚙️", width=35,
+                     command=self._show_settings,
+                     fg_color="transparent", border_width=1).pack(side="left", padx=2)
+        ctk.CTkButton(controls, text="❓", width=35,
+                     command=self._show_shortcuts,
+                     fg_color="transparent", border_width=1).pack(side="left", padx=2)
+        
+        # Theme switch
+        self.theme_switch = ctk.CTkSwitch(controls, text="🌙",
+                                          command=self._toggle_theme)
+        self.theme_switch.pack(side="left", padx=(15, 0))
+        if ctk.get_appearance_mode() == "Dark":
+            self.theme_switch.select()
+    
+    def _create_options_panel(self, parent):
+        """Create options panel."""
+        options = ctk.CTkFrame(parent, fg_color="transparent")
+        options.pack(fill="x", padx=10, pady=5)
+        
+        # Output folder
+        output_frame = ctk.CTkFrame(options, fg_color="transparent")
+        output_frame.pack(fill="x", pady=5)
+        
+        ctk.CTkLabel(output_frame, text="📂 Output:").pack(side="left")
+        self.output_label = ctk.CTkLabel(output_frame, text="Cùng folder gốc",
+                                          text_color="gray", wraplength=150)
+        self.output_label.pack(side="left", padx=5)
+        ctk.CTkButton(output_frame, text="Đổi", width=50, height=25,
+                     command=self._select_output,
+                     fg_color="transparent", border_width=1).pack(side="right")
+        
+        # Quality
+        quality_frame = ctk.CTkFrame(options, fg_color="transparent")
+        quality_frame.pack(fill="x", pady=5)
+        
+        ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
+        ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
+                          value=0).pack(side="left", padx=5)
+        ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
+                          value=1).pack(side="left")
+        
+        # Scan mode
+        ctk.CTkSwitch(options, text="📷 Scan Mode", 
+                     variable=self.var_scan_mode).pack(fill="x", pady=5)
+        
+        # Password
+        pw_frame = ctk.CTkFrame(options, fg_color="transparent")
+        pw_frame.pack(fill="x", pady=5)
+        
+        ctk.CTkSwitch(pw_frame, text="🔒", variable=self.var_password_enabled,
+                     command=self._on_password_toggle).pack(side="left")
+        self.password_entry = ctk.CTkEntry(pw_frame, textvariable=self.var_password,
+                                           show="*", width=120, state="disabled",
+                                           placeholder_text="Mật khẩu")
+        self.password_entry.pack(side="left", padx=5)
+        
+        # Page range
+        page_frame = ctk.CTkFrame(options, fg_color="transparent")
+        page_frame.pack(fill="x", pady=5)
+        
+        ctk.CTkLabel(page_frame, text="📄 Trang:").pack(side="left")
+        ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
+                    width=100, placeholder_text="1-3, 5").pack(side="left", padx=5)
+    
+    # =========== EVENT HANDLERS ===========
+    
+    def _on_files_changed(self, files: List[ConversionFile]):
+        """Called when file list changes."""
+        has_files = len(files) > 0
+        self.btn_convert.configure(state="normal" if has_files else "disabled")
+        
+        # Check for Excel files for sheet options
+        has_excel = any(f.file_type == FileType.EXCEL for f in files)
+        # Could show/hide sheet options here
+    
+    def _on_password_toggle(self):
+        """Toggle password entry state."""
+        if self.var_password_enabled.get():
+            self.password_entry.configure(state="normal")
+        else:
+            self.password_entry.configure(state="disabled")
+    
+    def _toggle_theme(self):
+        """Toggle dark/light theme."""
+        mode = "dark" if self.theme_switch.get() else "light"
+        ctk.set_appearance_mode(mode)
+    
+    # =========== FILE ACTIONS ===========
+    
+    def _add_files(self):
+        """Add files via dialog."""
+        filetypes = [
+            ("Office Files", " ".join(f"*{ext}" for ext in ALL_EXTENSIONS)),
+            ("Excel", "*.xlsx *.xls *.xlsm *.xlsb"),
+            ("Word", "*.docx *.doc"),
+            ("PowerPoint", "*.pptx *.ppt"),
+        ]
+        files = filedialog.askopenfilenames(filetypes=filetypes)
+        if files:
+            added = self.file_panel.add_files(list(files))
+            if added:
+                self._log(f"➕ Đã thêm {added} file(s)")
+    
+    def _add_folder(self):
+        """Add files from folder."""
+        folder = filedialog.askdirectory()
+        if folder:
+            files = []
+            for f in os.listdir(folder):
+                ext = Path(f).suffix.lower()
+                if ext in ALL_EXTENSIONS:
+                    files.append(os.path.join(folder, f))
+            
+            if files:
+                added = self.file_panel.add_files(files)
+                self._log(f"📁 Đã thêm {added} file(s) từ folder")
+    
+    def _show_recent(self):
+        """Show recent files dialog."""
+        recent = self.db.get_recent(10)
+        
+        if not recent:
+            messagebox.showinfo("Recent Files", "Chưa có files gần đây")
+            return
+        
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("🕐 Recent Files")
+        dialog.geometry("500x400")
+        dialog.transient(self)
+        dialog.grab_set()
+        
+        ctk.CTkLabel(dialog, text="📋 Files gần đây",
+                    font=ctk.CTkFont(size=16, weight="bold")).pack(pady=15)
+        
+        listbox_frame = ctk.CTkFrame(dialog)
+        listbox_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        
+        textbox = ctk.CTkTextbox(listbox_frame, font=ctk.CTkFont(size=12))
+        textbox.pack(fill="both", expand=True)
+        
+        for i, path in enumerate(recent, 1):
+            textbox.insert("end", f"{i}. {Path(path).name}\n")
+        textbox.configure(state="disabled")
+        
+        def add_all():
+            self.file_panel.add_files(recent)
+            dialog.destroy()
+            self._log(f"➕ Đã thêm {len(recent)} file(s) từ recent")
+        
+        ctk.CTkButton(dialog, text="➕ Thêm tất cả", 
+                     command=add_all).pack(pady=15)
+    
+    def _paste_files(self):
+        """Paste files from clipboard."""
+        # Future: implement clipboard paste
+        pass
+    
+    def _clear_files(self):
+        """Clear file list."""
+        if self.file_panel.files:
+            self.file_panel.clear()
+            self.preview_panel.clear()
+            self._log("🗑️ Đã xóa danh sách")
+    
+    def _select_output(self):
+        """Select output folder."""
+        folder = filedialog.askdirectory()
+        if folder:
+            self.output_folder = folder
+            display = Path(folder).name
+            self.output_label.configure(text=display, text_color="#22C55E")
+            self.config.set("output_folder", folder)
+    
+    # =========== CONVERSION ===========
+    
+    def _start_conversion(self):
+        """Start conversion process."""
+        if not self.file_panel.files or self.is_converting:
+            return
+        
+        self.is_converting = True
+        self.conversion_start_time = time.time()
+        
+        # UI updates
+        self.btn_convert.configure(state="disabled", text="⏳ Đang chuyển đổi...")
+        self.progress_frame.pack(fill="x", pady=5, after=self.btn_convert)
+        self.btn_stop.pack(pady=5)
+        self.progress_bar.set(0)
+        
+        # Create options
+        options = ConversionOptions(
+            quality=self.var_quality.get(),
+            scan_mode=self.var_scan_mode.get(),
+            password=self.var_password.get() if self.var_password_enabled.get() else None,
+            page_range=self.var_page_range.get() or None,
+        )
+        
+        if self.var_sheet_option.get() == 1:
+            parsed = parse_page_range(self.var_sheet_index.get())
+            if parsed:
+                options.sheet_indices = [i + 1 for i in parsed]
+        
+        # Create engine with callbacks
+        self.engine = ConversionEngine(
+            on_progress=self._on_progress,
+            on_file_complete=self._on_file_complete,
+            on_error=self._on_error
+        )
+        
+        # Start time display
+        self._update_time_display()
+        
+        # Start conversion thread
+        thread = threading.Thread(
+            target=self._run_conversion,
+            args=(options,),
+            daemon=True
+        )
+        thread.start()
+    
+    def _run_conversion(self, options: ConversionOptions):
+        """Run conversion in background thread."""
+        self.engine.convert_batch(
+            self.file_panel.files,
+            options,
+            self.output_folder if self.output_folder else None
+        )
+        self.after(0, self._on_conversion_done)
+    
+    def _stop_conversion(self):
+        """Stop conversion."""
+        if self.engine:
+            self.engine.stop()
+            self._log("⏹️ Đang dừng...")
+    
+    def _on_progress(self, current: int, total: int, filename: str):
+        """Progress callback from engine."""
+        progress = (current + 1) / total
+        self.after(0, lambda: self.progress_bar.set(progress))
+        self.after(0, lambda: self.progress_label.configure(
+            text=f"({current + 1}/{total}) {filename}"))
+    
+    def _on_file_complete(self, conv_file: ConversionFile):
+        """File completion callback."""
+        if conv_file.status == "completed":
+            self.after(0, lambda: self._log(f"✅ {conv_file.filename}"))
+        else:
+            self.after(0, lambda: self._log(f"❌ {conv_file.filename}"))
+        
+        self.after(0, self.file_panel._refresh_display)
+    
+    def _on_error(self, conv_file: ConversionFile, error: Exception):
+        """Error callback."""
+        self.after(0, lambda: self._log(f"❌ {conv_file.filename}: {str(error)[:50]}"))
+    
+    def _on_conversion_done(self):
+        """Conversion completed."""
+        self.is_converting = False
+        
+        elapsed = time.time() - self.conversion_start_time
+        mins, secs = divmod(int(elapsed), 60)
+        time_str = f"{mins}m {secs}s" if mins else f"{secs}s"
+        
+        completed = sum(1 for f in self.file_panel.files if f.status == "completed")
+        total = len(self.file_panel.files)
+        
+        self.btn_convert.configure(state="normal", text="🚀 CHUYỂN ĐỔI SANG PDF")
+        self.btn_stop.pack_forget()
+        
+        self._log(f"🎉 Hoàn thành {completed}/{total} trong {time_str}")
+        
+        if completed > 0:
+            folder = self.output_folder or str(Path(self.file_panel.files[0].path).parent)
+            if messagebox.askyesno("✅ Hoàn thành", 
+                                   f"Đã chuyển đổi {completed}/{total} files\n"
+                                   f"Thời gian: {time_str}\n\n"
+                                   f"Mở folder?"):
+                os.startfile(folder)
+    
+    def _update_time_display(self):
+        """Update elapsed time display."""
+        if self.is_converting:
+            elapsed = time.time() - self.conversion_start_time
+            mins, secs = divmod(int(elapsed), 60)
+            self.time_label.configure(text=f"⏱️ {mins:02d}:{secs:02d}")
+            self.after(1000, self._update_time_display)
+    
+    # =========== UTILITIES ===========
+    
+    def _log(self, message: str):
+        """Add log message with timestamp."""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        self.log_textbox.insert("end", f"[{timestamp}] {message}\n")
+        self.log_textbox.see("end")
+        logger.info(message)
+    
+    def _show_stats(self):
+        """Show statistics dialog."""
+        stats = self.db.get_stats()
+        
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("📊 Thống kê")
+        dialog.geometry("350x250")
+        dialog.transient(self)
+        dialog.grab_set()
+        
+        text = f"""
+📊 THỐNG KÊ TỔNG HỢP
+
+Tổng files: {stats['total']}
+Thành công: {stats['success']}
+Thất bại: {stats['failed']}
+Tỷ lệ: {stats['success_rate']:.1f}%
+Thời gian TB: {stats['avg_duration']:.1f}s
+        """
+        
+        ctk.CTkLabel(dialog, text=text, font=ctk.CTkFont(size=14),
+                    justify="left").pack(expand=True, padx=20, pady=20)
+        
+        ctk.CTkButton(dialog, text="Đóng", command=dialog.destroy).pack(pady=10)
+    
+    def _show_settings(self):
+        """Show settings dialog."""
+        from office_converter.ui.dialogs import show_settings
+        show_settings(self, self.config, "vi", lambda: None)
+    
+    def _show_shortcuts(self):
+        """Show keyboard shortcuts."""
+        shortcuts = """
+⌨️ KEYBOARD SHORTCUTS
+
+Ctrl+O     Thêm files
+Ctrl+V     Paste files
+Delete     Xóa danh sách
+Enter      Bắt đầu chuyển đổi
+Escape     Dừng chuyển đổi
+F1         Xem shortcuts
+        """
+        messagebox.showinfo("Phím tắt", shortcuts)
+    
+    def _open_pdf_tools(self):
+        """Open PDF Tools dialog."""
+        try:
+            from office_converter.ui.pdf_tools_dialog import PDFToolsDialog
+            PDFToolsDialog(self, "vi")
+        except Exception as e:
+            self._log(f"❌ Lỗi mở PDF Tools: {e}")
+    
+    def _on_closing(self):
+        """Cleanup on close."""
+        release_pool()
+        self.destroy()
+
+
+# ============================================================================
+# ENTRY POINT
+# ============================================================================
+
+def main():
+    """Application entry point."""
+    app = ConverterProApp()
+    app.mainloop()
+
+
+if __name__ == "__main__":
+    main()

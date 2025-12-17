@@ -109,13 +109,28 @@ def ocr_image(image_path: str, lang: str = 'eng+vie') -> str:
     except Exception as e:
         logger.error(f"OCR error: {e}")
         raise
+def get_best_language() -> str:
+    """Get the best available language for OCR."""
+    available = get_tesseract_languages()
+    if not available:
+        return 'eng'  # Default
+    
+    # Priority: eng+vie > vie > eng > first available
+    if 'eng' in available and 'vie' in available:
+        return 'eng+vie'
+    elif 'vie' in available:
+        return 'vie'
+    elif 'eng' in available:
+        return 'eng'
+    else:
+        return available[0]
 
 
 def ocr_pdf_to_searchable(
     input_pdf: str, 
     output_pdf: str, 
-    lang: str = 'eng+vie',
-    dpi: int = 300,
+    lang: str = None,  # None = auto-detect
+    dpi: int = 200,    # Lower DPI for faster processing
     progress_callback=None
 ) -> bool:
     """
@@ -124,8 +139,8 @@ def ocr_pdf_to_searchable(
     Args:
         input_pdf: Path to input scanned PDF
         output_pdf: Path to output searchable PDF
-        lang: Tesseract language code(s), e.g., 'eng', 'vie', 'eng+vie'
-        dpi: Resolution for image conversion
+        lang: Tesseract language code(s), e.g., 'eng', 'vie', 'eng+vie'. None = auto
+        dpi: Resolution for image conversion (lower = faster)
         progress_callback: Optional callback for progress updates
         
     Returns:
@@ -134,6 +149,22 @@ def ocr_pdf_to_searchable(
     if not is_ocr_available():
         logger.error("OCR not available")
         return False
+    
+    # Auto-detect language if not specified
+    if lang is None:
+        lang = get_best_language()
+        logger.info(f"OCR using auto-detected language: {lang}")
+    else:
+        # Validate requested language is available
+        available = get_tesseract_languages()
+        requested_langs = lang.split('+')
+        valid_langs = [l for l in requested_langs if l in available]
+        if not valid_langs:
+            lang = get_best_language()
+            logger.warning(f"Requested language not available, using: {lang}")
+        elif len(valid_langs) < len(requested_langs):
+            lang = '+'.join(valid_langs)
+            logger.warning(f"Some languages not available, using: {lang}")
     
     input_pdf = os.path.abspath(input_pdf)
     output_pdf = os.path.abspath(output_pdf)
@@ -153,6 +184,8 @@ def ocr_pdf_to_searchable(
             
     except Exception as e:
         logger.error(f"OCR PDF error: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 

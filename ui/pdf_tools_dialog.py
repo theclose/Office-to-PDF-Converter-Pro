@@ -498,11 +498,14 @@ class PDFToolsDialog:
                 if not is_ocr_available():
                     self.dialog.after(0, lambda: self._log("❌ OCR: Tesseract chưa được cài đặt"))
                     return False
-                return ocr_pdf_to_searchable(input_path, output_path, lang='eng+vie')
+                # Use lang=None for auto-detect available languages
+                return ocr_pdf_to_searchable(input_path, output_path, lang=None)
             except ImportError:
                 self.dialog.after(0, lambda: self._log("❌ OCR: Module OCR không khả dụng"))
                 return False
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 self.dialog.after(0, lambda err=str(e): self._log(f"❌ OCR error: {err}"))
                 return False
         return False

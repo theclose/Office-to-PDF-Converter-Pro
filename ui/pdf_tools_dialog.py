@@ -29,6 +29,7 @@ class PDFToolsDialog:
         ("watermark", "💧 Watermark"),
         ("pdf_to_img", "🖼️ PDF→Ảnh"),
         ("img_to_pdf", "📄 Ảnh→PDF"),
+        ("ocr", "🔍 OCR"),
     ]
     
     def __init__(self, parent, lang: str = "vi"):
@@ -490,6 +491,20 @@ class PDFToolsDialog:
             return pdf_tools.split_pdf(input_path, output_path)
         elif op == "img_to_pdf":
             return pdf_tools.images_to_pdf([input_path], output_path)
+        elif op == "ocr":
+            # OCR - convert scanned PDF to searchable PDF
+            try:
+                from office_converter.utils.ocr import ocr_pdf_to_searchable, is_ocr_available
+                if not is_ocr_available():
+                    self.dialog.after(0, lambda: self._log("❌ OCR: Tesseract chưa được cài đặt"))
+                    return False
+                return ocr_pdf_to_searchable(input_path, output_path, lang='eng+vie')
+            except ImportError:
+                self.dialog.after(0, lambda: self._log("❌ OCR: Module OCR không khả dụng"))
+                return False
+            except Exception as e:
+                self.dialog.after(0, lambda err=str(e): self._log(f"❌ OCR error: {err}"))
+                return False
         return False
     
     def _on_done(self, success: int, total: int):

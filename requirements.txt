@@ -1,5 +1,5 @@
 # Office to PDF Converter Pro - Requirements
-# Version 4.0.0
+# Version 4.0.5
 
 # Core dependencies
 pywin32>=306          # Windows COM automation for Office
@@ -10,6 +10,10 @@ Pillow>=10.0.0        # Image processing
 customtkinter>=5.2.0  # Modern Tkinter UI
 CTkToolTip>=0.8       # Tooltips for CustomTkinter
 tkinterdnd2>=0.3.0    # Drag and drop support
+
+# OCR (optional - requires Tesseract OCR installed)
+pytesseract>=0.3.10   # Tesseract OCR wrapper
+pdf2image>=1.16.0     # PDF to image conversion (requires poppler)
 
 # Development (optional)
 pytest>=7.4.0         # Testing

@@ -88,6 +88,7 @@ class BaseConverter(ABC):
 def get_converter_for_file(file_path: str) -> Optional[type]:
     """
     Factory function to get appropriate converter class for a file.
+    Returns MS Office converter classes (requires MS Office to be installed).
     
     Args:
         file_path: Path to the file
@@ -106,3 +107,50 @@ def get_converter_for_file(file_path: str) -> Optional[type]:
             return converter_class
     
     return None
+
+
+def get_best_converter(file_path: str, prefer_libreoffice: bool = False) -> Optional[type]:
+    """
+    Get the best available converter for a file.
+    Tries MS Office first, falls back to LibreOffice if MS Office fails.
+    
+    Args:
+        file_path: Path to the file
+        prefer_libreoffice: If True, prefer LibreOffice over MS Office
+        
+    Returns:
+        Converter class (not instance) or None if no converter available
+    """
+    from .libreoffice import LibreOfficeConverter, HAS_LIBREOFFICE
+    
+    # Get MS Office converter
+    ms_converter = get_converter_for_file(file_path)
+    
+    # Check if file is supported by LibreOffice
+    lo_available = HAS_LIBREOFFICE and LibreOfficeConverter.supports_file(file_path)
+    
+    if prefer_libreoffice:
+        # Prefer LibreOffice
+        if lo_available:
+            return LibreOfficeConverter
+        elif ms_converter:
+            return ms_converter
+    else:
+        # Prefer MS Office (default)
+        if ms_converter:
+            # Try to verify MS Office is available
+            try:
+                import win32com.client
+                # MS Office converter found and COM available
+                return ms_converter
+            except ImportError:
+                # No COM support, fall back to LibreOffice
+                if lo_available:
+                    logger.info("MS Office COM not available, using LibreOffice")
+                    return LibreOfficeConverter
+                return ms_converter  # Return anyway, let it fail gracefully
+        elif lo_available:
+            return LibreOfficeConverter
+    
+    return None
+

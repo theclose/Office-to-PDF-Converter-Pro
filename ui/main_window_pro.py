@@ -854,15 +854,16 @@ class ConverterProApp(ctk.CTk):
         
         # Time tracking
         self.total_estimated_time: float = 0.0
-        # Variables
-        self.var_quality = ctk.IntVar(value=self.config.pdf_quality)
-        self.var_scan_mode = ctk.BooleanVar(value=False)
+        # Variables - Load from config
+        self.var_quality = ctk.IntVar(value=self.config.get("pdf_quality", 0))
+        self.var_scan_mode = ctk.BooleanVar(value=self.config.get("scan_mode", False))
         self.var_password = ctk.StringVar()
         self.var_password_enabled = ctk.BooleanVar(value=False)
-        self.var_page_range = ctk.StringVar()
-        self.var_sheet_option = ctk.IntVar(value=0)
-        self.var_sheet_index = ctk.StringVar(value="1")
-        
+        self.var_page_range = ctk.StringVar(value=self.config.get("page_range", ""))
+        self.var_sheet_option = ctk.IntVar(value=self.config.get("sheet_option", 0))
+        self.var_sheet_index = ctk.StringVar(value=self.config.get("sheet_index", "1"))
+        self.var_output_same = ctk.BooleanVar(value=self.config.get("output_same", True))
+        self.var_output_folder = ctk.StringVar(value=self.config.get("output_folder", ""))
         # Setup window
         self.title(f"Office to PDF Converter Pro - v{self.VERSION}")
         self.geometry("1000x750")
@@ -1374,8 +1375,16 @@ class ConverterProApp(ctk.CTk):
             output_frame.pack(fill="x", pady=5)
             
             ctk.CTkLabel(output_frame, text="📂 Output:").pack(side="left")
-            self.output_label = ctk.CTkLabel(output_frame, text="Cùng folder gốc",
-                                              text_color="gray", wraplength=150)
+            # Show saved output folder or default
+            saved_folder = self.config.get("output_folder", "")
+            if saved_folder and os.path.exists(saved_folder):
+                self.output_folder = saved_folder
+                output_text = os.path.basename(saved_folder)
+            else:
+                output_text = "Cùng folder gốc"
+            self.output_label = ctk.CTkLabel(output_frame, text=output_text,
+                                              text_color="gray" if not saved_folder else "#22C55E", 
+                                              wraplength=150)
             self.output_label.pack(side="left", padx=5)
             ctk.CTkButton(output_frame, text="Đổi", width=50, height=25,
                          command=self._select_output,
@@ -1387,13 +1396,14 @@ class ConverterProApp(ctk.CTk):
             
             ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
             ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
-                              value=0).pack(side="left", padx=5)
+                              value=0, command=self._save_quality).pack(side="left", padx=5)
             ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
-                              value=1).pack(side="left")
+                              value=1, command=self._save_quality).pack(side="left")
             
             # Scan mode
             ctk.CTkSwitch(options, text="📷 Scan Mode", 
-                         variable=self.var_scan_mode).pack(fill="x", pady=5)
+                         variable=self.var_scan_mode,
+                         command=self._save_scan_mode).pack(fill="x", pady=5)
             
             # Password
             pw_frame = ctk.CTkFrame(options, fg_color="transparent")
@@ -1411,10 +1421,37 @@ class ConverterProApp(ctk.CTk):
             page_frame.pack(fill="x", pady=5)
             
             ctk.CTkLabel(page_frame, text="📄 Trang:").pack(side="left")
-            ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
-                        width=100, placeholder_text="1-3, 5").pack(side="left", padx=5)
+            page_entry = ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
+                        width=100, placeholder_text="1-3, 5")
+            page_entry.pack(side="left", padx=5)
+            # Save page range on focus out
+            page_entry.bind("<FocusOut>", lambda e: self._save_page_range())
         except Exception as e:
             logger.error(f"Create options error: {e}")
+    
+    def _save_quality(self):
+        """Save quality setting to config."""
+        try:
+            self.config.set("pdf_quality", self.var_quality.get())
+            self.config.save()
+        except Exception as e:
+            logger.error(f"Save quality error: {e}")
+    
+    def _save_scan_mode(self):
+        """Save scan mode setting to config."""
+        try:
+            self.config.set("scan_mode", self.var_scan_mode.get())
+            self.config.save()
+        except Exception as e:
+            logger.error(f"Save scan mode error: {e}")
+    
+    def _save_page_range(self):
+        """Save page range setting to config."""
+        try:
+            self.config.set("page_range", self.var_page_range.get())
+            self.config.save()
+        except Exception as e:
+            logger.error(f"Save page range error: {e}")
     
     # =========== EVENT HANDLERS ===========
     

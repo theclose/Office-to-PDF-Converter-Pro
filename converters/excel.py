@@ -140,18 +140,37 @@ class ExcelConverter(BaseConverter):
                     pass
             gc.collect()
     
-    def _safe_export(self, obj, path: str, quality: int):
-        """Robust export with multiple fallback strategies."""
-        try:
-            obj.Activate()
-        except Exception:
-            pass
+    def _safe_export(self, obj, path: str, quality: int = 0) -> None:
+        """
+        Export workbook/sheet to PDF with multiple fallback methods.
+        Handles common Excel COM errors with detailed logging.
+        """
+        # Verify temp folder is writable
+        temp_folder = os.path.dirname(path)
+        if not os.path.exists(temp_folder):
+            try:
+                os.makedirs(temp_folder, exist_ok=True)
+            except Exception as e:
+                raise Exception(f"Cannot create temp folder: {temp_folder}, {e}")
         
+        # Test write permission
+        test_file = os.path.join(temp_folder, f"_write_test_{uuid.uuid4().hex}.tmp")
+        try:
+            with open(test_file, 'w') as f:
+                f.write("test")
+            os.remove(test_file)
+        except Exception as e:
+            raise Exception(f"Temp folder not writable: {temp_folder}, {e}")
+        
+        # Clean up any existing file
         try:
             if os.path.exists(path):
                 os.remove(path)
-        except Exception:
-            pass
+        except Exception as e:
+            # If can't delete, file might be locked - try alternate name
+            alt_path = path.replace(".pdf", f"_{uuid.uuid4().hex[:8]}.pdf")
+            logger.warning(f"Cannot remove {path}, using {alt_path}: {e}")
+            path = alt_path
         
         errors = []  # Collect all errors for detailed logging
         
@@ -161,7 +180,8 @@ class ExcelConverter(BaseConverter):
                                     IncludeDocProperties=False,
                                     IgnorePrintAreas=False, 
                                     OpenAfterPublish=False)
-            return
+            if os.path.exists(path):
+                return
         except Exception as e:
             errors.append(f"Method 1 (Standard): {str(e)}")
         
@@ -171,7 +191,8 @@ class ExcelConverter(BaseConverter):
                                     IncludeDocProperties=False,
                                     IgnorePrintAreas=True,
                                     OpenAfterPublish=False)
-            return
+            if os.path.exists(path):
+                return
         except Exception as e:
             errors.append(f"Method 2 (IgnorePrintAreas): {str(e)}")
         
@@ -186,14 +207,16 @@ class ExcelConverter(BaseConverter):
                                     IncludeDocProperties=False,
                                     IgnorePrintAreas=False,
                                     OpenAfterPublish=False)
-            return
+            if os.path.exists(path):
+                return
         except Exception as e:
             errors.append(f"Method 3 (ClearPrintArea): {str(e)}")
         
         # Attempt 4: SaveAs PDF
         try:
             obj.SaveAs(Filename=path, FileFormat=57)
-            return
+            if os.path.exists(path):
+                return
         except Exception as e:
             errors.append(f"Method 4 (SaveAs): {str(e)}")
         
@@ -211,8 +234,10 @@ class ExcelConverter(BaseConverter):
                                            IncludeDocProperties=False,
                                            IgnorePrintAreas=False,
                                            OpenAfterPublish=False)
+                if os.path.exists(path):
+                    new_wb.Close(False)
+                    return
                 new_wb.Close(False)
-                return
             except Exception as e:
                 new_wb.Close(False)
                 raise e
@@ -235,8 +260,10 @@ class ExcelConverter(BaseConverter):
                                            IncludeDocProperties=False,
                                            IgnorePrintAreas=False,
                                            OpenAfterPublish=False)
+                if os.path.exists(path):
+                    new_wb.Close(False)
+                    return
                 new_wb.Close(False)
-                return
         except Exception as e:
             errors.append(f"Method 6 (RawCopy): {str(e)}")
         

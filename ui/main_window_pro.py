@@ -942,7 +942,7 @@ class ConverterProApp(ctk.CTk):
             logger.error(f"Setup drag drop error: {e}")
     
     def _handle_drop(self, files):
-        """Handle dropped files."""
+        """Handle dropped files with comprehensive Vietnamese path support."""
         try:
             if not files:
                 return
@@ -957,20 +957,41 @@ class ConverterProApp(ctk.CTk):
                 try:
                     # Handle different input types from windnd
                     if isinstance(file_path, bytes):
-                        # Use os.fsdecode for proper Windows filesystem encoding
-                        try:
-                            file_path = os.fsdecode(file_path)
-                        except (UnicodeDecodeError, LookupError):
-                            # Try common Windows encodings
-                            for encoding in ['mbcs', 'utf-8', 'cp1252', 'cp936']:
-                                try:
-                                    file_path = file_path.decode(encoding)
-                                    if os.path.exists(file_path):
-                                        break
-                                except:
-                                    continue
-                            else:
+                        # Try to decode with multiple encodings
+                        # Priority: system default (mbcs), Vietnamese (cp1258), then others
+                        decoded_path = None
+                        
+                        # Encodings to try, in priority order
+                        # cp1258 is Vietnamese Windows codepage
+                        # mbcs is Windows default multi-byte
+                        encodings_to_try = [
+                            'cp1258',  # Vietnamese Windows
+                            'utf-8',   # Universal
+                            'mbcs',    # Windows default
+                            'cp1252',  # Western European
+                            'cp936',   # Chinese
+                            'latin-1', # Fallback
+                        ]
+                        
+                        for encoding in encodings_to_try:
+                            try:
+                                test_path = file_path.decode(encoding)
+                                # Verify path exists to confirm correct decoding
+                                if os.path.exists(test_path):
+                                    decoded_path = test_path
+                                    break
+                            except (UnicodeDecodeError, LookupError, OSError):
+                                continue
+                        
+                        if decoded_path:
+                            file_path = decoded_path
+                        else:
+                            # Last resort: decode with surrogateescape
+                            try:
                                 file_path = file_path.decode('utf-8', errors='surrogateescape')
+                            except:
+                                file_path = file_path.decode('latin-1')
+                    
                     elif not isinstance(file_path, str):
                         file_path = str(file_path)
                     

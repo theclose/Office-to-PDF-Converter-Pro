@@ -267,7 +267,51 @@ class ExcelConverter(BaseConverter):
         except Exception as e:
             errors.append(f"Method 6 (RawCopy): {str(e)}")
         
+        # Attempt 7: Print to Microsoft Print to PDF
+        try:
+            app = obj.Application
+            
+            # Get current active printer
+            old_printer = None
+            try:
+                old_printer = app.ActivePrinter
+            except:
+                pass
+            
+            # Set Microsoft Print to PDF
+            try:
+                app.ActivePrinter = "Microsoft Print to PDF"
+            except:
+                try:
+                    app.ActivePrinter = "Microsoft Print to PDF on Ne00:"
+                except:
+                    pass
+            
+            # Print to file
+            if hasattr(obj, "PrintOut"):
+                obj.PrintOut(
+                    From=1,
+                    To=1000,
+                    Copies=1,
+                    ActivePrinter="Microsoft Print to PDF",
+                    PrintToFile=True,
+                    PrToFileName=path,
+                    Collate=True
+                )
+            
+            # Restore printer
+            if old_printer:
+                try:
+                    app.ActivePrinter = old_printer
+                except:
+                    pass
+            
+            if os.path.exists(path):
+                return
+        except Exception as e:
+            errors.append(f"Method 7 (PrintToPDF): {str(e)}")
+        
         # Log all errors for debugging
         error_summary = "\n".join(errors)
         logger.error(f"All export methods failed:\n{error_summary}")
-        raise Exception(f"All 6 export methods failed for: {path}\nDetails:\n{error_summary}")
+        raise Exception(f"All 7 export methods failed for: {path}\nDetails:\n{error_summary}")

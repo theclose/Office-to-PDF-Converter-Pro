@@ -972,7 +972,7 @@ class ConverterProApp(ctk.CTk):
             if added_count > 0:
                 # Refresh display
                 if self.file_panel:
-                    self.file_panel._refresh_listbox()
+                    self.file_panel._refresh_display()
                 self._log(f"📁 Thả thêm {added_count} file(s)")
                 self._on_files_changed(self.file_panel.files if self.file_panel else [])
         except Exception as e:

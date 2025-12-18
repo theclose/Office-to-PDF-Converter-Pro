@@ -954,47 +954,56 @@ class ConverterProApp(ctk.CTk):
             
             added_count = 0
             for file_path in files:
-                # Handle both bytes and str from windnd
-                if isinstance(file_path, bytes):
-                    # Try different encodings for Vietnamese paths
-                    decoded = None
-                    for encoding in ['utf-8', 'cp1252', 'gbk', 'latin-1']:
+                try:
+                    # Handle different input types from windnd
+                    if isinstance(file_path, bytes):
+                        # Use os.fsdecode for proper Windows filesystem encoding
                         try:
-                            decoded = file_path.decode(encoding)
-                            # Verify path exists
-                            if os.path.exists(decoded):
-                                file_path = decoded
-                                break
-                        except (UnicodeDecodeError, OSError):
-                            continue
-                    else:
-                        # Fallback: decode with errors='replace'
-                        file_path = file_path.decode('utf-8', errors='replace')
-                elif isinstance(file_path, str):
-                    # Already a string, just use it
-                    pass
-                else:
-                    # Unknown type, try to convert
-                    file_path = str(file_path)
-                
-                # Normalize path
-                file_path = os.path.normpath(file_path)
-                
-                # Check if file exists
-                if not os.path.exists(file_path):
-                    self._log(f"⚠️ File không tồn tại: {os.path.basename(file_path)}")
+                            file_path = os.fsdecode(file_path)
+                        except (UnicodeDecodeError, LookupError):
+                            # Try common Windows encodings
+                            for encoding in ['mbcs', 'utf-8', 'cp1252', 'cp936']:
+                                try:
+                                    file_path = file_path.decode(encoding)
+                                    if os.path.exists(file_path):
+                                        break
+                                except:
+                                    continue
+                            else:
+                                file_path = file_path.decode('utf-8', errors='surrogateescape')
+                    elif not isinstance(file_path, str):
+                        file_path = str(file_path)
+                    
+                    # Normalize path
+                    file_path = os.path.normpath(file_path)
+                    
+                    # Skip empty paths
+                    if not file_path or file_path == '.':
+                        continue
+                    
+                    # Check if file exists
+                    if not os.path.exists(file_path):
+                        # Log with basename only to avoid encoding issues in log
+                        try:
+                            basename = os.path.basename(file_path)
+                        except:
+                            basename = "unknown"
+                        self._log(f"⚠️ File không tồn tại: {basename}")
+                        continue
+                    
+                    # Check extension
+                    ext = os.path.splitext(file_path)[1].lower()
+                    if ext in all_extensions:
+                        # Add to file panel
+                        if self.file_panel:
+                            # Create ConversionFile and add
+                            conv_file = ConversionFile(path=file_path)
+                            if conv_file not in self.file_panel.files:
+                                self.file_panel.files.append(conv_file)
+                                added_count += 1
+                except Exception as file_err:
+                    logger.warning(f"Skip file due to error: {file_err}")
                     continue
-                
-                # Check extension
-                ext = os.path.splitext(file_path)[1].lower()
-                if ext in all_extensions:
-                    # Add to file panel
-                    if self.file_panel:
-                        # Create ConversionFile and add
-                        conv_file = ConversionFile(path=file_path)
-                        if conv_file not in self.file_panel.files:
-                            self.file_panel.files.append(conv_file)
-                            added_count += 1
             
             if added_count > 0:
                 # Refresh display

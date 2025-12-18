@@ -957,29 +957,44 @@ class ConverterProApp(ctk.CTk):
             for file_path in files:
                 try:
                     # Handle different input types from windnd
+                    # Debug: log raw bytes
+                    raw_data = file_path
+                    
                     if isinstance(file_path, bytes):
+                        # Log first few bytes for debugging
+                        logger.debug(f"Raw bytes: {file_path[:100]}")
+                        
                         # Try to decode with multiple encodings
-                        # Priority: system default (mbcs), Vietnamese (cp1258), then others
                         decoded_path = None
                         
-                        # Encodings to try, in priority order
-                        # cp1258 is Vietnamese Windows codepage
-                        # mbcs is Windows default multi-byte
+                        # Windows may use various encodings depending on system locale
+                        # Priority order for Vietnamese Windows:
                         encodings_to_try = [
-                            'cp1258',  # Vietnamese Windows
-                            'utf-8',   # Universal
-                            'mbcs',    # Windows default
-                            'cp1252',  # Western European
-                            'cp936',   # Chinese
-                            'latin-1', # Fallback
+                            'utf-8',       # Modern Windows
+                            'cp1258',      # Vietnamese Windows codepage
+                            'cp65001',     # UTF-8 alias
+                            'mbcs',        # Windows multi-byte
+                            'cp1252',      # Western European
+                            'ascii',       # Basic ASCII
+                            'cp936',       # Chinese
+                            'utf-16-le',   # Some Windows drag-drop uses UTF-16
+                            'latin-1',     # Always succeeds (fallback)
                         ]
                         
                         for encoding in encodings_to_try:
                             try:
                                 test_path = file_path.decode(encoding)
+                                # Clean up path (remove null chars, whitespace)
+                                test_path = test_path.strip().rstrip('\x00')
+                                # Skip empty or invalid
+                                if not test_path or len(test_path) < 3:
+                                    continue
+                                # Normalize
+                                test_path = os.path.normpath(test_path)
                                 # Verify path exists to confirm correct decoding
                                 if os.path.exists(test_path):
                                     decoded_path = test_path
+                                    logger.debug(f"Decoded with {encoding}: {test_path}")
                                     break
                             except (UnicodeDecodeError, LookupError, OSError):
                                 continue
@@ -987,11 +1002,17 @@ class ConverterProApp(ctk.CTk):
                         if decoded_path:
                             file_path = decoded_path
                         else:
-                            # Last resort: decode with surrogateescape
+                            # Try to interpret as raw filesystem bytes
                             try:
-                                file_path = file_path.decode('utf-8', errors='surrogateescape')
+                                import ctypes
+                                # Try os.fsdecode which uses surrogateescape
+                                file_path = os.fsdecode(file_path)
                             except:
+                                # Final fallback
                                 file_path = file_path.decode('latin-1')
+                            
+                            file_path = file_path.strip().rstrip('\x00')
+                            logger.warning(f"Path not verified: {file_path}")
                     
                     elif not isinstance(file_path, str):
                         file_path = str(file_path)
@@ -1000,7 +1021,7 @@ class ConverterProApp(ctk.CTk):
                     file_path = os.path.normpath(file_path)
                     
                     # Skip empty paths
-                    if not file_path or file_path == '.':
+                    if not file_path or file_path == '.' or len(file_path) < 3:
                         continue
                     
                     # Check if file exists
@@ -1011,6 +1032,7 @@ class ConverterProApp(ctk.CTk):
                         except:
                             basename = "unknown"
                         self._log(f"⚠️ File không tồn tại: {basename}")
+                        logger.warning(f"File not found: {file_path}")
                         continue
                     
                     # Check extension

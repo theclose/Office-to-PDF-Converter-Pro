@@ -741,7 +741,16 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         
         # Show completion dialog with Open Folder option
         if success > 0:
-            output_folder = self.var_output.get()
+            # Determine output folder
+            if self.var_output_same.get():
+                # Use folder of first input file
+                if self.files:
+                    output_folder = os.path.dirname(self.files[0])
+                else:
+                    output_folder = None
+            else:
+                output_folder = self.var_output_folder.get()
+            
             if output_folder and os.path.exists(output_folder):
                 result = messagebox.askyesno(
                     "✅ Hoàn thành",

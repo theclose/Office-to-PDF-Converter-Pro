@@ -712,7 +712,20 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         
         if result:
             self._log(f"✅ Đã gộp thành: {os.path.basename(output)}")
-            messagebox.showinfo("Thành công", f"Đã gộp {len(self.files)} files!")
+            # Ask to open folder
+            output_folder = os.path.dirname(output)
+            open_folder = messagebox.askyesno(
+                "✅ Thành công",
+                f"Đã gộp {len(self.files)} files!\n\n"
+                f"File: {os.path.basename(output)}\n\n"
+                f"Mở thư mục chứa file?",
+                parent=self
+            )
+            if open_folder:
+                try:
+                    os.startfile(output_folder)
+                except Exception as e:
+                    self._log(f"❌ Không thể mở folder: {e}")
         else:
             self._log("❌ Gộp thất bại!")
             messagebox.showerror("Lỗi", "Không thể gộp PDF!")

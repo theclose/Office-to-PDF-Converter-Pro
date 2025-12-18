@@ -77,12 +77,21 @@ def post_process_pdf(pdf_path: str, password: str = None,
 
 def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
     """
-    Convert PDF pages to images (rasterize) to prevent text copying.
-    Creates a "scan-like" PDF where text cannot be selected.
+    Convert PDF pages to fully flattened images (rasterize) to prevent text/image extraction.
+    Creates a true "scan-like" PDF where NOTHING can be extracted - all content becomes
+    a single bitmap image per page.
+    
+    This is the NUCLEAR option for security:
+    - Text cannot be selected/copied
+    - Embedded images CANNOT be extracted as separate objects
+    - Everything becomes a single rasterized image
     
     Args:
         pdf_path: Path to PDF file
-        dpi: Resolution (higher = better quality but larger)
+        dpi: Resolution (higher = better quality but larger file)
+             150 = good for documents
+             200 = high quality
+             300 = excellent (but large files)
         
     Returns:
         True on success
@@ -94,28 +103,62 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
         doc = fitz.open(pdf_path)
         new_doc = fitz.open()
         
-        for page in doc:
+        for page_num, page in enumerate(doc):
+            # Render page to pixmap (bitmap)
             mat = fitz.Matrix(dpi / 72, dpi / 72)
-            pix = page.get_pixmap(matrix=mat)
-            img_data = pix.tobytes("png")
+            pix = page.get_pixmap(matrix=mat, alpha=False)
             
-            rect = page.rect
-            new_page = new_doc.new_page(width=rect.width, height=rect.height)
-            new_page.insert_image(rect, stream=img_data)
+            # Convert to bytes - use JPEG for smaller size, PNG for quality
+            # JPEG is much smaller but lossy
+            # For security docs, use PNG to preserve quality
+            img_format = "png"  # Change to "jpeg" for smaller files
+            img_data = pix.tobytes(img_format)
+            
+            # Create new page with same dimensions
+            # CRITICAL: Use original rect scaled by DPI
+            page_rect = page.rect
+            new_width = page_rect.width * (dpi / 72)
+            new_height = page_rect.height * (dpi / 72)
+            
+            new_page = new_doc.new_page(width=new_width, height=new_height)
+            
+            # Insert image to cover entire page
+            # This makes the image the ONLY content - nothing else exists
+            img_rect = fitz.Rect(0, 0, new_width, new_height)
+            
+            # IMPORTANT: Use keep_proportion=False to force exact fit
+            # This ensures no white borders or scaling issues
+            new_page.insert_image(
+                img_rect,
+                stream=img_data,
+                keep_proportion=False,
+                overlay=True
+            )
         
         doc.close()
         
+        # Save with maximum compression
         temp_path = pdf_path + ".raster.tmp"
-        new_doc.save(temp_path, garbage=4, deflate=True)
+        new_doc.save(
+            temp_path,
+            garbage=4,           # Maximum garbage collection
+            deflate=True,        # Compress streams
+            clean=True,          # Remove unused objects
+            pretty=False,        # Don't prettify (smaller)
+            linear=False         # Don't linearize (web optimization not needed)
+        )
         new_doc.close()
         
+        # Replace original
         shutil.move(temp_path, pdf_path)
         return True
+        
     except Exception as e:
         logger.error(f"rasterize_pdf failed: {e}")
         try:
-            if os.path.exists(pdf_path + ".raster.tmp"):
-                os.remove(pdf_path + ".raster.tmp")
+            temp_path = pdf_path + ".raster.tmp"
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
         except Exception:
             pass
         return False

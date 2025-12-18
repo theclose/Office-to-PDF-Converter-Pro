@@ -816,7 +816,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
     
-    VERSION = "4.0.7"
+    VERSION = "4.0.8"
     
     def __init__(self):
         super().__init__()

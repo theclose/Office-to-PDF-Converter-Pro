@@ -954,9 +954,28 @@ class ConverterProApp(ctk.CTk):
             
             added_count = 0
             for file_path in files:
-                # Decode if bytes
+                # Decode if bytes - try multiple encodings for Vietnamese paths
                 if isinstance(file_path, bytes):
-                    file_path = file_path.decode('utf-8')
+                    # Try different encodings
+                    for encoding in ['utf-8', 'cp1252', 'gbk', 'latin-1']:
+                        try:
+                            file_path = file_path.decode(encoding)
+                            # Verify path exists
+                            if os.path.exists(file_path):
+                                break
+                        except (UnicodeDecodeError, OSError):
+                            continue
+                    else:
+                        # Fallback: decode with errors='replace'
+                        file_path = file_path.decode('utf-8', errors='replace')
+                
+                # Normalize path
+                file_path = os.path.normpath(file_path)
+                
+                # Check if file exists
+                if not os.path.exists(file_path):
+                    self._log(f"⚠️ File không tồn tại: {os.path.basename(file_path)}")
+                    continue
                 
                 # Check extension
                 ext = os.path.splitext(file_path)[1].lower()

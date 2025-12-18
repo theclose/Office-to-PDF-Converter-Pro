@@ -725,6 +725,28 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.progress_bar.set(1.0)
         self.lbl_status.configure(text=f"✅ Xong: {success}/{total}")
         self._log(f"\n🎉 Hoàn thành: {success}/{total} files")
+        
+        # Show completion dialog with Open Folder option
+        if success > 0:
+            output_folder = self.var_output.get()
+            if output_folder and os.path.exists(output_folder):
+                result = messagebox.askyesno(
+                    "✅ Hoàn thành",
+                    f"Đã xử lý thành công {success}/{total} files.\n\n"
+                    f"Mở thư mục chứa file đã xử lý?",
+                    parent=self
+                )
+                if result:
+                    try:
+                        os.startfile(output_folder)
+                    except Exception as e:
+                        self._log(f"❌ Không thể mở folder: {e}")
+            else:
+                messagebox.showinfo(
+                    "✅ Hoàn thành",
+                    f"Đã xử lý thành công {success}/{total} files.",
+                    parent=self
+                )
 
 
 def show_pdf_tools_pro(parent, lang: str = "vi"):

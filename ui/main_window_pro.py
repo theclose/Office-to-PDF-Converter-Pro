@@ -954,20 +954,28 @@ class ConverterProApp(ctk.CTk):
             
             added_count = 0
             for file_path in files:
-                # Decode if bytes - try multiple encodings for Vietnamese paths
+                # Handle both bytes and str from windnd
                 if isinstance(file_path, bytes):
-                    # Try different encodings
+                    # Try different encodings for Vietnamese paths
+                    decoded = None
                     for encoding in ['utf-8', 'cp1252', 'gbk', 'latin-1']:
                         try:
-                            file_path = file_path.decode(encoding)
+                            decoded = file_path.decode(encoding)
                             # Verify path exists
-                            if os.path.exists(file_path):
+                            if os.path.exists(decoded):
+                                file_path = decoded
                                 break
                         except (UnicodeDecodeError, OSError):
                             continue
                     else:
                         # Fallback: decode with errors='replace'
                         file_path = file_path.decode('utf-8', errors='replace')
+                elif isinstance(file_path, str):
+                    # Already a string, just use it
+                    pass
+                else:
+                    # Unknown type, try to convert
+                    file_path = str(file_path)
                 
                 # Normalize path
                 file_path = os.path.normpath(file_path)

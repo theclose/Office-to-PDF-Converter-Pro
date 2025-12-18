@@ -153,6 +153,8 @@ class ExcelConverter(BaseConverter):
         except Exception:
             pass
         
+        errors = []  # Collect all errors for detailed logging
+        
         # Attempt 1: Standard Export
         try:
             obj.ExportAsFixedFormat(0, path, Quality=quality, 
@@ -160,8 +162,8 @@ class ExcelConverter(BaseConverter):
                                     IgnorePrintAreas=False, 
                                     OpenAfterPublish=False)
             return
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"Method 1 (Standard): {str(e)}")
         
         # Attempt 2: Ignore Print Areas
         try:
@@ -170,8 +172,8 @@ class ExcelConverter(BaseConverter):
                                     IgnorePrintAreas=True,
                                     OpenAfterPublish=False)
             return
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"Method 2 (IgnorePrintAreas): {str(e)}")
         
         # Attempt 3: Clear Print Area
         try:
@@ -185,15 +187,15 @@ class ExcelConverter(BaseConverter):
                                     IgnorePrintAreas=False,
                                     OpenAfterPublish=False)
             return
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"Method 3 (ClearPrintArea): {str(e)}")
         
         # Attempt 4: SaveAs PDF
         try:
             obj.SaveAs(Filename=path, FileFormat=57)
             return
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"Method 4 (SaveAs): {str(e)}")
         
         # Attempt 5: Copy to new workbook
         try:
@@ -211,10 +213,11 @@ class ExcelConverter(BaseConverter):
                                            OpenAfterPublish=False)
                 new_wb.Close(False)
                 return
-            except Exception:
+            except Exception as e:
                 new_wb.Close(False)
-        except Exception:
-            pass
+                raise e
+        except Exception as e:
+            errors.append(f"Method 5 (CopyWorkbook): {str(e)}")
         
         # Attempt 6: Raw data copy
         try:
@@ -234,7 +237,10 @@ class ExcelConverter(BaseConverter):
                                            OpenAfterPublish=False)
                 new_wb.Close(False)
                 return
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(f"Method 6 (RawCopy): {str(e)}")
         
-        raise Exception(f"All 6 export methods failed for: {path}")
+        # Log all errors for debugging
+        error_summary = "\n".join(errors)
+        logger.error(f"All export methods failed:\n{error_summary}")
+        raise Exception(f"All 6 export methods failed for: {path}\nDetails:\n{error_summary}")

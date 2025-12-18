@@ -111,16 +111,31 @@ class ExcelConverter(BaseConverter):
             wb.Close(False)
             wb = None
             
-            if os.path.exists(com_pdf_path):
-                if os.path.exists(output_path):
-                    os.remove(output_path)
-                shutil.move(com_pdf_path, output_path)
+            # Wait briefly for Excel to release file
+            time.sleep(0.3)
             
-            try:
-                if os.path.exists(com_excel_path):
-                    os.remove(com_excel_path)
-            except Exception:
-                pass
+            # Retry move operation for locked files
+            if os.path.exists(com_pdf_path):
+                for attempt in range(5):
+                    try:
+                        if os.path.exists(output_path):
+                            os.remove(output_path)
+                        shutil.move(com_pdf_path, output_path)
+                        break
+                    except Exception as e:
+                        if attempt < 4:
+                            time.sleep(0.5)  # Wait for file release
+                        else:
+                            raise e
+            
+            # Cleanup temp Excel file
+            for attempt in range(3):
+                try:
+                    if os.path.exists(com_excel_path):
+                        os.remove(com_excel_path)
+                    break
+                except Exception:
+                    time.sleep(0.3)
             
             return True
             
@@ -133,11 +148,14 @@ class ExcelConverter(BaseConverter):
                     pass
             return False
         finally:
-            if os.path.exists(com_pdf_path):
+            # Retry cleanup with delays for locked files
+            for attempt in range(3):
                 try:
-                    os.remove(com_pdf_path)
+                    if os.path.exists(com_pdf_path):
+                        os.remove(com_pdf_path)
+                    break
                 except Exception:
-                    pass
+                    time.sleep(0.5)  # Wait for file to be released
             gc.collect()
     
     def _safe_export(self, obj, path: str, quality: int = 0) -> None:

@@ -4,7 +4,6 @@ Conversion History - Track and display conversion history.
 
 import os
 import json
-import time
 from datetime import datetime
 from typing import List, Dict, Optional
 from dataclasses import dataclass, asdict
@@ -23,10 +22,10 @@ class ConversionRecord:
     success: bool
     duration: float
     error: Optional[str] = None
-    
+
     def to_dict(self) -> Dict:
         return asdict(self)
-    
+
     @classmethod
     def from_dict(cls, data: Dict) -> 'ConversionRecord':
         return cls(**data)
@@ -34,18 +33,18 @@ class ConversionRecord:
 
 class ConversionHistory:
     """Manages conversion history with file persistence."""
-    
+
     MAX_RECORDS = 500  # Keep last 500 conversions
-    
+
     def __init__(self, history_file: Optional[str] = None):
         if history_file is None:
             package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             history_file = os.path.join(package_dir, "conversion_history.json")
-        
+
         self.history_file = history_file
         self.records: List[ConversionRecord] = []
         self._load()
-    
+
     def _load(self):
         """Load history from file."""
         try:
@@ -57,20 +56,20 @@ class ConversionHistory:
         except Exception as e:
             logger.error(f"Failed to load history: {e}")
             self.records = []
-    
+
     def _save(self):
         """Save history to file."""
         try:
             # Keep only last MAX_RECORDS
             if len(self.records) > self.MAX_RECORDS:
                 self.records = self.records[-self.MAX_RECORDS:]
-            
+
             with open(self.history_file, "w", encoding="utf-8") as f:
                 json.dump([r.to_dict() for r in self.records], f, indent=2, ensure_ascii=False)
         except Exception as e:
             logger.error(f"Failed to save history: {e}")
-    
-    def add(self, input_file: str, output_file: str, file_type: str, 
+
+    def add(self, input_file: str, output_file: str, file_type: str,
             success: bool, duration: float, error: Optional[str] = None):
         """Add a conversion record."""
         record = ConversionRecord(
@@ -84,25 +83,25 @@ class ConversionHistory:
         )
         self.records.append(record)
         self._save()
-    
+
     def get_recent(self, count: int = 50) -> List[ConversionRecord]:
         """Get most recent records."""
         return list(reversed(self.records[-count:]))
-    
+
     def get_stats(self) -> Dict:
         """Get conversion statistics."""
         total = len(self.records)
         success = sum(1 for r in self.records if r.success)
         failed = total - success
-        
+
         by_type = {}
         for r in self.records:
             by_type[r.file_type] = by_type.get(r.file_type, 0) + 1
-        
+
         avg_duration = 0
         if self.records:
             avg_duration = sum(r.duration for r in self.records) / total
-        
+
         return {
             "total": total,
             "success": success,
@@ -111,12 +110,12 @@ class ConversionHistory:
             "by_type": by_type,
             "avg_duration": round(avg_duration, 2)
         }
-    
+
     def clear(self):
         """Clear all history."""
         self.records = []
         self._save()
-    
+
     def search(self, query: str) -> List[ConversionRecord]:
         """Search records by filename."""
         query = query.lower()

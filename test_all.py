@@ -5,9 +5,8 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from office_converter.utils.logging_setup import setup_logging, get_logger
 from office_converter.utils.config import Config
-from office_converter.utils.localization import get_text, LANGUAGES
+from office_converter.utils.localization import get_text
 from office_converter.utils.pdf_tools import parse_page_range, HAS_PYMUPDF
 from office_converter.converters import ExcelConverter, WordConverter, PPTConverter, get_converter_for_file
 

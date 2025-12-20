@@ -7,7 +7,7 @@ from .com_pool import COMPool, get_pool, release_pool
 from .history import ConversionHistory, get_history
 
 __all__ = [
-    "Config", 
+    "Config",
     "get_text", "LANGUAGES", "set_language", "get_current_language",
     "merge_pdfs", "split_pdf", "rasterize_pdf", "post_process_pdf", "parse_page_range", "HAS_PYMUPDF",
     "setup_logging", "get_logger",

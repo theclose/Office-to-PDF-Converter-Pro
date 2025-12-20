@@ -19,37 +19,37 @@ class COMPool:
     Reuses instances instead of creating new ones for each conversion.
     Thread-safe with locking.
     """
-    
+
     _instance = None
     _lock = threading.Lock()
-    
+
     # Pool storage
     _excel: Optional[Any] = None
     _word: Optional[Any] = None
     _ppt: Optional[Any] = None
-    
+
     # Usage counters for memory optimization
     _excel_count = 0
     _word_count = 0
     _ppt_count = 0
-    
+
     # Auto-cleanup threshold (recycle after N conversions)
     RECYCLE_THRESHOLD = 50
     MAX_RETRY = 3
-    
+
     def __new__(cls):
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
                     cls._instance = super().__new__(cls)
         return cls._instance
-    
+
     def get_excel(self, _retry_count: int = 0) -> Optional[Any]:
         """Get or create Excel COM instance."""
         if _retry_count >= self.MAX_RETRY:
             logger.error("Max retries exceeded for Excel COM creation")
             return None
-        
+
         with self._lock:
             if self._excel is None:
                 try:
@@ -61,21 +61,21 @@ class COMPool:
                 except Exception as e:
                     logger.error(f"Failed to create Excel: {e}")
                     return None
-            
+
             self._excel_count += 1
-            
+
             if self._excel_count >= self.RECYCLE_THRESHOLD:
                 self._recycle_excel()
                 return self.get_excel(_retry_count + 1)
-            
+
             return self._excel
-    
+
     def get_word(self, _retry_count: int = 0) -> Optional[Any]:
         """Get or create Word COM instance."""
         if _retry_count >= self.MAX_RETRY:
             logger.error("Max retries exceeded for Word COM creation")
             return None
-        
+
         with self._lock:
             if self._word is None:
                 try:
@@ -87,21 +87,21 @@ class COMPool:
                 except Exception as e:
                     logger.error(f"Failed to create Word: {e}")
                     return None
-            
+
             self._word_count += 1
-            
+
             if self._word_count >= self.RECYCLE_THRESHOLD:
                 self._recycle_word()
                 return self.get_word(_retry_count + 1)
-            
+
             return self._word
-    
+
     def get_ppt(self, _retry_count: int = 0) -> Optional[Any]:
         """Get or create PowerPoint COM instance."""
         if _retry_count >= self.MAX_RETRY:
             logger.error("Max retries exceeded for PowerPoint COM creation")
             return None
-        
+
         with self._lock:
             if self._ppt is None:
                 try:
@@ -113,15 +113,15 @@ class COMPool:
                 except Exception as e:
                     logger.error(f"Failed to create PowerPoint: {e}")
                     return None
-            
+
             self._ppt_count += 1
-            
+
             if self._ppt_count >= self.RECYCLE_THRESHOLD:
                 self._recycle_ppt()
                 return self.get_ppt(_retry_count + 1)
-            
+
             return self._ppt
-    
+
     def _configure_excel(self, app):
         """Configure Excel for silent operation."""
         try:
@@ -133,7 +133,7 @@ class COMPool:
             app.PrintCommunication = True
         except Exception as e:
             logger.debug(f"Excel pool configure: {e}")
-    
+
     def _configure_word(self, app):
         """Configure Word for silent operation."""
         try:
@@ -144,14 +144,14 @@ class COMPool:
             app.AutomationSecurity = 3
         except Exception as e:
             logger.debug(f"Word pool configure: {e}")
-    
+
     def _configure_ppt(self, app):
         """Configure PowerPoint for silent operation."""
         try:
             app.DisplayAlerts = 0
         except Exception as e:
             logger.debug(f"PPT pool configure: {e}")
-    
+
     def _recycle_excel(self):
         """Recycle Excel instance to free memory."""
         if self._excel:
@@ -162,7 +162,7 @@ class COMPool:
             self._excel = None
             gc.collect()
             logger.info("Excel COM recycled")
-    
+
     def _recycle_word(self):
         """Recycle Word instance to free memory."""
         if self._word:
@@ -173,7 +173,7 @@ class COMPool:
             self._word = None
             gc.collect()
             logger.info("Word COM recycled")
-    
+
     def _recycle_ppt(self):
         """Recycle PowerPoint instance to free memory."""
         if self._ppt:
@@ -184,7 +184,7 @@ class COMPool:
             self._ppt = None
             gc.collect()
             logger.info("PowerPoint COM recycled")
-    
+
     def release_all(self):
         """Release all COM instances. Call on app exit."""
         with self._lock:
@@ -192,7 +192,7 @@ class COMPool:
             self._recycle_word()
             self._recycle_ppt()
             logger.info("All COM instances released")
-    
+
     def get_stats(self) -> Dict[str, int]:
         """Get usage statistics."""
         return {

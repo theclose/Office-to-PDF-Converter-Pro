@@ -6,9 +6,9 @@ from .ppt import PPTConverter
 from .libreoffice import LibreOfficeConverter, is_libreoffice_available, HAS_LIBREOFFICE
 
 __all__ = [
-    "BaseConverter", 
-    "ExcelConverter", 
-    "WordConverter", 
+    "BaseConverter",
+    "ExcelConverter",
+    "WordConverter",
     "PPTConverter",
     "LibreOfficeConverter",
     "get_converter_for_file",

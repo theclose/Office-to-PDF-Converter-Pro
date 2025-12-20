@@ -19,7 +19,7 @@ except ImportError:
     logger.warning("PyMuPDF not installed. PDF tools will be disabled.")
 
 
-def post_process_pdf(pdf_path: str, password: str = None, 
+def post_process_pdf(pdf_path: str, password: str = None,
                      author: str = None, title: str = None) -> bool:
     """
     Apply password protection and/or metadata to PDF.
@@ -35,10 +35,10 @@ def post_process_pdf(pdf_path: str, password: str = None,
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     try:
         doc = fitz.open(pdf_path)
-        
+
         # Set metadata if provided
         if author or title:
             metadata = doc.metadata
@@ -47,21 +47,21 @@ def post_process_pdf(pdf_path: str, password: str = None,
             if title:
                 metadata["title"] = title
             doc.set_metadata(metadata)
-        
+
         # Create temp path
         temp_path = pdf_path + ".tmp"
-        
+
         # Save with password or without
         if password:
             perm = fitz.PDF_PERM_PRINT | fitz.PDF_PERM_COPY
-            doc.save(temp_path, encryption=fitz.PDF_ENCRYPT_AES_256, 
+            doc.save(temp_path, encryption=fitz.PDF_ENCRYPT_AES_256,
                      user_pw=password, owner_pw=password, permissions=perm,
                      garbage=4, deflate=True)
         else:
             doc.save(temp_path, garbage=4, deflate=True)
-        
+
         doc.close()
-        
+
         # Replace original with temp
         shutil.move(temp_path, pdf_path)
         return True
@@ -98,34 +98,34 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     try:
         doc = fitz.open(pdf_path)
         new_doc = fitz.open()
-        
+
         for page_num, page in enumerate(doc):
             # Render page to pixmap (bitmap)
             mat = fitz.Matrix(dpi / 72, dpi / 72)
             pix = page.get_pixmap(matrix=mat, alpha=False)
-            
+
             # Convert to bytes - use JPEG for smaller size, PNG for quality
             # JPEG is much smaller but lossy
             # For security docs, use PNG to preserve quality
             img_format = "png"  # Change to "jpeg" for smaller files
             img_data = pix.tobytes(img_format)
-            
+
             # Create new page with same dimensions
             # CRITICAL: Use original rect scaled by DPI
             page_rect = page.rect
             new_width = page_rect.width * (dpi / 72)
             new_height = page_rect.height * (dpi / 72)
-            
+
             new_page = new_doc.new_page(width=new_width, height=new_height)
-            
+
             # Insert image to cover entire page
             # This makes the image the ONLY content - nothing else exists
             img_rect = fitz.Rect(0, 0, new_width, new_height)
-            
+
             # IMPORTANT: Use keep_proportion=False to force exact fit
             # This ensures no white borders or scaling issues
             new_page.insert_image(
@@ -134,9 +134,9 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
                 keep_proportion=False,
                 overlay=True
             )
-        
+
         doc.close()
-        
+
         # Save with maximum compression
         temp_path = pdf_path + ".raster.tmp"
         new_doc.save(
@@ -148,11 +148,11 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
             linear=False         # Don't linearize (web optimization not needed)
         )
         new_doc.close()
-        
+
         # Replace original
         shutil.move(temp_path, pdf_path)
         return True
-        
+
     except Exception as e:
         logger.error(f"rasterize_pdf failed: {e}")
         try:
@@ -176,7 +176,7 @@ def parse_page_range(range_str: str) -> Optional[List[int]]:
     """
     if not range_str or not range_str.strip():
         return None
-    
+
     pages = set()
     try:
         parts = range_str.replace(" ", "").split(",")
@@ -211,26 +211,26 @@ def extract_pdf_pages(pdf_path: str, page_indices: List[int]) -> bool:
     """
     if not HAS_PYMUPDF or not page_indices:
         return False
-    
+
     try:
         doc = fitz.open(pdf_path)
         total_pages = doc.page_count
-        
+
         valid_indices = [i for i in page_indices if 0 <= i < total_pages]
         if not valid_indices:
             doc.close()
             return False
-        
+
         new_doc = fitz.open()
         for idx in valid_indices:
             new_doc.insert_pdf(doc, from_page=idx, to_page=idx)
-        
+
         doc.close()
-        
+
         temp_path = pdf_path + ".tmp"
         new_doc.save(temp_path, garbage=4, deflate=True)
         new_doc.close()
-        
+
         shutil.move(temp_path, pdf_path)
         return True
     except Exception as e:
@@ -256,38 +256,38 @@ def merge_pdfs(pdf_files: List[str], output_path: str) -> Union[bool, str]:
     """
     if not HAS_PYMUPDF:
         return "PyMuPDF not installed"
-    
+
     if len(pdf_files) < 2:
         return "Need at least 2 PDF files to merge"
-    
+
     try:
         merged = fitz.open()
         skipped = []
-        
+
         for pdf_file in pdf_files:
             if not os.path.exists(pdf_file):
                 skipped.append(f"{os.path.basename(pdf_file)} (not found)")
                 continue
-            
+
             try:
                 doc = fitz.open(pdf_file)
                 if doc.is_encrypted:
                     doc.close()
                     skipped.append(f"{os.path.basename(pdf_file)} (encrypted)")
                     continue
-                
+
                 for page_num in range(doc.page_count):
                     merged.insert_pdf(doc, from_page=page_num, to_page=page_num)
                 doc.close()
-            except Exception as e:
+            except Exception:
                 skipped.append(f"{os.path.basename(pdf_file)} (error)")
-        
+
         if merged.page_count == 0:
             return "No pages to merge. All files failed."
-        
+
         merged.save(output_path, garbage=4, deflate=True)
         merged.close()
-        
+
         if skipped:
             return f"Merged successfully but skipped: {', '.join(skipped)}"
         return True
@@ -295,7 +295,7 @@ def merge_pdfs(pdf_files: List[str], output_path: str) -> Union[bool, str]:
         return str(e)
 
 
-def split_pdf(pdf_path: str, output_folder: str, 
+def split_pdf(pdf_path: str, output_folder: str,
               mode: str = "each") -> Tuple[int, Optional[str]]:
     """
     Split PDF into multiple files.
@@ -310,12 +310,12 @@ def split_pdf(pdf_path: str, output_folder: str,
     """
     if not HAS_PYMUPDF:
         return (0, "PyMuPDF not installed")
-    
+
     try:
         doc = fitz.open(pdf_path)
         base_name = os.path.splitext(os.path.basename(pdf_path))[0]
         count = 0
-        
+
         if mode == "each":
             for i in range(doc.page_count):
                 new_doc = fitz.open()
@@ -325,7 +325,7 @@ def split_pdf(pdf_path: str, output_folder: str,
                 new_doc.save(output_path, garbage=4, deflate=True)
                 new_doc.close()
                 count += 1
-        
+
         doc.close()
         return (count, None)
     except Exception as e:

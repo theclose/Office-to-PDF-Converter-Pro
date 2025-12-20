@@ -4,7 +4,6 @@ All specific converters (Excel, Word, PPT) inherit from this.
 """
 
 import os
-import time
 import logging
 from abc import ABC, abstractmethod
 from typing import Optional, Callable, List
@@ -14,10 +13,10 @@ logger = logging.getLogger(__name__)
 
 class BaseConverter(ABC):
     """Abstract base class for Office document converters."""
-    
+
     # Subclasses must define supported extensions
     SUPPORTED_EXTENSIONS: List[str] = []
-    
+
     def __init__(self, log_callback: Optional[Callable[[str], None]] = None,
                  progress_callback: Optional[Callable[[float], None]] = None):
         """
@@ -30,22 +29,22 @@ class BaseConverter(ABC):
         self.log_callback = log_callback or (lambda msg: None)
         self.progress_callback = progress_callback or (lambda pct: None)
         self._app = None  # COM application instance
-        
+
     def log(self, message: str):
         """Log a message to both file and UI callback."""
         logger.info(message)
         self.log_callback(message)
-        
+
     def update_progress(self, percent: float):
         """Update progress (0.0 to 1.0)."""
         self.progress_callback(min(1.0, max(0.0, percent)))
-    
+
     @classmethod
     def supports_file(cls, file_path: str) -> bool:
         """Check if this converter supports the given file."""
         ext = os.path.splitext(file_path)[1].lower()
         return ext in cls.SUPPORTED_EXTENSIONS
-    
+
     @abstractmethod
     def initialize(self) -> bool:
         """
@@ -53,7 +52,7 @@ class BaseConverter(ABC):
         Returns True if successful.
         """
         pass
-    
+
     @abstractmethod
     def convert(self, input_path: str, output_path: str, **options) -> bool:
         """
@@ -68,17 +67,17 @@ class BaseConverter(ABC):
             True if conversion successful
         """
         pass
-    
+
     @abstractmethod
     def cleanup(self):
         """Release COM resources."""
         pass
-    
+
     def __enter__(self):
         """Context manager entry."""
         self.initialize()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit."""
         self.cleanup()
@@ -99,13 +98,13 @@ def get_converter_for_file(file_path: str) -> Optional[type]:
     from .excel import ExcelConverter
     from .word import WordConverter
     from .ppt import PPTConverter
-    
+
     converters = [ExcelConverter, WordConverter, PPTConverter]
-    
+
     for converter_class in converters:
         if converter_class.supports_file(file_path):
             return converter_class
-    
+
     return None
 
 
@@ -122,13 +121,13 @@ def get_best_converter(file_path: str, prefer_libreoffice: bool = False) -> Opti
         Converter class (not instance) or None if no converter available
     """
     from .libreoffice import LibreOfficeConverter, HAS_LIBREOFFICE
-    
+
     # Get MS Office converter
     ms_converter = get_converter_for_file(file_path)
-    
+
     # Check if file is supported by LibreOffice
     lo_available = HAS_LIBREOFFICE and LibreOfficeConverter.supports_file(file_path)
-    
+
     if prefer_libreoffice:
         # Prefer LibreOffice
         if lo_available:
@@ -151,6 +150,6 @@ def get_best_converter(file_path: str, prefer_libreoffice: bool = False) -> Opti
                 return ms_converter  # Return anyway, let it fail gracefully
         elif lo_available:
             return LibreOfficeConverter
-    
+
     return None
 

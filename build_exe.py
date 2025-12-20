@@ -7,7 +7,6 @@ Usage:
     python build_exe.py --clean  # Clean build files
 """
 
-import os
 import sys
 import shutil
 import subprocess
@@ -305,7 +304,7 @@ if __name__ == "__main__":
             size_mb = exe_path.stat().st_size / (1024 * 1024)
             print()
             print("=" * 60)
-            print(f"✅ BUILD SUCCESSFUL!")
+            print("✅ BUILD SUCCESSFUL!")
             print(f"📁 Output: {exe_path}")
             print(f"📊 Size: {size_mb:.1f} MB")
             print("=" * 60)

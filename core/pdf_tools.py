@@ -34,29 +34,29 @@ def merge_pdfs(pdf_paths: List[str], output_path: str) -> bool:
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     if not pdf_paths:
         return False
-    
+
     try:
         merged_doc = fitz.open()
-        
+
         for pdf_path in pdf_paths:
             if os.path.exists(pdf_path):
                 doc = fitz.open(pdf_path)
                 merged_doc.insert_pdf(doc)
                 doc.close()
-        
+
         if len(merged_doc) == 0:
             merged_doc.close()
             return False
-        
+
         merged_doc.save(output_path)
         merged_doc.close()
-        
+
         logger.info(f"Merged {len(pdf_paths)} PDFs into {output_path}")
         return True
-        
+
     except Exception as e:
         logger.error(f"Merge error: {e}")
         return False
@@ -79,29 +79,29 @@ def split_pdf(input_path: str, output_folder: str) -> bool:
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     if not os.path.exists(input_path):
         return False
-    
+
     try:
         os.makedirs(output_folder, exist_ok=True)
-        
+
         doc = fitz.open(input_path)
         base_name = os.path.splitext(os.path.basename(input_path))[0]
         page_count = len(doc)
-        
+
         for i in range(page_count):
             new_doc = fitz.open()
             new_doc.insert_pdf(doc, from_page=i, to_page=i)
-            
+
             output_path = os.path.join(output_folder, f"{base_name}_page_{i+1:03d}.pdf")
             new_doc.save(output_path)
             new_doc.close()
-        
+
         doc.close()
         logger.info(f"Split PDF into {page_count} pages")
         return True
-        
+
     except Exception as e:
         logger.error(f"Split error: {e}")
         return False
@@ -111,7 +111,7 @@ def split_pdf(input_path: str, output_folder: str) -> bool:
 # PROTECT PDF - Password Protection
 # =============================================================================
 
-def protect_pdf(input_path: str, output_path: str, password: str, 
+def protect_pdf(input_path: str, output_path: str, password: str,
                 owner_password: str = None) -> bool:
     """
     Add password protection to a PDF file.
@@ -127,25 +127,25 @@ def protect_pdf(input_path: str, output_path: str, password: str,
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     if not os.path.exists(input_path):
         return False
-    
+
     if not password:
         logger.error("Password cannot be empty")
         return False
-    
+
     try:
         doc = fitz.open(input_path)
-        
+
         # Use owner password same as user password if not specified
         if owner_password is None:
             owner_password = password
-        
+
         # Set encryption
         perm = fitz.PDF_PERM_PRINT | fitz.PDF_PERM_COPY  # Allow print and copy
         encrypt = fitz.PDF_ENCRYPT_AES_256  # Strong encryption
-        
+
         doc.save(
             output_path,
             encryption=encrypt,
@@ -154,10 +154,10 @@ def protect_pdf(input_path: str, output_path: str, password: str,
             permissions=perm
         )
         doc.close()
-        
+
         logger.info(f"Protected PDF saved to {output_path}")
         return True
-        
+
     except Exception as e:
         logger.error(f"Protect PDF error: {e}")
         return False
@@ -192,29 +192,29 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
     if not HAS_PYMUPDF:
         logger.error("PyMuPDF (fitz) not installed")
         return False, 0.0
-    
+
     # Validate input file
     if not os.path.exists(input_path):
         logger.error(f"Input file not found: {input_path}")
         return False, 0.0
-    
+
     original_size = os.path.getsize(input_path)
     if original_size == 0:
         logger.error("Input file is empty")
         return False, 0.0
-    
+
     logger.info(f"Starting compression: {input_path}")
     logger.info(f"Original size: {original_size / 1024:.1f} KB")
-    
+
     try:
         # Open PDF
         doc = fitz.open(input_path)
-        
+
         if doc.page_count == 0:
             logger.error("PDF has no pages")
             doc.close()
             return False, 0.0
-        
+
         # ========================================
         # STEP 1: Remove metadata and dead weight
         # ========================================
@@ -237,7 +237,7 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
             logger.info("Step 1: Metadata removed")
         except Exception as e:
             logger.warning(f"Scrub failed (continuing): {e}")
-        
+
         # ========================================
         # STEP 2: Subset fonts (only used glyphs)
         # ========================================
@@ -246,7 +246,7 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
             logger.info("Step 2: Fonts subsetted")
         except Exception as e:
             logger.warning(f"Font subset failed (continuing): {e}")
-        
+
         # ========================================
         # STEP 3: Quality-based settings
         # ========================================
@@ -269,7 +269,7 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
         }
         settings = quality_settings.get(quality, quality_settings["medium"])
         logger.info(f"Step 3: Using {quality} quality settings (garbage={settings['garbage']})")
-        
+
         # ========================================
         # STEP 4: Save with compression
         # ========================================
@@ -283,28 +283,28 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
         )
         doc.close()
         logger.info("Step 4: Saved with compression")
-        
+
         # ========================================
         # STEP 5: Verify and compare
         # ========================================
         if not os.path.exists(output_path):
             logger.error("Output file was not created")
             return False, 0.0
-        
+
         new_size = os.path.getsize(output_path)
-        
+
         # If result is larger, use original
         if new_size >= original_size:
             logger.info("Compression did not reduce size - copying original")
             shutil.copy(input_path, output_path)
             return True, 0.0
-        
+
         # Calculate reduction percentage
         reduction = ((original_size - new_size) / original_size) * 100
         logger.info(f"Success: {original_size/1024:.1f}KB → {new_size/1024:.1f}KB ({reduction:.1f}% reduced)")
-        
+
         return True, reduction
-        
+
     except Exception as e:
         logger.error(f"Compression failed: {e}")
         import traceback
@@ -317,8 +317,8 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
 # =============================================================================
 
 def add_watermark(
-    input_path: str, 
-    output_path: str, 
+    input_path: str,
+    output_path: str,
     text: str,
     opacity: float = 0.3,
     font_size: int = 60,
@@ -328,22 +328,22 @@ def add_watermark(
     """Add text watermark to all pages of a PDF."""
     if not HAS_PYMUPDF:
         return False
-    
+
     if not os.path.exists(input_path):
         return False
-    
+
     # Validate rotation (only 0, 90, 180, 270 are valid for insert_text)
     if rotation not in [0, 90, 180, 270]:
         rotation = 0
-    
+
     try:
         doc = fitz.open(input_path)
-        
+
         for page in doc:
             rect = page.rect
             cx, cy = rect.width / 2, rect.height / 2
             text_width = len(text) * font_size * 0.4
-            
+
             page.insert_text(
                 point=(cx - text_width / 2, cy),
                 text=text,
@@ -353,11 +353,11 @@ def add_watermark(
                 rotate=rotation,
                 overlay=True,
             )
-        
+
         doc.save(output_path)
         doc.close()
         return True
-        
+
     except Exception as e:
         logger.error(f"Watermark error: {e}")
         return False
@@ -368,39 +368,39 @@ def add_watermark(
 # =============================================================================
 
 def pdf_to_images(
-    input_path: str, 
-    output_folder: str, 
+    input_path: str,
+    output_folder: str,
     dpi: int = 150,
     image_format: str = "png"
 ) -> List[str]:
     """Convert PDF pages to images."""
     if not HAS_PYMUPDF or not os.path.exists(input_path):
         return []
-    
+
     try:
         os.makedirs(output_folder, exist_ok=True)
         doc = fitz.open(input_path)
         base_name = os.path.splitext(os.path.basename(input_path))[0]
-        
+
         created_files = []
         zoom = dpi / 72
         matrix = fitz.Matrix(zoom, zoom)
-        
+
         for i, page in enumerate(doc):
             pix = page.get_pixmap(matrix=matrix)
             ext = "png" if image_format.lower() == "png" else "jpg"
             out_path = os.path.join(output_folder, f"{base_name}_page_{i+1:03d}.{ext}")
-            
+
             if ext == "jpg":
                 pix.save(out_path, output="jpeg", jpg_quality=90)
             else:
                 pix.save(out_path)
-            
+
             created_files.append(out_path)
-        
+
         doc.close()
         return created_files
-        
+
     except Exception as e:
         logger.error(f"PDF to images error: {e}")
         return []
@@ -414,29 +414,29 @@ def images_to_pdf(image_paths: List[str], output_path: str) -> bool:
     """Combine multiple images into a single PDF."""
     if not HAS_PYMUPDF or not image_paths:
         return False
-    
+
     try:
         doc = fitz.open()
-        
+
         for img_path in image_paths:
             if not os.path.exists(img_path):
                 continue
-            
+
             img = fitz.open(img_path)
             pdf_bytes = img.convert_to_pdf()
             img.close()
-            
+
             img_pdf = fitz.open("pdf", pdf_bytes)
             doc.insert_pdf(img_pdf)
             img_pdf.close()
-        
+
         if len(doc) == 0:
             return False
-        
+
         doc.save(output_path)
         doc.close()
         return True
-        
+
     except Exception as e:
         logger.error(f"Images to PDF error: {e}")
         return False
@@ -461,33 +461,33 @@ def rotate_pages(input_path: str, output_path: str, rotation: int, page_indices:
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     if rotation not in [90, 180, 270]:
         logger.error(f"Invalid rotation: {rotation}. Must be 90, 180, or 270.")
         return False
-    
+
     if not os.path.exists(input_path):
         return False
-    
+
     try:
         doc = fitz.open(input_path)
-        
+
         # Determine which pages to rotate
         if page_indices is None:
             pages_to_rotate = range(len(doc))
         else:
             pages_to_rotate = [i for i in page_indices if 0 <= i < len(doc)]
-        
+
         for page_idx in pages_to_rotate:
             page = doc[page_idx]
             page.set_rotation(page.rotation + rotation)
-        
+
         doc.save(output_path)
         doc.close()
-        
+
         logger.info(f"Rotated {len(list(pages_to_rotate))} pages by {rotation}°")
         return True
-        
+
     except Exception as e:
         logger.error(f"Rotate pages error: {e}")
         return False
@@ -506,7 +506,7 @@ def parse_page_range(page_range_str: str, total_pages: int) -> List[int]:
     """
     pages = set()
     parts = page_range_str.replace(" ", "").split(",")
-    
+
     for part in parts:
         if "-" in part:
             try:
@@ -524,7 +524,7 @@ def parse_page_range(page_range_str: str, total_pages: int) -> List[int]:
                     pages.add(page_num - 1)  # Convert to 0-indexed
             except ValueError:
                 continue
-    
+
     return sorted(list(pages))
 
 
@@ -542,30 +542,30 @@ def extract_pages(input_path: str, output_path: str, page_range: str) -> Tuple[b
     """
     if not HAS_PYMUPDF:
         return False, 0
-    
+
     if not os.path.exists(input_path):
         return False, 0
-    
+
     try:
         src_doc = fitz.open(input_path)
         page_indices = parse_page_range(page_range, len(src_doc))
-        
+
         if not page_indices:
             logger.error("No valid pages to extract")
             src_doc.close()
             return False, 0
-        
+
         new_doc = fitz.open()
         for idx in page_indices:
             new_doc.insert_pdf(src_doc, from_page=idx, to_page=idx)
-        
+
         new_doc.save(output_path)
         new_doc.close()
         src_doc.close()
-        
+
         logger.info(f"Extracted {len(page_indices)} pages")
         return True, len(page_indices)
-        
+
     except Exception as e:
         logger.error(f"Extract pages error: {e}")
         return False, 0
@@ -585,29 +585,29 @@ def delete_pages(input_path: str, output_path: str, page_range: str) -> Tuple[bo
     """
     if not HAS_PYMUPDF:
         return False, 0
-    
+
     if not os.path.exists(input_path):
         return False, 0
-    
+
     try:
         doc = fitz.open(input_path)
         page_indices = parse_page_range(page_range, len(doc))
-        
+
         if not page_indices:
             logger.error("No valid pages to delete")
             doc.close()
             return False, 0
-        
+
         # Delete in reverse order to maintain correct indices
         for idx in sorted(page_indices, reverse=True):
             doc.delete_page(idx)
-        
+
         doc.save(output_path)
         doc.close()
-        
+
         logger.info(f"Deleted {len(page_indices)} pages")
         return True, len(page_indices)
-        
+
     except Exception as e:
         logger.error(f"Delete pages error: {e}")
         return False, 0
@@ -628,37 +628,37 @@ def reorder_pages(input_path: str, output_path: str, new_order: List[int]) -> bo
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     if not os.path.exists(input_path):
         return False
-    
+
     try:
         src_doc = fitz.open(input_path)
-        
+
         # Validate new_order
         total_pages = len(src_doc)
         if len(new_order) != total_pages:
             logger.error(f"new_order length ({len(new_order)}) != total pages ({total_pages})")
             src_doc.close()
             return False
-        
+
         if set(new_order) != set(range(total_pages)):
             logger.error("new_order must contain each page index exactly once")
             src_doc.close()
             return False
-        
+
         # Create new document with pages in new order
         new_doc = fitz.open()
         for idx in new_order:
             new_doc.insert_pdf(src_doc, from_page=idx, to_page=idx)
-        
+
         new_doc.save(output_path)
         new_doc.close()
         src_doc.close()
-        
+
         logger.info(f"Reordered {total_pages} pages")
         return True
-        
+
     except Exception as e:
         logger.error(f"Reorder pages error: {e}")
         return False
@@ -677,17 +677,17 @@ def reverse_pages(input_path: str, output_path: str) -> bool:
     """
     if not HAS_PYMUPDF:
         return False
-    
+
     if not os.path.exists(input_path):
         return False
-    
+
     try:
         src_doc = fitz.open(input_path)
         new_order = list(range(len(src_doc) - 1, -1, -1))  # Reverse order
         src_doc.close()
-        
+
         return reorder_pages(input_path, output_path, new_order)
-        
+
     except Exception as e:
         logger.error(f"Reverse pages error: {e}")
         return False

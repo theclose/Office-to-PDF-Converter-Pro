@@ -2,7 +2,7 @@
 Localization Module - Multi-language support.
 """
 
-from typing import Dict, Any
+from typing import Dict
 
 # === MULTI-LANGUAGE DICTIONARY ===
 LANGUAGES: Dict[str, Dict[str, str]] = {

@@ -42,7 +42,7 @@ def test_modules():
     
     # Test 3: ExcelConverter
     print("\n[TEST 3] ExcelConverter...")
-    converter = ExcelConverter()
+    ExcelConverter()
     print(f"  Supported: {ExcelConverter.SUPPORTED_EXTENSIONS}")
     print(f"  Supports .xlsx: {ExcelConverter.supports_file('test.xlsx')}")
     print(f"  Supports .docx: {ExcelConverter.supports_file('test.docx')}")

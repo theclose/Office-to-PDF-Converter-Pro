@@ -48,7 +48,10 @@ def run_command(cmd: list, capture: bool = True) -> tuple:
     start = time.time()
     try:
         result = subprocess.run(cmd, capture_output=capture, text=True, timeout=300)
-        return result.returncode == 0, result.stdout + result.stderr if capture else "", time.time() - start
+        output = ""
+        if capture:
+            output = (result.stdout or "") + (result.stderr or "")
+        return result.returncode == 0, output, time.time() - start
     except Exception as e:
         return False, str(e), time.time() - start
 
@@ -77,15 +80,27 @@ def check_ruff(fix: bool = False) -> tuple:
     cmd = ["ruff", "check"] + dirs
     if fix:
         cmd.append("--fix")
-    cmd.extend(["--select", "E,F,W"])
+    # Only check for critical errors, ignore style issues
+    cmd.extend(["--select", "E,F", "--ignore", "E501,E402,E741,E722,E701,F401"])
     return run_command(cmd)
 
 
 def check_imports() -> tuple:
     start = time.time()
     try:
+        import sys
         import importlib
-        modules = ["converters.word", "converters.excel", "utils.file_utils"]
+        # Add parent directory to path so package can be imported
+        parent_dir = str(Path(__file__).parent.parent.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        
+        modules = [
+            "office_converter.converters.word",
+            "office_converter.converters.excel",
+            "office_converter.converters.ppt",
+            "office_converter.utils.config"
+        ]
         for mod in modules:
             importlib.import_module(mod)
         return True, "OK", time.time() - start

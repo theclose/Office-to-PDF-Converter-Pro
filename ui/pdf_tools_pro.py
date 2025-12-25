@@ -14,6 +14,13 @@ import logging
 from office_converter.core import pdf_tools
 from office_converter.utils.config import Config
 
+# Try to import windnd for drag and drop
+try:
+    import windnd
+    HAS_WINDND = True
+except ImportError:
+    HAS_WINDND = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -593,40 +600,45 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self._refresh_file_list()
 
     def _setup_file_drop(self, frame):
-        """Setup drag and drop for the file list."""
-        try:
-            from tkinterdnd2 import DND_FILES
+        """Setup drag and drop for the file list using windnd."""
+        if not HAS_WINDND:
+            logger.info("windnd not available, drag drop disabled in PDF Tools")
+            return
             
-            if hasattr(self, 'drop_target_register'):
-                frame.drop_target_register(DND_FILES)
-                frame.dnd_bind('<<Drop>>', self._on_file_drop)
-        except ImportError:
-            pass  # DnD not available
+        try:
+            # Register the dialog window for drag and drop
+            windnd.hook_dropfiles(self, func=self._handle_windnd_drop)
+            logger.info("Drag and drop enabled for PDF Tools")
         except Exception as e:
             logger.warning(f"Could not setup drag & drop: {e}")
 
-    def _on_file_drop(self, event):
-        """Handle dropped files."""
+    def _handle_windnd_drop(self, files):
+        """Handle dropped files from windnd."""
         try:
-            data = event.data
-            # Parse dropped file paths
-            files = []
-            if data.startswith('{'):
-                # Windows format with braces
-                import re
-                files = re.findall(r'\{([^}]+)\}', data)
-            else:
-                files = data.split()
+            if not files:
+                return
             
             op = self.var_operation.get()
             valid_exts = {'.png', '.jpg', '.jpeg', '.bmp', '.gif'} if op == "img_to_pdf" else {'.pdf'}
             
-            for f in files:
-                ext = os.path.splitext(f)[1].lower()
-                if ext in valid_exts and f not in self.files:
-                    self.files.append(f)
+            added = 0
+            for file_path in files:
+                try:
+                    # Handle bytes from windnd
+                    if isinstance(file_path, bytes):
+                        file_path = file_path.decode('utf-8', errors='replace')
+                    
+                    # Check extension
+                    ext = os.path.splitext(file_path)[1].lower()
+                    if ext in valid_exts and file_path not in self.files:
+                        self.files.append(file_path)
+                        added += 1
+                except Exception:
+                    continue
             
-            self._refresh_file_list()
+            if added > 0:
+                self._refresh_file_list()
+                self._log(f"📁 Thả thêm {added} file(s)")
         except Exception as e:
             logger.error(f"Drop error: {e}")
 

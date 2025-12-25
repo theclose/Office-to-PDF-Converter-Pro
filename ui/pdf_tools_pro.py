@@ -102,9 +102,20 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
 
     def _on_close(self):
         """Save last operation and close."""
-        self.config.set("pdf_tools_last_operation", self.var_operation.get())
-        self.config.save()
-        self.destroy()
+        try:
+            self.config.set("pdf_tools_last_operation", self.var_operation.get())
+            self.config.save()
+        except Exception as e:
+            logger.error(f"Config save error: {e}")
+        finally:
+            self.grab_release()
+            self.destroy()
+            try:
+                if self.parent:
+                    self.parent.lift()
+                    self.parent.focus_force()
+            except Exception:
+                pass
 
     def _switch_to_operation_tab(self, op: str):
         """Switch to the tab containing the given operation."""

@@ -288,6 +288,8 @@ class ConversionEngine:
         self._stop_requested = False
         self._stop_event = threading.Event()
         self._current_converter = None  # Track current converter for force stop
+        self._current_output_path = None  # Track current output file for cleanup
+        self._incomplete_files: List[str] = []  # Track incomplete files for cleanup
         self._db = RecentFilesDB()
 
     def stop(self, force: bool = False):
@@ -303,7 +305,7 @@ class ConversionEngine:
             self._force_stop()
 
     def _force_stop(self):
-        """Force stop by cleaning up current converter and killing Office processes."""
+        """Force stop by cleaning up current converter, files and killing Office processes."""
         try:
             # Cleanup current converter if exists
             if self._current_converter:
@@ -313,10 +315,60 @@ class ConversionEngine:
                     pass
                 self._current_converter = None
             
-            # Kill hanging Office processes
+            # Kill hanging Office processes first
             self._kill_office_processes()
+            
+            # Clean up incomplete/partial output files
+            self._cleanup_incomplete_files()
+            
         except Exception as e:
             logger.error(f"Force stop error: {e}")
+
+    def _cleanup_incomplete_files(self):
+        """Clean up incomplete output files and temp files."""
+        try:
+            import glob
+            
+            # Clean up current output file if it exists and is incomplete
+            if self._current_output_path and os.path.exists(self._current_output_path):
+                try:
+                    os.remove(self._current_output_path)
+                    logger.info(f"Cleaned up incomplete file: {self._current_output_path}")
+                except Exception as e:
+                    logger.warning(f"Could not remove incomplete file: {e}")
+                self._current_output_path = None
+            
+            # Clean up any tracked incomplete files
+            for file_path in self._incomplete_files:
+                if os.path.exists(file_path):
+                    try:
+                        os.remove(file_path)
+                        logger.info(f"Cleaned up incomplete file: {file_path}")
+                    except Exception as e:
+                        logger.warning(f"Could not remove: {e}")
+            self._incomplete_files.clear()
+            
+            # Clean up temp directory for any orphaned files
+            import tempfile
+            temp_dir = tempfile.gettempdir()
+            patterns = [
+                os.path.join(temp_dir, "~$*.doc*"),  # Word temp files
+                os.path.join(temp_dir, "~$*.xls*"),  # Excel temp files  
+                os.path.join(temp_dir, "~$*.ppt*"),  # PowerPoint temp files
+            ]
+            
+            for pattern in patterns:
+                for temp_file in glob.glob(pattern):
+                    try:
+                        # Only delete recent files (created in last 5 minutes)
+                        if os.path.getmtime(temp_file) > time.time() - 300:
+                            os.remove(temp_file)
+                            logger.debug(f"Cleaned up temp file: {temp_file}")
+                    except Exception:
+                        pass
+                        
+        except Exception as e:
+            logger.warning(f"Cleanup incomplete files error: {e}")
 
     def _kill_office_processes(self):
         """Kill Office application processes that may be hung."""
@@ -340,6 +392,8 @@ class ConversionEngine:
         self._stop_requested = False
         self._stop_event.clear()
         self._current_converter = None
+        self._current_output_path = None
+        self._incomplete_files.clear()
 
     def convert_batch(self, files: List[ConversionFile],
                       options: ConversionOptions,
@@ -365,6 +419,10 @@ class ConversionEngine:
                 output_path = str(Path(conv_file.path).with_suffix(".pdf"))
 
             conv_file.output_path = output_path
+            
+            # Track current output for cleanup on force stop
+            self._current_output_path = output_path
+            self._incomplete_files.append(output_path)
 
             # Progress callback
             if self.on_progress:
@@ -379,12 +437,20 @@ class ConversionEngine:
 
                 if success:
                     conv_file.status = "completed"
+                    # Remove from incomplete list since it's done
+                    if output_path in self._incomplete_files:
+                        self._incomplete_files.remove(output_path)
+                    self._current_output_path = None
+                    
                     self._db.add_recent(conv_file.path)
                     self._db.log_conversion(
                         conv_file.path, output_path, "completed", conv_file.duration
                     )
                 else:
                     conv_file.status = "failed"
+                    # Also remove failed file from incomplete (we don't need to clean it)
+                    if output_path in self._incomplete_files:
+                        self._incomplete_files.remove(output_path)
                     self._db.log_conversion(
                         conv_file.path, output_path, "failed", conv_file.duration
                     )

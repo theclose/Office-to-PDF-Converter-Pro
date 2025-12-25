@@ -883,7 +883,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.1.5"
+    VERSION = "4.1.6"
 
     def __init__(self):
         super().__init__()

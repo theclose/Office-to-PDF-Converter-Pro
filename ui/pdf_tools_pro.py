@@ -14,12 +14,16 @@ import logging
 from office_converter.core import pdf_tools
 from office_converter.utils.config import Config
 
-# Try to import windnd for drag and drop
-try:
-    import windnd
-    HAS_WINDND = True
-except ImportError:
-    HAS_WINDND = False
+# Drag and drop support - TkinterDnD2 for robust Unicode handling
+from office_converter.utils.tkdnd_wrapper import HAS_TKDND, DND_FILES, setup_widget_dnd
+from office_converter.utils.dnd_helpers import parse_dropped_paths
+
+if HAS_TKDND:
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info("tkinterdnd2 available for PDF Tools drag-drop")
+else:
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.warning("tkinterdnd2 not available in PDF Tools")
 
 logger = logging.getLogger(__name__)
 
@@ -626,34 +630,39 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self._refresh_file_list()
 
     def _setup_file_drop(self, frame):
-        """Setup drag and drop for the file list using windnd."""
-        if not HAS_WINDND:
+        """Setup drag and drop using TkinterDnD2 with Unicode support."""
+        if not HAS_TKDND:
             logger.info("windnd not available, drag drop disabled in PDF Tools")
             return
             
         try:
             # Register the dialog window for drag and drop
-            windnd.hook_dropfiles(self, func=self._handle_windnd_drop)
-            logger.info("Drag and drop enabled for PDF Tools")
+            self.drop_target_register(DND_FILES)
+            # Bind drop event
+            self.dnd_bind('<<Drop>>', self._handle_drop_event)
+            logger.info("Drag and drop enabled for PDF Tools (TkinterDnD2)")
         except Exception as e:
             logger.warning(f"Could not setup drag & drop: {e}")
 
-    def _handle_windnd_drop(self, files):
-        """Handle dropped files from windnd."""
+    def _handle_drop_event(self, event):
+        """Handle dropped files with robust Unicode path parsing via tk.splitlist()."""
         try:
-            if not files:
+            if not event.data:
+                return
+            
+            # Parse paths using production-grade utility
+            file_paths = parse_dropped_paths(self, event.data)
+            
+            if not file_paths:
+                logger.warning("No valid files in drop event")
                 return
             
             op = self.var_operation.get()
             valid_exts = {'.png', '.jpg', '.jpeg', '.bmp', '.gif'} if op == "img_to_pdf" else {'.pdf'}
             
             added = 0
-            for file_path in files:
+            for file_path in file_paths:
                 try:
-                    # Handle bytes from windnd
-                    if isinstance(file_path, bytes):
-                        file_path = file_path.decode('utf-8', errors='replace')
-                    
                     # Check extension
                     ext = os.path.splitext(file_path)[1].lower()
                     if ext in valid_exts and file_path not in self.files:

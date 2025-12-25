@@ -1,784 +1,784 @@
 ================================================================================
-            OFFICE TO PDF CONVERTER PRO - HUONG DAN SU DUNG
+            OFFICE TO PDF CONVERTER PRO - HƯỚNG DẪN SỬ DỤNG
 ================================================================================
-Phien ban huong dan: 4.1
-Ngay cap nhat: 25/12/2024
-Doi tuong: Nguoi dung pho thong, nguoi moi bat dau
+Phiên bản hướng dẫn: 4.1
+Ngày cập nhật: 25/12/2024
+Đối tượng: Người dùng phổ thông, người mới bắt đầu
 
 ================================================================================
-0) CACH SU DUNG HUONG DAN NAY
+0) CÁCH SỬ DỤNG HƯỚNG DẪN NÀY
 ================================================================================
 
-De tim nhanh noi dung can thiet:
+Để tìm nhanh nội dung cần thiết:
 
-1) Su dung phim Ctrl+F (hoac Command+F tren Mac) de mo hop tim kiem.
-2) Go tu khoa hoac ma muc (vi du: "E01" de tim loi E01).
-3) Nhan Enter de nhay den ket qua.
+1) Sử dụng phím Ctrl+F (hoặc Command+F trên Mac) để mở hộp tìm kiếm.
+2) Gõ từ khóa hoặc mã mục (ví dụ: "E01" để tìm lỗi E01).
+3) Nhấn Enter để nhảy đến kết quả.
 
-Ma muc tham chieu nhanh:
-- [QS] = Quick Start (Bat dau nhanh)
+Mã mục tham chiếu nhanh:
+- [QS] = Quick Start (Bắt đầu nhanh)
 - [WD] = Word to PDF
 - [XL] = Excel to PDF
 - [PP] = PowerPoint to PDF
 - [SM] = Scan Mode
 - [PT] = PDF Tools
-- [TS] = Troubleshooting (Xu ly loi)
-- [FAQ] = Cau hoi thuong gap
-- [GL] = Glossary (Tu dien thuat ngu)
+- [TS] = Troubleshooting (Xử lý lỗi)
+- [FAQ] = Câu hỏi thường gặp
+- [GL] = Glossary (Từ điển thuật ngữ)
 
 ================================================================================
-MUC LUC (TABLE OF CONTENTS)
+MỤC LỤC (TABLE OF CONTENTS)
 ================================================================================
 
-1) BAT DAU NHANH (3 phut) ................................. [QS]
+1) BẮT ĐẦU NHANH (3 phút) ................................. [QS]
 2) WORD TO PDF ............................................. [WD]
 3) EXCEL TO PDF ............................................ [XL]
 4) POWERPOINT TO PDF ....................................... [PP]
-5) SCAN MODE (Che do hoa anh) .............................. [SM]
+5) SCAN MODE (Chế độ hóa ảnh) .............................. [SM]
 6) PDF TOOLS ............................................... [PT]
-   6.1) Gop PDF (Merge)
-   6.2) Tach PDF (Split)
-   6.3) Trich xuat trang (Extract)
-   6.4) Xoa trang (Delete)
+   6.1) Gộp PDF (Merge)
+   6.2) Tách PDF (Split)
+   6.3) Trích xuất trang (Extract)
+   6.4) Xóa trang (Delete)
    6.5) Xoay trang (Rotate)
-   6.6) Dao nguoc thu tu (Reverse)
-   6.7) PDF sang Anh (PDF to Image)
-   6.8) Anh sang PDF (Image to PDF)
-   6.9) OCR (Nhan dang chu)
-   6.10) Nen PDF (Compress)
-   6.11) Dat mat khau (Password)
-   6.12) Them Watermark
-   6.13) Hoa anh bao mat (Rasterize)
-7) QUAN LY FILE SAU CONVERT ................................ [FM]
-8) XU LY LOI (TROUBLESHOOTING) ............................. [TS]
-9) CAU HOI THUONG GAP (FAQ) ................................ [FAQ]
-10) TU DIEN THUAT NGU (GLOSSARY) ........................... [GL]
-11) LIEN HE HO TRO ......................................... [SP]
+   6.6) Đảo ngược thứ tự (Reverse)
+   6.7) PDF sang Ảnh (PDF to Image)
+   6.8) Ảnh sang PDF (Image to PDF)
+   6.9) OCR (Nhận dạng chữ)
+   6.10) Nén PDF (Compress)
+   6.11) Đặt mật khẩu (Password)
+   6.12) Thêm Watermark
+   6.13) Hóa ảnh bảo mật (Rasterize)
+7) QUẢN LÝ FILE SAU CONVERT ................................ [FM]
+8) XỬ LÝ LỖI (TROUBLESHOOTING) ............................. [TS]
+9) CÂU HỎI THƯỜNG GẶP (FAQ) ................................ [FAQ]
+10) TỪ ĐIỂN THUẬT NGỮ (GLOSSARY) ........................... [GL]
+11) LIÊN HỆ HỖ TRỢ ......................................... [SP]
 
 ================================================================================
-1) BAT DAU NHANH - 3 PHUT LAM RA PDF [QS]
+1) BẮT ĐẦU NHANH - 3 PHÚT LÀM RA PDF [QS]
 ================================================================================
 
-Muc tieu: Tu file Word/Excel/PowerPoint, tao ra file PDF trong 3 phut.
+Mục tiêu: Từ file Word/Excel/PowerPoint, tạo ra file PDF trong 3 phút.
 
-BUOC 1: Mo ung dung
-- Nhap doi vao bieu tuong "Office to PDF Converter Pro" tren man hinh.
+BƯỚC 1: Mở ứng dụng
+- Nhấp đôi vào biểu tượng "Office to PDF Converter Pro" trên màn hình.
 
-BUOC 2: Them file can convert
-- Cach 1: Keo tha file tu thu muc vao vung "Keo tha file vao day".
-- Cach 2: Nhan nut "Chon file" va chon file tu may tinh.
+BƯỚC 2: Thêm file cần convert
+- Cách 1: Kéo thả file từ thư mục vào vùng "Kéo thả file vào đây".
+- Cách 2: Nhấn nút "Chọn file" và chọn file từ máy tính.
 
-BUOC 3: Kiem tra danh sach file
-- File da them se hien thi trong danh sach o giua man hinh.
-- Bieu tuong mau xanh la = Excel, xanh duong = Word, cam = PowerPoint.
+BƯỚC 3: Kiểm tra danh sách file
+- File đã thêm sẽ hiển thị trong danh sách ở giữa màn hình.
+- Biểu tượng màu xanh lá = Excel, xanh dương = Word, cam = PowerPoint.
 
-BUOC 4: Nhan nut CONVERT
-- Nhan nut "CONVERT" mau xanh o cuoi man hinh.
-- Cho thanh tien trinh chay den 100%.
+BƯỚC 4: Nhấn nút CONVERT
+- Nhấn nút "CONVERT" màu xanh ở cuối màn hình.
+- Chờ thanh tiến trình chạy đến 100%.
 
-BUOC 5: Mo file PDF
-- Khi hoan thanh, ban se thay thong bao "Hoan thanh".
-- File PDF duoc luu cung thu muc voi file goc.
-- Nhan "Mo thu muc" de xem ket qua.
+BƯỚC 5: Mở file PDF
+- Khi hoàn thành, bạn sẽ thấy thông báo "Hoàn thành".
+- File PDF được lưu cùng thư mục với file gốc.
+- Nhấn "Mở thư mục" để xem kết quả.
 
-KET QUA MONG DOI:
-- File PDF duoc tao ra cung ten voi file goc, duoi .pdf
-- Noi dung giu nguyen dinh dang, font chu, hinh anh.
+KẾT QUẢ MONG ĐỢI:
+- File PDF được tạo ra cùng tên với file gốc, đuôi .pdf
+- Nội dung giữ nguyên định dạng, font chữ, hình ảnh.
 
 ================================================================================
 2) WORD TO PDF [WD]
 ================================================================================
 
-HUONG DAN CHUYEN DOI:
+HƯỚNG DẪN CHUYỂN ĐỔI:
 
-BUOC 1: Keo tha file .doc hoac .docx vao ung dung.
-BUOC 2: Kiem tra file da hien trong danh sach (bieu tuong xanh duong).
-BUOC 3: Nhan nut "CONVERT".
-BUOC 4: Cho cho den khi thanh tien do hien 100%.
-BUOC 5: Kiem tra file PDF trong cung thu muc voi file Word goc.
+BƯỚC 1: Kéo thả file .doc hoặc .docx vào ứng dụng.
+BƯỚC 2: Kiểm tra file đã hiện trong danh sách (biểu tượng xanh dương).
+BƯỚC 3: Nhấn nút "CONVERT".
+BƯỚC 4: Chờ cho đến khi thanh tiến độ hiện 100%.
+BƯỚC 5: Kiểm tra file PDF trong cùng thư mục với file Word gốc.
 
-KET QUA MONG DOI:
-- File PDF giu nguyen:
-  + Dinh dang van ban (in dam, in nghieng, gach chan)
-  + Bang bieu, hinh anh
-  + Header/Footer (dau trang/cuoi trang)
-  + So trang
+KẾT QUẢ MONG ĐỢI:
+- File PDF giữ nguyên:
+  + Định dạng văn bản (in đậm, in nghiêng, gạch chân)
+  + Bảng biểu, hình ảnh
+  + Header/Footer (đầu trang/cuối trang)
+  + Số trang
 
 TIPS:
-- Dong file Word truoc khi convert de tranh loi "file dang mo".
-- Neu file co nhieu hinh anh, thoi gian convert se lau hon.
-- File .docx (moi) convert nhanh hon file .doc (cu).
+- Đóng file Word trước khi convert để tránh lỗi "file đang mở".
+- Nếu file có nhiều hình ảnh, thời gian convert sẽ lâu hơn.
+- File .docx (mới) convert nhanh hơn file .doc (cũ).
 
-LOI THUONG GAP:
-- Loi [WD-01]: Mat font tieng Viet -> Xem muc [TS-03]
-- Loi [WD-02]: File dang mo boi chuong trinh khac -> Dong file va thu lai
+LỖI THƯỜNG GẶP:
+- Lỗi [WD-01]: Mất font tiếng Việt -> Xem mục [TS-03]
+- Lỗi [WD-02]: File đang mở bởi chương trình khác -> Đóng file và thử lại
 
 ================================================================================
 3) EXCEL TO PDF [XL]
 ================================================================================
 
-LUU Y QUAN TRONG:
-Excel khac voi Word vi du lieu co the tran ra ngoai trang giay. Doc ky de
-tranh mat du lieu sau khi convert.
+LƯU Ý QUAN TRỌNG:
+Excel khác với Word vì dữ liệu có thể tràn ra ngoài trang giấy. Đọc kỹ để
+tránh mất dữ liệu sau khi convert.
 
-HUONG DAN CHUYEN DOI:
+HƯỚNG DẪN CHUYỂN ĐỔI:
 
-BUOC 1: Keo tha file .xls hoac .xlsx vao ung dung.
-BUOC 2: Kiem tra file da hien trong danh sach (bieu tuong mau xanh la).
-BUOC 3: Chon che do chat luong:
-        - "Cao" (High): Giu nguyen tat ca, file lon hon
-        - "Thap" (Low): Nen nhe, file nho hon
-BUOC 4: Nhan nut "CONVERT".
-BUOC 5: Mo file PDF va kiem tra tat ca cac cot, dong hien thi day du.
+BƯỚC 1: Kéo thả file .xls hoặc .xlsx vào ứng dụng.
+BƯỚC 2: Kiểm tra file đã hiện trong danh sách (biểu tượng màu xanh lá).
+BƯỚC 3: Chọn chế độ chất lượng:
+        - "Cao" (High): Giữ nguyên tất cả, file lớn hơn
+        - "Thấp" (Low): Nén nhẹ, file nhỏ hơn
+BƯỚC 4: Nhấn nút "CONVERT".
+BƯỚC 5: Mở file PDF và kiểm tra tất cả các cột, dòng hiển thị đầy đủ.
 
-KET QUA MONG DOI:
-- Tat ca cac sheet duoc convert (theo mac dinh).
-- Noi dung nam gon trong trang A4.
+KẾT QUẢ MONG ĐỢI:
+- Tất cả các sheet được convert (theo mặc định).
+- Nội dung nằm gọn trong trang A4.
 
-TIPS TRANH BI CAT COT:
-- Truoc khi convert, mo file Excel va vao:
+TIPS TRÁNH BỊ CẮT CỘT:
+- Trước khi convert, mở file Excel và vào:
   File > Print > Page Setup > Fit to 1 page wide
-- Hoac thu nho co chu trong Excel truoc khi convert.
-- Chon huong ngang (Landscape) cho bang nhieu cot.
+- Hoặc thu nhỏ cỡ chữ trong Excel trước khi convert.
+- Chọn hướng ngang (Landscape) cho bảng nhiều cột.
 
 WARNING:
-Neu bang Excel co qua nhieu cot (hon 20 cot), chu co the bi nho den muc
-khong doc duoc. Hay thu chia nho bang hoac xoay ngang trang.
+Nếu bảng Excel có quá nhiều cột (hơn 20 cột), chữ có thể bị nhỏ đến mức
+không đọc được. Hãy thử chia nhỏ bảng hoặc xoay ngang trang.
 
-LOI THUONG GAP:
-- Loi [XL-01]: Bi cat cot -> Xem muc [TS-04]
-- Loi [XL-02]: Chi thay 1 sheet -> Ung dung convert tat ca sheet theo mac dinh
-- Loi [XL-03]: Bang trong -> Kiem tra sheet co du lieu khong
+LỖI THƯỜNG GẶP:
+- Lỗi [XL-01]: Bị cắt cột -> Xem mục [TS-04]
+- Lỗi [XL-02]: Chỉ thấy 1 sheet -> Ứng dụng convert tất cả sheet theo mặc định
+- Lỗi [XL-03]: Bảng trống -> Kiểm tra sheet có dữ liệu không
 
 ================================================================================
 4) POWERPOINT TO PDF [PP]
 ================================================================================
 
-HUONG DAN CHUYEN DOI:
+HƯỚNG DẪN CHUYỂN ĐỔI:
 
-BUOC 1: Keo tha file .ppt hoac .pptx vao ung dung.
-BUOC 2: Kiem tra file da hien trong danh sach (bieu tuong mau cam).
-BUOC 3: Nhan nut "CONVERT".
-BUOC 4: Cho thanh tien trinh hoan thanh.
-BUOC 5: Mo file PDF de kiem tra.
+BƯỚC 1: Kéo thả file .ppt hoặc .pptx vào ứng dụng.
+BƯỚC 2: Kiểm tra file đã hiện trong danh sách (biểu tượng màu cam).
+BƯỚC 3: Nhấn nút "CONVERT".
+BƯỚC 4: Chờ thanh tiến trình hoàn thành.
+BƯỚC 5: Mở file PDF để kiểm tra.
 
-KET QUA MONG DOI:
-- Moi slide thanh 1 trang PDF.
-- Hinh anh, text box giu nguyen vi tri.
-- Mau sac, nen slide hien dung.
+KẾT QUẢ MONG ĐỢI:
+- Mỗi slide thành 1 trang PDF.
+- Hình ảnh, text box giữ nguyên vị trí.
+- Màu sắc, nền slide hiện đúng.
 
-LUU Y QUAN TRONG:
-- Video nhung trong slide SE KHONG PHAT duoc trong PDF (chi hien hinh anh).
-- Animation (hieu ung dong) SE MAT khi chuyen sang PDF.
-- Am thanh se khong duoc giu lai.
+LƯU Ý QUAN TRỌNG:
+- Video nhúng trong slide SẼ KHÔNG PHÁT được trong PDF (chỉ hiện hình ảnh).
+- Animation (hiệu ứng động) SẼ MẤT khi chuyển sang PDF.
+- Âm thanh sẽ không được giữ lại.
 
 TIPS:
-- Neu can giu video, hay xuat Powerpoint thanh video (.mp4) thay vi PDF.
-- Slide co nhieu hinh anh se mat thoi gian convert lau hon.
+- Nếu cần giữ video, hãy xuất PowerPoint thành video (.mp4) thay vì PDF.
+- Slide có nhiều hình ảnh sẽ mất thời gian convert lâu hơn.
 
 ================================================================================
-5) SCAN MODE - CHE DO HOA ANH BAO MAT [SM]
+5) SCAN MODE - CHẾ ĐỘ HÓA ẢNH BẢO MẬT [SM]
 ================================================================================
 
-SCAN MODE LA GI?
-Scan Mode bien file PDF thanh dang "anh chup", giong nhu ban scan (quet)
-tai lieu giay. Toan bo noi dung duoc "lam phang" thanh hinh anh.
+SCAN MODE LÀ GÌ?
+Scan Mode biến file PDF thành dạng "ảnh chụp", giống như bạn scan (quét)
+tài liệu giấy. Toàn bộ nội dung được "làm phẳng" thành hình ảnh.
 
-KHI NAO NEN DUNG?
-- Khi ban muon GIAM KHA NANG nguoi khac copy/edit noi dung.
-- Khi can gui tai lieu ma khong muon bi chinh sua.
-- Khi can tao ban PDF giong nhu scan tu may photo.
+KHI NÀO NÊN DÙNG?
+- Khi bạn muốn GIẢM KHẢ NĂNG người khác copy/edit nội dung.
+- Khi cần gửi tài liệu mà không muốn bị chỉnh sửa.
+- Khi cần tạo bản PDF giống như scan từ máy photo.
 
-CACH BAT SCAN MODE:
+CÁCH BẬT SCAN MODE:
 
-BUOC 1: Them file can convert vao ung dung.
-BUOC 2: Tim va BAT tuy chon "Scan Mode" o phan tuy chon.
-BUOC 3: Nhan nut "CONVERT".
-BUOC 4: Cho qua trinh hoan thanh.
+BƯỚC 1: Thêm file cần convert vào ứng dụng.
+BƯỚC 2: Tìm và BẬT tùy chọn "Scan Mode" ở phần tùy chọn.
+BƯỚC 3: Nhấn nút "CONVERT".
+BƯỚC 4: Chờ quá trình hoàn thành.
 
-KET QUA MONG DOI:
-- File PDF trong giong nhu anh chup.
-- Khong the boi den chon chu de copy.
-- Khong the dung cong cu PDF Editor de sua.
+KẾT QUẢ MONG ĐỢI:
+- File PDF trông giống như ảnh chụp.
+- Không thể bôi đen chọn chữ để copy.
+- Không thể dùng công cụ PDF Editor để sửa.
 
 ---------------------------------------------------------------------------
-CHON DPI (DO PHAN GIAI):
+CHỌN DPI (ĐỘ PHÂN GIẢI):
 ---------------------------------------------------------------------------
 
-DPI la gi?
-DPI = "Dots Per Inch" - so diem anh tren moi inch.
-DPI cang cao -> hinh cang net -> file cang nang.
+DPI là gì?
+DPI = "Dots Per Inch" - số điểm ảnh trên mỗi inch.
+DPI càng cao -> hình càng nét -> file càng nặng.
 
-Huong dan chon:
+Hướng dẫn chọn:
 
-| DPI  | Chat luong  | Dung luong | Dung khi                    |
+| DPI  | Chất lượng  | Dung lượng | Dùng khi                    |
 |------|-------------|------------|-----------------------------|
-| 100  | Thap        | Nho nhat   | Doc nhanh, khong can net    |
-| 150  | Vua (*)     | Vua        | Phu hop hau het truong hop  |
-| 200  | Cao         | Lon        | Can doc chu nho             |
-| 300  | Rat cao     | Rat lon    | In an chuyen nghiep         |
+| 100  | Thấp        | Nhỏ nhất   | Đọc nhanh, không cần nét    |
+| 150  | Vừa (*)     | Vừa        | Phù hợp hầu hết trường hợp  |
+| 200  | Cao         | Lớn        | Cần đọc chữ nhỏ             |
+| 300  | Rất cao     | Rất lớn    | In ấn chuyên nghiệp         |
 
-(*) Mac dinh: 150 DPI - can bang giua chat luong va dung luong.
+(*) Mặc định: 150 DPI - cân bằng giữa chất lượng và dung lượng.
 
 ---------------------------------------------------------------------------
-TUY CHON NANG CAO: HIEU UNG SCAN THAT
+TÙY CHỌN NÂNG CAO: HIỆU ỨNG SCAN THẬT
 ---------------------------------------------------------------------------
-Neu bat tuy chon "Hieu ung Scan that (Grayscale + Noise)", file se:
-- Chuyen thanh trang den (grayscale)
-- Them nhieu hat nhu giay thuc
-- Xoay nghieng nhe giong scan may photo
-- Kho bi phan tich boi phan mem AI/OCR hon
+Nếu bật tùy chọn "Hiệu ứng Scan thật (Grayscale + Noise)", file sẽ:
+- Chuyển thành trắng đen (grayscale)
+- Thêm nhiễu hạt như giấy thực
+- Xoay nghiêng nhẹ giống scan máy photo
+- Khó bị phân tích bởi phần mềm AI/OCR hơn
 
-WARNING - HAM Y VE BAO MAT:
-Scan Mode KHONG DAM BAO 100% chong copy/edit. Nguoi co ky thuat cao
-van co the dung phan mem OCR de doc lai noi dung. Tuy nhien, no lam
-TANG DO KHO KHAN dang ke so voi PDF thuong.
+WARNING - HÀM Ý VỀ BẢO MẬT:
+Scan Mode KHÔNG ĐẢM BẢO 100% chống copy/edit. Người có kỹ thuật cao
+vẫn có thể dùng phần mềm OCR để đọc lại nội dung. Tuy nhiên, nó làm
+TĂNG ĐỘ KHÓ KHĂN đáng kể so với PDF thường.
 
-TRADE-OFF DUNG LUONG:
-| File goc       | DPI 150      | DPI 300      |
+TRADE-OFF DUNG LƯỢNG:
+| File gốc       | DPI 150      | DPI 300      |
 |----------------|--------------|--------------|
 | 500 KB (text)  | 2-5 MB       | 8-20 MB      |
-| 2 MB (hinh)    | 5-10 MB      | 15-40 MB     |
+| 2 MB (hình)    | 5-10 MB      | 15-40 MB     |
 
-=> File sau Scan Mode SE LON HON file goc. Day la binh thuong.
+=> File sau Scan Mode SẼ LỚN HƠN file gốc. Đây là bình thường.
 
 ================================================================================
 6) PDF TOOLS [PT]
 ================================================================================
 
-Mo PDF Tools: Nhan nut "PDF Tools" tren thanh cong cu.
+Mở PDF Tools: Nhấn nút "PDF Tools" trên thanh công cụ.
 
 ---------------------------------------------------------------------------
-6.1) GOP PDF (MERGE) [PT-01]
+6.1) GỘP PDF (MERGE) [PT-01]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Gom nhieu file PDF rieng le thanh 1 file duy nhat.
+DÙNG KHI NÀO: Gom nhiều file PDF riêng lẻ thành 1 file duy nhất.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chinh sua" > Chon "Gop PDF".
-2) Them cac file PDF can gop (keo tha hoac chon file).
-3) Sap xep thu tu file theo mong muon.
-4) Nhan "THUC HIEN".
-5) Chon noi luu file moi.
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chỉnh sửa" > Chọn "Gộp PDF".
+2) Thêm các file PDF cần gộp (kéo thả hoặc chọn file).
+3) Sắp xếp thứ tự file theo mong muốn.
+4) Nhấn "THỰC HIỆN".
+5) Chọn nơi lưu file mới.
 
-KET QUA: 1 file PDF chua tat ca noi dung cac file theo thu tu da chon.
+KẾT QUẢ: 1 file PDF chứa tất cả nội dung các file theo thứ tự đã chọn.
 
-TIP: Keo tha de doi thu tu file truoc khi gop.
-NOTE: File ket qua co ten dang "merged_[ten file dau].pdf".
-
----------------------------------------------------------------------------
-6.2) TACH PDF (SPLIT) [PT-02]
----------------------------------------------------------------------------
-DUNG KHI NAO: Chia 1 file PDF lon thanh nhieu file nho.
-
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chinh sua" > Chon "Tach PDF".
-2) Them file PDF can tach.
-3) Chon cach tach:
-   - Tach moi trang thanh 1 file
-   - Tach theo khoang trang (vi du: 1-5, 6-10)
-4) Nhan "THUC HIEN".
-
-KET QUA: Nhieu file PDF nho, duoc danh so tu 001, 002...
-
-TIP: Dung cach tach theo khoang trang de chia chuong sach.
-WARNING: Kiem tra ky so trang truoc khi tach de tranh mat trang.
+TIP: Kéo thả để đổi thứ tự file trước khi gộp.
+NOTE: File kết quả có tên dạng "merged_[tên file đầu].pdf".
 
 ---------------------------------------------------------------------------
-6.3) TRICH XUAT TRANG (EXTRACT) [PT-03]
+6.2) TÁCH PDF (SPLIT) [PT-02]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Lay mot so trang cu the tu file PDF.
+DÙNG KHI NÀO: Chia 1 file PDF lớn thành nhiều file nhỏ.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chinh sua" > Chon "Trich xuat".
-2) Them file PDF nguon.
-3) Nhap cac trang can lay. Vi du:
-   - "1,3,5" = lay trang 1, 3, 5
-   - "1-5" = lay trang 1 den 5
-   - "1,3-5,8" = lay trang 1, trang 3 den 5, va trang 8
-4) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chỉnh sửa" > Chọn "Tách PDF".
+2) Thêm file PDF cần tách.
+3) Chọn cách tách:
+   - Tách mỗi trang thành 1 file
+   - Tách theo khoảng trang (ví dụ: 1-5, 6-10)
+4) Nhấn "THỰC HIỆN".
 
-KET QUA: File PDF moi chi chua cac trang da chon.
+KẾT QUẢ: Nhiều file PDF nhỏ, được đánh số từ 001, 002...
 
-TIP: Dung de tao ban tom tat chi voi cac trang quan trong.
-NOTE: File goc KHONG BI THAY DOI. Tool tao file moi.
+TIP: Dùng cách tách theo khoảng trang để chia chương sách.
+WARNING: Kiểm tra kỹ số trang trước khi tách để tránh mất trang.
 
 ---------------------------------------------------------------------------
-6.4) XOA TRANG (DELETE) [PT-04]
+6.3) TRÍCH XUẤT TRANG (EXTRACT) [PT-03]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Loai bo mot so trang khong can thiet.
+DÙNG KHI NÀO: Lấy một số trang cụ thể từ file PDF.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chinh sua" > Chon "Xoa trang".
-2) Them file PDF.
-3) Nhap so trang can xoa. Vi du: "2,4,6" hoac "10-15".
-4) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chỉnh sửa" > Chọn "Trích xuất".
+2) Thêm file PDF nguồn.
+3) Nhập các trang cần lấy. Ví dụ:
+   - "1,3,5" = lấy trang 1, 3, 5
+   - "1-5" = lấy trang 1 đến 5
+   - "1,3-5,8" = lấy trang 1, trang 3 đến 5, và trang 8
+4) Nhấn "THỰC HIỆN".
 
-KET QUA: File PDF moi KHONG co cac trang da xoa.
+KẾT QUẢ: File PDF mới chỉ chứa các trang đã chọn.
 
-WARNING: Kiem tra ky truoc khi xoa. Nen giu ban goc de phong mat du lieu.
-TIP: Xoa cac trang trong hoac trang quang cao khong can thiet.
+TIP: Dùng để tạo bản tóm tắt chỉ với các trang quan trọng.
+NOTE: File gốc KHÔNG BỊ THAY ĐỔI. Tool tạo file mới.
+
+---------------------------------------------------------------------------
+6.4) XÓA TRANG (DELETE) [PT-04]
+---------------------------------------------------------------------------
+DÙNG KHI NÀO: Loại bỏ một số trang không cần thiết.
+
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chỉnh sửa" > Chọn "Xóa trang".
+2) Thêm file PDF.
+3) Nhập số trang cần xóa. Ví dụ: "2,4,6" hoặc "10-15".
+4) Nhấn "THỰC HIỆN".
+
+KẾT QUẢ: File PDF mới KHÔNG có các trang đã xóa.
+
+WARNING: Kiểm tra kỹ trước khi xóa. Nên giữ bản gốc để phòng mất dữ liệu.
+TIP: Xóa các trang trống hoặc trang quảng cáo không cần thiết.
 
 ---------------------------------------------------------------------------
 6.5) XOAY TRANG (ROTATE) [PT-05]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Sua trang bi nguoc, bi xoay ngang sai huong.
+DÙNG KHI NÀO: Sửa trang bị ngược, bị xoay ngang sai hướng.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chinh sua" > Chon "Xoay".
-2) Them file PDF.
-3) Chon goc xoay: 90 do (phai), 180 do (nguoc), 270 do (trai).
-4) Chon trang can xoay hoac "Tat ca".
-5) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chỉnh sửa" > Chọn "Xoay".
+2) Thêm file PDF.
+3) Chọn góc xoay: 90 độ (phải), 180 độ (ngược), 270 độ (trái).
+4) Chọn trang cần xoay hoặc "Tất cả".
+5) Nhấn "THỰC HIỆN".
 
-KET QUA: Cac trang duoc xoay theo goc da chon.
+KẾT QUẢ: Các trang được xoay theo góc đã chọn.
 
-TIP: Thuong dung 180 do de sua trang bi nguoc dau.
-NOTE: Xoay 90 do de chuyen trang ngang thanh dung hoac nguoc lai.
-
----------------------------------------------------------------------------
-6.6) DAO NGUOC THU TU (REVERSE) [PT-06]
----------------------------------------------------------------------------
-DUNG KHI NAO: Dao thu tu trang (trang cuoi thanh trang dau).
-
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chinh sua" > Chon "Dao nguoc".
-2) Them file PDF.
-3) Nhan "THUC HIEN".
-
-KET QUA: Trang 1 thanh trang cuoi, trang cuoi thanh trang 1.
-
-TIP: Huu ich khi scan tai lieu bi nguoc thu tu.
+TIP: Thường dùng 180 độ để sửa trang bị ngược đầu.
+NOTE: Xoay 90 độ để chuyển trang ngang thành dọc hoặc ngược lại.
 
 ---------------------------------------------------------------------------
-6.7) PDF SANG ANH (PDF TO IMAGE) [PT-07]
+6.6) ĐẢO NGƯỢC THỨ TỰ (REVERSE) [PT-06]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Xuat moi trang PDF thanh file anh rieng.
+DÙNG KHI NÀO: Đảo thứ tự trang (trang cuối thành trang đầu).
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chuyen doi" > Chon "PDF sang Anh".
-2) Them file PDF.
-3) Chon dinh dang anh: PNG (net, file lon) hoac JPEG (nho hon).
-4) Chon DPI (150 hoac 300).
-5) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chỉnh sửa" > Chọn "Đảo ngược".
+2) Thêm file PDF.
+3) Nhấn "THỰC HIỆN".
 
-KET QUA: Moi trang thanh 1 file anh (page_001.png, page_002.png...).
+KẾT QUẢ: Trang 1 thành trang cuối, trang cuối thành trang 1.
 
-TIP: Chon PNG cho tai lieu can chat luong cao, JPEG cho anh thuong.
-WARNING: File PDF 100 trang se tao ra 100 file anh.
+TIP: Hữu ích khi scan tài liệu bị ngược thứ tự.
 
 ---------------------------------------------------------------------------
-6.8) ANH SANG PDF (IMAGE TO PDF) [PT-08]
+6.7) PDF SANG ẢNH (PDF TO IMAGE) [PT-07]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Gom nhieu anh thanh 1 file PDF.
+DÙNG KHI NÀO: Xuất mỗi trang PDF thành file ảnh riêng.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chuyen doi" > Chon "Anh sang PDF".
-2) Them cac file anh (JPG, PNG, BMP...).
-3) Sap xep thu tu anh.
-4) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chuyển đổi" > Chọn "PDF sang Ảnh".
+2) Thêm file PDF.
+3) Chọn định dạng ảnh: PNG (nét, file lớn) hoặc JPEG (nhỏ hơn).
+4) Chọn DPI (150 hoặc 300).
+5) Nhấn "THỰC HIỆN".
 
-KET QUA: 1 file PDF, moi anh la 1 trang.
+KẾT QUẢ: Mỗi trang thành 1 file ảnh (page_001.png, page_002.png...).
 
-TIP: Dung de tao album anh dang PDF hoac gom anh scan.
-NOTE: Nen dung anh cung kich thuoc de PDF trong dep.
-
----------------------------------------------------------------------------
-6.9) OCR - NHAN DANG CHU [PT-09]
----------------------------------------------------------------------------
-DUNG KHI NAO: Bien PDF scan (dang anh) thanh PDF co the tim kiem chu.
-
-CAC BUOC:
-1) Mo PDF Tools > Tab "Chuyen doi" > Chon "OCR".
-2) Them file PDF scan.
-3) Nhan "THUC HIEN".
-4) Cho qua trinh (co the mat vai phut).
-
-KET QUA: File PDF co the dung Ctrl+F tim kiem noi dung.
-
-WARNING: Do chinh xac OCR phu thuoc chat luong anh goc.
-- Anh mo, nghieng, chu nho -> sai nhieu.
-- Anh net, thang, chu ro -> dung hon.
-
-TIP: Scan goc o DPI 300 de OCR chinh xac hon.
-NOTE: OCR tieng Viet co the sai dau ( a/a, o/o, u/u).
+TIP: Chọn PNG cho tài liệu cần chất lượng cao, JPEG cho ảnh thường.
+WARNING: File PDF 100 trang sẽ tạo ra 100 file ảnh.
 
 ---------------------------------------------------------------------------
-6.10) NEN PDF (COMPRESS) [PT-10]
+6.8) ẢNH SANG PDF (IMAGE TO PDF) [PT-08]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Giam dung luong file PDF de gui email hoac upload.
+DÙNG KHI NÀO: Gom nhiều ảnh thành 1 file PDF.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Toi uu" > Chon "Nen".
-2) Them file PDF.
-3) Chon muc nen:
-   - Thap: Giam it, giu chat luong
-   - Trung binh: Can bang
-   - Cao: Giam nhieu, mat net
-4) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chuyển đổi" > Chọn "Ảnh sang PDF".
+2) Thêm các file ảnh (JPG, PNG, BMP...).
+3) Sắp xếp thứ tự ảnh.
+4) Nhấn "THỰC HIỆN".
 
-KET QUA: File nho hon. Vi du: 10MB -> 2-5MB.
+KẾT QUẢ: 1 file PDF, mỗi ảnh là 1 trang.
 
-TIP: Chon muc "Trung binh" cho hau het truong hop.
-WARNING: Nen qua manh co the lam anh bi vo, chu bi mo.
+TIP: Dùng để tạo album ảnh dạng PDF hoặc gom ảnh scan.
+NOTE: Nên dùng ảnh cùng kích thước để PDF trông đẹp.
 
 ---------------------------------------------------------------------------
-6.11) DAT MAT KHAU (PASSWORD) [PT-11]
+6.9) OCR - NHẬN DẠNG CHỮ [PT-09]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Bao ve file PDF, chi mo duoc khi nhap mat khau.
+DÙNG KHI NÀO: Biến PDF scan (dạng ảnh) thành PDF có thể tìm kiếm chữ.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Toi uu" > Chon "Mat khau".
-2) Them file PDF.
-3) Nhap mat khau moi (nho luu lai mat khau nay!).
-4) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Chuyển đổi" > Chọn "OCR".
+2) Thêm file PDF scan.
+3) Nhấn "THỰC HIỆN".
+4) Chờ quá trình (có thể mất vài phút).
 
-KET QUA: File PDF yeu cau nhap mat khau khi mo.
+KẾT QUẢ: File PDF có thể dùng Ctrl+F tìm kiếm nội dung.
 
-WARNING - RAT QUAN TRONG:
-Neu QUEN mat khau, KHONG CO CACH nao mo file. 
-Hay luu mat khau o noi an toan.
+WARNING: Độ chính xác OCR phụ thuộc chất lượng ảnh gốc.
+- Ảnh mờ, nghiêng, chữ nhỏ -> sai nhiều.
+- Ảnh nét, thẳng, chữ rõ -> đúng hơn.
 
-TIP: Dung mat khau manh: ket hop chu, so, ky tu dac biet.
-
----------------------------------------------------------------------------
-6.12) THEM WATERMARK [PT-12]
----------------------------------------------------------------------------
-DUNG KHI NAO: Them dong chu "MAU", "CONFIDENTIAL"... tren moi trang.
-
-CAC BUOC:
-1) Mo PDF Tools > Tab "Toi uu" > Chon "Watermark".
-2) Them file PDF.
-3) Nhap noi dung watermark (vi du: "BAN NHAP", "CONG TY ABC").
-4) Nhan "THUC HIEN".
-
-KET QUA: Moi trang co dong chu mo xuyen suot.
-
-TIP: Dung watermark "MAU" cho ban draft, "CONFIDENTIAL" cho tai lieu mat.
-NOTE: Watermark SE HIEN khi in ra giay.
+TIP: Scan gốc ở DPI 300 để OCR chính xác hơn.
+NOTE: OCR tiếng Việt có thể sai dấu (ă/â, ô/ơ, ư/u).
 
 ---------------------------------------------------------------------------
-6.13) HOA ANH BAO MAT - RASTERIZE [PT-13]
+6.10) NÉN PDF (COMPRESS) [PT-10]
 ---------------------------------------------------------------------------
-DUNG KHI NAO: Bien PDF thanh dang anh de chong copy/edit (tuong tu Scan Mode).
+DÙNG KHI NÀO: Giảm dung lượng file PDF để gửi email hoặc upload.
 
-CAC BUOC:
-1) Mo PDF Tools > Tab "Toi uu" > Chon "Hoa anh (Secure)".
-2) Them file PDF.
-3) Chon DPI (150 = vua, 200 = cao, 300 = in an).
-4) (Tuy chon) Bat "Hieu ung Scan that" neu muon giong may scan.
-5) Nhan "THUC HIEN".
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Tối ưu" > Chọn "Nén".
+2) Thêm file PDF.
+3) Chọn mức nén:
+   - Thấp: Giảm ít, giữ chất lượng
+   - Trung bình: Cân bằng
+   - Cao: Giảm nhiều, mất nét
+4) Nhấn "THỰC HIỆN".
 
-KET QUA: File PDF khong the edit/copy nhu file scan.
+KẾT QUẢ: File nhỏ hơn. Ví dụ: 10MB -> 2-5MB.
 
-TIP: Dung cho hop dong, chung chi can gui nhung khong muon bi sua.
-WARNING: File se LON hon file goc. Xem bang so sanh o muc [SM].
+TIP: Chọn mức "Trung bình" cho hầu hết trường hợp.
+WARNING: Nén quá mạnh có thể làm ảnh bị vỡ, chữ bị mờ.
+
+---------------------------------------------------------------------------
+6.11) ĐẶT MẬT KHẨU (PASSWORD) [PT-11]
+---------------------------------------------------------------------------
+DÙNG KHI NÀO: Bảo vệ file PDF, chỉ mở được khi nhập mật khẩu.
+
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Tối ưu" > Chọn "Mật khẩu".
+2) Thêm file PDF.
+3) Nhập mật khẩu mới (nhớ lưu lại mật khẩu này!).
+4) Nhấn "THỰC HIỆN".
+
+KẾT QUẢ: File PDF yêu cầu nhập mật khẩu khi mở.
+
+WARNING - RẤT QUAN TRỌNG:
+Nếu QUÊN mật khẩu, KHÔNG CÓ CÁCH nào mở file. 
+Hãy lưu mật khẩu ở nơi an toàn.
+
+TIP: Dùng mật khẩu mạnh: kết hợp chữ, số, ký tự đặc biệt.
+
+---------------------------------------------------------------------------
+6.12) THÊM WATERMARK [PT-12]
+---------------------------------------------------------------------------
+DÙNG KHI NÀO: Thêm dòng chữ "MẪU", "CONFIDENTIAL"... trên mỗi trang.
+
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Tối ưu" > Chọn "Watermark".
+2) Thêm file PDF.
+3) Nhập nội dung watermark (ví dụ: "BẢN NHÁP", "CÔNG TY ABC").
+4) Nhấn "THỰC HIỆN".
+
+KẾT QUẢ: Mỗi trang có dòng chữ mờ xuyên suốt.
+
+TIP: Dùng watermark "MẪU" cho bản draft, "CONFIDENTIAL" cho tài liệu mật.
+NOTE: Watermark SẼ HIỆN khi in ra giấy.
+
+---------------------------------------------------------------------------
+6.13) HÓA ẢNH BẢO MẬT - RASTERIZE [PT-13]
+---------------------------------------------------------------------------
+DÙNG KHI NÀO: Biến PDF thành dạng ảnh để chống copy/edit (tương tự Scan Mode).
+
+CÁC BƯỚC:
+1) Mở PDF Tools > Tab "Tối ưu" > Chọn "Hóa ảnh (Secure)".
+2) Thêm file PDF.
+3) Chọn DPI (150 = vừa, 200 = cao, 300 = in ấn).
+4) (Tùy chọn) Bật "Hiệu ứng Scan thật" nếu muốn giống máy scan.
+5) Nhấn "THỰC HIỆN".
+
+KẾT QUẢ: File PDF không thể edit/copy như file scan.
+
+TIP: Dùng cho hợp đồng, chứng chỉ cần gửi nhưng không muốn bị sửa.
+WARNING: File sẽ LỚN hơn file gốc. Xem bảng so sánh ở mục [SM].
 
 ================================================================================
-7) QUAN LY FILE SAU CONVERT [FM]
+7) QUẢN LÝ FILE SAU CONVERT [FM]
 ================================================================================
 
-NOI LUU FILE:
-- Mac dinh: File PDF duoc luu cung thu muc voi file goc.
-- Ten file: Giong ten file goc, thay duoi thanh .pdf
-  Vi du: "Bao cao.docx" -> "Bao cao.pdf"
+NƠI LƯU FILE:
+- Mặc định: File PDF được lưu cùng thư mục với file gốc.
+- Tên file: Giống tên file gốc, thay đuôi thành .pdf
+  Ví dụ: "Báo cáo.docx" -> "Báo cáo.pdf"
 
-CACH MO FILE NHANH:
-- Sau khi convert, nhan "Mo thu muc" de mo File Explorer.
-- Hoac nhan "Mo file" de mo truc tiep file PDF.
+CÁCH MỞ FILE NHANH:
+- Sau khi convert, nhấn "Mở thư mục" để mở File Explorer.
+- Hoặc nhấn "Mở file" để mở trực tiếp file PDF.
 
-CACH DOI TEN FILE:
-1) Nhan chuot phai vao file trong File Explorer.
-2) Chon "Rename" (Doi ten).
-3) Nhap ten moi va nhan Enter.
+CÁCH ĐỔI TÊN FILE:
+1) Nhấn chuột phải vào file trong File Explorer.
+2) Chọn "Rename" (Đổi tên).
+3) Nhập tên mới và nhấn Enter.
 
-CACH XOA FILE:
-1) Chon file trong File Explorer.
-2) Nhan phim Delete.
-3) Xac nhan xoa.
+CÁCH XÓA FILE:
+1) Chọn file trong File Explorer.
+2) Nhấn phím Delete.
+3) Xác nhận xóa.
 
-CACH CHIA SE FILE:
-- Email: Dinh kem file PDF vao email.
-- Zalo/Messenger: Gui file qua tin nhan.
-- Google Drive/OneDrive: Upload len dam may.
+CÁCH CHIA SẺ FILE:
+- Email: Đính kèm file PDF vào email.
+- Zalo/Messenger: Gửi file qua tin nhắn.
+- Google Drive/OneDrive: Upload lên đám mây.
 
-TIP: Tao thu muc rieng cho file PDF de de quan ly.
-
-================================================================================
-8) XU LY LOI - TROUBLESHOOTING [TS]
-================================================================================
-
----------------------------------------------------------------------------
-[TS-01] KHONG CHON DUOC FILE / QUYEN TRUY CAP
----------------------------------------------------------------------------
-TRIEU CHUNG: Nhan "Chon file" nhung khong thay file, hoac bao loi quyen.
-
-NGUYEN NHAN:
-- File nam trong thu muc he thong (C:\Windows, C:\Program Files).
-- File dang bi khoa boi phan mem khac.
-- Khong co quyen doc file.
-
-CACH XU LY:
-1) Copy file sang thu muc khac (Desktop, Documents).
-2) Dong cac chuong trinh dang mo file do.
-3) Nhan chuot phai vao file > Properties > Security > kiem tra quyen Read.
-
----------------------------------------------------------------------------
-[TS-02] CONVERT LAU / TREO UNG DUNG
----------------------------------------------------------------------------
-TRIEU CHUNG: Thanh tien trinh dung im, ung dung khong phan hoi.
-
-NGUYEN NHAN:
-- File qua lon (tren 100MB).
-- File chua nhieu hinh anh/bieu do.
-- May tinh cau hinh yeu.
-
-CACH XU LY:
-1) Cho them 5-10 phut. File lon can thoi gian xu ly.
-2) Kiem tra Task Manager (Ctrl+Shift+Esc) xem Excel/Word co dang chay khong.
-3) Neu qua 15 phut van khong xong, thu chia nho file roi convert tung phan.
-4) Khoi dong lai ung dung va thu lai.
-
----------------------------------------------------------------------------
-[TS-03] FONT TIENG VIET LOI (O VUONG, KY TU LA)
----------------------------------------------------------------------------
-TRIEU CHUNG: Chu tieng Viet hien thanh o vuong hoac ky tu rac.
-
-NGUYEN NHAN:
-- File goc dung font chua cai tren may.
-- Font khong ho tro Unicode.
-
-CACH XU LY:
-1) Mo file goc (Word/Excel), chon tat ca (Ctrl+A).
-2) Doi sang font pho bien: Arial, Times New Roman, hoac Tahoma.
-3) Luu file va convert lai.
-4) Neu van loi, cai them font: download font va copy vao C:\Windows\Fonts.
-
----------------------------------------------------------------------------
-[TS-04] EXCEL BI CAT COT / CHU QUA NHO
----------------------------------------------------------------------------
-TRIEU CHUNG: PDF chi hien mot phan bang, cot bi cat, chu ti hon.
-
-NGUYEN NHAN: Bang Excel rong hon trang A4.
-
-CACH XU LY:
-1) Mo file Excel goc.
-2) Vao File > Print > Page Setup.
-3) Chon "Fit All Columns on One Page" (Vua tat ca cot vao 1 trang).
-4) Hoac chon huong giay Landscape (ngang).
-5) Luu va convert lai.
-
-TIP: Truoc khi convert, nhan Ctrl+P trong Excel de xem Print Preview.
-
----------------------------------------------------------------------------
-[TS-05] SCAN MODE FILE QUA NANG
----------------------------------------------------------------------------
-TRIEU CHUNG: File sau Scan Mode lon gap 5-10 lan file goc.
-
-NGUYEN NHAN: Day la binh thuong. Scan Mode bien text thanh anh.
-
-CACH XU LY:
-1) Giam DPI: chon 100 hoac 150 thay vi 300.
-2) Sau khi Scan, dung tool "Nen PDF" de giam dung luong.
-3) Chap nhan file lon neu can chat luong cao.
-
----------------------------------------------------------------------------
-[TS-06] FILE CO PASSWORD KHONG MO DUOC
----------------------------------------------------------------------------
-TRIEU CHUNG: Ung dung bao "File duoc bao ve bang mat khau".
-
-NGUYEN NHAN: File goc dang bi khoa.
-
-CACH XU LY:
-1) Mo file bang Word/Excel/PowerPoint goc.
-2) Nhap mat khau.
-3) Luu lai file KHONG co mat khau (Save As > Tools > General Options > xoa pass).
-4) Convert file moi.
-
-NOTE: Ung dung KHONG pha duoc mat khau. Can biet mat khau goc.
-
----------------------------------------------------------------------------
-[TS-07] KHONG THAY FILE OUTPUT / KHONG LUU DUOC
----------------------------------------------------------------------------
-TRIEU CHUNG: Convert hoan thanh nhung khong tim thay file PDF.
-
-NGUYEN NHAN:
-- O cung het dung luong.
-- Thu muc khong co quyen ghi.
-- Antivirus chan tao file.
-
-CACH XU LY:
-1) Kiem tra dung luong o cung (tren 1GB trong).
-2) Thu luu sang thu muc khac (Desktop hoac Documents).
-3) Tam tat antivirus va thu lai.
-4) Kiem tra file o cung thu muc voi file goc.
-
----------------------------------------------------------------------------
-[TS-08] CHIA SE LOI (KHONG GUI DUOC FILE)
----------------------------------------------------------------------------
-TRIEU CHUNG: Khong dinh kem hoac upload duoc file PDF.
-
-NGUYEN NHAN:
-- File qua lon (vuot gioi han email 25MB).
-- Mang yeu.
-
-CACH XU LY:
-1) Dung tool "Nen PDF" de giam dung luong.
-2) Chia file thanh nhieu phan nho.
-3) Upload len Google Drive/OneDrive roi chia se link.
-
----------------------------------------------------------------------------
-[TS-09] PDF TOOLS KET QUA KHAC MONG DOI
----------------------------------------------------------------------------
-TRIEU CHUNG: Sau khi dung tool, file khong nhu y muon.
-
-NGUYEN NHAN:
-- Chon sai tuy chon.
-- Nhap sai so trang.
-
-CACH XU LY:
-1) Dung file goc (file goc khong bi thay doi).
-2) Doc lai huong dan tool o muc [PT].
-3) Thu lai voi tuy chon dung.
-
-TIP: Luon giu ban goc truoc khi xu ly.
-
----------------------------------------------------------------------------
-[TS-10] OCR SAI CHU / KHONG NHAN DANG DUOC
----------------------------------------------------------------------------
-TRIEU CHUNG: Tim kiem khong ra, hoac chu bi sai.
-
-NGUYEN NHAN:
-- Anh goc xau (mo, nghieng, nhoe).
-- Font dac biet (thu phap, nghe thuat).
-- Tieng Viet co dau kho nhan dang.
-
-CACH XU LY:
-1) Scan lai o DPI cao hon (300 DPI).
-2) Dam bao anh thang, ro net.
-3) Kiem tra lai ket qua OCR bang mat.
-4) Voi tai lieu quan trong, nen danh lai bang tay.
+TIP: Tạo thư mục riêng cho file PDF để dễ quản lý.
 
 ================================================================================
-9) CAU HOI THUONG GAP - FAQ [FAQ]
+8) XỬ LÝ LỖI - TROUBLESHOOTING [TS]
 ================================================================================
 
-H1: App nay co mat phi khong?
-D1: [Thong tin phi can duoc cap nhat theo chinh sach cong ty]
+---------------------------------------------------------------------------
+[TS-01] KHÔNG CHỌN ĐƯỢC FILE / QUYỀN TRUY CẬP
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Nhấn "Chọn file" nhưng không thấy file, hoặc báo lỗi quyền.
 
-H2: Toi co can ket noi Internet khong?
-D2: KHONG. App xu ly HOAN TOAN OFFLINE tren may tinh cua ban.
-    Du lieu KHONG duoc upload len server.
+NGUYÊN NHÂN:
+- File nằm trong thư mục hệ thống (C:\Windows, C:\Program Files).
+- File đang bị khóa bởi phần mềm khác.
+- Không có quyền đọc file.
 
-H3: App ho tro nhung dinh dang file nao?
+CÁCH XỬ LÝ:
+1) Copy file sang thư mục khác (Desktop, Documents).
+2) Đóng các chương trình đang mở file đó.
+3) Nhấn chuột phải vào file > Properties > Security > kiểm tra quyền Read.
+
+---------------------------------------------------------------------------
+[TS-02] CONVERT LÂU / TREO ỨNG DỤNG
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Thanh tiến trình đứng im, ứng dụng không phản hồi.
+
+NGUYÊN NHÂN:
+- File quá lớn (trên 100MB).
+- File chứa nhiều hình ảnh/biểu đồ.
+- Máy tính cấu hình yếu.
+
+CÁCH XỬ LÝ:
+1) Chờ thêm 5-10 phút. File lớn cần thời gian xử lý.
+2) Kiểm tra Task Manager (Ctrl+Shift+Esc) xem Excel/Word có đang chạy không.
+3) Nếu quá 15 phút vẫn không xong, thử chia nhỏ file rồi convert từng phần.
+4) Khởi động lại ứng dụng và thử lại.
+
+---------------------------------------------------------------------------
+[TS-03] FONT TIẾNG VIỆT LỖI (Ô VUÔNG, KÝ TỰ LẠ)
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Chữ tiếng Việt hiện thành ô vuông hoặc ký tự rác.
+
+NGUYÊN NHÂN:
+- File gốc dùng font chưa cài trên máy.
+- Font không hỗ trợ Unicode.
+
+CÁCH XỬ LÝ:
+1) Mở file gốc (Word/Excel), chọn tất cả (Ctrl+A).
+2) Đổi sang font phổ biến: Arial, Times New Roman, hoặc Tahoma.
+3) Lưu file và convert lại.
+4) Nếu vẫn lỗi, cài thêm font: download font và copy vào C:\Windows\Fonts.
+
+---------------------------------------------------------------------------
+[TS-04] EXCEL BỊ CẮT CỘT / CHỮ QUÁ NHỎ
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: PDF chỉ hiện một phần bảng, cột bị cắt, chữ tí hon.
+
+NGUYÊN NHÂN: Bảng Excel rộng hơn trang A4.
+
+CÁCH XỬ LÝ:
+1) Mở file Excel gốc.
+2) Vào File > Print > Page Setup.
+3) Chọn "Fit All Columns on One Page" (Vừa tất cả cột vào 1 trang).
+4) Hoặc chọn hướng giấy Landscape (ngang).
+5) Lưu và convert lại.
+
+TIP: Trước khi convert, nhấn Ctrl+P trong Excel để xem Print Preview.
+
+---------------------------------------------------------------------------
+[TS-05] SCAN MODE FILE QUÁ NẶNG
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: File sau Scan Mode lớn gấp 5-10 lần file gốc.
+
+NGUYÊN NHÂN: Đây là bình thường. Scan Mode biến text thành ảnh.
+
+CÁCH XỬ LÝ:
+1) Giảm DPI: chọn 100 hoặc 150 thay vì 300.
+2) Sau khi Scan, dùng tool "Nén PDF" để giảm dung lượng.
+3) Chấp nhận file lớn nếu cần chất lượng cao.
+
+---------------------------------------------------------------------------
+[TS-06] FILE CÓ PASSWORD KHÔNG MỞ ĐƯỢC
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Ứng dụng báo "File được bảo vệ bằng mật khẩu".
+
+NGUYÊN NHÂN: File gốc đang bị khóa.
+
+CÁCH XỬ LÝ:
+1) Mở file bằng Word/Excel/PowerPoint gốc.
+2) Nhập mật khẩu.
+3) Lưu lại file KHÔNG có mật khẩu (Save As > Tools > General Options > xóa pass).
+4) Convert file mới.
+
+NOTE: Ứng dụng KHÔNG phá được mật khẩu. Cần biết mật khẩu gốc.
+
+---------------------------------------------------------------------------
+[TS-07] KHÔNG THẤY FILE OUTPUT / KHÔNG LƯU ĐƯỢC
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Convert hoàn thành nhưng không tìm thấy file PDF.
+
+NGUYÊN NHÂN:
+- Ổ cứng hết dung lượng.
+- Thư mục không có quyền ghi.
+- Antivirus chặn tạo file.
+
+CÁCH XỬ LÝ:
+1) Kiểm tra dung lượng ổ cứng (trên 1GB trống).
+2) Thử lưu sang thư mục khác (Desktop hoặc Documents).
+3) Tạm tắt antivirus và thử lại.
+4) Kiểm tra file ở cùng thư mục với file gốc.
+
+---------------------------------------------------------------------------
+[TS-08] CHIA SẺ LỖI (KHÔNG GỬI ĐƯỢC FILE)
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Không đính kèm hoặc upload được file PDF.
+
+NGUYÊN NHÂN:
+- File quá lớn (vượt giới hạn email 25MB).
+- Mạng yếu.
+
+CÁCH XỬ LÝ:
+1) Dùng tool "Nén PDF" để giảm dung lượng.
+2) Chia file thành nhiều phần nhỏ.
+3) Upload lên Google Drive/OneDrive rồi chia sẻ link.
+
+---------------------------------------------------------------------------
+[TS-09] PDF TOOLS KẾT QUẢ KHÁC MONG ĐỢI
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Sau khi dùng tool, file không như ý muốn.
+
+NGUYÊN NHÂN:
+- Chọn sai tùy chọn.
+- Nhập sai số trang.
+
+CÁCH XỬ LÝ:
+1) Dùng file gốc (file gốc không bị thay đổi).
+2) Đọc lại hướng dẫn tool ở mục [PT].
+3) Thử lại với tùy chọn đúng.
+
+TIP: Luôn giữ bản gốc trước khi xử lý.
+
+---------------------------------------------------------------------------
+[TS-10] OCR SAI CHỮ / KHÔNG NHẬN DẠNG ĐƯỢC
+---------------------------------------------------------------------------
+TRIỆU CHỨNG: Tìm kiếm không ra, hoặc chữ bị sai.
+
+NGUYÊN NHÂN:
+- Ảnh gốc xấu (mờ, nghiêng, nhòe).
+- Font đặc biệt (thư pháp, nghệ thuật).
+- Tiếng Việt có dấu khó nhận dạng.
+
+CÁCH XỬ LÝ:
+1) Scan lại ở DPI cao hơn (300 DPI).
+2) Đảm bảo ảnh thẳng, rõ nét.
+3) Kiểm tra lại kết quả OCR bằng mắt.
+4) Với tài liệu quan trọng, nên đánh lại bằng tay.
+
+================================================================================
+9) CÂU HỎI THƯỜNG GẶP - FAQ [FAQ]
+================================================================================
+
+H1: App này có mất phí không?
+D1: [Thông tin phí cần được cập nhật theo chính sách công ty]
+
+H2: Tôi có cần kết nối Internet không?
+D2: KHÔNG. App xử lý HOÀN TOÀN OFFLINE trên máy tính của bạn.
+    Dữ liệu KHÔNG được upload lên server.
+
+H3: App hỗ trợ những định dạng file nào?
 D3: - Word: .doc, .docx
     - Excel: .xls, .xlsx
     - PowerPoint: .ppt, .pptx
-    - Anh: .jpg, .png, .bmp (cho chuc nang Anh sang PDF)
+    - Ảnh: .jpg, .png, .bmp (cho chức năng Ảnh sang PDF)
 
-H4: File toi co mat sau khi convert khong?
-D4: KHONG. File goc van giu nguyen. App chi TAO THEM file PDF moi.
+H4: File tôi có mất sau khi convert không?
+D4: KHÔNG. File gốc vẫn giữ nguyên. App chỉ TẠO THÊM file PDF mới.
 
-H5: Toi co the convert nhieu file cung luc khong?
-D5: CO. Keo nhieu file vao ung dung, tat ca se duoc convert lan luot.
+H5: Tôi có thể convert nhiều file cùng lúc không?
+D5: CÓ. Kéo nhiều file vào ứng dụng, tất cả sẽ được convert lần lượt.
 
-H6: Scan Mode co chong copy 100% khong?
-D6: KHONG. Scan Mode lam TANG DO KHO KHAN cho viec copy/edit, nhung
-    nguoi co ky thuat cao van co the dung OCR de doc lai. Khong co
-    phuong phap nao chong copy tuyet doi.
+H6: Scan Mode có chống copy 100% không?
+D6: KHÔNG. Scan Mode làm TĂNG ĐỘ KHÓ KHĂN cho việc copy/edit, nhưng
+    người có kỹ thuật cao vẫn có thể dùng OCR để đọc lại. Không có
+    phương pháp nào chống copy tuyệt đối.
 
-H7: Tai sao file PDF nang hon file Word goc?
-D7: Do la binh thuong. PDF nhung font va anh de hien thi giong nhau
-    tren moi thiet bi. Dung tool "Nen PDF" neu can file nho hon.
+H7: Tại sao file PDF nặng hơn file Word gốc?
+D7: Đó là bình thường. PDF nhúng font và ảnh để hiển thị giống nhau
+    trên mọi thiết bị. Dùng tool "Nén PDF" nếu cần file nhỏ hơn.
 
-H8: Toi quen mat khau file PDF, lam sao mo?
-D8: KHONG CO CACH mo file PDF da khoa neu khong biet mat khau.
-    Day la co che bao mat. Hay luu mat khau can than.
+H8: Tôi quên mật khẩu file PDF, làm sao mở?
+D8: KHÔNG CÓ CÁCH mở file PDF đã khóa nếu không biết mật khẩu.
+    Đây là cơ chế bảo mật. Hãy lưu mật khẩu cẩn thận.
 
-H9: App co hoat dong tren Windows 7 khong?
-D9: App ho tro Windows 10 tro len. Windows 7 co the gap loi.
+H9: App có hoạt động trên Windows 7 không?
+D9: App hỗ trợ Windows 10 trở lên. Windows 7 có thể gặp lỗi.
 
-H10: Lam sao de convert chi 1 so trang cua file Word?
-D10: Bo 1: Convert toan bo thanh PDF.
-     Bo 2: Dung tool "Trich xuat" de lay cac trang can thiet.
+H10: Làm sao để convert chỉ 1 số trang của file Word?
+D10: Bước 1: Convert toàn bộ thành PDF.
+     Bước 2: Dùng tool "Trích xuất" để lấy các trang cần thiết.
 
 ================================================================================
-10) TU DIEN THUAT NGU - GLOSSARY [GL]
+10) TỪ ĐIỂN THUẬT NGỮ - GLOSSARY [GL]
 ================================================================================
 
 PDF (Portable Document Format):
-    Dinh dang tai lieu di dong. Hien thi giong nhau tren moi thiet bi.
+    Định dạng tài liệu di động. Hiển thị giống nhau trên mọi thiết bị.
 
 DPI (Dots Per Inch):
-    Do phan giai. So cao = anh net hon nhung file lon hon.
+    Độ phân giải. Số cao = ảnh nét hơn nhưng file lớn hơn.
 
 OCR (Optical Character Recognition):
-    Cong nghe nhan dang chu tu anh. Bien anh thanh text co the tim kiem.
+    Công nghệ nhận dạng chữ từ ảnh. Biến ảnh thành text có thể tìm kiếm.
 
 Scan Mode:
-    Che do bien PDF thanh dang anh de han che copy/edit noi dung.
+    Chế độ biến PDF thành dạng ảnh để hạn chế copy/edit nội dung.
 
-Rasterize (Hoa anh):
-    Qua trinh bien van ban/do hoa thanh diem anh (pixel).
+Rasterize (Hóa ảnh):
+    Quá trình biến văn bản/đồ họa thành điểm ảnh (pixel).
 
 Watermark:
-    Hinh hoac chu mo, hien tren tat ca cac trang de danh dau sap huu.
+    Hình hoặc chữ mờ, hiện trên tất cả các trang để đánh dấu sở hữu.
 
-Merge (Gop):
-    Ket hop nhieu file thanh 1 file duy nhat.
+Merge (Gộp):
+    Kết hợp nhiều file thành 1 file duy nhất.
 
-Split (Tach):
-    Chia 1 file thanh nhieu file nho.
+Split (Tách):
+    Chia 1 file thành nhiều file nhỏ.
 
-Compress (Nen):
-    Giam dung luong file bang cach toi uu hoa du lieu ben trong.
+Compress (Nén):
+    Giảm dung lượng file bằng cách tối ưu hóa dữ liệu bên trong.
 
 WAL (Write-Ahead Logging):
-    Ky thuat co so du lieu giup ghi/doc du lieu an toan va nhanh.
+    Kỹ thuật cơ sở dữ liệu giúp ghi/đọc dữ liệu an toàn và nhanh.
 
 Grayscale:
-    Che do mau trang den (khong co mau sac).
+    Chế độ màu trắng đen (không có màu sắc).
 
 JPEG/JPG:
-    Dinh dang anh pho bien, nen mat du lieu, file nho.
+    Định dạng ảnh phổ biến, nén mất dữ liệu, file nhỏ.
 
 PNG:
-    Dinh dang anh chat luong cao, khong mat du lieu, file lon hon.
+    Định dạng ảnh chất lượng cao, không mất dữ liệu, file lớn hơn.
 
-Flatten (Lam phang):
-    Gop tat ca cac lop (layer) thanh 1 lop duy nhat.
-
-================================================================================
-11) LIEN HE HO TRO [SP]
-================================================================================
-
-KHI NAO CAN LIEN HE:
-- Da thu tat ca huong dan Troubleshooting nhung van gap loi.
-- Gap loi ma huong dan nay chua de cap.
-- Co gop y cai thien ung dung.
-
-THONG TIN CAN GUI KHI BAO LOI:
-
-1) Ten loi hoac ma loi (neu co)
-2) Mo ta buoc tai tao loi:
-   - Ban dang lam gi?
-   - Loi xay ra o buoc nao?
-3) Thong tin he thong:
-   - Phien ban Windows (Win 10/11)
-   - Phien ban app (xem o menu About/Thong tin)
-4) Anh chup man hinh (neu co the)
-
-KHONG GUI:
-- Noi dung file co thong tin ca nhan (CMND, so tai khoan...).
-- File chua du lieu nhat ky cong ty.
-- Mat khau cua ban.
-
-CACH GUI:
-- Email: [Dia chi email ho tro]
-- Hoac: Vao menu Help > Gui phan hoi
+Flatten (Làm phẳng):
+    Gộp tất cả các lớp (layer) thành 1 lớp duy nhất.
 
 ================================================================================
-                            HET HUONG DAN
+11) LIÊN HỆ HỖ TRỢ [SP]
 ================================================================================
-Cam on ban da su dung Office to PDF Converter Pro!
-Chuc ban lam viec hieu qua.
+
+KHI NÀO CẦN LIÊN HỆ:
+- Đã thử tất cả hướng dẫn Troubleshooting nhưng vẫn gặp lỗi.
+- Gặp lỗi mà hướng dẫn này chưa đề cập.
+- Có góp ý cải thiện ứng dụng.
+
+THÔNG TIN CẦN GỬI KHI BÁO LỖI:
+
+1) Tên lỗi hoặc mã lỗi (nếu có)
+2) Mô tả bước tái tạo lỗi:
+   - Bạn đang làm gì?
+   - Lỗi xảy ra ở bước nào?
+3) Thông tin hệ thống:
+   - Phiên bản Windows (Win 10/11)
+   - Phiên bản app (xem ở menu About/Thông tin)
+4) Ảnh chụp màn hình (nếu có thể)
+
+KHÔNG GỬI:
+- Nội dung file có thông tin cá nhân (CMND, số tài khoản...).
+- File chứa dữ liệu nhạy cảm công ty.
+- Mật khẩu của bạn.
+
+CÁCH GỬI:
+- Email: [Địa chỉ email hỗ trợ]
+- Hoặc: Vào menu Help > Gửi phản hồi
+
+================================================================================
+                            HẾT HƯỚNG DẪN
+================================================================================
+Cảm ơn bạn đã sử dụng Office to PDF Converter Pro!
+Chúc bạn làm việc hiệu quả.
 ================================================================================

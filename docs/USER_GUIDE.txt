@@ -11,7 +11,7 @@ Ngày cập nhật: 25/12/2024
 
 Để tìm nhanh nội dung cần thiết:
 
-1) Sử dụng phím Ctrl+F (hoặc Command+F trên Mac) để mở hộp tìm kiếm.
+1) Sử dụng phím Ctrl+F để mở hộp tìm kiếm.
 2) Gõ từ khóa hoặc mã mục (ví dụ: "E01" để tìm lỗi E01).
 3) Nhấn Enter để nhảy đến kết quả.
 
@@ -773,7 +773,8 @@ KHÔNG GỬI:
 - Mật khẩu của bạn.
 
 CÁCH GỬI:
-- Email: [Địa chỉ email hỗ trợ]
+- Email: dotungkh@gmail.com
+- Số điện thoại: 0914665866
 - Hoặc: Vào menu Help > Gửi phản hồi
 
 ================================================================================

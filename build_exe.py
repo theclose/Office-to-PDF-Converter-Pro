@@ -112,6 +112,8 @@ def get_hidden_imports():
         "office_converter.utils.ocr",
         "office_converter.utils.updater",
         "office_converter.utils.libreoffice",
+        "office_converter.utils.parallel_converter",
+        "office_converter.utils.watchdog",
         "office_converter.ui",
         "office_converter.ui.main_window_pro",
         "office_converter.ui.pdf_tools_dialog",

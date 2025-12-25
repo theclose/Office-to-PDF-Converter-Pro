@@ -107,6 +107,25 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
 
         # Save operation when closing
         self.protocol("WM_DELETE_WINDOW", self._on_close)
+        
+        # Fix for window restore after minimize (windnd compatibility)
+        self._restore_scheduled = False
+        self.bind('<Map>', self._on_window_restore)
+
+    def _on_window_restore(self, event=None):
+        """Handle window restore after minimize - simple refresh."""
+        if self._restore_scheduled:
+            return
+        self._restore_scheduled = True
+        
+        def do_restore():
+            try:
+                self._restore_scheduled = False
+                self.update_idletasks()
+            except Exception:
+                pass
+        
+        self.after(100, do_restore)
 
     def _on_close(self):
         """Save last operation and close."""

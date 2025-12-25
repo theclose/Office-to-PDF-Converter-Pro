@@ -1829,9 +1829,9 @@ class ConverterProApp(ctk.CTk):
         try:
             percent = int(progress * 100)
 
-            # Update progress bar
+            # Update progress bar with smooth animation
             if self.progress_bar:
-                self.progress_bar.set(progress)
+                self._animate_progress(progress)
 
             # Update percent label with color change
             if self.progress_percent:
@@ -1867,6 +1867,35 @@ class ConverterProApp(ctk.CTk):
 
         except Exception as e:
             logger.error(f"Update progress UI error: {e}")
+
+    def _animate_progress(self, target: float, steps: int = 5):
+        """Smoothly animate progress bar to target value."""
+        try:
+            current = self.progress_bar.get() if hasattr(self.progress_bar, 'get') else 0
+            
+            # If target is lower (shouldn't happen) or nearly same, just set directly
+            if target <= current or abs(target - current) < 0.01:
+                self.progress_bar.set(target)
+                return
+            
+            # Calculate step size
+            step_size = (target - current) / steps
+            
+            def animate_step(step_num):
+                if step_num >= steps:
+                    self.progress_bar.set(target)
+                    return
+                
+                new_value = current + (step_size * (step_num + 1))
+                self.progress_bar.set(min(new_value, target))
+                
+                # Schedule next step (16ms = ~60fps)
+                self.after(16, lambda: animate_step(step_num + 1))
+            
+            animate_step(0)
+        except Exception:
+            # Fallback to direct set
+            self.progress_bar.set(target)
 
     def _on_file_complete(self, conv_file: ConversionFile):
         """File completion callback."""

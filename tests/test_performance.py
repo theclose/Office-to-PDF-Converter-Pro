@@ -95,7 +95,6 @@ class TestAppendOnlyLog:
     def test_jsonl_format_write(self):
         """Verify JSONL format is used for logging."""
         import json
-        import tempfile
         
         with tempfile.NamedTemporaryFile(mode='w', suffix='.jsonl', delete=False) as f:
             record = {"file_size_mb": 1.5, "duration_seconds": 10.2, "success": True}

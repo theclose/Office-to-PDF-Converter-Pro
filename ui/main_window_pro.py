@@ -152,18 +152,30 @@ class ConversionOptions:
 # ============================================================================
 
 class RecentFilesDB:
-    """SQLite database for recent files and history."""
+    """SQLite database for recent files and history with connection pooling."""
 
     def __init__(self, db_path: Optional[str] = None):
         if db_path is None:
             db_path = os.path.join(package_dir, "converter_history.db")
         self.db_path = db_path
+        self._conn: Optional[sqlite3.Connection] = None
+        self._lock = threading.Lock()
         self._init_db()
+
+    def _get_connection(self) -> sqlite3.Connection:
+        """Get or create persistent connection."""
+        if self._conn is None:
+            self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            # Enable WAL mode for better concurrent reads
+            self._conn.execute("PRAGMA journal_mode=WAL")
+            self._conn.execute("PRAGMA synchronous=NORMAL")
+        return self._conn
 
     def _init_db(self):
         """Initialize database tables."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS recent_files (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -182,13 +194,15 @@ class RecentFilesDB:
                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
+                conn.commit()
         except Exception as e:
             logger.error(f"Database init error: {e}")
 
     def add_recent(self, path: str):
         """Add or update recent file."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 conn.execute("""
                     INSERT INTO recent_files (path, last_used, use_count)
                     VALUES (?, CURRENT_TIMESTAMP, 1)
@@ -196,13 +210,15 @@ class RecentFilesDB:
                         last_used = CURRENT_TIMESTAMP,
                         use_count = use_count + 1
                 """, (path,))
+                conn.commit()
         except Exception as e:
             logger.error(f"Add recent error: {e}")
 
     def get_recent(self, limit: int = 10) -> List[str]:
         """Get recent files."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 cursor = conn.execute("""
                     SELECT path FROM recent_files
                     WHERE path IS NOT NULL
@@ -218,19 +234,22 @@ class RecentFilesDB:
                        status: str, duration: float):
         """Log conversion result."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 conn.execute("""
                     INSERT INTO conversion_history 
                     (input_path, output_path, status, duration)
                     VALUES (?, ?, ?, ?)
                 """, (input_path, output_path, status, duration))
+                conn.commit()
         except Exception as e:
             logger.error(f"Log conversion error: {e}")
 
     def get_stats(self) -> Dict[str, Any]:
         """Get conversion statistics."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 cursor = conn.execute("""
                     SELECT 
                         COUNT(*) as total,

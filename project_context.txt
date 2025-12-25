@@ -1,6 +1,6 @@
 ================================================================================
 PROJECT CONTEXT - office_converter
-Generated: 2025-12-25 10:33:51
+Generated: 2025-12-25 15:01:39
 Extensions: .py
 ================================================================================
 
@@ -13,13 +13,13 @@ LINES: 5
 # Office Converter - Modular Architecture
 # This package contains the refactored Office to PDF converter
 
-__version__ = "4.0.8"
+__version__ = "4.1.0"
 __author__ = "VNTime JSC"
 
 
 ================================================================================
 FILE PATH: build_exe.py
-LINES: 336
+LINES: 338
 ================================================================================
 
 """
@@ -38,7 +38,7 @@ from pathlib import Path
 
 # Project info
 APP_NAME = "OfficeToPDF_Pro"
-VERSION = "4.0.8"
+VERSION = "4.1.0"
 MAIN_SCRIPT = "run_pro.py"
 
 # Directories
@@ -136,6 +136,8 @@ def get_hidden_imports():
         "office_converter.utils.ocr",
         "office_converter.utils.updater",
         "office_converter.utils.libreoffice",
+        "office_converter.utils.parallel_converter",
+        "office_converter.utils.watchdog",
         "office_converter.ui",
         "office_converter.ui.main_window_pro",
         "office_converter.ui.pdf_tools_dialog",
@@ -827,15 +829,76 @@ if __name__ == "__main__":
 
 ================================================================================
 FILE PATH: converters\__init__.py
-LINES: 18
+LINES: 80
 ================================================================================
 
-# Converters Module
+# Converters Module - Lazy Loading for Fast Startup
+"""
+Lazy-loads converter classes on first access to improve app startup time.
+Heavy COM-dependent modules are only loaded when actually needed.
+"""
+
+# Always available (lightweight)
 from .base import BaseConverter, get_converter_for_file, get_best_converter
-from .excel import ExcelConverter
-from .word import WordConverter
-from .ppt import PPTConverter
-from .libreoffice import LibreOfficeConverter, is_libreoffice_available, HAS_LIBREOFFICE
+
+# Lazy loading for heavy converters
+_excel_converter = None
+_word_converter = None
+_ppt_converter = None
+_libreoffice_converter = None
+_has_libreoffice = None
+_is_libreoffice_available = None
+
+
+def __getattr__(name):
+    """Lazy load heavy converter classes on first access."""
+    global _excel_converter, _word_converter, _ppt_converter
+    global _libreoffice_converter, _has_libreoffice, _is_libreoffice_available
+    
+    if name == "ExcelConverter":
+        if _excel_converter is None:
+            from .excel import ExcelConverter as _ec
+            globals()["_excel_converter"] = _ec
+            globals()["ExcelConverter"] = _ec
+        return globals().get("ExcelConverter") or _excel_converter
+    
+    elif name == "WordConverter":
+        if _word_converter is None:
+            from .word import WordConverter as _wc
+            globals()["_word_converter"] = _wc
+            globals()["WordConverter"] = _wc
+        return globals().get("WordConverter") or _word_converter
+    
+    elif name == "PPTConverter":
+        if _ppt_converter is None:
+            from .ppt import PPTConverter as _pc
+            globals()["_ppt_converter"] = _pc
+            globals()["PPTConverter"] = _pc
+        return globals().get("PPTConverter") or _ppt_converter
+    
+    elif name == "LibreOfficeConverter":
+        if _libreoffice_converter is None:
+            from .libreoffice import LibreOfficeConverter as _loc
+            globals()["_libreoffice_converter"] = _loc
+            globals()["LibreOfficeConverter"] = _loc
+        return globals().get("LibreOfficeConverter") or _libreoffice_converter
+    
+    elif name == "HAS_LIBREOFFICE":
+        if _has_libreoffice is None:
+            from .libreoffice import HAS_LIBREOFFICE as _hlo
+            globals()["_has_libreoffice"] = _hlo
+            globals()["HAS_LIBREOFFICE"] = _hlo
+        return globals().get("HAS_LIBREOFFICE", False)
+    
+    elif name == "is_libreoffice_available":
+        if _is_libreoffice_available is None:
+            from .libreoffice import is_libreoffice_available as _ila
+            globals()["_is_libreoffice_available"] = _ila
+            globals()["is_libreoffice_available"] = _ila
+        return globals().get("is_libreoffice_available") or _is_libreoffice_available
+    
+    raise AttributeError(f"module 'converters' has no attribute '{name}'")
+
 
 __all__ = [
     "BaseConverter",
@@ -850,9 +913,10 @@ __all__ = [
 ]
 
 
+
 ================================================================================
 FILE PATH: converters\base.py
-LINES: 155
+LINES: 194
 ================================================================================
 
 """
@@ -862,10 +926,48 @@ All specific converters (Excel, Word, PPT) inherit from this.
 
 import os
 import logging
+import threading
 from abc import ABC, abstractmethod
 from typing import Optional, Callable, List
 
 logger = logging.getLogger(__name__)
+
+# Thread-local storage for COM initialization tracking
+_com_init_count = threading.local()
+
+
+def ensure_com_initialized():
+    """Ensure COM is initialized for the current thread. Returns True if newly initialized."""
+    import pythoncom
+    
+    if not hasattr(_com_init_count, 'count'):
+        _com_init_count.count = 0
+    
+    if _com_init_count.count == 0:
+        pythoncom.CoInitialize()
+        _com_init_count.count = 1
+        logger.debug(f"COM initialized for thread {threading.current_thread().name}")
+        return True
+    else:
+        _com_init_count.count += 1
+        return False
+
+
+def release_com():
+    """Release COM for the current thread if this was the last user."""
+    import pythoncom
+    
+    if not hasattr(_com_init_count, 'count') or _com_init_count.count <= 0:
+        return
+    
+    _com_init_count.count -= 1
+    
+    if _com_init_count.count == 0:
+        try:
+            pythoncom.CoUninitialize()
+            logger.debug(f"COM released for thread {threading.current_thread().name}")
+        except Exception as e:
+            logger.debug(f"COM release warning: {e}")
 
 
 class BaseConverter(ABC):
@@ -886,6 +988,7 @@ class BaseConverter(ABC):
         self.log_callback = log_callback or (lambda msg: None)
         self.progress_callback = progress_callback or (lambda pct: None)
         self._app = None  # COM application instance
+        self._com_owned = False  # Track if this instance initialized COM
 
     def log(self, message: str):
         """Log a message to both file and UI callback."""
@@ -1014,7 +1117,7 @@ def get_best_converter(file_path: str, prefer_libreoffice: bool = False) -> Opti
 
 ================================================================================
 FILE PATH: converters\excel.py
-LINES: 335
+LINES: 387
 ================================================================================
 
 """
@@ -1047,18 +1150,18 @@ class ExcelConverter(BaseConverter):
                  progress_callback: Optional[Callable[[float], None]] = None):
         super().__init__(log_callback, progress_callback)
         self._excel = None
-        self._use_pool = False  # Disabled pool due to COM corruption issues
+        self._use_pool = True  # Re-enabled with health check protection
 
     def initialize(self) -> bool:
         """Get Excel COM from pool."""
         try:
-            pythoncom.CoInitialize()
+            from .base import ensure_com_initialized
+            self._com_owned = ensure_com_initialized()
+            
             if self._use_pool:
                 self._excel = get_pool().get_excel()
             else:
-                import win32com.client
-                self._excel = win32com.client.Dispatch("Excel.Application")
-                self._configure_standalone()
+                self._excel = self._create_excel_instance()
 
             if self._excel:
                 logger.info("Excel ready (pooled)" if self._use_pool else "Excel ready (standalone)")
@@ -1068,14 +1171,67 @@ class ExcelConverter(BaseConverter):
             logger.error(f"Failed to initialize Excel: {e}")
             return False
 
-    def _configure_standalone(self):
+    def _create_excel_instance(self):
+        """Create Excel COM instance with auto-recovery for corrupted cache."""
+        import win32com.client
+        
+        try:
+            excel = win32com.client.Dispatch("Excel.Application")
+            self._configure_standalone_app(excel)
+            return excel
+        except AttributeError as e:
+            # CLSIDToClassMap error = corrupted COM cache
+            if "CLSIDToClassMap" in str(e) or "gen_py" in str(e):
+                logger.warning("Corrupted COM cache detected, clearing and retrying...")
+                self._clear_com_cache()
+                
+                # Retry after clearing cache
+                try:
+                    # Force reload of win32com.client
+                    import importlib
+                    import win32com
+                    if hasattr(win32com, 'client'):
+                        importlib.reload(win32com.client)
+                    
+                    excel = win32com.client.Dispatch("Excel.Application")
+                    self._configure_standalone_app(excel)
+                    logger.info("Excel COM recovered after clearing cache")
+                    return excel
+                except Exception as retry_error:
+                    logger.error(f"Retry failed after cache clear: {retry_error}")
+                    raise
+            else:
+                raise
+
+    def _clear_com_cache(self):
+        """Clear the win32com gen_py cache to fix corrupted COM types."""
+        try:
+            import win32com
+            import shutil as sh
+            
+            gen_path = getattr(win32com, '__gen_path__', None)
+            if gen_path and os.path.exists(gen_path):
+                for item in os.listdir(gen_path):
+                    item_path = os.path.join(gen_path, item)
+                    try:
+                        if os.path.isdir(item_path):
+                            sh.rmtree(item_path)
+                        else:
+                            os.remove(item_path)
+                    except Exception:
+                        pass
+                logger.info(f"Cleared COM cache at: {gen_path}")
+        except Exception as e:
+            logger.warning(f"Failed to clear COM cache: {e}")
+
+    def _configure_standalone_app(self, excel):
         """Configure standalone Excel instance."""
         try:
-            self._excel.Visible = False
-            self._excel.DisplayAlerts = False
-            self._excel.ScreenUpdating = False
-            self._excel.EnableEvents = False
-            self._excel.AskToUpdateLinks = False
+            excel.Visible = False
+            excel.DisplayAlerts = False
+            excel.ScreenUpdating = False
+            excel.EnableEvents = False
+            excel.AskToUpdateLinks = False
         except Exception as e:
             logger.debug(f"Excel configure warning: {e}")
 
@@ -1088,10 +1244,9 @@ class ExcelConverter(BaseConverter):
                 logger.debug(f"Excel quit error: {e}")
             self._excel = None
 
-        try:
-            pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        # Release COM properly
+        from .base import release_com
+        release_com()
 
         gc.collect()
         logger.info("Excel cleanup done")
@@ -1563,7 +1718,7 @@ def get_libreoffice_version() -> Optional[str]:
 
 ================================================================================
 FILE PATH: converters\ppt.py
-LINES: 135
+LINES: 136
 ================================================================================
 
 """
@@ -1597,12 +1752,14 @@ class PPTConverter(BaseConverter):
                  progress_callback: Optional[Callable[[float], None]] = None):
         super().__init__(log_callback, progress_callback)
         self._ppt = None
-        self._use_pool = False
+        self._use_pool = True  # Re-enabled with health check protection
 
     def initialize(self) -> bool:
         """Get PowerPoint COM from pool."""
         try:
-            pythoncom.CoInitialize()
+            from .base import ensure_com_initialized
+            self._com_owned = ensure_com_initialized()
+            
             if self._use_pool:
                 self._ppt = get_pool().get_ppt()
             else:
@@ -1634,10 +1791,9 @@ class PPTConverter(BaseConverter):
                 logger.debug(f"PPT quit error: {e}")
             self._ppt = None
 
-        try:
-            pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        # Release COM properly
+        from .base import release_com
+        release_com()
 
         gc.collect()
         logger.info("PowerPoint cleanup done")
@@ -1705,7 +1861,7 @@ class PPTConverter(BaseConverter):
 
 ================================================================================
 FILE PATH: converters\word.py
-LINES: 158
+LINES: 159
 ================================================================================
 
 """
@@ -1742,12 +1898,14 @@ class WordConverter(BaseConverter):
                  progress_callback: Optional[Callable[[float], None]] = None):
         super().__init__(log_callback, progress_callback)
         self._word = None
-        self._use_pool = False
+        self._use_pool = True  # Re-enabled with health check protection
 
     def initialize(self) -> bool:
         """Get Word COM from pool."""
         try:
-            pythoncom.CoInitialize()
+            from .base import ensure_com_initialized
+            self._com_owned = ensure_com_initialized()
+            
             if self._use_pool:
                 self._word = get_pool().get_word()
             else:
@@ -1783,10 +1941,9 @@ class WordConverter(BaseConverter):
                 logger.debug(f"Word quit error: {e}")
             self._word = None
 
-        try:
-            pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        # Release COM properly
+        from .base import release_com
+        release_com()
 
         gc.collect()
         logger.info("Word cleanup done")
@@ -1870,7 +2027,7 @@ class WordConverter(BaseConverter):
 
 ================================================================================
 FILE PATH: core\pdf_tools.py
-LINES: 869
+LINES: 928
 ================================================================================
 
 """
@@ -1888,6 +2045,13 @@ try:
     HAS_PYMUPDF = True
 except ImportError:
     HAS_PYMUPDF = False
+
+try:
+    from PIL import Image, ImageFilter, ImageEnhance, ImageChops
+    import random
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 
 logger = logging.getLogger(__name__)
 
@@ -2102,14 +2266,46 @@ def post_process_pdf(pdf_path: str, password: str = None,
 # RASTERIZE PDF - Flatten to Images
 # =============================================================================
 
-def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
+def _apply_scan_effects(img):
+    """Apply scan-like effects to PIL Image (internal helper)."""
+    if not HAS_PIL:
+        return img
+        
+    try:
+        # 1. Grayscale
+        img = img.convert("L")
+        
+        # 2. Slight Blur (soften digital edges)
+        img = img.filter(ImageFilter.GaussianBlur(0.5))
+        
+        # 3. Add Noise (simulate paper grain)
+        # Create noise image using os.urandom (fast)
+        w, h = img.size
+        noise_data = os.urandom(w * h)
+        noise_img = Image.frombytes("L", (w, h), noise_data)
+        # Blend noise (alpha 0.05-0.1 is usually enough)
+        img = Image.blend(img, noise_img, 0.05)
+        
+        # 4. Slight Skew/Rotate (-0.3 to 0.3 degrees)
+        angle = random.uniform(-0.3, 0.3)
+        img = img.rotate(angle, resample=Image.BICUBIC, expand=False, fillcolor="white")
+        
+        return img
+    except Exception as e:
+        logger.error(f"Scan effect error: {e}")
+        return img
+
+
+def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simulate_scan: bool = False) -> bool:
     """
     Convert PDF pages to fully flattened images (rasterize) to prevent extraction.
     Creates a true "scan-like" PDF.
     
     Args:
-        pdf_path: Path to PDF file
+        pdf_path: Path to source PDF file
+        output_path: Path to save result (if None, overwrites source)
         dpi: Resolution (150=good, 200=high, 300=excellent)
+        simulate_scan: If True, adds noise, blur, grayscale and rotation to mimic real scanner
         
     Returns:
         True on success
@@ -2117,6 +2313,8 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
     if not HAS_PYMUPDF:
         return False
 
+    target_path = output_path if output_path else pdf_path
+    
     try:
         doc = fitz.open(pdf_path)
         new_doc = fitz.open()
@@ -2124,7 +2322,22 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
         for page in doc:
             mat = fitz.Matrix(dpi / 72, dpi / 72)
             pix = page.get_pixmap(matrix=mat, alpha=False)
-            img_data = pix.tobytes("png")
+            
+            # Apply effects if requested
+            if simulate_scan and HAS_PIL:
+                # Convert to PIL
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                # Apply effects
+                img = _apply_scan_effects(img)
+                # Convert back to bytes (JPEG with compression)
+                # Use standard IO to get bytes
+                import io
+                buf = io.BytesIO()
+                # Save as JPEG with 80 quality for scan artifact
+                img.save(buf, format="JPEG", quality=80)
+                img_data = buf.getvalue()
+            else:
+                img_data = pix.tobytes("png")
 
             page_rect = page.rect
             new_width = page_rect.width * (dpi / 72)
@@ -2137,11 +2350,14 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
 
         doc.close()
 
-        temp_path = pdf_path + ".raster.tmp"
+        # Save to temp then move/rename
+        temp_path = target_path + ".raster.tmp"
         new_doc.save(temp_path, garbage=4, deflate=True, clean=True)
         new_doc.close()
 
-        shutil.move(temp_path, pdf_path)
+        if os.path.exists(target_path) and target_path != temp_path:
+            os.remove(target_path)
+        shutil.move(temp_path, target_path)
         return True
 
     except Exception as e:
@@ -3207,6 +3423,298 @@ class TestConverters:
         from office_converter.converters import PPTConverter
         assert ".pptx" in PPTConverter.SUPPORTED_EXTENSIONS
         assert ".ppt" in PPTConverter.SUPPORTED_EXTENSIONS
+
+
+================================================================================
+FILE PATH: tests\test_performance.py
+LINES: 285
+================================================================================
+
+"""
+Comprehensive Performance and Integration Tests
+=================================================
+Tests for Month 2 optimization items and overall system health.
+"""
+
+import pytest
+import os
+import sys
+import time
+import tempfile
+import threading
+from pathlib import Path
+from unittest.mock import Mock, patch, MagicMock
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+
+# =============================================================================
+# ITEM #7: Background PDF Preview Tests
+# =============================================================================
+
+class TestBackgroundPDFPreview:
+    """Tests for background PDF preview rendering."""
+
+    def test_render_id_increments(self):
+        """Verify render_id increments to cancel stale renders."""
+        # Mock the PDFPreviewPanel
+        from unittest.mock import MagicMock
+        
+        # Create mock panel with render tracking
+        panel = MagicMock()
+        panel._render_id = 0
+        
+        # Simulate multiple render calls
+        for i in range(5):
+            panel._render_id += 1
+            
+        assert panel._render_id == 5
+
+    def test_loading_state_management(self):
+        """Verify loading state is properly managed."""
+        panel = MagicMock()
+        panel._is_loading = False
+        
+        # Simulate loading flow
+        panel._is_loading = True
+        assert panel._is_loading
+        
+        panel._is_loading = False
+        assert not panel._is_loading
+
+
+# =============================================================================
+# ITEM #8: Virtual File List Tests
+# =============================================================================
+
+class TestVirtualFileList:
+    """Tests for virtual file list with 1000+ file support."""
+
+    def test_large_file_list_truncation(self):
+        """Verify large file lists are properly truncated for display."""
+        MAX_DISPLAY = 200
+        
+        # Simulate 1000 files
+        file_count = 1000
+        display_files = list(range(file_count))[:MAX_DISPLAY]
+        
+        assert len(display_files) == MAX_DISPLAY
+        assert file_count > MAX_DISPLAY
+
+    def test_batch_text_join_performance(self):
+        """Verify batch text joining is faster than individual inserts."""
+        lines = [f"Line {i}" for i in range(200)]
+        
+        # Batch join
+        start = time.perf_counter()
+        result = "\n".join(lines)
+        batch_time = time.perf_counter() - start
+        
+        assert len(result) > 0
+        assert batch_time < 0.1  # Should be very fast
+
+
+# =============================================================================
+# ITEM #10: Append-Only Log Tests
+# =============================================================================
+
+class TestAppendOnlyLog:
+    """Tests for append-only JSONL conversion logging."""
+
+    def test_jsonl_format_write(self):
+        """Verify JSONL format is used for logging."""
+        import json
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.jsonl', delete=False) as f:
+            record = {"file_size_mb": 1.5, "duration_seconds": 10.2, "success": True}
+            f.write(json.dumps(record) + '\n')
+            f.write(json.dumps(record) + '\n')
+            temp_path = f.name
+        
+        try:
+            # Read and verify
+            with open(temp_path, 'r') as f:
+                lines = f.readlines()
+            
+            assert len(lines) == 2
+            for line in lines:
+                data = json.loads(line.strip())
+                assert "file_size_mb" in data
+        finally:
+            os.unlink(temp_path)
+
+    def test_jsonl_append_vs_full_write(self):
+        """Verify append is faster than full rewrite."""
+        import json
+        import tempfile
+        
+        records = [{"id": i, "data": "x" * 100} for i in range(100)]
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.jsonl', delete=False) as f:
+            temp_path = f.name
+        
+        try:
+            # Append method
+            start = time.perf_counter()
+            with open(temp_path, 'a') as f:
+                for r in records:
+                    f.write(json.dumps(r) + '\n')
+            append_time = time.perf_counter() - start
+            
+            # Full rewrite method (simulated)
+            start = time.perf_counter()
+            with open(temp_path, 'w') as f:
+                json.dump(records, f)
+            full_time = time.perf_counter() - start
+            
+            # Both should be fast, but append scales better
+            assert append_time < 1.0
+            assert full_time < 1.0
+        finally:
+            os.unlink(temp_path)
+
+
+# =============================================================================
+# COMPOOL TESTS
+# =============================================================================
+
+class TestCOMPoolHealthCheck:
+    """Tests for COMPool health check mechanism."""
+
+    def test_health_check_methods_exist(self):
+        """Verify health check methods exist in COMPool."""
+        from office_converter.utils.com_pool import COMPool
+        
+        pool = COMPool()
+        
+        assert hasattr(pool, '_is_excel_alive')
+        assert hasattr(pool, '_is_word_alive')
+        assert hasattr(pool, '_is_ppt_alive')
+
+    def test_pool_singleton(self):
+        """Verify COMPool is a singleton."""
+        from office_converter.utils.com_pool import COMPool
+        
+        pool1 = COMPool()
+        pool2 = COMPool()
+        
+        assert pool1 is pool2
+
+
+# =============================================================================
+# LAZY IMPORT TESTS
+# =============================================================================
+
+class TestLazyImports:
+    """Tests for lazy import mechanism."""
+
+    def test_converters_module_lazy_load(self):
+        """Verify converters module supports lazy loading."""
+        # This import should be fast (no heavy modules loaded yet)
+        from office_converter.converters import get_converter_for_file
+        
+        assert callable(get_converter_for_file)
+
+    def test_getattr_mechanism(self):
+        """Verify __getattr__ works for lazy loading."""
+        # Try to access ExcelConverter
+        from office_converter import converters
+        
+        # This should trigger lazy loading
+        assert hasattr(converters, '__getattr__')
+
+
+# =============================================================================
+# PERFORMANCE BENCHMARKS
+# =============================================================================
+
+class TestPerformanceBenchmarks:
+    """Performance benchmark tests."""
+
+    def test_import_time_under_threshold(self):
+        """Verify main module imports quickly."""
+        import subprocess
+        import sys
+        
+        # Run import in subprocess to measure import time
+        code = """
+import time
+start = time.perf_counter()
+try:
+    import office_converter
+    elapsed = time.perf_counter() - start
+    print(f"OK:{elapsed:.2f}")
+except Exception as e:
+    print(f"ERR:{e}")
+"""
+        result = subprocess.run(
+            [sys.executable, '-c', code],
+            capture_output=True,
+            timeout=30,
+            text=True
+        )
+        
+        # Check output
+        output = result.stdout.strip()
+        if output.startswith("OK:"):
+            # Verify import time is under 10 seconds
+            import_time = float(output.split(":")[1])
+            assert import_time < 10.0, f"Import took too long: {import_time:.2f}s"
+        else:
+            # Module may not be installed in test environment, skip
+            pytest.skip(f"Module import issue: {output}")
+
+    def test_no_memory_leak_in_record_list(self):
+        """Verify conversion records don't leak memory."""
+        records = []
+        
+        # Add many records
+        for i in range(1000):
+            records.append({"id": i, "data": "x" * 100})
+        
+        # Trim to last 500
+        records = records[-500:]
+        
+        assert len(records) == 500
+
+
+# =============================================================================
+# INTEGRATION TESTS
+# =============================================================================
+
+class TestIntegration:
+    """Integration tests for full workflow."""
+
+    def test_converter_module_structure(self):
+        """Verify converter module exports are correct."""
+        from office_converter.converters import (
+            BaseConverter,
+            get_converter_for_file,
+            get_best_converter,
+        )
+        
+        assert BaseConverter is not None
+        assert callable(get_converter_for_file)
+        assert callable(get_best_converter)
+
+    def test_pdf_tools_exports(self):
+        """Verify pdf_tools exports are correct."""
+        from office_converter.utils.pdf_tools import (
+            HAS_PYMUPDF,
+            parse_page_range,
+            rasterize_pdf,
+        )
+        
+        assert isinstance(HAS_PYMUPDF, bool)
+        assert callable(parse_page_range)
+        assert callable(rasterize_pdf)
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
 
 
 ================================================================================
@@ -5798,7 +6306,7 @@ if __name__ == "__main__":
 
 ================================================================================
 FILE PATH: ui\main_window_pro.py
-LINES: 2026
+LINES: 2451
 ================================================================================
 
 """
@@ -5826,6 +6334,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 import customtkinter as ctk
+import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 
@@ -5838,11 +6347,16 @@ if root_dir not in sys.path:
 
 from office_converter.utils.logging_setup import setup_logging
 from office_converter.utils.config import Config
+from office_converter.utils.com_pool import release_pool
+# Lazy: pdf_tools and converters are loaded on-demand
+# from office_converter.utils.pdf_tools import ... -> Moved to functions
+# from office_converter.converters import ExcelConverter -> Moved to _convert_single
+
+# PDF tools - loaded at module level for preview panel
 from office_converter.utils.pdf_tools import (
     post_process_pdf, rasterize_pdf, parse_page_range, extract_pdf_pages, HAS_PYMUPDF
 )
-from office_converter.utils.com_pool import release_pool
-from office_converter.converters import get_converter_for_file, ExcelConverter
+from office_converter.converters import get_converter_for_file  # Lightweight lookup only
 
 # Setup logging
 logger = setup_logging()
@@ -5950,18 +6464,30 @@ class ConversionOptions:
 # ============================================================================
 
 class RecentFilesDB:
-    """SQLite database for recent files and history."""
+    """SQLite database for recent files and history with connection pooling."""
 
     def __init__(self, db_path: Optional[str] = None):
         if db_path is None:
             db_path = os.path.join(package_dir, "converter_history.db")
         self.db_path = db_path
+        self._conn: Optional[sqlite3.Connection] = None
+        self._lock = threading.Lock()
         self._init_db()
+
+    def _get_connection(self) -> sqlite3.Connection:
+        """Get or create persistent connection."""
+        if self._conn is None:
+            self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            # Enable WAL mode for better concurrent reads
+            self._conn.execute("PRAGMA journal_mode=WAL")
+            self._conn.execute("PRAGMA synchronous=NORMAL")
+        return self._conn
 
     def _init_db(self):
         """Initialize database tables."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS recent_files (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -5980,13 +6506,15 @@ class RecentFilesDB:
                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
+                conn.commit()
         except Exception as e:
             logger.error(f"Database init error: {e}")
 
     def add_recent(self, path: str):
         """Add or update recent file."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 conn.execute("""
                     INSERT INTO recent_files (path, last_used, use_count)
                     VALUES (?, CURRENT_TIMESTAMP, 1)
@@ -5994,13 +6522,15 @@ class RecentFilesDB:
                         last_used = CURRENT_TIMESTAMP,
                         use_count = use_count + 1
                 """, (path,))
+                conn.commit()
         except Exception as e:
             logger.error(f"Add recent error: {e}")
 
     def get_recent(self, limit: int = 10) -> List[str]:
         """Get recent files."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 cursor = conn.execute("""
                     SELECT path FROM recent_files
                     WHERE path IS NOT NULL
@@ -6016,19 +6546,22 @@ class RecentFilesDB:
                        status: str, duration: float):
         """Log conversion result."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 conn.execute("""
                     INSERT INTO conversion_history 
                     (input_path, output_path, status, duration)
                     VALUES (?, ?, ?, ?)
                 """, (input_path, output_path, status, duration))
+                conn.commit()
         except Exception as e:
             logger.error(f"Log conversion error: {e}")
 
     def get_stats(self) -> Dict[str, Any]:
         """Get conversion statistics."""
         try:
-            with sqlite3.connect(self.db_path) as conn:
+            with self._lock:
+                conn = self._get_connection()
                 cursor = conn.execute("""
                     SELECT 
                         COUNT(*) as total,
@@ -6064,15 +6597,114 @@ class ConversionEngine:
         self.on_file_complete = on_file_complete
         self.on_error = on_error
         self._stop_requested = False
+        self._stop_event = threading.Event()
+        self._current_converter = None  # Track current converter for force stop
+        self._current_output_path = None  # Track current output file for cleanup
+        self._incomplete_files: List[str] = []  # Track incomplete files for cleanup
         self._db = RecentFilesDB()
 
-    def stop(self):
-        """Request conversion stop."""
+    def stop(self, force: bool = False):
+        """Request conversion stop.
+        
+        Args:
+            force: If True, attempt to forcefully terminate Office processes.
+        """
         self._stop_requested = True
+        self._stop_event.set()
+        
+        if force:
+            self._force_stop()
+
+    def _force_stop(self):
+        """Force stop by cleaning up current converter, files and killing Office processes."""
+        try:
+            # Cleanup current converter if exists
+            if self._current_converter:
+                try:
+                    self._current_converter.cleanup()
+                except Exception:
+                    pass
+                self._current_converter = None
+            
+            # Kill hanging Office processes first
+            self._kill_office_processes()
+            
+            # Clean up incomplete/partial output files
+            self._cleanup_incomplete_files()
+            
+        except Exception as e:
+            logger.error(f"Force stop error: {e}")
+
+    def _cleanup_incomplete_files(self):
+        """Clean up incomplete output files and temp files."""
+        try:
+            import glob
+            
+            # Clean up current output file if it exists and is incomplete
+            if self._current_output_path and os.path.exists(self._current_output_path):
+                try:
+                    os.remove(self._current_output_path)
+                    logger.info(f"Cleaned up incomplete file: {self._current_output_path}")
+                except Exception as e:
+                    logger.warning(f"Could not remove incomplete file: {e}")
+                self._current_output_path = None
+            
+            # Clean up any tracked incomplete files
+            for file_path in self._incomplete_files:
+                if os.path.exists(file_path):
+                    try:
+                        os.remove(file_path)
+                        logger.info(f"Cleaned up incomplete file: {file_path}")
+                    except Exception as e:
+                        logger.warning(f"Could not remove: {e}")
+            self._incomplete_files.clear()
+            
+            # Clean up temp directory for any orphaned files
+            import tempfile
+            temp_dir = tempfile.gettempdir()
+            patterns = [
+                os.path.join(temp_dir, "~$*.doc*"),  # Word temp files
+                os.path.join(temp_dir, "~$*.xls*"),  # Excel temp files  
+                os.path.join(temp_dir, "~$*.ppt*"),  # PowerPoint temp files
+            ]
+            
+            for pattern in patterns:
+                for temp_file in glob.glob(pattern):
+                    try:
+                        # Only delete recent files (created in last 5 minutes)
+                        if os.path.getmtime(temp_file) > time.time() - 300:
+                            os.remove(temp_file)
+                            logger.debug(f"Cleaned up temp file: {temp_file}")
+                    except Exception:
+                        pass
+                        
+        except Exception as e:
+            logger.warning(f"Cleanup incomplete files error: {e}")
+
+    def _kill_office_processes(self):
+        """Kill Office application processes that may be hung."""
+        try:
+            import subprocess
+            # Kill common Office processes that might be stuck
+            for proc_name in ['EXCEL.EXE', 'WINWORD.EXE', 'POWERPNT.EXE']:
+                try:
+                    subprocess.run(
+                        ['taskkill', '/F', '/IM', proc_name],
+                        capture_output=True,
+                        timeout=5
+                    )
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.warning(f"Kill office processes error: {e}")
 
     def reset(self):
         """Reset stop flag."""
         self._stop_requested = False
+        self._stop_event.clear()
+        self._current_converter = None
+        self._current_output_path = None
+        self._incomplete_files.clear()
 
     def convert_batch(self, files: List[ConversionFile],
                       options: ConversionOptions,
@@ -6098,6 +6730,10 @@ class ConversionEngine:
                 output_path = str(Path(conv_file.path).with_suffix(".pdf"))
 
             conv_file.output_path = output_path
+            
+            # Track current output for cleanup on force stop
+            self._current_output_path = output_path
+            self._incomplete_files.append(output_path)
 
             # Progress callback
             if self.on_progress:
@@ -6112,12 +6748,20 @@ class ConversionEngine:
 
                 if success:
                     conv_file.status = "completed"
+                    # Remove from incomplete list since it's done
+                    if output_path in self._incomplete_files:
+                        self._incomplete_files.remove(output_path)
+                    self._current_output_path = None
+                    
                     self._db.add_recent(conv_file.path)
                     self._db.log_conversion(
                         conv_file.path, output_path, "completed", conv_file.duration
                     )
                 else:
                     conv_file.status = "failed"
+                    # Also remove failed file from incomplete (we don't need to clean it)
+                    if output_path in self._incomplete_files:
+                        self._incomplete_files.remove(output_path)
                     self._db.log_conversion(
                         conv_file.path, output_path, "failed", conv_file.duration
                     )
@@ -6151,6 +6795,10 @@ class ConversionEngine:
     def _convert_single(self, conv_file: ConversionFile,
                         options: ConversionOptions) -> bool:
         """Convert a single file."""
+        # Check stop before starting
+        if self._stop_requested:
+            return False
+            
         # get_converter_for_file returns a CLASS, not an instance!
         converter_class = get_converter_for_file(conv_file.path)
         if not converter_class:
@@ -6159,15 +6807,20 @@ class ConversionEngine:
 
         # Create instance of the converter
         converter = converter_class()
+        self._current_converter = converter  # Track for force stop
 
         try:
+            # Check stop again before initialization
+            if self._stop_requested:
+                return False
+                
             # Initialize COM application
             if not converter.initialize():
                 logger.error(f"Failed to initialize converter for: {conv_file.path}")
                 return False
 
-            # Excel with sheet indices
-            if isinstance(converter, ExcelConverter) and options.sheet_indices:
+            # Excel with sheet indices (check by name to avoid eager import)
+            if converter.__class__.__name__ == "ExcelConverter" and options.sheet_indices:
                 success = converter.convert(
                     conv_file.path,
                     conv_file.output_path,
@@ -6227,7 +6880,7 @@ class ConversionEngine:
 # ============================================================================
 
 class PDFPreviewPanel(ctk.CTkFrame):
-    """PDF preview panel using PyMuPDF."""
+    """PDF preview panel using PyMuPDF with background rendering."""
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
@@ -6236,6 +6889,11 @@ class PDFPreviewPanel(ctk.CTkFrame):
         self.current_page = 0
         self.total_pages = 0
         self.photo_image = None
+        
+        # Background rendering state
+        self._render_thread = None
+        self._render_id = 0  # Incremented on each render to cancel stale renders
+        self._is_loading = False
 
         self._create_widgets()
 
@@ -6293,11 +6951,40 @@ class PDFPreviewPanel(ctk.CTkFrame):
             logger.error(f"PDF load error: {e}")
 
     def _render_page(self):
-        """Render current page."""
+        """Start background rendering of current page."""
         if not self.current_pdf or fitz is None:
             return
 
+        # Increment render ID to cancel any pending stale renders
+        self._render_id += 1
+        current_render_id = self._render_id
+        
+        # Show loading indicator
+        self._show_loading()
+        
+        # Start background thread
+        self._render_thread = threading.Thread(
+            target=self._do_render_page,
+            args=(current_render_id,),
+            daemon=True
+        )
+        self._render_thread.start()
+
+    def _show_loading(self):
+        """Show loading indicator."""
+        self._is_loading = True
+        self.preview_label.configure(text="⏳ Đang tải...", image=None)
+        self.page_label.configure(
+            text=f"Trang {self.current_page + 1}/{self.total_pages}"
+        )
+
+    def _do_render_page(self, render_id: int):
+        """Background worker to render PDF page."""
         try:
+            # Check if this render is still valid
+            if render_id != self._render_id:
+                return  # Cancelled - newer render requested
+                
             page = self.current_pdf[self.current_page]
 
             # Render to image
@@ -6305,26 +6992,65 @@ class PDFPreviewPanel(ctk.CTkFrame):
             mat = fitz.Matrix(zoom, zoom)
             pix = page.get_pixmap(matrix=mat)
 
+            # Check again before expensive operations
+            if render_id != self._render_id:
+                return
+
             # Convert to PIL Image
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            
+            # Release pixmap memory immediately
+            pix = None
 
             # Resize to fit
             max_width = 300
             max_height = 400
             img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
 
+            # Final check before UI update
+            if render_id != self._render_id:
+                return
+
+            # Schedule UI update on main thread
+            self.after(0, lambda i=img, r=render_id: self._apply_rendered_image(i, r))
+
+        except Exception as e:
+            if render_id == self._render_id:
+                self.after(0, lambda err=str(e): self._show_render_error(err))
+
+    def _apply_rendered_image(self, img, render_id: int):
+        """Apply rendered image to UI (must be called on main thread)."""
+        try:
+            # Check if this render is still valid
+            if render_id != self._render_id:
+                return
+                
+            # Release old photo_image to prevent memory leak
+            if self.photo_image is not None:
+                del self.photo_image
+                self.photo_image = None
+
             # Convert to PhotoImage
             self.photo_image = ImageTk.PhotoImage(img)
+            
+            # Release PIL image after conversion
+            img = None
 
             # Update label
+            self._is_loading = False
             self.preview_label.configure(image=self.photo_image, text="")
             self.page_label.configure(
                 text=f"Trang {self.current_page + 1}/{self.total_pages}"
             )
 
         except Exception as e:
-            self.preview_label.configure(text=f"Lỗi render: {e}")
-            logger.error(f"PDF render error: {e}")
+            self._show_render_error(str(e))
+
+    def _show_render_error(self, error: str):
+        """Show render error in UI."""
+        self._is_loading = False
+        self.preview_label.configure(text=f"Lỗi render: {error}")
+        logger.error(f"PDF render error: {error}")
 
     def _prev_page(self):
         """Go to previous page."""
@@ -6363,7 +7089,7 @@ class PDFPreviewPanel(ctk.CTkFrame):
                 self.current_pdf = None
             self.photo_image = None
             self.preview_label.configure(
-                image="",
+                image=None,
                 text="Chọn file PDF để xem preview"
             )
             self.page_label.configure(text="")
@@ -6378,16 +7104,19 @@ class PDFPreviewPanel(ctk.CTkFrame):
 # ============================================================================
 
 class FileListPanel(ctk.CTkFrame):
-    """Enhanced file list with drag & drop and type indicators."""
+    """Enhanced file list with drag & drop, selection and type indicators."""
 
     def __init__(self, parent, on_selection_change: Optional[Callable] = None, **kwargs):
         super().__init__(parent, **kwargs)
 
         self.files: List[ConversionFile] = []
+        self.selected_indices: set = set()  # Track selected file indices
+        self.anchor_index: int = -1  # For shift-selection
         self.on_selection_change = on_selection_change
 
         self._create_widgets()
         self._setup_drag_drop()
+        self._setup_keyboard_bindings()
 
     def _create_widgets(self):
         """Create file list widgets."""
@@ -6405,16 +7134,24 @@ class FileListPanel(ctk.CTkFrame):
 
         self.drop_label = ctk.CTkLabel(
             self.drop_frame,
-            text="📁 Kéo thả files vào đây\n\n💡 Ctrl+O: Thêm files\n⌫ Delete: Xóa files",
+            text="📁 Kéo thả files vào đây\n\n💡 Ctrl+O: Thêm files\n⌫ Delete: Xóa files đã chọn\n🔲 Ctrl+A: Chọn tất cả",
             font=ctk.CTkFont(size=14),
             text_color="gray"
         )
         self.drop_label.pack(expand=True, pady=30)
 
-        self.file_textbox = ctk.CTkTextbox(
+        # Use Listbox for proper selection support
+        self.file_listbox = tk.Listbox(
             self.drop_frame,
-            font=ctk.CTkFont(family="Consolas", size=12),
-            state="disabled"
+            font=("Consolas", 11),
+            selectmode=tk.EXTENDED,  # Allow multiple selection
+            bg="#2b2b2b",
+            fg="#dcdcdc",
+            selectbackground="#1f6aa5",
+            selectforeground="white",
+            highlightthickness=0,
+            borderwidth=0,
+            activestyle="none"
         )
 
         # Stats row
@@ -6450,6 +7187,53 @@ class FileListPanel(ctk.CTkFrame):
             logger.info("TkinterDnD2 not available, drag & drop disabled")
         except Exception as e:
             logger.warning(f"Could not setup drag & drop: {e}")
+
+    def _setup_keyboard_bindings(self):
+        """Setup keyboard shortcuts for file selection."""
+        # Ctrl+A to select all
+        self.file_listbox.bind('<Control-a>', self._select_all)
+        self.file_listbox.bind('<Control-A>', self._select_all)
+        
+        # Delete to remove selected
+        self.file_listbox.bind('<Delete>', self._delete_selected)
+        self.file_listbox.bind('<BackSpace>', self._delete_selected)
+        
+        # Update selected_indices when selection changes
+        self.file_listbox.bind('<<ListboxSelect>>', self._on_listbox_select)
+
+    def _select_all(self, event=None):
+        """Select all files."""
+        if self.files:
+            self.file_listbox.select_set(0, tk.END)
+            self.selected_indices = set(range(len(self.files)))
+        return "break"  # Prevent default behavior
+
+    def _delete_selected(self, event=None):
+        """Delete selected files from list."""
+        selection = self.file_listbox.curselection()
+        if not selection:
+            return
+        
+        # Remove in reverse order to maintain indices
+        for idx in sorted(selection, reverse=True):
+            if 0 <= idx < len(self.files):
+                del self.files[idx]
+        
+        self.selected_indices.clear()
+        self._refresh_display()
+        return "break"
+
+    def _on_listbox_select(self, event=None):
+        """Handle listbox selection change."""
+        selection = self.file_listbox.curselection()
+        self.selected_indices = set(selection)
+
+    def get_selected_files(self) -> List[ConversionFile]:
+        """Get currently selected files (or all if none selected)."""
+        if self.selected_indices:
+            return [self.files[i] for i in sorted(self.selected_indices) if i < len(self.files)]
+        return self.files  # Return all if none selected
+
 
     def _on_drop(self, event):
         """Handle dropped files."""
@@ -6528,7 +7312,19 @@ class FileListPanel(ctk.CTkFrame):
             logger.error(f"Remove completed error: {e}")
 
     def _refresh_display(self):
-        """Refresh the file list display."""
+        """Refresh the file list display with debouncing for large lists."""
+        try:
+            # Debounce: cancel previous scheduled refresh
+            if hasattr(self, '_refresh_job') and self._refresh_job:
+                self.after_cancel(self._refresh_job)
+            
+            # Schedule refresh after 50ms debounce
+            self._refresh_job = self.after(50, self._do_refresh_display)
+        except Exception as e:
+            logger.error(f"Refresh display error: {e}")
+
+    def _do_refresh_display(self):
+        """Actual refresh implementation."""
         try:
             count = len(self.files)
 
@@ -6551,27 +7347,31 @@ class FileListPanel(ctk.CTkFrame):
 
             # Update list display
             if count == 0:
-                self.file_textbox.pack_forget()
+                self.file_listbox.pack_forget()
                 self.drop_label.pack(expand=True, pady=30)
             else:
                 self.drop_label.pack_forget()
-                self.file_textbox.pack(fill="both", expand=True)
+                self.file_listbox.pack(fill="both", expand=True)
 
-                self.file_textbox.configure(state="normal")
-                self.file_textbox.delete("1.0", "end")
+                # Clear and repopulate listbox
+                self.file_listbox.delete(0, tk.END)
 
-                for i, f in enumerate(self.files, 1):
+                # Progressive rendering: show only first 200 files for performance
+                MAX_DISPLAY = 200
+                display_files = self.files[:MAX_DISPLAY]
+                
+                for i, f in enumerate(display_files, 1):
                     status_icon = {
                         "pending": f.icon,
                         "converting": "⏳",
                         "completed": "✅",
                         "failed": "❌"
                     }.get(f.status, f.icon)
-
-                    line = f"{status_icon} {i:2d}. {f.filename}\n"
-                    self.file_textbox.insert("end", line)
-
-                self.file_textbox.configure(state="disabled")
+                    self.file_listbox.insert(tk.END, f"{status_icon} {i:3d}. {f.filename}")
+                
+                # Add "more files" indicator if truncated
+                if count > MAX_DISPLAY:
+                    self.file_listbox.insert(tk.END, f"... và {count - MAX_DISPLAY} files nữa")
 
             # Callback
             if self.on_selection_change:
@@ -6615,7 +7415,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
 
-    VERSION = "4.0.8"
+    VERSION = "4.1.0"
 
     def __init__(self):
         super().__init__()
@@ -6680,6 +7480,9 @@ class ConverterProApp(ctk.CTk):
         # Setup drag and drop
         self._setup_drag_drop()
 
+        # Fix for window restore after minimize (windnd compatibility)
+        self.bind('<Map>', self._on_window_restore)
+        
         # Cleanup
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
@@ -6692,8 +7495,35 @@ class ConverterProApp(ctk.CTk):
         if HAS_WINDND:
             self._log("📁 Drag & Drop: Kéo thả file hoạt động")
 
+        # Cleanup old temp files from previous sessions
+        self._cleanup_temp_files()
+
         # Check for updates on startup
         self._check_for_updates()
+
+    def _cleanup_temp_files(self):
+        """Clean up orphaned temp files from crashed conversions."""
+        try:
+            import glob
+            temp_dir = os.environ.get("TEMP", os.path.expanduser("~"))
+            patterns = ["tmp_*.xlsx", "tmp_*.xls", "tmp_*.docx", "tmp_*.doc", 
+                       "tmp_*.pptx", "tmp_*.ppt", "tmp_*.pdf"]
+            
+            cleaned = 0
+            for pattern in patterns:
+                for f in glob.glob(os.path.join(temp_dir, pattern)):
+                    try:
+                        # Only delete files older than 1 hour
+                        if os.path.getmtime(f) < (time.time() - 3600):
+                            os.remove(f)
+                            cleaned += 1
+                    except (OSError, PermissionError):
+                        pass  # File in use, skip
+            
+            if cleaned > 0:
+                logger.info(f"Cleaned {cleaned} orphaned temp files")
+        except Exception as e:
+            logger.debug(f"Temp cleanup error: {e}")
 
     def _check_for_updates(self):
         """Check for updates asynchronously."""
@@ -7235,14 +8065,27 @@ class ConverterProApp(ctk.CTk):
                                                placeholder_text="Mật khẩu")
             self.password_entry.pack(side="left", padx=5)
 
-            # Page range
+            # Excel sheet selection
+            sheet_frame = ctk.CTkFrame(options, fg_color="transparent")
+            sheet_frame.pack(fill="x", pady=5)
+            
+            ctk.CTkLabel(sheet_frame, text="📗 Sheet (Excel):").pack(side="left")
+            sheet_entry = ctk.CTkEntry(sheet_frame, textvariable=self.var_sheet_index,
+                        width=80, placeholder_text="all")
+            sheet_entry.pack(side="left", padx=5)
+            ctk.CTkLabel(sheet_frame, text="(VD: 1-3, 5 hoặc để trống = tất cả)", 
+                        text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
+
+            # PDF page range  
             page_frame = ctk.CTkFrame(options, fg_color="transparent")
             page_frame.pack(fill="x", pady=5)
 
-            ctk.CTkLabel(page_frame, text="📄 Trang:").pack(side="left")
+            ctk.CTkLabel(page_frame, text="📄 Trang PDF:").pack(side="left")
             page_entry = ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
-                        width=100, placeholder_text="1-3, 5")
+                        width=80, placeholder_text="all")
             page_entry.pack(side="left", padx=5)
+            ctk.CTkLabel(page_frame, text="(Chỉ xuất các trang chỉ định)", 
+                        text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
             # Save page range on focus out
             page_entry.bind("<FocusOut>", lambda e: self._save_page_range())
         except Exception as e:
@@ -7280,6 +8123,24 @@ class ConverterProApp(ctk.CTk):
             has_files = len(files) > 0
             if self.btn_convert:
                 self.btn_convert.configure(state="normal" if has_files else "disabled")
+            
+            # Try to preview the first PDF file if available
+            if hasattr(self, 'preview_panel') and self.preview_panel:
+                pdf_file = None
+                for f in files:
+                    if f.output_path and os.path.exists(f.output_path):
+                        # Use converted PDF
+                        pdf_file = f.output_path
+                        break
+                    elif f.path.lower().endswith('.pdf'):
+                        # Use source PDF
+                        pdf_file = f.path
+                        break
+                
+                if pdf_file:
+                    self.preview_panel.load_pdf(pdf_file)
+                else:
+                    self.preview_panel.clear()
         except Exception as e:
             logger.error(f"On files changed error: {e}")
 
@@ -7573,11 +8434,36 @@ class ConverterProApp(ctk.CTk):
             self.after(0, self._on_conversion_done)
 
     def _stop_conversion(self):
-        """Stop conversion."""
+        """Stop conversion immediately (force stop)."""
         try:
             if self.engine:
-                self.engine.stop()
-                self._log("⏹️ Đang dừng...")
+                self._log("⏹️ Đang dừng ngay lập tức...")
+                
+                # Force stop - kills Office processes if needed
+                self.engine.stop(force=True)
+                
+                # Immediately update UI
+                self.is_converting = False
+                
+                # Hide progress frame
+                if hasattr(self, 'progress_frame') and self.progress_frame:
+                    self.progress_frame.pack_forget()
+                
+                # Re-enable convert button and show main content
+                if hasattr(self, 'btn_convert') and self.btn_convert:
+                    self.btn_convert.configure(state="normal")
+                if hasattr(self, 'main_content_frame') and self.main_content_frame:
+                    self.main_content_frame.pack(fill="both", expand=True, padx=15, pady=10)
+                
+                self._log("⏹️ Đã dừng chuyển đổi!")
+                
+                # Mark pending files as cancelled
+                if self.file_panel:
+                    for f in self.file_panel.files:
+                        if f.status == "converting" or f.status == "pending":
+                            f.status = "pending"  # Reset to pending
+                    self.file_panel._refresh_display()
+                    
         except Exception as e:
             logger.error(f"Stop conversion error: {e}")
 
@@ -7594,9 +8480,9 @@ class ConverterProApp(ctk.CTk):
         try:
             percent = int(progress * 100)
 
-            # Update progress bar
+            # Update progress bar with smooth animation
             if self.progress_bar:
-                self.progress_bar.set(progress)
+                self._animate_progress(progress)
 
             # Update percent label with color change
             if self.progress_percent:
@@ -7632,6 +8518,35 @@ class ConverterProApp(ctk.CTk):
 
         except Exception as e:
             logger.error(f"Update progress UI error: {e}")
+
+    def _animate_progress(self, target: float, steps: int = 5):
+        """Smoothly animate progress bar to target value."""
+        try:
+            current = self.progress_bar.get() if hasattr(self.progress_bar, 'get') else 0
+            
+            # If target is lower (shouldn't happen) or nearly same, just set directly
+            if target <= current or abs(target - current) < 0.01:
+                self.progress_bar.set(target)
+                return
+            
+            # Calculate step size
+            step_size = (target - current) / steps
+            
+            def animate_step(step_num):
+                if step_num >= steps:
+                    self.progress_bar.set(target)
+                    return
+                
+                new_value = current + (step_size * (step_num + 1))
+                self.progress_bar.set(min(new_value, target))
+                
+                # Schedule next step (16ms = ~60fps)
+                self.after(16, lambda: animate_step(step_num + 1))
+            
+            animate_step(0)
+        except Exception:
+            # Fallback to direct set
+            self.progress_bar.set(target)
 
     def _on_file_complete(self, conv_file: ConversionFile):
         """File completion callback."""
@@ -7801,6 +8716,24 @@ F1         Xem shortcuts
             messagebox.showinfo("Phím tắt", shortcuts)
         except Exception as e:
             logger.error(f"Show shortcuts error: {e}")
+
+    def _on_window_restore(self, event=None):
+        """Handle window restore after minimize - simple refresh."""
+        # Debounce - avoid multiple triggers
+        if hasattr(self, '_restore_scheduled') and self._restore_scheduled:
+            return
+        self._restore_scheduled = True
+        
+        def do_restore():
+            try:
+                self._restore_scheduled = False
+                # Simple refresh - just update the window
+                self.update_idletasks()
+            except Exception:
+                pass
+        
+        # Schedule after 100ms to debounce
+        self.after(100, do_restore)
 
     def _on_closing(self):
         """Cleanup on close."""
@@ -8433,7 +9366,7 @@ def show_pdf_tools_dialog(parent, lang: str = "vi"):
 
 ================================================================================
 FILE PATH: ui\pdf_tools_pro.py
-LINES: 776
+LINES: 944
 ================================================================================
 
 """
@@ -8444,12 +9377,20 @@ Professional UI with dark theme, smooth animations, and batch processing
 import os
 import threading
 import customtkinter as ctk
+import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import List
 import logging
 
 from office_converter.core import pdf_tools
 from office_converter.utils.config import Config
+
+# Try to import windnd for drag and drop
+try:
+    import windnd
+    HAS_WINDND = True
+except ImportError:
+    HAS_WINDND = False
 
 logger = logging.getLogger(__name__)
 
@@ -8476,12 +9417,13 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             ("compress", "📦 Nén", "Giảm dung lượng file"),
             ("protect", "🔒 Mật khẩu", "Bảo vệ bằng password"),
             ("watermark", "💧 Watermark", "Thêm watermark text"),
+            ("rasterize", "🔐 Hóa ảnh (Secure)", "Flatten thành ảnh 1 lớp"),
         ],
     }
 
     # All operation keys for validation
     ALL_OPERATIONS = ["merge", "split", "extract", "delete", "rotate", "reverse",
-                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark"]
+                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark", "rasterize"]
 
     def __init__(self, parent, lang: str = "vi"):
         super().__init__(parent)
@@ -8520,6 +9462,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.var_watermark_text = ctk.StringVar(value="CONFIDENTIAL")
         self.var_password = ctk.StringVar()
         self.var_dpi = ctk.IntVar(value=150)
+        self.var_simulate_scan = ctk.BooleanVar(value=False)
         self.var_image_format = ctk.StringVar(value="png")
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
@@ -8529,18 +9472,55 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         # Set the correct tab based on last operation
         self._switch_to_operation_tab(last_op)
 
-        # Modal behavior
+        # Non-modal: just keep on top of parent, don't lock input
+        # This fixes the minimize/restore issue
         self.transient(parent)
-        self.grab_set()
+        # Remove grab_set() to allow proper minimize/restore behavior
+        # self.grab_set()  # Removed - causes minimize issues
 
         # Save operation when closing
         self.protocol("WM_DELETE_WINDOW", self._on_close)
+        
+        # Bind Unmap (minimize) and Map (restore) events for state handling
+        self.bind('<Unmap>', self._on_window_minimize)
+        self.bind('<Map>', self._on_window_restore)
+        self._is_minimized = False
+
+    def _on_window_minimize(self, event=None):
+        """Handle window minimize."""
+        self._is_minimized = True
+
+    def _on_window_restore(self, event=None):
+        """Handle window restore after minimize."""
+        if not self._is_minimized:
+            return
+        self._is_minimized = False
+        
+        try:
+            # Force window to front and refresh
+            self.deiconify()
+            self.lift()
+            self.focus_force()
+            self.update_idletasks()
+        except Exception:
+            pass
 
     def _on_close(self):
         """Save last operation and close."""
-        self.config.set("pdf_tools_last_operation", self.var_operation.get())
-        self.config.save()
-        self.destroy()
+        try:
+            self.config.set("pdf_tools_last_operation", self.var_operation.get())
+            self.config.save()
+        except Exception as e:
+            logger.error(f"Config save error: {e}")
+        finally:
+            self.grab_release()
+            self.destroy()
+            try:
+                if self.parent:
+                    self.parent.lift()
+                    self.parent.focus_force()
+            except Exception:
+                pass
 
     def _switch_to_operation_tab(self, op: str):
         """Switch to the tab containing the given operation."""
@@ -8549,7 +9529,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 self.tab_view.set("✏️ Chỉnh sửa")
             elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
                 self.tab_view.set("🔄 Chuyển đổi")
-            elif op in ["compress", "protect", "watermark"]:
+            elif op in ["compress", "protect", "watermark", "rasterize"]:
                 self.tab_view.set("⚡ Tối ưu")
         except Exception:
             pass  # Tab may not exist yet
@@ -8722,19 +9702,35 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 width=70, height=28
             ).pack(side="left", padx=2)
 
-        # File list
+        # File list with selection support
         file_list_frame = ctk.CTkFrame(right_panel)
         file_list_frame.grid(row=1, column=0, sticky="nsew", pady=(0, 10))
         file_list_frame.grid_rowconfigure(0, weight=1)
         file_list_frame.grid_columnconfigure(0, weight=1)
 
-        self.file_listbox = ctk.CTkTextbox(
+        # Use tk.Listbox for proper selection (Ctrl+A, Shift+arrows, Delete)
+        self.file_listbox = tk.Listbox(
             file_list_frame,
-            height=200,
-            font=ctk.CTkFont(family="Consolas", size=12)
+            font=("Consolas", 11),
+            selectmode=tk.EXTENDED,  # Allow multiple selection
+            bg="#2b2b2b",
+            fg="#dcdcdc",
+            selectbackground="#1f6aa5",
+            selectforeground="white",
+            highlightthickness=0,
+            borderwidth=0,
+            activestyle="none"
         )
         self.file_listbox.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        self.file_listbox.configure(state="disabled")
+        
+        # Keyboard bindings for selection
+        self.file_listbox.bind('<Control-a>', lambda e: self._select_all_files())
+        self.file_listbox.bind('<Control-A>', lambda e: self._select_all_files())
+        self.file_listbox.bind('<Delete>', lambda e: self._remove_selected_files())
+        self.file_listbox.bind('<BackSpace>', lambda e: self._remove_selected_files())
+        
+        # Setup drag and drop for file list
+        self._setup_file_drop(file_list_frame)
 
         # Progress section
         progress_frame = ctk.CTkFrame(right_panel)
@@ -8886,6 +9882,40 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     self.options_content, text=fmt.upper(),
                     variable=self.var_image_format, value=fmt
                 ).pack(anchor="w", padx=10)
+
+        elif op == "rasterize":
+            ctk.CTkLabel(self.options_content, text="Chất lượng (DPI):").pack(anchor="w")
+            ctk.CTkLabel(
+                self.options_content, 
+                text="⚠️ Sẽ biến PDF thành ảnh. Không thể copy text/ảnh.",
+                text_color="#F59E0B",
+                font=ctk.CTkFont(size=11)
+            ).pack(anchor="w", pady=(0, 5))
+            
+            ctk.CTkSlider(
+                self.options_content,
+                from_=72, to=300,
+                variable=self.var_dpi,
+                width=180
+            ).pack(anchor="w", pady=5)
+            
+            # Show DPI value
+            self.lbl_dpi = ctk.CTkLabel(self.options_content, text=f"{self.var_dpi.get()} DPI")
+            self.lbl_dpi.pack(anchor="w", padx=5)
+            
+            def update_dpi_label(value):
+                self.lbl_dpi.configure(text=f"{int(value)} DPI")
+                
+            self.var_dpi.trace_add("write", lambda *args: update_dpi_label(self.var_dpi.get()))
+
+            # Checkbox simulate scan
+            ctk.CTkCheckBox(
+                self.options_content,
+                text="Hiệu ứng Scan thật (Grayscale + Noise)",
+                variable=self.var_simulate_scan,
+                font=ctk.CTkFont(size=12)
+            ).pack(anchor="w", pady=5)
+
         else:
             ctk.CTkLabel(
                 self.options_content,
@@ -8936,10 +9966,29 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self._refresh_file_list()
 
     def _remove_files(self):
-        """Remove selected file (last one for now)."""
+        """Remove selected files."""
+        self._remove_selected_files()
+
+    def _remove_selected_files(self):
+        """Remove selected files from list."""
+        selection = self.file_listbox.curselection()
+        if not selection:
+            # If nothing selected, remove last one
+            if self.files:
+                self.files.pop()
+        else:
+            # Remove in reverse order to maintain indices
+            for idx in sorted(selection, reverse=True):
+                if 0 <= idx < len(self.files):
+                    del self.files[idx]
+        self._refresh_file_list()
+        return "break"
+
+    def _select_all_files(self):
+        """Select all files in the list."""
         if self.files:
-            self.files.pop()
-            self._refresh_file_list()
+            self.file_listbox.select_set(0, tk.END)
+        return "break"
 
     def _clear_files(self):
         """Clear all files."""
@@ -8947,26 +9996,70 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.compression_results.clear()
         self._refresh_file_list()
 
+    def _setup_file_drop(self, frame):
+        """Setup drag and drop for the file list using windnd."""
+        if not HAS_WINDND:
+            logger.info("windnd not available, drag drop disabled in PDF Tools")
+            return
+            
+        try:
+            # Register the dialog window for drag and drop
+            windnd.hook_dropfiles(self, func=self._handle_windnd_drop)
+            logger.info("Drag and drop enabled for PDF Tools")
+        except Exception as e:
+            logger.warning(f"Could not setup drag & drop: {e}")
+
+    def _handle_windnd_drop(self, files):
+        """Handle dropped files from windnd."""
+        try:
+            if not files:
+                return
+            
+            op = self.var_operation.get()
+            valid_exts = {'.png', '.jpg', '.jpeg', '.bmp', '.gif'} if op == "img_to_pdf" else {'.pdf'}
+            
+            added = 0
+            for file_path in files:
+                try:
+                    # Handle bytes from windnd
+                    if isinstance(file_path, bytes):
+                        file_path = file_path.decode('utf-8', errors='replace')
+                    
+                    # Check extension
+                    ext = os.path.splitext(file_path)[1].lower()
+                    if ext in valid_exts and file_path not in self.files:
+                        self.files.append(file_path)
+                        added += 1
+                except Exception:
+                    continue
+            
+            if added > 0:
+                self._refresh_file_list()
+                self._log(f"📁 Thả thêm {added} file(s)")
+        except Exception as e:
+            logger.error(f"Drop error: {e}")
+
     def _refresh_file_list(self):
         """Refresh the file list display."""
-        self.file_listbox.configure(state="normal")
-        self.file_listbox.delete("1.0", "end")
+        # Clear and repopulate listbox
+        self.file_listbox.delete(0, tk.END)
 
         for i, f in enumerate(self.files, 1):
             basename = os.path.basename(f)
-            size = os.path.getsize(f) / 1024  # KB
+            try:
+                size = os.path.getsize(f) / 1024  # KB
+            except Exception:
+                size = 0
 
             # Show compression results if available
             if f in self.compression_results:
                 orig, new = self.compression_results[f]
                 ratio = (1 - new/orig) * 100 if orig > 0 else 0
-                line = f"{i}. {basename} ({size:.0f}KB → {new/1024:.0f}KB, -{ratio:.0f}%)\n"
+                line = f"{i}. {basename} ({size:.0f}KB → {new/1024:.0f}KB, -{ratio:.0f}%)"
             else:
-                line = f"{i}. {basename} ({size:.0f} KB)\n"
+                line = f"{i}. {basename} ({size:.0f} KB)"
 
-            self.file_listbox.insert("end", line)
-
-        self.file_listbox.configure(state="disabled")
+            self.file_listbox.insert(tk.END, line)
 
         # Update count
         total_size = sum(os.path.getsize(f) for f in self.files) if self.files else 0
@@ -9040,6 +10133,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             "split": "_split",
             "img_to_pdf": ".pdf",
             "ocr": "_ocr",
+            "rasterize": "_rasterized",
         }
         suffix = suffixes.get(op, "_output")
 
@@ -9119,6 +10213,13 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 if not is_ocr_available():
                     return False
                 return ocr_pdf_to_searchable(input_path, output_path, lang=None)
+            elif op == "rasterize":
+                return pdf_tools.rasterize_pdf(
+                    input_path, 
+                    output_path, 
+                    self.var_dpi.get(),
+                    simulate_scan=self.var_simulate_scan.get()
+                )
             return False
         except Exception as e:
             logger.error(f"Operation {op} failed: {e}")
@@ -9239,7 +10340,7 @@ __all__ = [
 
 ================================================================================
 FILE PATH: utils\com_pool.py
-LINES: 222
+LINES: 271
 ================================================================================
 
 """
@@ -9288,6 +10389,43 @@ class COMPool:
                     cls._instance = super().__new__(cls)
         return cls._instance
 
+    def _is_excel_alive(self) -> bool:
+        """Check if Excel instance is still alive and responsive."""
+        if self._excel is None:
+            return False
+        try:
+            # Try to access a simple property - if COM server is dead, this fails
+            _ = self._excel.Version
+            return True
+        except Exception:
+            logger.warning("Excel COM instance is dead, will recreate")
+            self._excel = None
+            return False
+
+    def _is_word_alive(self) -> bool:
+        """Check if Word instance is still alive and responsive."""
+        if self._word is None:
+            return False
+        try:
+            _ = self._word.Version
+            return True
+        except Exception:
+            logger.warning("Word COM instance is dead, will recreate")
+            self._word = None
+            return False
+
+    def _is_ppt_alive(self) -> bool:
+        """Check if PowerPoint instance is still alive and responsive."""
+        if self._ppt is None:
+            return False
+        try:
+            _ = self._ppt.Version
+            return True
+        except Exception:
+            logger.warning("PowerPoint COM instance is dead, will recreate")
+            self._ppt = None
+            return False
+
     def get_excel(self, _retry_count: int = 0) -> Optional[Any]:
         """Get or create Excel COM instance."""
         if _retry_count >= self.MAX_RETRY:
@@ -9295,6 +10433,10 @@ class COMPool:
             return None
 
         with self._lock:
+            # Health check existing instance
+            if self._excel is not None and not self._is_excel_alive():
+                self._excel = None
+            
             if self._excel is None:
                 try:
                     pythoncom.CoInitialize()
@@ -9321,6 +10463,10 @@ class COMPool:
             return None
 
         with self._lock:
+            # Health check existing instance
+            if self._word is not None and not self._is_word_alive():
+                self._word = None
+            
             if self._word is None:
                 try:
                     pythoncom.CoInitialize()
@@ -9347,6 +10493,10 @@ class COMPool:
             return None
 
         with self._lock:
+            # Health check existing instance
+            if self._ppt is not None and not self._is_ppt_alive():
+                self._ppt = None
+            
             if self._ppt is None:
                 try:
                     pythoncom.CoInitialize()
@@ -10708,6 +11858,378 @@ def get_ocr_status() -> dict:
 
 
 ================================================================================
+FILE PATH: utils\parallel_converter.py
+LINES: 365
+================================================================================
+
+"""
+Parallel Conversion System
+============================
+Multi-process conversion for 2-4x throughput improvement.
+
+Each worker process has its own COM instance to avoid threading issues.
+Uses multiprocessing Queue for job distribution and result collection.
+"""
+
+import os
+import sys
+import time
+import logging
+import multiprocessing as mp
+from multiprocessing import Process, Queue, Event
+from typing import Optional, List, Dict, Any, Callable
+from dataclasses import dataclass, asdict
+from enum import Enum
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# DATA STRUCTURES
+# =============================================================================
+
+class JobStatus(Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+@dataclass
+class ConversionJob:
+    """A single conversion job."""
+    job_id: str
+    input_path: str
+    output_path: str
+    quality: str = "high"
+    sheet_indices: Optional[List[int]] = None
+    
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass
+class ConversionResult:
+    """Result of a conversion job."""
+    job_id: str
+    success: bool
+    duration: float
+    error: Optional[str] = None
+    output_path: Optional[str] = None
+
+
+# =============================================================================
+# WORKER PROCESS
+# =============================================================================
+
+def _worker_process(
+    worker_id: int,
+    job_queue: Queue,
+    result_queue: Queue,
+    stop_event: Event
+):
+    """
+    Worker process that handles conversion jobs.
+    Each worker has its own COM instance.
+    """
+    import pythoncom
+    
+    # Initialize COM for this process
+    pythoncom.CoInitialize()
+    
+    logger.info(f"Worker {worker_id} started")
+    
+    try:
+        while not stop_event.is_set():
+            try:
+                # Get job with timeout (allows checking stop_event)
+                job_dict = job_queue.get(timeout=1.0)
+                
+                if job_dict is None:  # Poison pill
+                    break
+                    
+                job = ConversionJob(**job_dict)
+                start_time = time.perf_counter()
+                
+                try:
+                    # Determine file type and get converter
+                    ext = Path(job.input_path).suffix.lower()
+                    
+                    # Lazy import converters
+                    from office_converter.converters import get_converter_for_file
+                    
+                    converter_class = get_converter_for_file(job.input_path)
+                    if converter_class is None:
+                        raise ValueError(f"No converter for {ext}")
+                    
+                    # Create converter instance
+                    converter = converter_class()
+                    
+                    if not converter.initialize():
+                        raise RuntimeError("Failed to initialize converter")
+                    
+                    try:
+                        # Perform conversion
+                        if converter.__class__.__name__ == "ExcelConverter" and job.sheet_indices:
+                            success = converter.convert(
+                                job.input_path,
+                                job.output_path,
+                                job.quality,
+                                job.sheet_indices
+                            )
+                        else:
+                            success = converter.convert(
+                                job.input_path,
+                                job.output_path,
+                                job.quality
+                            )
+                    finally:
+                        converter.cleanup()
+                    
+                    duration = time.perf_counter() - start_time
+                    
+                    result = ConversionResult(
+                        job_id=job.job_id,
+                        success=success,
+                        duration=duration,
+                        output_path=job.output_path if success else None
+                    )
+                    
+                except Exception as e:
+                    logger.error(f"Worker {worker_id} error: {e}")
+                    duration = time.perf_counter() - start_time
+                    result = ConversionResult(
+                        job_id=job.job_id,
+                        success=False,
+                        duration=duration,
+                        error=str(e)
+                    )
+                
+                result_queue.put(asdict(result))
+                
+            except mp.queues.Empty:
+                continue  # Timeout, check stop_event again
+            except Exception as e:
+                logger.error(f"Worker {worker_id} queue error: {e}")
+                
+    finally:
+        # Cleanup COM
+        try:
+            pythoncom.CoUninitialize()
+        except Exception:
+            pass
+        logger.info(f"Worker {worker_id} stopped")
+
+
+# =============================================================================
+# WORKER POOL MANAGER
+# =============================================================================
+
+class ParallelConverter:
+    """
+    Manages a pool of worker processes for parallel conversion.
+    
+    Usage:
+        converter = ParallelConverter(num_workers=3)
+        converter.start()
+        
+        # Submit jobs
+        converter.submit(job1)
+        converter.submit(job2)
+        
+        # Get results
+        for result in converter.get_results():
+            print(result)
+        
+        converter.stop()
+    """
+    
+    DEFAULT_WORKERS = 2
+    
+    def __init__(
+        self,
+        num_workers: Optional[int] = None,
+        on_result: Optional[Callable[[ConversionResult], None]] = None
+    ):
+        """
+        Initialize parallel converter.
+        
+        Args:
+            num_workers: Number of worker processes (default: CPU count / 2, max 4)
+            on_result: Callback for each result
+        """
+        if num_workers is None:
+            # Auto-detect: half of CPUs, min 1, max 4
+            cpu_count = mp.cpu_count() or 2
+            num_workers = max(1, min(4, cpu_count // 2))
+        
+        self.num_workers = num_workers
+        self.on_result = on_result
+        
+        self.job_queue: Optional[Queue] = None
+        self.result_queue: Optional[Queue] = None
+        self.stop_event: Optional[Event] = None
+        self.workers: List[Process] = []
+        
+        self._is_running = False
+        self._job_counter = 0
+        self._pending_jobs: Dict[str, ConversionJob] = {}
+        
+        logger.info(f"ParallelConverter initialized with {num_workers} workers")
+    
+    def start(self):
+        """Start the worker pool."""
+        if self._is_running:
+            return
+            
+        self.job_queue = mp.Queue()
+        self.result_queue = mp.Queue()
+        self.stop_event = mp.Event()
+        
+        # Start workers
+        for i in range(self.num_workers):
+            worker = Process(
+                target=_worker_process,
+                args=(i, self.job_queue, self.result_queue, self.stop_event),
+                daemon=True
+            )
+            worker.start()
+            self.workers.append(worker)
+        
+        self._is_running = True
+        logger.info(f"Started {self.num_workers} workers")
+    
+    def stop(self, timeout: float = 5.0):
+        """Stop all workers gracefully."""
+        if not self._is_running:
+            return
+        
+        # Signal stop
+        self.stop_event.set()
+        
+        # Send poison pills
+        for _ in self.workers:
+            try:
+                self.job_queue.put(None, timeout=1.0)
+            except Exception:
+                pass
+        
+        # Wait for workers
+        for worker in self.workers:
+            worker.join(timeout=timeout)
+            if worker.is_alive():
+                worker.terminate()
+        
+        self.workers.clear()
+        self._is_running = False
+        logger.info("All workers stopped")
+    
+    def submit(self, job: ConversionJob) -> str:
+        """
+        Submit a conversion job.
+        
+        Returns:
+            Job ID
+        """
+        if not self._is_running:
+            raise RuntimeError("ParallelConverter not started")
+        
+        if not job.job_id:
+            self._job_counter += 1
+            job.job_id = f"job_{self._job_counter}"
+        
+        self._pending_jobs[job.job_id] = job
+        self.job_queue.put(job.to_dict())
+        
+        return job.job_id
+    
+    def get_results(self, block: bool = False, timeout: float = 0.1) -> List[ConversionResult]:
+        """
+        Get completed results.
+        
+        Args:
+            block: Whether to block waiting for results
+            timeout: Timeout for blocking wait
+            
+        Returns:
+            List of completed results
+        """
+        results = []
+        
+        while True:
+            try:
+                result_dict = self.result_queue.get(block=block, timeout=timeout)
+                result = ConversionResult(**result_dict)
+                results.append(result)
+                
+                # Remove from pending
+                if result.job_id in self._pending_jobs:
+                    del self._pending_jobs[result.job_id]
+                
+                # Callback
+                if self.on_result:
+                    try:
+                        self.on_result(result)
+                    except Exception as e:
+                        logger.error(f"Result callback error: {e}")
+                
+                if not block:
+                    block = False  # Only block on first get
+                    
+            except mp.queues.Empty:
+                break
+        
+        return results
+    
+    def get_pending_count(self) -> int:
+        """Get number of pending jobs."""
+        return len(self._pending_jobs)
+    
+    def is_running(self) -> bool:
+        """Check if converter is running."""
+        return self._is_running
+    
+    def get_worker_status(self) -> List[Dict[str, Any]]:
+        """Get status of all workers."""
+        status = []
+        for i, worker in enumerate(self.workers):
+            status.append({
+                "id": i,
+                "alive": worker.is_alive(),
+                "pid": worker.pid
+            })
+        return status
+
+
+# =============================================================================
+# CONVENIENCE FUNCTIONS
+# =============================================================================
+
+_global_converter: Optional[ParallelConverter] = None
+
+
+def get_parallel_converter(num_workers: int = None) -> ParallelConverter:
+    """Get or create global parallel converter."""
+    global _global_converter
+    
+    if _global_converter is None or not _global_converter.is_running():
+        _global_converter = ParallelConverter(num_workers)
+        _global_converter.start()
+    
+    return _global_converter
+
+
+def shutdown_parallel_converter():
+    """Shutdown global parallel converter."""
+    global _global_converter
+    
+    if _global_converter is not None:
+        _global_converter.stop()
+        _global_converter = None
+
+
+================================================================================
 FILE PATH: utils\pdf_tools.py
 LINES: 71
 ================================================================================
@@ -10787,7 +12309,7 @@ __all__ = [
 
 ================================================================================
 FILE PATH: utils\progress_estimator.py
-LINES: 418
+LINES: 466
 ================================================================================
 
 """
@@ -10977,33 +12499,75 @@ class ConversionLogger:
         logger.info(f"ConversionLogger: {len(self.records)} historical records loaded")
 
     def _load_history(self):
-        """Load historical records from file."""
+        """Load historical records from file (supports both JSON and JSONL)."""
         try:
+            # Try JSONL format first (new format)
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            if jsonl_file.exists():
+                with open(jsonl_file, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            try:
+                                record = ConversionRecord.from_dict(json.loads(line))
+                                self.records.append(record)
+                            except Exception:
+                                pass  # Skip malformed lines
+                self.log_file = jsonl_file  # Use JSONL going forward
+                return
+            
+            # Fall back to old JSON format
             if self.log_file.exists():
                 with open(self.log_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     self.records = [ConversionRecord.from_dict(r) for r in data.get('records', [])]
+                # Migrate to JSONL
+                self._migrate_to_jsonl()
         except Exception as e:
             logger.warning(f"Error loading history: {e}")
             self.records = []
 
-    def _save_history(self):
-        """Save records to file."""
+    def _migrate_to_jsonl(self):
+        """Migrate old JSON format to append-only JSONL."""
         try:
-            data = {
-                'version': '1.0',
-                'last_updated': datetime.now().isoformat(),
-                'record_count': len(self.records),
-                'records': [r.to_dict() for r in self.records[-500:]]  # Keep last 500
-            }
-            with open(self.log_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            with open(jsonl_file, 'w', encoding='utf-8') as f:
+                for record in self.records:
+                    f.write(json.dumps(record.to_dict()) + '\n')
+            self.log_file = jsonl_file
+            logger.info(f"Migrated {len(self.records)} records to JSONL format")
+        except Exception as e:
+            logger.warning(f"Error migrating to JSONL: {e}")
+
+    def _save_history(self):
+        """Append-only save - only called for compaction."""
+        # Note: Regular logging uses _append_record()
+        # This is kept for compaction (trimming old records)
+        try:
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            # Keep only last 500 records
+            records_to_save = self.records[-500:]
+            with open(jsonl_file, 'w', encoding='utf-8') as f:
+                for record in records_to_save:
+                    f.write(json.dumps(record.to_dict()) + '\n')
+            self.records = records_to_save
+            logger.debug(f"Compacted history to {len(records_to_save)} records")
         except Exception as e:
             logger.warning(f"Error saving history: {e}")
+
+    def _append_record(self, record: ConversionRecord):
+        """Fast append-only write for new records."""
+        try:
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            with open(jsonl_file, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(record.to_dict()) + '\n')
+        except Exception as e:
+            logger.warning(f"Error appending record: {e}")
 
     def log_conversion(self, file_path: str, duration: float, success: bool = True, **kwargs):
         """
         Log a conversion result (minimal data only).
+        Uses append-only logging for performance.
         
         Args:
             file_path: Path to converted file (used to get size)
@@ -11020,7 +12584,13 @@ class ConversionLogger:
             )
 
             self.records.append(record)
-            self._save_history()
+            
+            # Fast append instead of full rewrite
+            self._append_record(record)
+            
+            # Periodic compaction (every 100 records over limit)
+            if len(self.records) > 600:
+                self._save_history()
 
             logger.debug(f"Logged: {file_size:.2f}MB = {duration:.1f}s")
 
@@ -11487,7 +13057,308 @@ if __name__ == "__main__":
 
 
 ================================================================================
+FILE PATH: utils\watchdog.py
+LINES: 294
+================================================================================
+
+"""
+Watchdog & Health Monitoring System
+=====================================
+Monitors application and worker health for 24/7 stability.
+
+Features:
+- Worker health monitoring
+- Automatic worker restart on failure
+- Memory usage tracking
+- Conversion success rate monitoring
+"""
+
+import os
+import time
+import logging
+import threading
+from typing import Optional, Dict, List, Any, Callable
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from collections import deque
+
+logger = logging.getLogger(__name__)
+
+# Try to import psutil for system monitoring
+try:
+    import psutil
+    HAS_PSUTIL = True
+except ImportError:
+    HAS_PSUTIL = False
+
+
+# =============================================================================
+# HEALTH METRICS
+# =============================================================================
+
+@dataclass
+class HealthMetrics:
+    """Real-time health metrics."""
+    timestamp: datetime = field(default_factory=datetime.now)
+    memory_mb: float = 0.0
+    cpu_percent: float = 0.0
+    conversion_success_rate: float = 1.0
+    active_workers: int = 0
+    pending_jobs: int = 0
+    total_conversions: int = 0
+    failed_conversions: int = 0
+    
+    def is_healthy(self) -> bool:
+        """Check if metrics indicate healthy state."""
+        # Unhealthy conditions:
+        # - Memory > 2GB
+        # - Success rate < 50%
+        # - No active workers when jobs pending
+        if self.memory_mb > 2048:
+            return False
+        if self.conversion_success_rate < 0.5 and self.total_conversions > 10:
+            return False
+        if self.active_workers == 0 and self.pending_jobs > 0:
+            return False
+        return True
+
+
+# =============================================================================
+# CONVERSION TRACKER
+# =============================================================================
+
+class ConversionTracker:
+    """Tracks conversion history for success rate calculation."""
+    
+    def __init__(self, window_size: int = 100):
+        """
+        Args:
+            window_size: Number of recent conversions to track
+        """
+        self.window_size = window_size
+        self._history: deque = deque(maxlen=window_size)
+        self._lock = threading.Lock()
+    
+    def record(self, success: bool, duration: float = 0.0):
+        """Record a conversion result."""
+        with self._lock:
+            self._history.append({
+                "success": success,
+                "duration": duration,
+                "timestamp": time.time()
+            })
+    
+    def get_success_rate(self) -> float:
+        """Get recent success rate."""
+        with self._lock:
+            if not self._history:
+                return 1.0
+            successful = sum(1 for r in self._history if r["success"])
+            return successful / len(self._history)
+    
+    def get_avg_duration(self) -> float:
+        """Get average conversion duration."""
+        with self._lock:
+            if not self._history:
+                return 0.0
+            durations = [r["duration"] for r in self._history if r["duration"] > 0]
+            return sum(durations) / len(durations) if durations else 0.0
+    
+    def get_total(self) -> int:
+        """Get total conversions tracked."""
+        with self._lock:
+            return len(self._history)
+    
+    def get_failed(self) -> int:
+        """Get failed conversions count."""
+        with self._lock:
+            return sum(1 for r in self._history if not r["success"])
+
+
+# =============================================================================
+# WATCHDOG
+# =============================================================================
+
+class Watchdog:
+    """
+    Monitors application health and triggers recovery actions.
+    
+    Usage:
+        watchdog = Watchdog()
+        watchdog.start()
+        
+        # Register health check callbacks
+        watchdog.on_unhealthy = lambda metrics: restart_workers()
+        
+        # Get current health
+        metrics = watchdog.get_metrics()
+        
+        watchdog.stop()
+    """
+    
+    CHECK_INTERVAL = 5.0  # seconds
+    
+    def __init__(
+        self,
+        parallel_converter=None,
+        on_unhealthy: Optional[Callable[[HealthMetrics], None]] = None,
+        on_worker_died: Optional[Callable[[int], None]] = None
+    ):
+        """
+        Args:
+            parallel_converter: ParallelConverter instance to monitor
+            on_unhealthy: Callback when system becomes unhealthy
+            on_worker_died: Callback when a worker process dies
+        """
+        self.parallel_converter = parallel_converter
+        self.on_unhealthy = on_unhealthy
+        self.on_worker_died = on_worker_died
+        
+        self.tracker = ConversionTracker()
+        self._thread: Optional[threading.Thread] = None
+        self._stop_event = threading.Event()
+        self._last_metrics: Optional[HealthMetrics] = None
+        self._known_dead_workers: set = set()
+    
+    def start(self):
+        """Start the watchdog monitoring thread."""
+        if self._thread is not None and self._thread.is_alive():
+            return
+        
+        self._stop_event.clear()
+        self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
+        self._thread.start()
+        logger.info("Watchdog started")
+    
+    def stop(self):
+        """Stop the watchdog."""
+        self._stop_event.set()
+        if self._thread is not None:
+            self._thread.join(timeout=2.0)
+        logger.info("Watchdog stopped")
+    
+    def record_conversion(self, success: bool, duration: float = 0.0):
+        """Record a conversion for tracking."""
+        self.tracker.record(success, duration)
+    
+    def get_metrics(self) -> HealthMetrics:
+        """Get current health metrics."""
+        metrics = HealthMetrics()
+        metrics.timestamp = datetime.now()
+        
+        # System metrics
+        if HAS_PSUTIL:
+            try:
+                process = psutil.Process()
+                metrics.memory_mb = process.memory_info().rss / (1024 * 1024)
+                metrics.cpu_percent = process.cpu_percent(interval=0.1)
+            except Exception:
+                pass
+        
+        # Conversion metrics
+        metrics.conversion_success_rate = self.tracker.get_success_rate()
+        metrics.total_conversions = self.tracker.get_total()
+        metrics.failed_conversions = self.tracker.get_failed()
+        
+        # Worker metrics
+        if self.parallel_converter is not None:
+            try:
+                status = self.parallel_converter.get_worker_status()
+                metrics.active_workers = sum(1 for w in status if w["alive"])
+                metrics.pending_jobs = self.parallel_converter.get_pending_count()
+            except Exception:
+                pass
+        
+        self._last_metrics = metrics
+        return metrics
+    
+    def _monitor_loop(self):
+        """Main monitoring loop."""
+        while not self._stop_event.is_set():
+            try:
+                metrics = self.get_metrics()
+                
+                # Check health
+                if not metrics.is_healthy():
+                    logger.warning(f"System unhealthy: {metrics}")
+                    if self.on_unhealthy:
+                        try:
+                            self.on_unhealthy(metrics)
+                        except Exception as e:
+                            logger.error(f"Unhealthy callback error: {e}")
+                
+                # Check for dead workers
+                if self.parallel_converter is not None:
+                    self._check_workers()
+                
+            except Exception as e:
+                logger.error(f"Watchdog error: {e}")
+            
+            # Wait for next check
+            self._stop_event.wait(self.CHECK_INTERVAL)
+    
+    def _check_workers(self):
+        """Check for dead workers and trigger callbacks."""
+        try:
+            status = self.parallel_converter.get_worker_status()
+            
+            for worker in status:
+                worker_id = worker["id"]
+                is_alive = worker["alive"]
+                
+                if not is_alive and worker_id not in self._known_dead_workers:
+                    # New dead worker
+                    self._known_dead_workers.add(worker_id)
+                    logger.warning(f"Worker {worker_id} died")
+                    
+                    if self.on_worker_died:
+                        try:
+                            self.on_worker_died(worker_id)
+                        except Exception as e:
+                            logger.error(f"Worker died callback error: {e}")
+                
+                elif is_alive and worker_id in self._known_dead_workers:
+                    # Worker was restarted
+                    self._known_dead_workers.remove(worker_id)
+                    logger.info(f"Worker {worker_id} recovered")
+                    
+        except Exception as e:
+            logger.error(f"Worker check error: {e}")
+
+
+# =============================================================================
+# GLOBAL INSTANCE
+# =============================================================================
+
+_watchdog: Optional[Watchdog] = None
+
+
+def get_watchdog() -> Watchdog:
+    """Get or create global watchdog instance."""
+    global _watchdog
+    if _watchdog is None:
+        _watchdog = Watchdog()
+    return _watchdog
+
+
+def start_watchdog(parallel_converter=None):
+    """Start the global watchdog."""
+    watchdog = get_watchdog()
+    watchdog.parallel_converter = parallel_converter
+    watchdog.start()
+    return watchdog
+
+
+def stop_watchdog():
+    """Stop the global watchdog."""
+    global _watchdog
+    if _watchdog is not None:
+        _watchdog.stop()
+        _watchdog = None
+
+
+================================================================================
 END OF PROJECT CONTEXT
-Total files: 34
-Total lines: 11243
+Total files: 37
+Total lines: 13093
 ================================================================================

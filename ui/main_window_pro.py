@@ -564,228 +564,6 @@ class ConversionEngine:
             logger.error(f"Post-processing error: {e}")
 
 
-# ============================================================================
-# PDF PREVIEW COMPONENT
-# ============================================================================
-
-class PDFPreviewPanel(ctk.CTkFrame):
-    """PDF preview panel using PyMuPDF with background rendering."""
-
-    def __init__(self, parent, **kwargs):
-        super().__init__(parent, **kwargs)
-
-        self.current_pdf = None
-        self.current_page = 0
-        self.total_pages = 0
-        self.photo_image = None
-        
-        # Background rendering state
-        self._render_thread = None
-        self._render_id = 0  # Incremented on each render to cancel stale renders
-        self._is_loading = False
-
-        self._create_widgets()
-
-    def _create_widgets(self):
-        """Create preview widgets."""
-        # Header
-        header = ctk.CTkFrame(self, fg_color="transparent")
-        header.pack(fill="x", padx=10, pady=5)
-
-        ctk.CTkLabel(header, text="👁️ Preview",
-                    font=ctk.CTkFont(weight="bold")).pack(side="left")
-
-        self.page_label = ctk.CTkLabel(header, text="", text_color="gray")
-        self.page_label.pack(side="right")
-
-        # Preview canvas
-        self.canvas_frame = ctk.CTkFrame(self)
-        self.canvas_frame.pack(fill="both", expand=True, padx=10, pady=5)
-
-        self.preview_label = ctk.CTkLabel(
-            self.canvas_frame,
-            text="Chọn file PDF để xem preview",
-            text_color="gray"
-        )
-        self.preview_label.pack(expand=True)
-
-        # Navigation
-        nav_frame = ctk.CTkFrame(self, fg_color="transparent")
-        nav_frame.pack(fill="x", padx=10, pady=5)
-
-        self.btn_prev = ctk.CTkButton(nav_frame, text="◀", width=40,
-                                       command=self._prev_page, state="disabled")
-        self.btn_prev.pack(side="left", padx=5)
-
-        self.btn_next = ctk.CTkButton(nav_frame, text="▶", width=40,
-                                       command=self._next_page, state="disabled")
-        self.btn_next.pack(side="left", padx=5)
-
-    def load_pdf(self, pdf_path: str):
-        """Load and display PDF."""
-        if fitz is None:
-            self.preview_label.configure(text="PyMuPDF không có\nKhông thể preview")
-            return
-
-        try:
-            if self.current_pdf:
-                self.current_pdf.close()
-            self.current_pdf = fitz.open(pdf_path)
-            self.total_pages = len(self.current_pdf)
-            self.current_page = 0
-            self._render_page()
-            self._update_navigation()
-        except Exception as e:
-            self.preview_label.configure(text=f"Lỗi: {e}")
-            logger.error(f"PDF load error: {e}")
-
-    def _render_page(self):
-        """Start background rendering of current page."""
-        if not self.current_pdf or fitz is None:
-            return
-
-        # Increment render ID to cancel any pending stale renders
-        self._render_id += 1
-        current_render_id = self._render_id
-        
-        # Show loading indicator
-        self._show_loading()
-        
-        # Start background thread
-        self._render_thread = threading.Thread(
-            target=self._do_render_page,
-            args=(current_render_id,),
-            daemon=True
-        )
-        self._render_thread.start()
-
-    def _show_loading(self):
-        """Show loading indicator."""
-        self._is_loading = True
-        self.preview_label.configure(text="⏳ Đang tải...", image=None)
-        self.page_label.configure(
-            text=f"Trang {self.current_page + 1}/{self.total_pages}"
-        )
-
-    def _do_render_page(self, render_id: int):
-        """Background worker to render PDF page."""
-        try:
-            # Check if this render is still valid
-            if render_id != self._render_id:
-                return  # Cancelled - newer render requested
-                
-            page = self.current_pdf[self.current_page]
-
-            # Render to image
-            zoom = 1.5
-            mat = fitz.Matrix(zoom, zoom)
-            pix = page.get_pixmap(matrix=mat)
-
-            # Check again before expensive operations
-            if render_id != self._render_id:
-                return
-
-            # Convert to PIL Image
-            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            
-            # Release pixmap memory immediately
-            pix = None
-
-            # Resize to fit
-            max_width = 300
-            max_height = 400
-            img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
-
-            # Final check before UI update
-            if render_id != self._render_id:
-                return
-
-            # Schedule UI update on main thread
-            self.after(0, lambda i=img, r=render_id: self._apply_rendered_image(i, r))
-
-        except Exception as e:
-            if render_id == self._render_id:
-                self.after(0, lambda err=str(e): self._show_render_error(err))
-
-    def _apply_rendered_image(self, img, render_id: int):
-        """Apply rendered image to UI (must be called on main thread)."""
-        try:
-            # Check if this render is still valid
-            if render_id != self._render_id:
-                return
-                
-            # Release old photo_image to prevent memory leak
-            if self.photo_image is not None:
-                del self.photo_image
-                self.photo_image = None
-
-            # Convert to PhotoImage
-            self.photo_image = ImageTk.PhotoImage(img)
-            
-            # Release PIL image after conversion
-            img = None
-
-            # Update label
-            self._is_loading = False
-            self.preview_label.configure(image=self.photo_image, text="")
-            self.page_label.configure(
-                text=f"Trang {self.current_page + 1}/{self.total_pages}"
-            )
-
-        except Exception as e:
-            self._show_render_error(str(e))
-
-    def _show_render_error(self, error: str):
-        """Show render error in UI."""
-        self._is_loading = False
-        self.preview_label.configure(text=f"Lỗi render: {error}")
-        logger.error(f"PDF render error: {error}")
-
-    def _prev_page(self):
-        """Go to previous page."""
-        try:
-            if self.current_page > 0:
-                self.current_page -= 1
-                self._render_page()
-                self._update_navigation()
-        except Exception as e:
-            logger.error(f"Prev page error: {e}")
-
-    def _next_page(self):
-        """Go to next page."""
-        try:
-            if self.current_page < self.total_pages - 1:
-                self.current_page += 1
-                self._render_page()
-                self._update_navigation()
-        except Exception as e:
-            logger.error(f"Next page error: {e}")
-
-    def _update_navigation(self):
-        """Update navigation buttons state."""
-        self.btn_prev.configure(
-            state="normal" if self.current_page > 0 else "disabled"
-        )
-        self.btn_next.configure(
-            state="normal" if self.current_page < self.total_pages - 1 else "disabled"
-        )
-
-    def clear(self):
-        """Clear preview."""
-        try:
-            if self.current_pdf:
-                self.current_pdf.close()
-                self.current_pdf = None
-            self.photo_image = None
-            self.preview_label.configure(
-                image=None,
-                text="Chọn file PDF để xem preview"
-            )
-            self.page_label.configure(text="")
-            self.btn_prev.configure(state="disabled")
-            self.btn_next.configure(state="disabled")
-        except Exception as e:
-            logger.error(f"Clear preview error: {e}")
 
 
 # ============================================================================
@@ -1104,7 +882,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
 
-    VERSION = "4.1.0"
+    VERSION = "4.1.1"
 
     def __init__(self):
         super().__init__()
@@ -1121,7 +899,6 @@ class ConverterProApp(ctk.CTk):
 
         # UI references (will be set in _create_layout)
         self.file_panel: Optional[FileListPanel] = None
-        self.preview_panel: Optional[PDFPreviewPanel] = None
         self.btn_convert: Optional[ctk.CTkButton] = None
         self.progress_frame: Optional[ctk.CTkFrame] = None
         self.progress_bar: Optional[ctk.CTkProgressBar] = None
@@ -1178,9 +955,9 @@ class ConverterProApp(ctk.CTk):
         # Initial log
         self._log(f"🚀 Office to PDF Converter Pro v{self.VERSION}")
         if fitz:
-            self._log("📄 PyMuPDF: Hỗ trợ đầy đủ PDF tools")
+            self._log("📄 PyMuPDF: Hỗ trợ xử lý trang PDF")
         else:
-            self._log("⚠️ PyMuPDF không có: PDF preview disabled")
+            self._log("⚠️ PyMuPDF không có: Không hỗ trợ chọn trang")
         if HAS_WINDND:
             self._log("📁 Drag & Drop: Kéo thả file hoạt động")
 
@@ -1412,16 +1189,12 @@ class ConverterProApp(ctk.CTk):
                          fg_color="transparent", border_width=2,
                          hover_color="#DC2626").pack(side="right")
 
-            # Right column: Preview + Options
-            right_frame = ctk.CTkFrame(self.main_content_frame, width=350, corner_radius=12)
+            # Right column: Options
+            right_frame = ctk.CTkFrame(self.main_content_frame, width=320, corner_radius=12)
             right_frame.pack(side="right", fill="y", padx=(5, 0))
             right_frame.pack_propagate(False)
 
-            # Preview panel
-            self.preview_panel = PDFPreviewPanel(right_frame, corner_radius=10)
-            self.preview_panel.pack(fill="x", padx=10, pady=10)
-
-            # Options panel
+            # Options panel - takes full height of right column
             self._create_options_panel(right_frame)
 
             # === CONVERT BUTTON ===
@@ -1812,24 +1585,6 @@ class ConverterProApp(ctk.CTk):
             has_files = len(files) > 0
             if self.btn_convert:
                 self.btn_convert.configure(state="normal" if has_files else "disabled")
-            
-            # Try to preview the first PDF file if available
-            if hasattr(self, 'preview_panel') and self.preview_panel:
-                pdf_file = None
-                for f in files:
-                    if f.output_path and os.path.exists(f.output_path):
-                        # Use converted PDF
-                        pdf_file = f.output_path
-                        break
-                    elif f.path.lower().endswith('.pdf'):
-                        # Use source PDF
-                        pdf_file = f.path
-                        break
-                
-                if pdf_file:
-                    self.preview_panel.load_pdf(pdf_file)
-                else:
-                    self.preview_panel.clear()
         except Exception as e:
             logger.error(f"On files changed error: {e}")
 

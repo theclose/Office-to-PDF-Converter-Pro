@@ -83,6 +83,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.var_watermark_text = ctk.StringVar(value="CONFIDENTIAL")
         self.var_password = ctk.StringVar()
         self.var_dpi = ctk.IntVar(value=150)
+        self.var_simulate_scan = ctk.BooleanVar(value=False)
         self.var_image_format = ctk.StringVar(value="png")
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
@@ -475,6 +476,14 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 
             self.var_dpi.trace_add("write", lambda *args: update_dpi_label(self.var_dpi.get()))
 
+            # Checkbox simulate scan
+            ctk.CTkCheckBox(
+                self.options_content,
+                text="Hiệu ứng Scan thật (Grayscale + Noise)",
+                variable=self.var_simulate_scan,
+                font=ctk.CTkFont(size=12)
+            ).pack(anchor="w", pady=5)
+
         else:
             ctk.CTkLabel(
                 self.options_content,
@@ -710,7 +719,12 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     return False
                 return ocr_pdf_to_searchable(input_path, output_path, lang=None)
             elif op == "rasterize":
-                return pdf_tools.rasterize_pdf(input_path, output_path, self.var_dpi.get())
+                return pdf_tools.rasterize_pdf(
+                    input_path, 
+                    output_path, 
+                    self.var_dpi.get(),
+                    simulate_scan=self.var_simulate_scan.get()
+                )
             return False
         except Exception as e:
             logger.error(f"Operation {op} failed: {e}")

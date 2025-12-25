@@ -14,6 +14,13 @@ try:
 except ImportError:
     HAS_PYMUPDF = False
 
+try:
+    from PIL import Image, ImageFilter, ImageEnhance, ImageChops
+    import random
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -227,7 +234,37 @@ def post_process_pdf(pdf_path: str, password: str = None,
 # RASTERIZE PDF - Flatten to Images
 # =============================================================================
 
-def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150) -> bool:
+def _apply_scan_effects(img):
+    """Apply scan-like effects to PIL Image (internal helper)."""
+    if not HAS_PIL:
+        return img
+        
+    try:
+        # 1. Grayscale
+        img = img.convert("L")
+        
+        # 2. Slight Blur (soften digital edges)
+        img = img.filter(ImageFilter.GaussianBlur(0.5))
+        
+        # 3. Add Noise (simulate paper grain)
+        # Create noise image using os.urandom (fast)
+        w, h = img.size
+        noise_data = os.urandom(w * h)
+        noise_img = Image.frombytes("L", (w, h), noise_data)
+        # Blend noise (alpha 0.05-0.1 is usually enough)
+        img = Image.blend(img, noise_img, 0.05)
+        
+        # 4. Slight Skew/Rotate (-0.3 to 0.3 degrees)
+        angle = random.uniform(-0.3, 0.3)
+        img = img.rotate(angle, resample=Image.BICUBIC, expand=False, fillcolor="white")
+        
+        return img
+    except Exception as e:
+        logger.error(f"Scan effect error: {e}")
+        return img
+
+
+def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simulate_scan: bool = False) -> bool:
     """
     Convert PDF pages to fully flattened images (rasterize) to prevent extraction.
     Creates a true "scan-like" PDF.
@@ -236,6 +273,7 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150) -> boo
         pdf_path: Path to source PDF file
         output_path: Path to save result (if None, overwrites source)
         dpi: Resolution (150=good, 200=high, 300=excellent)
+        simulate_scan: If True, adds noise, blur, grayscale and rotation to mimic real scanner
         
     Returns:
         True on success
@@ -252,7 +290,22 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150) -> boo
         for page in doc:
             mat = fitz.Matrix(dpi / 72, dpi / 72)
             pix = page.get_pixmap(matrix=mat, alpha=False)
-            img_data = pix.tobytes("png")
+            
+            # Apply effects if requested
+            if simulate_scan and HAS_PIL:
+                # Convert to PIL
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                # Apply effects
+                img = _apply_scan_effects(img)
+                # Convert back to bytes (JPEG with compression)
+                # Use standard IO to get bytes
+                import io
+                buf = io.BytesIO()
+                # Save as JPEG with 80 quality for scan artifact
+                img.save(buf, format="JPEG", quality=80)
+                img_data = buf.getvalue()
+            else:
+                img_data = pix.tobytes("png")
 
             page_rect = page.rect
             new_width = page_rect.width * (dpi / 72)

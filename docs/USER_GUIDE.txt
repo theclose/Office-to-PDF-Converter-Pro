@@ -1,0 +1,784 @@
+================================================================================
+            OFFICE TO PDF CONVERTER PRO - HUONG DAN SU DUNG
+================================================================================
+Phien ban huong dan: 4.1
+Ngay cap nhat: 25/12/2024
+Doi tuong: Nguoi dung pho thong, nguoi moi bat dau
+
+================================================================================
+0) CACH SU DUNG HUONG DAN NAY
+================================================================================
+
+De tim nhanh noi dung can thiet:
+
+1) Su dung phim Ctrl+F (hoac Command+F tren Mac) de mo hop tim kiem.
+2) Go tu khoa hoac ma muc (vi du: "E01" de tim loi E01).
+3) Nhan Enter de nhay den ket qua.
+
+Ma muc tham chieu nhanh:
+- [QS] = Quick Start (Bat dau nhanh)
+- [WD] = Word to PDF
+- [XL] = Excel to PDF
+- [PP] = PowerPoint to PDF
+- [SM] = Scan Mode
+- [PT] = PDF Tools
+- [TS] = Troubleshooting (Xu ly loi)
+- [FAQ] = Cau hoi thuong gap
+- [GL] = Glossary (Tu dien thuat ngu)
+
+================================================================================
+MUC LUC (TABLE OF CONTENTS)
+================================================================================
+
+1) BAT DAU NHANH (3 phut) ................................. [QS]
+2) WORD TO PDF ............................................. [WD]
+3) EXCEL TO PDF ............................................ [XL]
+4) POWERPOINT TO PDF ....................................... [PP]
+5) SCAN MODE (Che do hoa anh) .............................. [SM]
+6) PDF TOOLS ............................................... [PT]
+   6.1) Gop PDF (Merge)
+   6.2) Tach PDF (Split)
+   6.3) Trich xuat trang (Extract)
+   6.4) Xoa trang (Delete)
+   6.5) Xoay trang (Rotate)
+   6.6) Dao nguoc thu tu (Reverse)
+   6.7) PDF sang Anh (PDF to Image)
+   6.8) Anh sang PDF (Image to PDF)
+   6.9) OCR (Nhan dang chu)
+   6.10) Nen PDF (Compress)
+   6.11) Dat mat khau (Password)
+   6.12) Them Watermark
+   6.13) Hoa anh bao mat (Rasterize)
+7) QUAN LY FILE SAU CONVERT ................................ [FM]
+8) XU LY LOI (TROUBLESHOOTING) ............................. [TS]
+9) CAU HOI THUONG GAP (FAQ) ................................ [FAQ]
+10) TU DIEN THUAT NGU (GLOSSARY) ........................... [GL]
+11) LIEN HE HO TRO ......................................... [SP]
+
+================================================================================
+1) BAT DAU NHANH - 3 PHUT LAM RA PDF [QS]
+================================================================================
+
+Muc tieu: Tu file Word/Excel/PowerPoint, tao ra file PDF trong 3 phut.
+
+BUOC 1: Mo ung dung
+- Nhap doi vao bieu tuong "Office to PDF Converter Pro" tren man hinh.
+
+BUOC 2: Them file can convert
+- Cach 1: Keo tha file tu thu muc vao vung "Keo tha file vao day".
+- Cach 2: Nhan nut "Chon file" va chon file tu may tinh.
+
+BUOC 3: Kiem tra danh sach file
+- File da them se hien thi trong danh sach o giua man hinh.
+- Bieu tuong mau xanh la = Excel, xanh duong = Word, cam = PowerPoint.
+
+BUOC 4: Nhan nut CONVERT
+- Nhan nut "CONVERT" mau xanh o cuoi man hinh.
+- Cho thanh tien trinh chay den 100%.
+
+BUOC 5: Mo file PDF
+- Khi hoan thanh, ban se thay thong bao "Hoan thanh".
+- File PDF duoc luu cung thu muc voi file goc.
+- Nhan "Mo thu muc" de xem ket qua.
+
+KET QUA MONG DOI:
+- File PDF duoc tao ra cung ten voi file goc, duoi .pdf
+- Noi dung giu nguyen dinh dang, font chu, hinh anh.
+
+================================================================================
+2) WORD TO PDF [WD]
+================================================================================
+
+HUONG DAN CHUYEN DOI:
+
+BUOC 1: Keo tha file .doc hoac .docx vao ung dung.
+BUOC 2: Kiem tra file da hien trong danh sach (bieu tuong xanh duong).
+BUOC 3: Nhan nut "CONVERT".
+BUOC 4: Cho cho den khi thanh tien do hien 100%.
+BUOC 5: Kiem tra file PDF trong cung thu muc voi file Word goc.
+
+KET QUA MONG DOI:
+- File PDF giu nguyen:
+  + Dinh dang van ban (in dam, in nghieng, gach chan)
+  + Bang bieu, hinh anh
+  + Header/Footer (dau trang/cuoi trang)
+  + So trang
+
+TIPS:
+- Dong file Word truoc khi convert de tranh loi "file dang mo".
+- Neu file co nhieu hinh anh, thoi gian convert se lau hon.
+- File .docx (moi) convert nhanh hon file .doc (cu).
+
+LOI THUONG GAP:
+- Loi [WD-01]: Mat font tieng Viet -> Xem muc [TS-03]
+- Loi [WD-02]: File dang mo boi chuong trinh khac -> Dong file va thu lai
+
+================================================================================
+3) EXCEL TO PDF [XL]
+================================================================================
+
+LUU Y QUAN TRONG:
+Excel khac voi Word vi du lieu co the tran ra ngoai trang giay. Doc ky de
+tranh mat du lieu sau khi convert.
+
+HUONG DAN CHUYEN DOI:
+
+BUOC 1: Keo tha file .xls hoac .xlsx vao ung dung.
+BUOC 2: Kiem tra file da hien trong danh sach (bieu tuong mau xanh la).
+BUOC 3: Chon che do chat luong:
+        - "Cao" (High): Giu nguyen tat ca, file lon hon
+        - "Thap" (Low): Nen nhe, file nho hon
+BUOC 4: Nhan nut "CONVERT".
+BUOC 5: Mo file PDF va kiem tra tat ca cac cot, dong hien thi day du.
+
+KET QUA MONG DOI:
+- Tat ca cac sheet duoc convert (theo mac dinh).
+- Noi dung nam gon trong trang A4.
+
+TIPS TRANH BI CAT COT:
+- Truoc khi convert, mo file Excel va vao:
+  File > Print > Page Setup > Fit to 1 page wide
+- Hoac thu nho co chu trong Excel truoc khi convert.
+- Chon huong ngang (Landscape) cho bang nhieu cot.
+
+WARNING:
+Neu bang Excel co qua nhieu cot (hon 20 cot), chu co the bi nho den muc
+khong doc duoc. Hay thu chia nho bang hoac xoay ngang trang.
+
+LOI THUONG GAP:
+- Loi [XL-01]: Bi cat cot -> Xem muc [TS-04]
+- Loi [XL-02]: Chi thay 1 sheet -> Ung dung convert tat ca sheet theo mac dinh
+- Loi [XL-03]: Bang trong -> Kiem tra sheet co du lieu khong
+
+================================================================================
+4) POWERPOINT TO PDF [PP]
+================================================================================
+
+HUONG DAN CHUYEN DOI:
+
+BUOC 1: Keo tha file .ppt hoac .pptx vao ung dung.
+BUOC 2: Kiem tra file da hien trong danh sach (bieu tuong mau cam).
+BUOC 3: Nhan nut "CONVERT".
+BUOC 4: Cho thanh tien trinh hoan thanh.
+BUOC 5: Mo file PDF de kiem tra.
+
+KET QUA MONG DOI:
+- Moi slide thanh 1 trang PDF.
+- Hinh anh, text box giu nguyen vi tri.
+- Mau sac, nen slide hien dung.
+
+LUU Y QUAN TRONG:
+- Video nhung trong slide SE KHONG PHAT duoc trong PDF (chi hien hinh anh).
+- Animation (hieu ung dong) SE MAT khi chuyen sang PDF.
+- Am thanh se khong duoc giu lai.
+
+TIPS:
+- Neu can giu video, hay xuat Powerpoint thanh video (.mp4) thay vi PDF.
+- Slide co nhieu hinh anh se mat thoi gian convert lau hon.
+
+================================================================================
+5) SCAN MODE - CHE DO HOA ANH BAO MAT [SM]
+================================================================================
+
+SCAN MODE LA GI?
+Scan Mode bien file PDF thanh dang "anh chup", giong nhu ban scan (quet)
+tai lieu giay. Toan bo noi dung duoc "lam phang" thanh hinh anh.
+
+KHI NAO NEN DUNG?
+- Khi ban muon GIAM KHA NANG nguoi khac copy/edit noi dung.
+- Khi can gui tai lieu ma khong muon bi chinh sua.
+- Khi can tao ban PDF giong nhu scan tu may photo.
+
+CACH BAT SCAN MODE:
+
+BUOC 1: Them file can convert vao ung dung.
+BUOC 2: Tim va BAT tuy chon "Scan Mode" o phan tuy chon.
+BUOC 3: Nhan nut "CONVERT".
+BUOC 4: Cho qua trinh hoan thanh.
+
+KET QUA MONG DOI:
+- File PDF trong giong nhu anh chup.
+- Khong the boi den chon chu de copy.
+- Khong the dung cong cu PDF Editor de sua.
+
+---------------------------------------------------------------------------
+CHON DPI (DO PHAN GIAI):
+---------------------------------------------------------------------------
+
+DPI la gi?
+DPI = "Dots Per Inch" - so diem anh tren moi inch.
+DPI cang cao -> hinh cang net -> file cang nang.
+
+Huong dan chon:
+
+| DPI  | Chat luong  | Dung luong | Dung khi                    |
+|------|-------------|------------|-----------------------------|
+| 100  | Thap        | Nho nhat   | Doc nhanh, khong can net    |
+| 150  | Vua (*)     | Vua        | Phu hop hau het truong hop  |
+| 200  | Cao         | Lon        | Can doc chu nho             |
+| 300  | Rat cao     | Rat lon    | In an chuyen nghiep         |
+
+(*) Mac dinh: 150 DPI - can bang giua chat luong va dung luong.
+
+---------------------------------------------------------------------------
+TUY CHON NANG CAO: HIEU UNG SCAN THAT
+---------------------------------------------------------------------------
+Neu bat tuy chon "Hieu ung Scan that (Grayscale + Noise)", file se:
+- Chuyen thanh trang den (grayscale)
+- Them nhieu hat nhu giay thuc
+- Xoay nghieng nhe giong scan may photo
+- Kho bi phan tich boi phan mem AI/OCR hon
+
+WARNING - HAM Y VE BAO MAT:
+Scan Mode KHONG DAM BAO 100% chong copy/edit. Nguoi co ky thuat cao
+van co the dung phan mem OCR de doc lai noi dung. Tuy nhien, no lam
+TANG DO KHO KHAN dang ke so voi PDF thuong.
+
+TRADE-OFF DUNG LUONG:
+| File goc       | DPI 150      | DPI 300      |
+|----------------|--------------|--------------|
+| 500 KB (text)  | 2-5 MB       | 8-20 MB      |
+| 2 MB (hinh)    | 5-10 MB      | 15-40 MB     |
+
+=> File sau Scan Mode SE LON HON file goc. Day la binh thuong.
+
+================================================================================
+6) PDF TOOLS [PT]
+================================================================================
+
+Mo PDF Tools: Nhan nut "PDF Tools" tren thanh cong cu.
+
+---------------------------------------------------------------------------
+6.1) GOP PDF (MERGE) [PT-01]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Gom nhieu file PDF rieng le thanh 1 file duy nhat.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chinh sua" > Chon "Gop PDF".
+2) Them cac file PDF can gop (keo tha hoac chon file).
+3) Sap xep thu tu file theo mong muon.
+4) Nhan "THUC HIEN".
+5) Chon noi luu file moi.
+
+KET QUA: 1 file PDF chua tat ca noi dung cac file theo thu tu da chon.
+
+TIP: Keo tha de doi thu tu file truoc khi gop.
+NOTE: File ket qua co ten dang "merged_[ten file dau].pdf".
+
+---------------------------------------------------------------------------
+6.2) TACH PDF (SPLIT) [PT-02]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Chia 1 file PDF lon thanh nhieu file nho.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chinh sua" > Chon "Tach PDF".
+2) Them file PDF can tach.
+3) Chon cach tach:
+   - Tach moi trang thanh 1 file
+   - Tach theo khoang trang (vi du: 1-5, 6-10)
+4) Nhan "THUC HIEN".
+
+KET QUA: Nhieu file PDF nho, duoc danh so tu 001, 002...
+
+TIP: Dung cach tach theo khoang trang de chia chuong sach.
+WARNING: Kiem tra ky so trang truoc khi tach de tranh mat trang.
+
+---------------------------------------------------------------------------
+6.3) TRICH XUAT TRANG (EXTRACT) [PT-03]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Lay mot so trang cu the tu file PDF.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chinh sua" > Chon "Trich xuat".
+2) Them file PDF nguon.
+3) Nhap cac trang can lay. Vi du:
+   - "1,3,5" = lay trang 1, 3, 5
+   - "1-5" = lay trang 1 den 5
+   - "1,3-5,8" = lay trang 1, trang 3 den 5, va trang 8
+4) Nhan "THUC HIEN".
+
+KET QUA: File PDF moi chi chua cac trang da chon.
+
+TIP: Dung de tao ban tom tat chi voi cac trang quan trong.
+NOTE: File goc KHONG BI THAY DOI. Tool tao file moi.
+
+---------------------------------------------------------------------------
+6.4) XOA TRANG (DELETE) [PT-04]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Loai bo mot so trang khong can thiet.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chinh sua" > Chon "Xoa trang".
+2) Them file PDF.
+3) Nhap so trang can xoa. Vi du: "2,4,6" hoac "10-15".
+4) Nhan "THUC HIEN".
+
+KET QUA: File PDF moi KHONG co cac trang da xoa.
+
+WARNING: Kiem tra ky truoc khi xoa. Nen giu ban goc de phong mat du lieu.
+TIP: Xoa cac trang trong hoac trang quang cao khong can thiet.
+
+---------------------------------------------------------------------------
+6.5) XOAY TRANG (ROTATE) [PT-05]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Sua trang bi nguoc, bi xoay ngang sai huong.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chinh sua" > Chon "Xoay".
+2) Them file PDF.
+3) Chon goc xoay: 90 do (phai), 180 do (nguoc), 270 do (trai).
+4) Chon trang can xoay hoac "Tat ca".
+5) Nhan "THUC HIEN".
+
+KET QUA: Cac trang duoc xoay theo goc da chon.
+
+TIP: Thuong dung 180 do de sua trang bi nguoc dau.
+NOTE: Xoay 90 do de chuyen trang ngang thanh dung hoac nguoc lai.
+
+---------------------------------------------------------------------------
+6.6) DAO NGUOC THU TU (REVERSE) [PT-06]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Dao thu tu trang (trang cuoi thanh trang dau).
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chinh sua" > Chon "Dao nguoc".
+2) Them file PDF.
+3) Nhan "THUC HIEN".
+
+KET QUA: Trang 1 thanh trang cuoi, trang cuoi thanh trang 1.
+
+TIP: Huu ich khi scan tai lieu bi nguoc thu tu.
+
+---------------------------------------------------------------------------
+6.7) PDF SANG ANH (PDF TO IMAGE) [PT-07]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Xuat moi trang PDF thanh file anh rieng.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chuyen doi" > Chon "PDF sang Anh".
+2) Them file PDF.
+3) Chon dinh dang anh: PNG (net, file lon) hoac JPEG (nho hon).
+4) Chon DPI (150 hoac 300).
+5) Nhan "THUC HIEN".
+
+KET QUA: Moi trang thanh 1 file anh (page_001.png, page_002.png...).
+
+TIP: Chon PNG cho tai lieu can chat luong cao, JPEG cho anh thuong.
+WARNING: File PDF 100 trang se tao ra 100 file anh.
+
+---------------------------------------------------------------------------
+6.8) ANH SANG PDF (IMAGE TO PDF) [PT-08]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Gom nhieu anh thanh 1 file PDF.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chuyen doi" > Chon "Anh sang PDF".
+2) Them cac file anh (JPG, PNG, BMP...).
+3) Sap xep thu tu anh.
+4) Nhan "THUC HIEN".
+
+KET QUA: 1 file PDF, moi anh la 1 trang.
+
+TIP: Dung de tao album anh dang PDF hoac gom anh scan.
+NOTE: Nen dung anh cung kich thuoc de PDF trong dep.
+
+---------------------------------------------------------------------------
+6.9) OCR - NHAN DANG CHU [PT-09]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Bien PDF scan (dang anh) thanh PDF co the tim kiem chu.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Chuyen doi" > Chon "OCR".
+2) Them file PDF scan.
+3) Nhan "THUC HIEN".
+4) Cho qua trinh (co the mat vai phut).
+
+KET QUA: File PDF co the dung Ctrl+F tim kiem noi dung.
+
+WARNING: Do chinh xac OCR phu thuoc chat luong anh goc.
+- Anh mo, nghieng, chu nho -> sai nhieu.
+- Anh net, thang, chu ro -> dung hon.
+
+TIP: Scan goc o DPI 300 de OCR chinh xac hon.
+NOTE: OCR tieng Viet co the sai dau ( a/a, o/o, u/u).
+
+---------------------------------------------------------------------------
+6.10) NEN PDF (COMPRESS) [PT-10]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Giam dung luong file PDF de gui email hoac upload.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Toi uu" > Chon "Nen".
+2) Them file PDF.
+3) Chon muc nen:
+   - Thap: Giam it, giu chat luong
+   - Trung binh: Can bang
+   - Cao: Giam nhieu, mat net
+4) Nhan "THUC HIEN".
+
+KET QUA: File nho hon. Vi du: 10MB -> 2-5MB.
+
+TIP: Chon muc "Trung binh" cho hau het truong hop.
+WARNING: Nen qua manh co the lam anh bi vo, chu bi mo.
+
+---------------------------------------------------------------------------
+6.11) DAT MAT KHAU (PASSWORD) [PT-11]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Bao ve file PDF, chi mo duoc khi nhap mat khau.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Toi uu" > Chon "Mat khau".
+2) Them file PDF.
+3) Nhap mat khau moi (nho luu lai mat khau nay!).
+4) Nhan "THUC HIEN".
+
+KET QUA: File PDF yeu cau nhap mat khau khi mo.
+
+WARNING - RAT QUAN TRONG:
+Neu QUEN mat khau, KHONG CO CACH nao mo file. 
+Hay luu mat khau o noi an toan.
+
+TIP: Dung mat khau manh: ket hop chu, so, ky tu dac biet.
+
+---------------------------------------------------------------------------
+6.12) THEM WATERMARK [PT-12]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Them dong chu "MAU", "CONFIDENTIAL"... tren moi trang.
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Toi uu" > Chon "Watermark".
+2) Them file PDF.
+3) Nhap noi dung watermark (vi du: "BAN NHAP", "CONG TY ABC").
+4) Nhan "THUC HIEN".
+
+KET QUA: Moi trang co dong chu mo xuyen suot.
+
+TIP: Dung watermark "MAU" cho ban draft, "CONFIDENTIAL" cho tai lieu mat.
+NOTE: Watermark SE HIEN khi in ra giay.
+
+---------------------------------------------------------------------------
+6.13) HOA ANH BAO MAT - RASTERIZE [PT-13]
+---------------------------------------------------------------------------
+DUNG KHI NAO: Bien PDF thanh dang anh de chong copy/edit (tuong tu Scan Mode).
+
+CAC BUOC:
+1) Mo PDF Tools > Tab "Toi uu" > Chon "Hoa anh (Secure)".
+2) Them file PDF.
+3) Chon DPI (150 = vua, 200 = cao, 300 = in an).
+4) (Tuy chon) Bat "Hieu ung Scan that" neu muon giong may scan.
+5) Nhan "THUC HIEN".
+
+KET QUA: File PDF khong the edit/copy nhu file scan.
+
+TIP: Dung cho hop dong, chung chi can gui nhung khong muon bi sua.
+WARNING: File se LON hon file goc. Xem bang so sanh o muc [SM].
+
+================================================================================
+7) QUAN LY FILE SAU CONVERT [FM]
+================================================================================
+
+NOI LUU FILE:
+- Mac dinh: File PDF duoc luu cung thu muc voi file goc.
+- Ten file: Giong ten file goc, thay duoi thanh .pdf
+  Vi du: "Bao cao.docx" -> "Bao cao.pdf"
+
+CACH MO FILE NHANH:
+- Sau khi convert, nhan "Mo thu muc" de mo File Explorer.
+- Hoac nhan "Mo file" de mo truc tiep file PDF.
+
+CACH DOI TEN FILE:
+1) Nhan chuot phai vao file trong File Explorer.
+2) Chon "Rename" (Doi ten).
+3) Nhap ten moi va nhan Enter.
+
+CACH XOA FILE:
+1) Chon file trong File Explorer.
+2) Nhan phim Delete.
+3) Xac nhan xoa.
+
+CACH CHIA SE FILE:
+- Email: Dinh kem file PDF vao email.
+- Zalo/Messenger: Gui file qua tin nhan.
+- Google Drive/OneDrive: Upload len dam may.
+
+TIP: Tao thu muc rieng cho file PDF de de quan ly.
+
+================================================================================
+8) XU LY LOI - TROUBLESHOOTING [TS]
+================================================================================
+
+---------------------------------------------------------------------------
+[TS-01] KHONG CHON DUOC FILE / QUYEN TRUY CAP
+---------------------------------------------------------------------------
+TRIEU CHUNG: Nhan "Chon file" nhung khong thay file, hoac bao loi quyen.
+
+NGUYEN NHAN:
+- File nam trong thu muc he thong (C:\Windows, C:\Program Files).
+- File dang bi khoa boi phan mem khac.
+- Khong co quyen doc file.
+
+CACH XU LY:
+1) Copy file sang thu muc khac (Desktop, Documents).
+2) Dong cac chuong trinh dang mo file do.
+3) Nhan chuot phai vao file > Properties > Security > kiem tra quyen Read.
+
+---------------------------------------------------------------------------
+[TS-02] CONVERT LAU / TREO UNG DUNG
+---------------------------------------------------------------------------
+TRIEU CHUNG: Thanh tien trinh dung im, ung dung khong phan hoi.
+
+NGUYEN NHAN:
+- File qua lon (tren 100MB).
+- File chua nhieu hinh anh/bieu do.
+- May tinh cau hinh yeu.
+
+CACH XU LY:
+1) Cho them 5-10 phut. File lon can thoi gian xu ly.
+2) Kiem tra Task Manager (Ctrl+Shift+Esc) xem Excel/Word co dang chay khong.
+3) Neu qua 15 phut van khong xong, thu chia nho file roi convert tung phan.
+4) Khoi dong lai ung dung va thu lai.
+
+---------------------------------------------------------------------------
+[TS-03] FONT TIENG VIET LOI (O VUONG, KY TU LA)
+---------------------------------------------------------------------------
+TRIEU CHUNG: Chu tieng Viet hien thanh o vuong hoac ky tu rac.
+
+NGUYEN NHAN:
+- File goc dung font chua cai tren may.
+- Font khong ho tro Unicode.
+
+CACH XU LY:
+1) Mo file goc (Word/Excel), chon tat ca (Ctrl+A).
+2) Doi sang font pho bien: Arial, Times New Roman, hoac Tahoma.
+3) Luu file va convert lai.
+4) Neu van loi, cai them font: download font va copy vao C:\Windows\Fonts.
+
+---------------------------------------------------------------------------
+[TS-04] EXCEL BI CAT COT / CHU QUA NHO
+---------------------------------------------------------------------------
+TRIEU CHUNG: PDF chi hien mot phan bang, cot bi cat, chu ti hon.
+
+NGUYEN NHAN: Bang Excel rong hon trang A4.
+
+CACH XU LY:
+1) Mo file Excel goc.
+2) Vao File > Print > Page Setup.
+3) Chon "Fit All Columns on One Page" (Vua tat ca cot vao 1 trang).
+4) Hoac chon huong giay Landscape (ngang).
+5) Luu va convert lai.
+
+TIP: Truoc khi convert, nhan Ctrl+P trong Excel de xem Print Preview.
+
+---------------------------------------------------------------------------
+[TS-05] SCAN MODE FILE QUA NANG
+---------------------------------------------------------------------------
+TRIEU CHUNG: File sau Scan Mode lon gap 5-10 lan file goc.
+
+NGUYEN NHAN: Day la binh thuong. Scan Mode bien text thanh anh.
+
+CACH XU LY:
+1) Giam DPI: chon 100 hoac 150 thay vi 300.
+2) Sau khi Scan, dung tool "Nen PDF" de giam dung luong.
+3) Chap nhan file lon neu can chat luong cao.
+
+---------------------------------------------------------------------------
+[TS-06] FILE CO PASSWORD KHONG MO DUOC
+---------------------------------------------------------------------------
+TRIEU CHUNG: Ung dung bao "File duoc bao ve bang mat khau".
+
+NGUYEN NHAN: File goc dang bi khoa.
+
+CACH XU LY:
+1) Mo file bang Word/Excel/PowerPoint goc.
+2) Nhap mat khau.
+3) Luu lai file KHONG co mat khau (Save As > Tools > General Options > xoa pass).
+4) Convert file moi.
+
+NOTE: Ung dung KHONG pha duoc mat khau. Can biet mat khau goc.
+
+---------------------------------------------------------------------------
+[TS-07] KHONG THAY FILE OUTPUT / KHONG LUU DUOC
+---------------------------------------------------------------------------
+TRIEU CHUNG: Convert hoan thanh nhung khong tim thay file PDF.
+
+NGUYEN NHAN:
+- O cung het dung luong.
+- Thu muc khong co quyen ghi.
+- Antivirus chan tao file.
+
+CACH XU LY:
+1) Kiem tra dung luong o cung (tren 1GB trong).
+2) Thu luu sang thu muc khac (Desktop hoac Documents).
+3) Tam tat antivirus va thu lai.
+4) Kiem tra file o cung thu muc voi file goc.
+
+---------------------------------------------------------------------------
+[TS-08] CHIA SE LOI (KHONG GUI DUOC FILE)
+---------------------------------------------------------------------------
+TRIEU CHUNG: Khong dinh kem hoac upload duoc file PDF.
+
+NGUYEN NHAN:
+- File qua lon (vuot gioi han email 25MB).
+- Mang yeu.
+
+CACH XU LY:
+1) Dung tool "Nen PDF" de giam dung luong.
+2) Chia file thanh nhieu phan nho.
+3) Upload len Google Drive/OneDrive roi chia se link.
+
+---------------------------------------------------------------------------
+[TS-09] PDF TOOLS KET QUA KHAC MONG DOI
+---------------------------------------------------------------------------
+TRIEU CHUNG: Sau khi dung tool, file khong nhu y muon.
+
+NGUYEN NHAN:
+- Chon sai tuy chon.
+- Nhap sai so trang.
+
+CACH XU LY:
+1) Dung file goc (file goc khong bi thay doi).
+2) Doc lai huong dan tool o muc [PT].
+3) Thu lai voi tuy chon dung.
+
+TIP: Luon giu ban goc truoc khi xu ly.
+
+---------------------------------------------------------------------------
+[TS-10] OCR SAI CHU / KHONG NHAN DANG DUOC
+---------------------------------------------------------------------------
+TRIEU CHUNG: Tim kiem khong ra, hoac chu bi sai.
+
+NGUYEN NHAN:
+- Anh goc xau (mo, nghieng, nhoe).
+- Font dac biet (thu phap, nghe thuat).
+- Tieng Viet co dau kho nhan dang.
+
+CACH XU LY:
+1) Scan lai o DPI cao hon (300 DPI).
+2) Dam bao anh thang, ro net.
+3) Kiem tra lai ket qua OCR bang mat.
+4) Voi tai lieu quan trong, nen danh lai bang tay.
+
+================================================================================
+9) CAU HOI THUONG GAP - FAQ [FAQ]
+================================================================================
+
+H1: App nay co mat phi khong?
+D1: [Thong tin phi can duoc cap nhat theo chinh sach cong ty]
+
+H2: Toi co can ket noi Internet khong?
+D2: KHONG. App xu ly HOAN TOAN OFFLINE tren may tinh cua ban.
+    Du lieu KHONG duoc upload len server.
+
+H3: App ho tro nhung dinh dang file nao?
+D3: - Word: .doc, .docx
+    - Excel: .xls, .xlsx
+    - PowerPoint: .ppt, .pptx
+    - Anh: .jpg, .png, .bmp (cho chuc nang Anh sang PDF)
+
+H4: File toi co mat sau khi convert khong?
+D4: KHONG. File goc van giu nguyen. App chi TAO THEM file PDF moi.
+
+H5: Toi co the convert nhieu file cung luc khong?
+D5: CO. Keo nhieu file vao ung dung, tat ca se duoc convert lan luot.
+
+H6: Scan Mode co chong copy 100% khong?
+D6: KHONG. Scan Mode lam TANG DO KHO KHAN cho viec copy/edit, nhung
+    nguoi co ky thuat cao van co the dung OCR de doc lai. Khong co
+    phuong phap nao chong copy tuyet doi.
+
+H7: Tai sao file PDF nang hon file Word goc?
+D7: Do la binh thuong. PDF nhung font va anh de hien thi giong nhau
+    tren moi thiet bi. Dung tool "Nen PDF" neu can file nho hon.
+
+H8: Toi quen mat khau file PDF, lam sao mo?
+D8: KHONG CO CACH mo file PDF da khoa neu khong biet mat khau.
+    Day la co che bao mat. Hay luu mat khau can than.
+
+H9: App co hoat dong tren Windows 7 khong?
+D9: App ho tro Windows 10 tro len. Windows 7 co the gap loi.
+
+H10: Lam sao de convert chi 1 so trang cua file Word?
+D10: Bo 1: Convert toan bo thanh PDF.
+     Bo 2: Dung tool "Trich xuat" de lay cac trang can thiet.
+
+================================================================================
+10) TU DIEN THUAT NGU - GLOSSARY [GL]
+================================================================================
+
+PDF (Portable Document Format):
+    Dinh dang tai lieu di dong. Hien thi giong nhau tren moi thiet bi.
+
+DPI (Dots Per Inch):
+    Do phan giai. So cao = anh net hon nhung file lon hon.
+
+OCR (Optical Character Recognition):
+    Cong nghe nhan dang chu tu anh. Bien anh thanh text co the tim kiem.
+
+Scan Mode:
+    Che do bien PDF thanh dang anh de han che copy/edit noi dung.
+
+Rasterize (Hoa anh):
+    Qua trinh bien van ban/do hoa thanh diem anh (pixel).
+
+Watermark:
+    Hinh hoac chu mo, hien tren tat ca cac trang de danh dau sap huu.
+
+Merge (Gop):
+    Ket hop nhieu file thanh 1 file duy nhat.
+
+Split (Tach):
+    Chia 1 file thanh nhieu file nho.
+
+Compress (Nen):
+    Giam dung luong file bang cach toi uu hoa du lieu ben trong.
+
+WAL (Write-Ahead Logging):
+    Ky thuat co so du lieu giup ghi/doc du lieu an toan va nhanh.
+
+Grayscale:
+    Che do mau trang den (khong co mau sac).
+
+JPEG/JPG:
+    Dinh dang anh pho bien, nen mat du lieu, file nho.
+
+PNG:
+    Dinh dang anh chat luong cao, khong mat du lieu, file lon hon.
+
+Flatten (Lam phang):
+    Gop tat ca cac lop (layer) thanh 1 lop duy nhat.
+
+================================================================================
+11) LIEN HE HO TRO [SP]
+================================================================================
+
+KHI NAO CAN LIEN HE:
+- Da thu tat ca huong dan Troubleshooting nhung van gap loi.
+- Gap loi ma huong dan nay chua de cap.
+- Co gop y cai thien ung dung.
+
+THONG TIN CAN GUI KHI BAO LOI:
+
+1) Ten loi hoac ma loi (neu co)
+2) Mo ta buoc tai tao loi:
+   - Ban dang lam gi?
+   - Loi xay ra o buoc nao?
+3) Thong tin he thong:
+   - Phien ban Windows (Win 10/11)
+   - Phien ban app (xem o menu About/Thong tin)
+4) Anh chup man hinh (neu co the)
+
+KHONG GUI:
+- Noi dung file co thong tin ca nhan (CMND, so tai khoan...).
+- File chua du lieu nhat ky cong ty.
+- Mat khau cua ban.
+
+CACH GUI:
+- Email: [Dia chi email ho tro]
+- Hoac: Vao menu Help > Gui phan hoi
+
+================================================================================
+                            HET HUONG DAN
+================================================================================
+Cam on ban da su dung Office to PDF Converter Pro!
+Chuc ban lam viec hieu qua.
+================================================================================

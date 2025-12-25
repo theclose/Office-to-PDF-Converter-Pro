@@ -504,14 +504,25 @@ class PDFPreviewPanel(ctk.CTkFrame):
 
             # Convert to PIL Image
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            
+            # Release pixmap memory immediately
+            pix = None
 
             # Resize to fit
             max_width = 300
             max_height = 400
             img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
 
+            # Release old photo_image to prevent memory leak
+            if self.photo_image is not None:
+                del self.photo_image
+                self.photo_image = None
+
             # Convert to PhotoImage
             self.photo_image = ImageTk.PhotoImage(img)
+            
+            # Release PIL image after conversion
+            img = None
 
             # Update label
             self.preview_label.configure(image=self.photo_image, text="")
@@ -812,7 +823,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
 
-    VERSION = "4.0.8"
+    VERSION = "4.1.0"
 
     def __init__(self):
         super().__init__()
@@ -889,8 +900,35 @@ class ConverterProApp(ctk.CTk):
         if HAS_WINDND:
             self._log("📁 Drag & Drop: Kéo thả file hoạt động")
 
+        # Cleanup old temp files from previous sessions
+        self._cleanup_temp_files()
+
         # Check for updates on startup
         self._check_for_updates()
+
+    def _cleanup_temp_files(self):
+        """Clean up orphaned temp files from crashed conversions."""
+        try:
+            import glob
+            temp_dir = os.environ.get("TEMP", os.path.expanduser("~"))
+            patterns = ["tmp_*.xlsx", "tmp_*.xls", "tmp_*.docx", "tmp_*.doc", 
+                       "tmp_*.pptx", "tmp_*.ppt", "tmp_*.pdf"]
+            
+            cleaned = 0
+            for pattern in patterns:
+                for f in glob.glob(os.path.join(temp_dir, pattern)):
+                    try:
+                        # Only delete files older than 1 hour
+                        if os.path.getmtime(f) < (time.time() - 3600):
+                            os.remove(f)
+                            cleaned += 1
+                    except (OSError, PermissionError):
+                        pass  # File in use, skip
+            
+            if cleaned > 0:
+                logger.info(f"Cleaned {cleaned} orphaned temp files")
+        except Exception as e:
+            logger.debug(f"Temp cleanup error: {e}")
 
     def _check_for_updates(self):
         """Check for updates asynchronously."""

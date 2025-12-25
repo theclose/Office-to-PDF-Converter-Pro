@@ -33,7 +33,9 @@ class ExcelConverter(BaseConverter):
     def initialize(self) -> bool:
         """Get Excel COM from pool."""
         try:
-            pythoncom.CoInitialize()
+            from .base import ensure_com_initialized
+            self._com_owned = ensure_com_initialized()
+            
             if self._use_pool:
                 self._excel = get_pool().get_excel()
             else:
@@ -120,10 +122,9 @@ class ExcelConverter(BaseConverter):
                 logger.debug(f"Excel quit error: {e}")
             self._excel = None
 
-        try:
-            pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        # Release COM properly
+        from .base import release_com
+        release_com()
 
         gc.collect()
         logger.info("Excel cleanup done")

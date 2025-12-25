@@ -37,7 +37,9 @@ class WordConverter(BaseConverter):
     def initialize(self) -> bool:
         """Get Word COM from pool."""
         try:
-            pythoncom.CoInitialize()
+            from .base import ensure_com_initialized
+            self._com_owned = ensure_com_initialized()
+            
             if self._use_pool:
                 self._word = get_pool().get_word()
             else:
@@ -73,10 +75,9 @@ class WordConverter(BaseConverter):
                 logger.debug(f"Word quit error: {e}")
             self._word = None
 
-        try:
-            pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        # Release COM properly
+        from .base import release_com
+        release_com()
 
         gc.collect()
         logger.info("Word cleanup done")

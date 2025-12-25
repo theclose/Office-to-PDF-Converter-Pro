@@ -5,10 +5,48 @@ All specific converters (Excel, Word, PPT) inherit from this.
 
 import os
 import logging
+import threading
 from abc import ABC, abstractmethod
 from typing import Optional, Callable, List
 
 logger = logging.getLogger(__name__)
+
+# Thread-local storage for COM initialization tracking
+_com_init_count = threading.local()
+
+
+def ensure_com_initialized():
+    """Ensure COM is initialized for the current thread. Returns True if newly initialized."""
+    import pythoncom
+    
+    if not hasattr(_com_init_count, 'count'):
+        _com_init_count.count = 0
+    
+    if _com_init_count.count == 0:
+        pythoncom.CoInitialize()
+        _com_init_count.count = 1
+        logger.debug(f"COM initialized for thread {threading.current_thread().name}")
+        return True
+    else:
+        _com_init_count.count += 1
+        return False
+
+
+def release_com():
+    """Release COM for the current thread if this was the last user."""
+    import pythoncom
+    
+    if not hasattr(_com_init_count, 'count') or _com_init_count.count <= 0:
+        return
+    
+    _com_init_count.count -= 1
+    
+    if _com_init_count.count == 0:
+        try:
+            pythoncom.CoUninitialize()
+            logger.debug(f"COM released for thread {threading.current_thread().name}")
+        except Exception as e:
+            logger.debug(f"COM release warning: {e}")
 
 
 class BaseConverter(ABC):
@@ -29,6 +67,7 @@ class BaseConverter(ABC):
         self.log_callback = log_callback or (lambda msg: None)
         self.progress_callback = progress_callback or (lambda pct: None)
         self._app = None  # COM application instance
+        self._com_owned = False  # Track if this instance initialized COM
 
     def log(self, message: str):
         """Log a message to both file and UI callback."""

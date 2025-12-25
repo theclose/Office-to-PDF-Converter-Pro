@@ -34,7 +34,9 @@ class PPTConverter(BaseConverter):
     def initialize(self) -> bool:
         """Get PowerPoint COM from pool."""
         try:
-            pythoncom.CoInitialize()
+            from .base import ensure_com_initialized
+            self._com_owned = ensure_com_initialized()
+            
             if self._use_pool:
                 self._ppt = get_pool().get_ppt()
             else:
@@ -66,10 +68,9 @@ class PPTConverter(BaseConverter):
                 logger.debug(f"PPT quit error: {e}")
             self._ppt = None
 
-        try:
-            pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        # Release COM properly
+        from .base import release_com
+        release_com()
 
         gc.collect()
         logger.info("PowerPoint cleanup done")

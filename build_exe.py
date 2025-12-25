@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Project info
 APP_NAME = "OfficeToPDF_Pro"
-VERSION = "4.0.8"
+VERSION = "4.1.0"
 MAIN_SCRIPT = "run_pro.py"
 
 # Directories

@@ -38,12 +38,13 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             ("compress", "📦 Nén", "Giảm dung lượng file"),
             ("protect", "🔒 Mật khẩu", "Bảo vệ bằng password"),
             ("watermark", "💧 Watermark", "Thêm watermark text"),
+            ("rasterize", "🔐 Hóa ảnh (Secure)", "Flatten thành ảnh 1 lớp"),
         ],
     }
 
     # All operation keys for validation
     ALL_OPERATIONS = ["merge", "split", "extract", "delete", "rotate", "reverse",
-                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark"]
+                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark", "rasterize"]
 
     def __init__(self, parent, lang: str = "vi"):
         super().__init__(parent)
@@ -111,7 +112,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 self.tab_view.set("✏️ Chỉnh sửa")
             elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
                 self.tab_view.set("🔄 Chuyển đổi")
-            elif op in ["compress", "protect", "watermark"]:
+            elif op in ["compress", "protect", "watermark", "rasterize"]:
                 self.tab_view.set("⚡ Tối ưu")
         except Exception:
             pass  # Tab may not exist yet
@@ -448,6 +449,32 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     self.options_content, text=fmt.upper(),
                     variable=self.var_image_format, value=fmt
                 ).pack(anchor="w", padx=10)
+
+        elif op == "rasterize":
+            ctk.CTkLabel(self.options_content, text="Chất lượng (DPI):").pack(anchor="w")
+            ctk.CTkLabel(
+                self.options_content, 
+                text="⚠️ Sẽ biến PDF thành ảnh. Không thể copy text/ảnh.",
+                text_color="#F59E0B",
+                font=ctk.CTkFont(size=11)
+            ).pack(anchor="w", pady=(0, 5))
+            
+            ctk.CTkSlider(
+                self.options_content,
+                from_=72, to=300,
+                variable=self.var_dpi,
+                width=180
+            ).pack(anchor="w", pady=5)
+            
+            # Show DPI value
+            self.lbl_dpi = ctk.CTkLabel(self.options_content, text=f"{self.var_dpi.get()} DPI")
+            self.lbl_dpi.pack(anchor="w", padx=5)
+            
+            def update_dpi_label(value):
+                self.lbl_dpi.configure(text=f"{int(value)} DPI")
+                
+            self.var_dpi.trace_add("write", lambda *args: update_dpi_label(self.var_dpi.get()))
+
         else:
             ctk.CTkLabel(
                 self.options_content,
@@ -602,6 +629,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             "split": "_split",
             "img_to_pdf": ".pdf",
             "ocr": "_ocr",
+            "rasterize": "_rasterized",
         }
         suffix = suffixes.get(op, "_output")
 
@@ -681,6 +709,8 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 if not is_ocr_available():
                     return False
                 return ocr_pdf_to_searchable(input_path, output_path, lang=None)
+            elif op == "rasterize":
+                return pdf_tools.rasterize_pdf(input_path, output_path, self.var_dpi.get())
             return False
         except Exception as e:
             logger.error(f"Operation {op} failed: {e}")

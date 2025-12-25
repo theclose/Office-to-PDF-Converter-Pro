@@ -227,13 +227,14 @@ def post_process_pdf(pdf_path: str, password: str = None,
 # RASTERIZE PDF - Flatten to Images
 # =============================================================================
 
-def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
+def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150) -> bool:
     """
     Convert PDF pages to fully flattened images (rasterize) to prevent extraction.
     Creates a true "scan-like" PDF.
     
     Args:
-        pdf_path: Path to PDF file
+        pdf_path: Path to source PDF file
+        output_path: Path to save result (if None, overwrites source)
         dpi: Resolution (150=good, 200=high, 300=excellent)
         
     Returns:
@@ -242,6 +243,8 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
     if not HAS_PYMUPDF:
         return False
 
+    target_path = output_path if output_path else pdf_path
+    
     try:
         doc = fitz.open(pdf_path)
         new_doc = fitz.open()
@@ -262,11 +265,14 @@ def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
 
         doc.close()
 
-        temp_path = pdf_path + ".raster.tmp"
+        # Save to temp then move/rename
+        temp_path = target_path + ".raster.tmp"
         new_doc.save(temp_path, garbage=4, deflate=True, clean=True)
         new_doc.close()
 
-        shutil.move(temp_path, pdf_path)
+        if os.path.exists(target_path) and target_path != temp_path:
+            os.remove(target_path)
+        shutil.move(temp_path, target_path)
         return True
 
     except Exception as e:

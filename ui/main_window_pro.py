@@ -50,14 +50,14 @@ from office_converter.converters import get_converter_for_file  # Lightweight lo
 # Setup logging
 logger = setup_logging()
 
-# Drag and drop support
-HAS_WINDND = False
-try:
-    import windnd
-    HAS_WINDND = True
-    logger.info("windnd available for drag-drop")
-except ImportError:
-    logger.warning("windnd not installed - drag drop disabled")
+# Drag and drop support - TkinterDnD2 for robust Unicode handling
+from office_converter.utils.tkdnd_wrapper import TkDnDWrapper, HAS_TKDND, DND_FILES
+from office_converter.utils.dnd_helpers import parse_dropped_paths
+
+if HAS_TKDND:
+    logger.info("tkinterdnd2 available - drag-drop enabled with Unicode support")
+else:
+    logger.warning("tkinterdnd2 not installed - drag drop disabled")
 
 # Import fitz (PyMuPDF) at module level with proper fallback
 fitz = None
@@ -880,10 +880,10 @@ class FileListPanel(ctk.CTkFrame):
 # MAIN APPLICATION
 # ============================================================================
 
-class ConverterProApp(ctk.CTk):
-    """Professional-grade Office to PDF Converter."""
+class ConverterProApp(TkDnDWrapper):
+    """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.1.2"
+    VERSION = "4.1.3"
 
     def __init__(self):
         super().__init__()
@@ -960,8 +960,8 @@ class ConverterProApp(ctk.CTk):
             self._log("📄 PyMuPDF: Hỗ trợ xử lý trang PDF")
         else:
             self._log("⚠️ PyMuPDF không có: Không hỗ trợ chọn trang")
-        if HAS_WINDND:
-            self._log("📁 Drag & Drop: Kéo thả file hoạt động")
+        if HAS_TKDND:
+            self._log("📁 Drag & Drop: Kéo thả file hoạt động (TkinterDnD2)")
 
         # Cleanup old temp files from previous sessions
         self._cleanup_temp_files()
@@ -1027,22 +1027,32 @@ class ConverterProApp(ctk.CTk):
             logger.error(f"Setup shortcuts error: {e}")
 
     def _setup_drag_drop(self):
-        """Setup drag and drop support using windnd."""
-        if not HAS_WINDND:
-            logger.info("windnd not available, drag drop disabled")
+        """Setup drag and drop support using TkinterDnD2 with Unicode support."""
+        if not HAS_TKDND:
+            logger.info("tkinterdnd2 not available, drag drop disabled")
             return
 
         try:
-            # Register the main window for drag and drop
-            windnd.hook_dropfiles(self, func=self._handle_drop)
-            logger.info("Drag and drop enabled for main window")
+            # Register the main window for file drops
+            self.drop_target_register(DND_FILES)
+            # Bind drop event
+            self.dnd_bind('<<Drop>>', self._handle_drop)
+            logger.info("Drag and drop enabled with Unicode support")
         except Exception as e:
             logger.error(f"Setup drag drop error: {e}")
 
-    def _handle_drop(self, files):
-        """Handle dropped files with comprehensive Vietnamese path support."""
+    def _handle_drop(self, event):
+        """Handle dropped files with robust Unicode path parsing via tk.splitlist()."""
         try:
-            if not files:
+            if not event.data:
+                return
+
+            # Parse paths using production-grade utility that handles
+            # Tcl list format with tk.splitlist() for perfect Unicode support
+            file_paths = parse_dropped_paths(self, event.data)
+            
+            if not file_paths:
+                logger.warning("No valid files in drop event")
                 return
 
             # Get all supported extensions
@@ -1051,95 +1061,21 @@ class ConverterProApp(ctk.CTk):
                 all_extensions.update(ext_set)
 
             added_count = 0
-            for file_path in files:
+            for file_path in file_paths:
                 try:
-                    # Handle different input types from windnd
-                    # Debug: log raw bytes
-
-                    if isinstance(file_path, bytes):
-                        # Log first few bytes for debugging
-                        logger.debug(f"Raw bytes: {file_path[:100]}")
-
-                        # Try to decode with multiple encodings
-                        decoded_path = None
-
-                        # Windows may use various encodings depending on system locale
-                        # Priority order for Vietnamese Windows:
-                        encodings_to_try = [
-                            'utf-8',       # Modern Windows
-                            'cp1258',      # Vietnamese Windows codepage
-                            'cp65001',     # UTF-8 alias
-                            'mbcs',        # Windows multi-byte
-                            'cp1252',      # Western European
-                            'ascii',       # Basic ASCII
-                            'cp936',       # Chinese
-                            'utf-16-le',   # Some Windows drag-drop uses UTF-16
-                            'latin-1',     # Always succeeds (fallback)
-                        ]
-
-                        for encoding in encodings_to_try:
-                            try:
-                                test_path = file_path.decode(encoding)
-                                # Clean up path (remove null chars, whitespace)
-                                test_path = test_path.strip().rstrip('\x00')
-                                # Skip empty or invalid
-                                if not test_path or len(test_path) < 3:
-                                    continue
-                                # Normalize
-                                test_path = os.path.normpath(test_path)
-                                # Verify path exists to confirm correct decoding
-                                if os.path.exists(test_path):
-                                    decoded_path = test_path
-                                    logger.debug(f"Decoded with {encoding}: {test_path}")
-                                    break
-                            except (UnicodeDecodeError, LookupError, OSError):
-                                continue
-
-                        if decoded_path:
-                            file_path = decoded_path
-                        else:
-                            # Try to interpret as raw filesystem bytes
-                            try:
-                                # Try os.fsdecode which uses surrogateescape
-                                file_path = os.fsdecode(file_path)
-                            except:
-                                # Final fallback
-                                file_path = file_path.decode('latin-1')
-
-                            file_path = file_path.strip().rstrip('\x00')
-                            logger.warning(f"Path not verified: {file_path}")
-
-                    elif not isinstance(file_path, str):
-                        file_path = str(file_path)
-
-                    # Normalize path
-                    file_path = os.path.normpath(file_path)
-
-                    # Skip empty paths
-                    if not file_path or file_path == '.' or len(file_path) < 3:
-                        continue
-
-                    # Check if file exists
-                    if not os.path.exists(file_path):
-                        # Log with basename only to avoid encoding issues in log
-                        try:
-                            basename = os.path.basename(file_path)
-                        except:
-                            basename = "unknown"
-                        self._log(f"⚠️ File không tồn tại: {basename}")
-                        logger.warning(f"File not found: {file_path}")
-                        continue
-
                     # Check extension
                     ext = os.path.splitext(file_path)[1].lower()
                     if ext in all_extensions:
                         # Add to file panel
                         if self.file_panel:
-                            # Create ConversionFile and add
                             conv_file = ConversionFile(path=file_path)
                             if conv_file not in self.file_panel.files:
                                 self.file_panel.files.append(conv_file)
                                 added_count += 1
+                    else:
+                        # Unsupported extension
+                        basename = os.path.basename(file_path)
+                        self._log(f"⚠️ File không hỗ trợ: {basename}")
                 except Exception as file_err:
                     logger.warning(f"Skip file due to error: {file_err}")
                     continue
@@ -1150,6 +1086,7 @@ class ConverterProApp(ctk.CTk):
                     self.file_panel._refresh_display()
                 self._log(f"📁 Thả thêm {added_count} file(s)")
                 self._on_files_changed(self.file_panel.files if self.file_panel else [])
+                
         except Exception as e:
             logger.error(f"Handle drop error: {e}")
             self._log(f"❌ Lỗi kéo thả: {e}")

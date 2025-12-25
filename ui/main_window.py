@@ -655,8 +655,7 @@ class ConverterApp:
 
         # PDF Tools row
         self.lbl_pdf_tools.config(text=get_text("pdf_tools", lang))
-        self.btn_merge.config(text=get_text("btn_merge", lang))
-        self.btn_split.config(text=get_text("btn_split", lang))
+        # Note: btn_merge/btn_split removed - using unified PDF Tools dialog instead
 
         # Output folder
         self.lbl_output_title.config(text=get_text("output_folder", lang))

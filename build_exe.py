@@ -228,7 +228,7 @@ def build():
     main_script_path = PROJECT_ROOT / MAIN_SCRIPT
     if not main_script_path.exists():
         # Create run_pro.py if doesn't exist
-        run_script = '''#!/usr/bin/env python
+        run_script = '''
 """Office to PDF Converter Pro - Entry Point"""
 import sys
 import os

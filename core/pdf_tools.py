@@ -164,6 +164,123 @@ def protect_pdf(input_path: str, output_path: str, password: str,
 
 
 # =============================================================================
+# POST-PROCESS PDF - Metadata and Password
+# =============================================================================
+
+def post_process_pdf(pdf_path: str, password: str = None,
+                     author: str = None, title: str = None) -> bool:
+    """
+    Apply password protection and/or metadata to PDF in-place.
+    
+    Args:
+        pdf_path: Path to PDF file
+        password: Optional password for encryption
+        author: Optional author metadata
+        title: Optional title metadata
+        
+    Returns:
+        True on success
+    """
+    if not HAS_PYMUPDF:
+        return False
+
+    try:
+        doc = fitz.open(pdf_path)
+
+        # Set metadata if provided
+        if author or title:
+            metadata = doc.metadata
+            if author:
+                metadata["author"] = author
+            if title:
+                metadata["title"] = title
+            doc.set_metadata(metadata)
+
+        # Create temp path
+        temp_path = pdf_path + ".tmp"
+
+        # Save with password or without
+        if password:
+            perm = fitz.PDF_PERM_PRINT | fitz.PDF_PERM_COPY
+            doc.save(temp_path, encryption=fitz.PDF_ENCRYPT_AES_256,
+                     user_pw=password, owner_pw=password, permissions=perm,
+                     garbage=4, deflate=True)
+        else:
+            doc.save(temp_path, garbage=4, deflate=True)
+
+        doc.close()
+
+        # Replace original with temp
+        shutil.move(temp_path, pdf_path)
+        return True
+    except Exception as e:
+        logger.error(f"post_process_pdf failed: {e}")
+        try:
+            if os.path.exists(pdf_path + ".tmp"):
+                os.remove(pdf_path + ".tmp")
+        except OSError:
+            pass
+        return False
+
+
+# =============================================================================
+# RASTERIZE PDF - Flatten to Images
+# =============================================================================
+
+def rasterize_pdf(pdf_path: str, dpi: int = 150) -> bool:
+    """
+    Convert PDF pages to fully flattened images (rasterize) to prevent extraction.
+    Creates a true "scan-like" PDF.
+    
+    Args:
+        pdf_path: Path to PDF file
+        dpi: Resolution (150=good, 200=high, 300=excellent)
+        
+    Returns:
+        True on success
+    """
+    if not HAS_PYMUPDF:
+        return False
+
+    try:
+        doc = fitz.open(pdf_path)
+        new_doc = fitz.open()
+
+        for page in doc:
+            mat = fitz.Matrix(dpi / 72, dpi / 72)
+            pix = page.get_pixmap(matrix=mat, alpha=False)
+            img_data = pix.tobytes("png")
+
+            page_rect = page.rect
+            new_width = page_rect.width * (dpi / 72)
+            new_height = page_rect.height * (dpi / 72)
+
+            new_page = new_doc.new_page(width=new_width, height=new_height)
+            img_rect = fitz.Rect(0, 0, new_width, new_height)
+            new_page.insert_image(img_rect, stream=img_data,
+                                  keep_proportion=False, overlay=True)
+
+        doc.close()
+
+        temp_path = pdf_path + ".raster.tmp"
+        new_doc.save(temp_path, garbage=4, deflate=True, clean=True)
+        new_doc.close()
+
+        shutil.move(temp_path, pdf_path)
+        return True
+
+    except Exception as e:
+        logger.error(f"rasterize_pdf failed: {e}")
+        try:
+            temp_path = pdf_path + ".raster.tmp"
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+        except OSError:
+            pass
+        return False
+
+
+# =============================================================================
 # COMPRESS PDF - Professional Implementation
 # Based on PyMuPDF official documentation and best practices
 # =============================================================================
@@ -493,34 +610,43 @@ def rotate_pages(input_path: str, output_path: str, rotation: int, page_indices:
         return False
 
 
-def parse_page_range(page_range_str: str, total_pages: int) -> List[int]:
+def parse_page_range(page_range_str: str, total_pages: Optional[int] = None) -> List[int]:
     """
     Parse page range string to list of 0-indexed page numbers.
     
     Args:
         page_range_str: String like "1-5,7,10-15" (1-indexed)
-        total_pages: Total number of pages in document
+        total_pages: Optional total number of pages (for validation). 
+                     If None, pages are not clamped to a maximum.
         
     Returns:
-        List of 0-indexed page numbers
+        List of 0-indexed page numbers, or empty list if invalid
     """
+    if not page_range_str or not page_range_str.strip():
+        return []
+    
     pages = set()
     parts = page_range_str.replace(" ", "").split(",")
 
     for part in parts:
         if "-" in part:
             try:
-                start, end = part.split("-")
+                start, end = part.split("-", 1)
                 start = max(1, int(start))
-                end = min(total_pages, int(end))
+                end = int(end)
+                if total_pages is not None:
+                    end = min(total_pages, end)
+                if start > end:
+                    start, end = end, start  # Handle reversed ranges
                 for i in range(start, end + 1):
-                    pages.add(i - 1)  # Convert to 0-indexed
+                    if i >= 1 and (total_pages is None or i <= total_pages):
+                        pages.add(i - 1)  # Convert to 0-indexed
             except ValueError:
                 continue
         else:
             try:
                 page_num = int(part)
-                if 1 <= page_num <= total_pages:
+                if page_num >= 1 and (total_pages is None or page_num <= total_pages):
                     pages.add(page_num - 1)  # Convert to 0-indexed
             except ValueError:
                 continue
@@ -690,4 +816,54 @@ def reverse_pages(input_path: str, output_path: str) -> bool:
 
     except Exception as e:
         logger.error(f"Reverse pages error: {e}")
+        return False
+
+
+# =============================================================================
+# EXTRACT PDF PAGES (IN-PLACE) - For converter post-processing
+# =============================================================================
+
+def extract_pdf_pages(pdf_path: str, page_indices: List[int]) -> bool:
+    """
+    Extract specific pages from PDF and overwrite the original.
+    
+    Args:
+        pdf_path: Path to PDF
+        page_indices: List of 0-indexed page numbers
+        
+    Returns:
+        True on success
+    """
+    if not HAS_PYMUPDF or not page_indices:
+        return False
+
+    try:
+        doc = fitz.open(pdf_path)
+        total_pages = doc.page_count
+
+        valid_indices = [i for i in page_indices if 0 <= i < total_pages]
+        if not valid_indices:
+            doc.close()
+            return False
+
+        new_doc = fitz.open()
+        for idx in valid_indices:
+            new_doc.insert_pdf(doc, from_page=idx, to_page=idx)
+
+        doc.close()
+
+        temp_path = pdf_path + ".tmp"
+        new_doc.save(temp_path, garbage=4, deflate=True)
+        new_doc.close()
+
+        shutil.move(temp_path, pdf_path)
+        logger.info(f"Extracted {len(valid_indices)} pages in-place")
+        return True
+    except Exception as e:
+        logger.error(f"extract_pdf_pages failed: {e}")
+        try:
+            if os.path.exists(pdf_path + ".tmp"):
+                os.remove(pdf_path + ".tmp")
+        except OSError:
+            pass
         return False

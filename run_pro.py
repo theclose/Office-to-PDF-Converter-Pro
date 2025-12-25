@@ -1,12 +1,13 @@
-#!/usr/bin/env python
+
 """Office to PDF Converter Pro - Entry Point"""
 import sys
 import os
 
-# Add project root to path
+# Add parent directory to path (so office_converter package can be imported)
 project_root = os.path.dirname(os.path.abspath(__file__))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+parent_dir = os.path.dirname(project_root)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 if __name__ == "__main__":
     from office_converter.ui.main_window_pro import ConverterProApp

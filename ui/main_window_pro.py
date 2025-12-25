@@ -1665,8 +1665,10 @@ class ConverterProApp(ctk.CTk):
             self.is_converting = True
             self.conversion_start_time = time.time()
 
-            # Calculate estimated time
-            self.total_estimated_time = self._calculate_estimated_time()
+            # Calculate estimated time - MOVED TO BACKGROUND
+            # self.total_estimated_time = self._calculate_estimated_time()
+            # Default estimate (5s per file) prevents determining size on main thread
+            self.total_estimated_time = len(self.file_panel.files) * 5.0
 
             # UI updates
             if self.btn_convert:
@@ -1721,7 +1723,10 @@ class ConverterProApp(ctk.CTk):
 
             # Start time display
             self._update_time_display()
-
+        
+            # Force UI update to prevent freeze before thread starts
+            self.update_idletasks()
+        
             # Start conversion thread
             thread = threading.Thread(
                 target=self._run_conversion,
@@ -1915,7 +1920,10 @@ class ConverterProApp(ctk.CTk):
                 # Update elapsed label (clean format, no icon)
                 if self.elapsed_label:
                     self.elapsed_label.configure(text=f"{mins:02d}:{secs:02d}")
-
+            
+                # Keep UI responsive
+                self.update_idletasks()
+            
                 # Schedule next update (faster for smoother display)
                 self.after(500, self._update_time_display)
         except Exception as e:

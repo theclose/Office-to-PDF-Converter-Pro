@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Office Converter - Main Entry Point
 Converts Office documents (Excel, Word, PowerPoint) to PDF.

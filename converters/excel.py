@@ -37,9 +37,7 @@ class ExcelConverter(BaseConverter):
             if self._use_pool:
                 self._excel = get_pool().get_excel()
             else:
-                import win32com.client
-                self._excel = win32com.client.Dispatch("Excel.Application")
-                self._configure_standalone()
+                self._excel = self._create_excel_instance()
 
             if self._excel:
                 logger.info("Excel ready (pooled)" if self._use_pool else "Excel ready (standalone)")
@@ -49,14 +47,67 @@ class ExcelConverter(BaseConverter):
             logger.error(f"Failed to initialize Excel: {e}")
             return False
 
-    def _configure_standalone(self):
+    def _create_excel_instance(self):
+        """Create Excel COM instance with auto-recovery for corrupted cache."""
+        import win32com.client
+        
+        try:
+            excel = win32com.client.Dispatch("Excel.Application")
+            self._configure_standalone_app(excel)
+            return excel
+        except AttributeError as e:
+            # CLSIDToClassMap error = corrupted COM cache
+            if "CLSIDToClassMap" in str(e) or "gen_py" in str(e):
+                logger.warning("Corrupted COM cache detected, clearing and retrying...")
+                self._clear_com_cache()
+                
+                # Retry after clearing cache
+                try:
+                    # Force reload of win32com.client
+                    import importlib
+                    import win32com
+                    if hasattr(win32com, 'client'):
+                        importlib.reload(win32com.client)
+                    
+                    excel = win32com.client.Dispatch("Excel.Application")
+                    self._configure_standalone_app(excel)
+                    logger.info("Excel COM recovered after clearing cache")
+                    return excel
+                except Exception as retry_error:
+                    logger.error(f"Retry failed after cache clear: {retry_error}")
+                    raise
+            else:
+                raise
+
+    def _clear_com_cache(self):
+        """Clear the win32com gen_py cache to fix corrupted COM types."""
+        try:
+            import win32com
+            import shutil as sh
+            
+            gen_path = getattr(win32com, '__gen_path__', None)
+            if gen_path and os.path.exists(gen_path):
+                for item in os.listdir(gen_path):
+                    item_path = os.path.join(gen_path, item)
+                    try:
+                        if os.path.isdir(item_path):
+                            sh.rmtree(item_path)
+                        else:
+                            os.remove(item_path)
+                    except Exception:
+                        pass
+                logger.info(f"Cleared COM cache at: {gen_path}")
+        except Exception as e:
+            logger.warning(f"Failed to clear COM cache: {e}")
+
+    def _configure_standalone_app(self, excel):
         """Configure standalone Excel instance."""
         try:
-            self._excel.Visible = False
-            self._excel.DisplayAlerts = False
-            self._excel.ScreenUpdating = False
-            self._excel.EnableEvents = False
-            self._excel.AskToUpdateLinks = False
+            excel.Visible = False
+            excel.DisplayAlerts = False
+            excel.ScreenUpdating = False
+            excel.EnableEvents = False
+            excel.AskToUpdateLinks = False
         except Exception as e:
             logger.debug(f"Excel configure warning: {e}")
 

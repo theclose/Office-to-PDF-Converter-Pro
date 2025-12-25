@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 import customtkinter as ctk
+import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 
@@ -672,16 +673,19 @@ class PDFPreviewPanel(ctk.CTkFrame):
 # ============================================================================
 
 class FileListPanel(ctk.CTkFrame):
-    """Enhanced file list with drag & drop and type indicators."""
+    """Enhanced file list with drag & drop, selection and type indicators."""
 
     def __init__(self, parent, on_selection_change: Optional[Callable] = None, **kwargs):
         super().__init__(parent, **kwargs)
 
         self.files: List[ConversionFile] = []
+        self.selected_indices: set = set()  # Track selected file indices
+        self.anchor_index: int = -1  # For shift-selection
         self.on_selection_change = on_selection_change
 
         self._create_widgets()
         self._setup_drag_drop()
+        self._setup_keyboard_bindings()
 
     def _create_widgets(self):
         """Create file list widgets."""
@@ -699,16 +703,24 @@ class FileListPanel(ctk.CTkFrame):
 
         self.drop_label = ctk.CTkLabel(
             self.drop_frame,
-            text="📁 Kéo thả files vào đây\n\n💡 Ctrl+O: Thêm files\n⌫ Delete: Xóa files",
+            text="📁 Kéo thả files vào đây\n\n💡 Ctrl+O: Thêm files\n⌫ Delete: Xóa files đã chọn\n🔲 Ctrl+A: Chọn tất cả",
             font=ctk.CTkFont(size=14),
             text_color="gray"
         )
         self.drop_label.pack(expand=True, pady=30)
 
-        self.file_textbox = ctk.CTkTextbox(
+        # Use Listbox for proper selection support
+        self.file_listbox = tk.Listbox(
             self.drop_frame,
-            font=ctk.CTkFont(family="Consolas", size=12),
-            state="disabled"
+            font=("Consolas", 11),
+            selectmode=tk.EXTENDED,  # Allow multiple selection
+            bg="#2b2b2b",
+            fg="#dcdcdc",
+            selectbackground="#1f6aa5",
+            selectforeground="white",
+            highlightthickness=0,
+            borderwidth=0,
+            activestyle="none"
         )
 
         # Stats row
@@ -744,6 +756,53 @@ class FileListPanel(ctk.CTkFrame):
             logger.info("TkinterDnD2 not available, drag & drop disabled")
         except Exception as e:
             logger.warning(f"Could not setup drag & drop: {e}")
+
+    def _setup_keyboard_bindings(self):
+        """Setup keyboard shortcuts for file selection."""
+        # Ctrl+A to select all
+        self.file_listbox.bind('<Control-a>', self._select_all)
+        self.file_listbox.bind('<Control-A>', self._select_all)
+        
+        # Delete to remove selected
+        self.file_listbox.bind('<Delete>', self._delete_selected)
+        self.file_listbox.bind('<BackSpace>', self._delete_selected)
+        
+        # Update selected_indices when selection changes
+        self.file_listbox.bind('<<ListboxSelect>>', self._on_listbox_select)
+
+    def _select_all(self, event=None):
+        """Select all files."""
+        if self.files:
+            self.file_listbox.select_set(0, tk.END)
+            self.selected_indices = set(range(len(self.files)))
+        return "break"  # Prevent default behavior
+
+    def _delete_selected(self, event=None):
+        """Delete selected files from list."""
+        selection = self.file_listbox.curselection()
+        if not selection:
+            return
+        
+        # Remove in reverse order to maintain indices
+        for idx in sorted(selection, reverse=True):
+            if 0 <= idx < len(self.files):
+                del self.files[idx]
+        
+        self.selected_indices.clear()
+        self._refresh_display()
+        return "break"
+
+    def _on_listbox_select(self, event=None):
+        """Handle listbox selection change."""
+        selection = self.file_listbox.curselection()
+        self.selected_indices = set(selection)
+
+    def get_selected_files(self) -> List[ConversionFile]:
+        """Get currently selected files (or all if none selected)."""
+        if self.selected_indices:
+            return [self.files[i] for i in sorted(self.selected_indices) if i < len(self.files)]
+        return self.files  # Return all if none selected
+
 
     def _on_drop(self, event):
         """Handle dropped files."""
@@ -857,22 +916,19 @@ class FileListPanel(ctk.CTkFrame):
 
             # Update list display
             if count == 0:
-                self.file_textbox.pack_forget()
+                self.file_listbox.pack_forget()
                 self.drop_label.pack(expand=True, pady=30)
             else:
                 self.drop_label.pack_forget()
-                self.file_textbox.pack(fill="both", expand=True)
+                self.file_listbox.pack(fill="both", expand=True)
 
-                self.file_textbox.configure(state="normal")
-                self.file_textbox.delete("1.0", "end")
+                # Clear and repopulate listbox
+                self.file_listbox.delete(0, tk.END)
 
                 # Progressive rendering: show only first 200 files for performance
-                # with indicator for more
                 MAX_DISPLAY = 200
                 display_files = self.files[:MAX_DISPLAY]
                 
-                # Build text in one batch for performance
-                lines = []
                 for i, f in enumerate(display_files, 1):
                     status_icon = {
                         "pending": f.icon,
@@ -880,15 +936,11 @@ class FileListPanel(ctk.CTkFrame):
                         "completed": "✅",
                         "failed": "❌"
                     }.get(f.status, f.icon)
-                    lines.append(f"{status_icon} {i:3d}. {f.filename}")
+                    self.file_listbox.insert(tk.END, f"{status_icon} {i:3d}. {f.filename}")
                 
                 # Add "more files" indicator if truncated
                 if count > MAX_DISPLAY:
-                    lines.append(f"\n... và {count - MAX_DISPLAY} files nữa")
-                
-                # Single insert for performance
-                self.file_textbox.insert("end", "\n".join(lines))
-                self.file_textbox.configure(state="disabled")
+                    self.file_listbox.insert(tk.END, f"... và {count - MAX_DISPLAY} files nữa")
 
             # Callback
             if self.on_selection_change:
@@ -1579,14 +1631,27 @@ class ConverterProApp(ctk.CTk):
                                                placeholder_text="Mật khẩu")
             self.password_entry.pack(side="left", padx=5)
 
-            # Page range
+            # Excel sheet selection
+            sheet_frame = ctk.CTkFrame(options, fg_color="transparent")
+            sheet_frame.pack(fill="x", pady=5)
+            
+            ctk.CTkLabel(sheet_frame, text="📗 Sheet (Excel):").pack(side="left")
+            sheet_entry = ctk.CTkEntry(sheet_frame, textvariable=self.var_sheet_index,
+                        width=80, placeholder_text="all")
+            sheet_entry.pack(side="left", padx=5)
+            ctk.CTkLabel(sheet_frame, text="(VD: 1-3, 5 hoặc để trống = tất cả)", 
+                        text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
+
+            # PDF page range  
             page_frame = ctk.CTkFrame(options, fg_color="transparent")
             page_frame.pack(fill="x", pady=5)
 
-            ctk.CTkLabel(page_frame, text="📄 Trang:").pack(side="left")
+            ctk.CTkLabel(page_frame, text="📄 Trang PDF:").pack(side="left")
             page_entry = ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
-                        width=100, placeholder_text="1-3, 5")
+                        width=80, placeholder_text="all")
             page_entry.pack(side="left", padx=5)
+            ctk.CTkLabel(page_frame, text="(Chỉ xuất các trang chỉ định)", 
+                        text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
             # Save page range on focus out
             page_entry.bind("<FocusOut>", lambda e: self._save_page_range())
         except Exception as e:
@@ -1624,6 +1689,24 @@ class ConverterProApp(ctk.CTk):
             has_files = len(files) > 0
             if self.btn_convert:
                 self.btn_convert.configure(state="normal" if has_files else "disabled")
+            
+            # Try to preview the first PDF file if available
+            if hasattr(self, 'preview_panel') and self.preview_panel:
+                pdf_file = None
+                for f in files:
+                    if f.output_path and os.path.exists(f.output_path):
+                        # Use converted PDF
+                        pdf_file = f.output_path
+                        break
+                    elif f.path.lower().endswith('.pdf'):
+                        # Use source PDF
+                        pdf_file = f.path
+                        break
+                
+                if pdf_file:
+                    self.preview_panel.load_pdf(pdf_file)
+                else:
+                    self.preview_panel.clear()
         except Exception as e:
             logger.error(f"On files changed error: {e}")
 

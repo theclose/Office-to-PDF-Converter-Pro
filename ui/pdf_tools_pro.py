@@ -6,6 +6,7 @@ Professional UI with dark theme, smooth animations, and batch processing
 import os
 import threading
 import customtkinter as ctk
+import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import List
 import logging
@@ -297,19 +298,35 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 width=70, height=28
             ).pack(side="left", padx=2)
 
-        # File list
+        # File list with selection support
         file_list_frame = ctk.CTkFrame(right_panel)
         file_list_frame.grid(row=1, column=0, sticky="nsew", pady=(0, 10))
         file_list_frame.grid_rowconfigure(0, weight=1)
         file_list_frame.grid_columnconfigure(0, weight=1)
 
-        self.file_listbox = ctk.CTkTextbox(
+        # Use tk.Listbox for proper selection (Ctrl+A, Shift+arrows, Delete)
+        self.file_listbox = tk.Listbox(
             file_list_frame,
-            height=200,
-            font=ctk.CTkFont(family="Consolas", size=12)
+            font=("Consolas", 11),
+            selectmode=tk.EXTENDED,  # Allow multiple selection
+            bg="#2b2b2b",
+            fg="#dcdcdc",
+            selectbackground="#1f6aa5",
+            selectforeground="white",
+            highlightthickness=0,
+            borderwidth=0,
+            activestyle="none"
         )
         self.file_listbox.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        self.file_listbox.configure(state="disabled")
+        
+        # Keyboard bindings for selection
+        self.file_listbox.bind('<Control-a>', lambda e: self._select_all_files())
+        self.file_listbox.bind('<Control-A>', lambda e: self._select_all_files())
+        self.file_listbox.bind('<Delete>', lambda e: self._remove_selected_files())
+        self.file_listbox.bind('<BackSpace>', lambda e: self._remove_selected_files())
+        
+        # Setup drag and drop for file list
+        self._setup_file_drop(file_list_frame)
 
         # Progress section
         progress_frame = ctk.CTkFrame(right_panel)
@@ -545,10 +562,29 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self._refresh_file_list()
 
     def _remove_files(self):
-        """Remove selected file (last one for now)."""
+        """Remove selected files."""
+        self._remove_selected_files()
+
+    def _remove_selected_files(self):
+        """Remove selected files from list."""
+        selection = self.file_listbox.curselection()
+        if not selection:
+            # If nothing selected, remove last one
+            if self.files:
+                self.files.pop()
+        else:
+            # Remove in reverse order to maintain indices
+            for idx in sorted(selection, reverse=True):
+                if 0 <= idx < len(self.files):
+                    del self.files[idx]
+        self._refresh_file_list()
+        return "break"
+
+    def _select_all_files(self):
+        """Select all files in the list."""
         if self.files:
-            self.files.pop()
-            self._refresh_file_list()
+            self.file_listbox.select_set(0, tk.END)
+        return "break"
 
     def _clear_files(self):
         """Clear all files."""
@@ -556,26 +592,65 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.compression_results.clear()
         self._refresh_file_list()
 
+    def _setup_file_drop(self, frame):
+        """Setup drag and drop for the file list."""
+        try:
+            from tkinterdnd2 import DND_FILES
+            
+            if hasattr(self, 'drop_target_register'):
+                frame.drop_target_register(DND_FILES)
+                frame.dnd_bind('<<Drop>>', self._on_file_drop)
+        except ImportError:
+            pass  # DnD not available
+        except Exception as e:
+            logger.warning(f"Could not setup drag & drop: {e}")
+
+    def _on_file_drop(self, event):
+        """Handle dropped files."""
+        try:
+            data = event.data
+            # Parse dropped file paths
+            files = []
+            if data.startswith('{'):
+                # Windows format with braces
+                import re
+                files = re.findall(r'\{([^}]+)\}', data)
+            else:
+                files = data.split()
+            
+            op = self.var_operation.get()
+            valid_exts = {'.png', '.jpg', '.jpeg', '.bmp', '.gif'} if op == "img_to_pdf" else {'.pdf'}
+            
+            for f in files:
+                ext = os.path.splitext(f)[1].lower()
+                if ext in valid_exts and f not in self.files:
+                    self.files.append(f)
+            
+            self._refresh_file_list()
+        except Exception as e:
+            logger.error(f"Drop error: {e}")
+
     def _refresh_file_list(self):
         """Refresh the file list display."""
-        self.file_listbox.configure(state="normal")
-        self.file_listbox.delete("1.0", "end")
+        # Clear and repopulate listbox
+        self.file_listbox.delete(0, tk.END)
 
         for i, f in enumerate(self.files, 1):
             basename = os.path.basename(f)
-            size = os.path.getsize(f) / 1024  # KB
+            try:
+                size = os.path.getsize(f) / 1024  # KB
+            except Exception:
+                size = 0
 
             # Show compression results if available
             if f in self.compression_results:
                 orig, new = self.compression_results[f]
                 ratio = (1 - new/orig) * 100 if orig > 0 else 0
-                line = f"{i}. {basename} ({size:.0f}KB → {new/1024:.0f}KB, -{ratio:.0f}%)\n"
+                line = f"{i}. {basename} ({size:.0f}KB → {new/1024:.0f}KB, -{ratio:.0f}%)"
             else:
-                line = f"{i}. {basename} ({size:.0f} KB)\n"
+                line = f"{i}. {basename} ({size:.0f} KB)"
 
-            self.file_listbox.insert("end", line)
-
-        self.file_listbox.configure(state="disabled")
+            self.file_listbox.insert(tk.END, line)
 
         # Update count
         total_size = sum(os.path.getsize(f) for f in self.files) if self.files else 0

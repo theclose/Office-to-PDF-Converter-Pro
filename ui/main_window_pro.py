@@ -286,15 +286,60 @@ class ConversionEngine:
         self.on_file_complete = on_file_complete
         self.on_error = on_error
         self._stop_requested = False
+        self._stop_event = threading.Event()
+        self._current_converter = None  # Track current converter for force stop
         self._db = RecentFilesDB()
 
-    def stop(self):
-        """Request conversion stop."""
+    def stop(self, force: bool = False):
+        """Request conversion stop.
+        
+        Args:
+            force: If True, attempt to forcefully terminate Office processes.
+        """
         self._stop_requested = True
+        self._stop_event.set()
+        
+        if force:
+            self._force_stop()
+
+    def _force_stop(self):
+        """Force stop by cleaning up current converter and killing Office processes."""
+        try:
+            # Cleanup current converter if exists
+            if self._current_converter:
+                try:
+                    self._current_converter.cleanup()
+                except Exception:
+                    pass
+                self._current_converter = None
+            
+            # Kill hanging Office processes
+            self._kill_office_processes()
+        except Exception as e:
+            logger.error(f"Force stop error: {e}")
+
+    def _kill_office_processes(self):
+        """Kill Office application processes that may be hung."""
+        try:
+            import subprocess
+            # Kill common Office processes that might be stuck
+            for proc_name in ['EXCEL.EXE', 'WINWORD.EXE', 'POWERPNT.EXE']:
+                try:
+                    subprocess.run(
+                        ['taskkill', '/F', '/IM', proc_name],
+                        capture_output=True,
+                        timeout=5
+                    )
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.warning(f"Kill office processes error: {e}")
 
     def reset(self):
         """Reset stop flag."""
         self._stop_requested = False
+        self._stop_event.clear()
+        self._current_converter = None
 
     def convert_batch(self, files: List[ConversionFile],
                       options: ConversionOptions,
@@ -373,6 +418,10 @@ class ConversionEngine:
     def _convert_single(self, conv_file: ConversionFile,
                         options: ConversionOptions) -> bool:
         """Convert a single file."""
+        # Check stop before starting
+        if self._stop_requested:
+            return False
+            
         # get_converter_for_file returns a CLASS, not an instance!
         converter_class = get_converter_for_file(conv_file.path)
         if not converter_class:
@@ -381,8 +430,13 @@ class ConversionEngine:
 
         # Create instance of the converter
         converter = converter_class()
+        self._current_converter = converter  # Track for force stop
 
         try:
+            # Check stop again before initialization
+            if self._stop_requested:
+                return False
+                
             # Initialize COM application
             if not converter.initialize():
                 logger.error(f"Failed to initialize converter for: {conv_file.path}")
@@ -2000,11 +2054,36 @@ class ConverterProApp(ctk.CTk):
             self.after(0, self._on_conversion_done)
 
     def _stop_conversion(self):
-        """Stop conversion."""
+        """Stop conversion immediately (force stop)."""
         try:
             if self.engine:
-                self.engine.stop()
-                self._log("⏹️ Đang dừng...")
+                self._log("⏹️ Đang dừng ngay lập tức...")
+                
+                # Force stop - kills Office processes if needed
+                self.engine.stop(force=True)
+                
+                # Immediately update UI
+                self.is_converting = False
+                
+                # Hide progress frame
+                if hasattr(self, 'progress_frame') and self.progress_frame:
+                    self.progress_frame.pack_forget()
+                
+                # Re-enable convert button and show main content
+                if hasattr(self, 'btn_convert') and self.btn_convert:
+                    self.btn_convert.configure(state="normal")
+                if hasattr(self, 'main_content_frame') and self.main_content_frame:
+                    self.main_content_frame.pack(fill="both", expand=True, padx=15, pady=10)
+                
+                self._log("⏹️ Đã dừng chuyển đổi!")
+                
+                # Mark pending files as cancelled
+                if self.file_panel:
+                    for f in self.file_panel.files:
+                        if f.status == "converting" or f.status == "pending":
+                            f.status = "pending"  # Reset to pending
+                    self.file_panel._refresh_display()
+                    
         except Exception as e:
             logger.error(f"Stop conversion error: {e}")
 

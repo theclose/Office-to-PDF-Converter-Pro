@@ -2407,20 +2407,22 @@ F1         Xem shortcuts
             logger.error(f"Show shortcuts error: {e}")
 
     def _on_window_restore(self, event=None):
-        """Handle window restore after minimize - fix for windnd compatibility."""
-        try:
-            # Ensure window is properly visible after restore
-            self.lift()
-            self.focus_force()
-            
-            # Re-register drag and drop if needed (windnd sometimes loses it)
-            if HAS_WINDND:
-                try:
-                    windnd.hook_dropfiles(self, func=self._handle_drop)
-                except Exception:
-                    pass
-        except Exception as e:
-            logger.debug(f"Window restore handler: {e}")
+        """Handle window restore after minimize - simple refresh."""
+        # Debounce - avoid multiple triggers
+        if hasattr(self, '_restore_scheduled') and self._restore_scheduled:
+            return
+        self._restore_scheduled = True
+        
+        def do_restore():
+            try:
+                self._restore_scheduled = False
+                # Simple refresh - just update the window
+                self.update_idletasks()
+            except Exception:
+                pass
+        
+        # Schedule after 100ms to debounce
+        self.after(100, do_restore)
 
     def _on_closing(self):
         """Cleanup on close."""

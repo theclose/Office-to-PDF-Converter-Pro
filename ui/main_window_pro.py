@@ -139,7 +139,8 @@ class ConversionFile:
 @dataclass
 class ConversionOptions:
     """Conversion settings."""
-    quality: int = 0  # 0=high, 1=compact
+    quality: int = 0  # 0=high, 1=compact, 2=custom
+    quality_dpi: int = 300  # only used if quality=2
     scan_mode: bool = False
     password: Optional[str] = None
     page_range: Optional[str] = None
@@ -882,7 +883,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(ctk.CTk):
     """Professional-grade Office to PDF Converter."""
 
-    VERSION = "4.1.1"
+    VERSION = "4.1.2"
 
     def __init__(self):
         super().__init__()
@@ -921,6 +922,7 @@ class ConverterProApp(ctk.CTk):
         self.total_estimated_time: float = 0.0
         # Variables - Load from config
         self.var_quality = ctk.IntVar(value=self.config.get("pdf_quality", 0))
+        self.var_dpi = ctk.StringVar(value=str(self.config.get("pdf_dpi", "300")))
         self.var_scan_mode = ctk.BooleanVar(value=self.config.get("scan_mode", False))
         self.var_password = ctk.StringVar()
         self.var_password_enabled = ctk.BooleanVar(value=False)
@@ -1507,9 +1509,21 @@ class ConverterProApp(ctk.CTk):
 
             ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
             ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
-                              value=0, command=self._save_quality).pack(side="left", padx=5)
+                              value=0, command=self._on_quality_change).pack(side="left", padx=5)
             ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
-                              value=1, command=self._save_quality).pack(side="left")
+                              value=1, command=self._on_quality_change).pack(side="left")
+            ctk.CTkRadioButton(quality_frame, text="Tùy chọn", variable=self.var_quality,
+                              value=2, command=self._on_quality_change).pack(side="left", padx=5)
+
+            self.dpi_frame = ctk.CTkFrame(quality_frame, fg_color="transparent")
+            self.dpi_frame.pack(side="left")
+
+            self.dpi_entry = ctk.CTkEntry(self.dpi_frame, width=50, textvariable=self.var_dpi)
+            self.dpi_entry.pack(side="left")
+            ctk.CTkLabel(self.dpi_frame, text="DPI", font=ctk.CTkFont(size=11)).pack(side="left", padx=2)
+            
+            # Initial state
+            self._on_quality_change()
 
             # Scan mode
             ctk.CTkSwitch(options, text="📷 Scan Mode",
@@ -1553,10 +1567,24 @@ class ConverterProApp(ctk.CTk):
         except Exception as e:
             logger.error(f"Create options error: {e}")
 
+    def _on_quality_change(self):
+        """Handle quality selection change."""
+        try:
+            val = self.var_quality.get()
+            if val == 2:
+                self.dpi_entry.configure(state="normal")
+            else:
+                self.dpi_entry.configure(state="disabled")
+            self._save_quality()
+        except Exception:
+            pass
+
     def _save_quality(self):
         """Save quality setting to config."""
         try:
             self.config.set("pdf_quality", self.var_quality.get())
+            if self.var_quality.get() == 2:
+                self.config.set("pdf_dpi", self.var_dpi.get())
             self.config.save()
         except Exception as e:
             logger.error(f"Save quality error: {e}")
@@ -1809,9 +1837,16 @@ class ConverterProApp(ctk.CTk):
             if self.progress_frame and self.btn_convert:
                 self.progress_frame.pack(fill="x", pady=15, after=self.btn_convert)
 
+            # Parse DPI
+            try:
+                dpi = int(self.var_dpi.get())
+            except (ValueError, TypeError):
+                dpi = 300
+
             # Create options
             options = ConversionOptions(
                 quality=self.var_quality.get(),
+                quality_dpi=dpi,
                 scan_mode=self.var_scan_mode.get(),
                 password=self.var_password.get() if self.var_password_enabled.get() else None,
                 page_range=self.var_page_range.get() or None,

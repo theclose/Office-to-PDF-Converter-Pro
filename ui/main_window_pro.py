@@ -429,7 +429,7 @@ class ConversionEngine:
 # ============================================================================
 
 class PDFPreviewPanel(ctk.CTkFrame):
-    """PDF preview panel using PyMuPDF."""
+    """PDF preview panel using PyMuPDF with background rendering."""
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
@@ -438,6 +438,11 @@ class PDFPreviewPanel(ctk.CTkFrame):
         self.current_page = 0
         self.total_pages = 0
         self.photo_image = None
+        
+        # Background rendering state
+        self._render_thread = None
+        self._render_id = 0  # Incremented on each render to cancel stale renders
+        self._is_loading = False
 
         self._create_widgets()
 
@@ -495,17 +500,50 @@ class PDFPreviewPanel(ctk.CTkFrame):
             logger.error(f"PDF load error: {e}")
 
     def _render_page(self):
-        """Render current page."""
+        """Start background rendering of current page."""
         if not self.current_pdf or fitz is None:
             return
 
+        # Increment render ID to cancel any pending stale renders
+        self._render_id += 1
+        current_render_id = self._render_id
+        
+        # Show loading indicator
+        self._show_loading()
+        
+        # Start background thread
+        self._render_thread = threading.Thread(
+            target=self._do_render_page,
+            args=(current_render_id,),
+            daemon=True
+        )
+        self._render_thread.start()
+
+    def _show_loading(self):
+        """Show loading indicator."""
+        self._is_loading = True
+        self.preview_label.configure(text="⏳ Đang tải...", image=None)
+        self.page_label.configure(
+            text=f"Trang {self.current_page + 1}/{self.total_pages}"
+        )
+
+    def _do_render_page(self, render_id: int):
+        """Background worker to render PDF page."""
         try:
+            # Check if this render is still valid
+            if render_id != self._render_id:
+                return  # Cancelled - newer render requested
+                
             page = self.current_pdf[self.current_page]
 
             # Render to image
             zoom = 1.5
             mat = fitz.Matrix(zoom, zoom)
             pix = page.get_pixmap(matrix=mat)
+
+            # Check again before expensive operations
+            if render_id != self._render_id:
+                return
 
             # Convert to PIL Image
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
@@ -518,6 +556,24 @@ class PDFPreviewPanel(ctk.CTkFrame):
             max_height = 400
             img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
 
+            # Final check before UI update
+            if render_id != self._render_id:
+                return
+
+            # Schedule UI update on main thread
+            self.after(0, lambda i=img, r=render_id: self._apply_rendered_image(i, r))
+
+        except Exception as e:
+            if render_id == self._render_id:
+                self.after(0, lambda err=str(e): self._show_render_error(err))
+
+    def _apply_rendered_image(self, img, render_id: int):
+        """Apply rendered image to UI (must be called on main thread)."""
+        try:
+            # Check if this render is still valid
+            if render_id != self._render_id:
+                return
+                
             # Release old photo_image to prevent memory leak
             if self.photo_image is not None:
                 del self.photo_image
@@ -530,14 +586,20 @@ class PDFPreviewPanel(ctk.CTkFrame):
             img = None
 
             # Update label
+            self._is_loading = False
             self.preview_label.configure(image=self.photo_image, text="")
             self.page_label.configure(
                 text=f"Trang {self.current_page + 1}/{self.total_pages}"
             )
 
         except Exception as e:
-            self.preview_label.configure(text=f"Lỗi render: {e}")
-            logger.error(f"PDF render error: {e}")
+            self._show_render_error(str(e))
+
+    def _show_render_error(self, error: str):
+        """Show render error in UI."""
+        self._is_loading = False
+        self.preview_label.configure(text=f"Lỗi render: {error}")
+        logger.error(f"PDF render error: {error}")
 
     def _prev_page(self):
         """Go to previous page."""
@@ -741,7 +803,19 @@ class FileListPanel(ctk.CTkFrame):
             logger.error(f"Remove completed error: {e}")
 
     def _refresh_display(self):
-        """Refresh the file list display."""
+        """Refresh the file list display with debouncing for large lists."""
+        try:
+            # Debounce: cancel previous scheduled refresh
+            if hasattr(self, '_refresh_job') and self._refresh_job:
+                self.after_cancel(self._refresh_job)
+            
+            # Schedule refresh after 50ms debounce
+            self._refresh_job = self.after(50, self._do_refresh_display)
+        except Exception as e:
+            logger.error(f"Refresh display error: {e}")
+
+    def _do_refresh_display(self):
+        """Actual refresh implementation."""
         try:
             count = len(self.files)
 
@@ -773,17 +847,28 @@ class FileListPanel(ctk.CTkFrame):
                 self.file_textbox.configure(state="normal")
                 self.file_textbox.delete("1.0", "end")
 
-                for i, f in enumerate(self.files, 1):
+                # Progressive rendering: show only first 200 files for performance
+                # with indicator for more
+                MAX_DISPLAY = 200
+                display_files = self.files[:MAX_DISPLAY]
+                
+                # Build text in one batch for performance
+                lines = []
+                for i, f in enumerate(display_files, 1):
                     status_icon = {
                         "pending": f.icon,
                         "converting": "⏳",
                         "completed": "✅",
                         "failed": "❌"
                     }.get(f.status, f.icon)
-
-                    line = f"{status_icon} {i:2d}. {f.filename}\n"
-                    self.file_textbox.insert("end", line)
-
+                    lines.append(f"{status_icon} {i:3d}. {f.filename}")
+                
+                # Add "more files" indicator if truncated
+                if count > MAX_DISPLAY:
+                    lines.append(f"\n... và {count - MAX_DISPLAY} files nữa")
+                
+                # Single insert for performance
+                self.file_textbox.insert("end", "\n".join(lines))
                 self.file_textbox.configure(state="disabled")
 
             # Callback

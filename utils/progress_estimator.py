@@ -185,33 +185,75 @@ class ConversionLogger:
         logger.info(f"ConversionLogger: {len(self.records)} historical records loaded")
 
     def _load_history(self):
-        """Load historical records from file."""
+        """Load historical records from file (supports both JSON and JSONL)."""
         try:
+            # Try JSONL format first (new format)
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            if jsonl_file.exists():
+                with open(jsonl_file, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            try:
+                                record = ConversionRecord.from_dict(json.loads(line))
+                                self.records.append(record)
+                            except Exception:
+                                pass  # Skip malformed lines
+                self.log_file = jsonl_file  # Use JSONL going forward
+                return
+            
+            # Fall back to old JSON format
             if self.log_file.exists():
                 with open(self.log_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     self.records = [ConversionRecord.from_dict(r) for r in data.get('records', [])]
+                # Migrate to JSONL
+                self._migrate_to_jsonl()
         except Exception as e:
             logger.warning(f"Error loading history: {e}")
             self.records = []
 
-    def _save_history(self):
-        """Save records to file."""
+    def _migrate_to_jsonl(self):
+        """Migrate old JSON format to append-only JSONL."""
         try:
-            data = {
-                'version': '1.0',
-                'last_updated': datetime.now().isoformat(),
-                'record_count': len(self.records),
-                'records': [r.to_dict() for r in self.records[-500:]]  # Keep last 500
-            }
-            with open(self.log_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            with open(jsonl_file, 'w', encoding='utf-8') as f:
+                for record in self.records:
+                    f.write(json.dumps(record.to_dict()) + '\n')
+            self.log_file = jsonl_file
+            logger.info(f"Migrated {len(self.records)} records to JSONL format")
+        except Exception as e:
+            logger.warning(f"Error migrating to JSONL: {e}")
+
+    def _save_history(self):
+        """Append-only save - only called for compaction."""
+        # Note: Regular logging uses _append_record()
+        # This is kept for compaction (trimming old records)
+        try:
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            # Keep only last 500 records
+            records_to_save = self.records[-500:]
+            with open(jsonl_file, 'w', encoding='utf-8') as f:
+                for record in records_to_save:
+                    f.write(json.dumps(record.to_dict()) + '\n')
+            self.records = records_to_save
+            logger.debug(f"Compacted history to {len(records_to_save)} records")
         except Exception as e:
             logger.warning(f"Error saving history: {e}")
+
+    def _append_record(self, record: ConversionRecord):
+        """Fast append-only write for new records."""
+        try:
+            jsonl_file = self.log_dir / "conversion_history.jsonl"
+            with open(jsonl_file, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(record.to_dict()) + '\n')
+        except Exception as e:
+            logger.warning(f"Error appending record: {e}")
 
     def log_conversion(self, file_path: str, duration: float, success: bool = True, **kwargs):
         """
         Log a conversion result (minimal data only).
+        Uses append-only logging for performance.
         
         Args:
             file_path: Path to converted file (used to get size)
@@ -228,7 +270,13 @@ class ConversionLogger:
             )
 
             self.records.append(record)
-            self._save_history()
+            
+            # Fast append instead of full rewrite
+            self._append_record(record)
+            
+            # Periodic compaction (every 100 records over limit)
+            if len(self.records) > 600:
+                self._save_history()
 
             logger.debug(f"Logged: {file_size:.2f}MB = {duration:.1f}s")
 

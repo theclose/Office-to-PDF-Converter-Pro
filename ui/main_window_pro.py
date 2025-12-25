@@ -883,7 +883,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.1.4"
+    VERSION = "4.1.5"
 
     def __init__(self):
         super().__init__()
@@ -2180,10 +2180,7 @@ F1         Xem shortcuts
             except Exception as e:
                 logger.debug(f"DB close error: {e}")
             
-            # 4. Destroy window
-            self.destroy()
-            
-            # 5. Force kill any remaining Office processes
+            # 4. Force kill any remaining Office processes
             try:
                 import subprocess
                 subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
@@ -2195,12 +2192,13 @@ F1         Xem shortcuts
             except Exception:
                 pass
             
-            logger.info("Cleanup complete - exiting")
+            logger.info("Cleanup complete - forcing exit")
             
         except Exception as e:
             logger.error(f"Cleanup error: {e}")
         finally:
-            # Force exit to kill any remaining threads
+            # Force exit without calling destroy() to avoid Tcl command errors
+            # os._exit(0) will terminate the process immediately
             import os
             os._exit(0)
 

@@ -778,7 +778,7 @@ class PDFPreviewPanel(ctk.CTkFrame):
                 self.current_pdf = None
             self.photo_image = None
             self.preview_label.configure(
-                image="",
+                image=None,
                 text="Chọn file PDF để xem preview"
             )
             self.page_label.configure(text="")

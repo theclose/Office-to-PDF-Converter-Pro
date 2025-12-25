@@ -883,7 +883,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.1.3"
+    VERSION = "4.1.4"
 
     def __init__(self):
         super().__init__()
@@ -2152,12 +2152,57 @@ F1         Xem shortcuts
         self.after(100, do_restore)
 
     def _on_closing(self):
-        """Cleanup on close."""
+        """Cleanup on close with forced termination."""
         try:
-            release_pool()
-        except Exception:
-            pass
-        self.destroy()
+            logger.info("Application closing - starting cleanup")
+            
+            # 1. Stop conversion engine if running
+            if self.engine and self.is_converting:
+                logger.info("Stopping conversion engine...")
+                self.engine.stop(force=True)
+                # Wait a bit for threads to finish
+                import time
+                time.sleep(0.5)
+            
+            # 2. Release COM pool
+            try:
+                release_pool()
+                logger.info("COM pool released")
+            except Exception as e:
+                logger.debug(f"COM pool release error: {e}")
+            
+            # 3. Close database connection
+            try:
+                if hasattr(self, 'db') and self.db:
+                    if hasattr(self.db, '_conn') and self.db._conn:
+                        self.db._conn.close()
+                    logger.info("Database connection closed")
+            except Exception as e:
+                logger.debug(f"DB close error: {e}")
+            
+            # 4. Destroy window
+            self.destroy()
+            
+            # 5. Force kill any remaining Office processes
+            try:
+                import subprocess
+                subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                             stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                subprocess.run(['taskkill', '/F', '/IM', 'WINWORD.EXE'], 
+                             stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                subprocess.run(['taskkill', '/F', '/IM', 'POWERPNT.EXE'], 
+                             stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            except Exception:
+                pass
+            
+            logger.info("Cleanup complete - exiting")
+            
+        except Exception as e:
+            logger.error(f"Cleanup error: {e}")
+        finally:
+            # Force exit to kill any remaining threads
+            import os
+            os._exit(0)
 
 
 # ============================================================================

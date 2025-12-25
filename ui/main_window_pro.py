@@ -1169,6 +1169,9 @@ class ConverterProApp(ctk.CTk):
         # Setup drag and drop
         self._setup_drag_drop()
 
+        # Fix for window restore after minimize (windnd compatibility)
+        self.bind('<Map>', self._on_window_restore)
+        
         # Cleanup
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
@@ -2402,6 +2405,22 @@ F1         Xem shortcuts
             messagebox.showinfo("Phím tắt", shortcuts)
         except Exception as e:
             logger.error(f"Show shortcuts error: {e}")
+
+    def _on_window_restore(self, event=None):
+        """Handle window restore after minimize - fix for windnd compatibility."""
+        try:
+            # Ensure window is properly visible after restore
+            self.lift()
+            self.focus_force()
+            
+            # Re-register drag and drop if needed (windnd sometimes loses it)
+            if HAS_WINDND:
+                try:
+                    windnd.hook_dropfiles(self, func=self._handle_drop)
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.debug(f"Window restore handler: {e}")
 
     def _on_closing(self):
         """Cleanup on close."""

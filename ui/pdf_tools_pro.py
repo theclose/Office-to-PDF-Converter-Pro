@@ -101,31 +101,38 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         # Set the correct tab based on last operation
         self._switch_to_operation_tab(last_op)
 
-        # Modal behavior
+        # Non-modal: just keep on top of parent, don't lock input
+        # This fixes the minimize/restore issue
         self.transient(parent)
-        self.grab_set()
+        # Remove grab_set() to allow proper minimize/restore behavior
+        # self.grab_set()  # Removed - causes minimize issues
 
         # Save operation when closing
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         
-        # Fix for window restore after minimize (windnd compatibility)
-        self._restore_scheduled = False
+        # Bind Unmap (minimize) and Map (restore) events for state handling
+        self.bind('<Unmap>', self._on_window_minimize)
         self.bind('<Map>', self._on_window_restore)
+        self._is_minimized = False
+
+    def _on_window_minimize(self, event=None):
+        """Handle window minimize."""
+        self._is_minimized = True
 
     def _on_window_restore(self, event=None):
-        """Handle window restore after minimize - simple refresh."""
-        if self._restore_scheduled:
+        """Handle window restore after minimize."""
+        if not self._is_minimized:
             return
-        self._restore_scheduled = True
+        self._is_minimized = False
         
-        def do_restore():
-            try:
-                self._restore_scheduled = False
-                self.update_idletasks()
-            except Exception:
-                pass
-        
-        self.after(100, do_restore)
+        try:
+            # Force window to front and refresh
+            self.deiconify()
+            self.lift()
+            self.focus_force()
+            self.update_idletasks()
+        except Exception:
+            pass
 
     def _on_close(self):
         """Save last operation and close."""

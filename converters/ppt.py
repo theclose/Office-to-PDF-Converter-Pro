@@ -29,7 +29,7 @@ class PPTConverter(BaseConverter):
                  progress_callback: Optional[Callable[[float], None]] = None):
         super().__init__(log_callback, progress_callback)
         self._ppt = None
-        self._use_pool = False
+        self._use_pool = True  # Re-enabled with health check protection
 
     def initialize(self) -> bool:
         """Get PowerPoint COM from pool."""

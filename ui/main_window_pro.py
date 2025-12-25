@@ -35,11 +35,16 @@ if root_dir not in sys.path:
 
 from office_converter.utils.logging_setup import setup_logging
 from office_converter.utils.config import Config
+from office_converter.utils.com_pool import release_pool
+# Lazy: pdf_tools and converters are loaded on-demand
+# from office_converter.utils.pdf_tools import ... -> Moved to functions
+# from office_converter.converters import ExcelConverter -> Moved to _convert_single
+
+# PDF tools - loaded at module level for preview panel
 from office_converter.utils.pdf_tools import (
     post_process_pdf, rasterize_pdf, parse_page_range, extract_pdf_pages, HAS_PYMUPDF
 )
-from office_converter.utils.com_pool import release_pool
-from office_converter.converters import get_converter_for_file, ExcelConverter
+from office_converter.converters import get_converter_for_file  # Lightweight lookup only
 
 # Setup logging
 logger = setup_logging()
@@ -363,8 +368,8 @@ class ConversionEngine:
                 logger.error(f"Failed to initialize converter for: {conv_file.path}")
                 return False
 
-            # Excel with sheet indices
-            if isinstance(converter, ExcelConverter) and options.sheet_indices:
+            # Excel with sheet indices (check by name to avoid eager import)
+            if converter.__class__.__name__ == "ExcelConverter" and options.sheet_indices:
                 success = converter.convert(
                     conv_file.path,
                     conv_file.output_path,

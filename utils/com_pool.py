@@ -44,6 +44,43 @@ class COMPool:
                     cls._instance = super().__new__(cls)
         return cls._instance
 
+    def _is_excel_alive(self) -> bool:
+        """Check if Excel instance is still alive and responsive."""
+        if self._excel is None:
+            return False
+        try:
+            # Try to access a simple property - if COM server is dead, this fails
+            _ = self._excel.Version
+            return True
+        except Exception:
+            logger.warning("Excel COM instance is dead, will recreate")
+            self._excel = None
+            return False
+
+    def _is_word_alive(self) -> bool:
+        """Check if Word instance is still alive and responsive."""
+        if self._word is None:
+            return False
+        try:
+            _ = self._word.Version
+            return True
+        except Exception:
+            logger.warning("Word COM instance is dead, will recreate")
+            self._word = None
+            return False
+
+    def _is_ppt_alive(self) -> bool:
+        """Check if PowerPoint instance is still alive and responsive."""
+        if self._ppt is None:
+            return False
+        try:
+            _ = self._ppt.Version
+            return True
+        except Exception:
+            logger.warning("PowerPoint COM instance is dead, will recreate")
+            self._ppt = None
+            return False
+
     def get_excel(self, _retry_count: int = 0) -> Optional[Any]:
         """Get or create Excel COM instance."""
         if _retry_count >= self.MAX_RETRY:
@@ -51,6 +88,10 @@ class COMPool:
             return None
 
         with self._lock:
+            # Health check existing instance
+            if self._excel is not None and not self._is_excel_alive():
+                self._excel = None
+            
             if self._excel is None:
                 try:
                     pythoncom.CoInitialize()
@@ -77,6 +118,10 @@ class COMPool:
             return None
 
         with self._lock:
+            # Health check existing instance
+            if self._word is not None and not self._is_word_alive():
+                self._word = None
+            
             if self._word is None:
                 try:
                     pythoncom.CoInitialize()
@@ -103,6 +148,10 @@ class COMPool:
             return None
 
         with self._lock:
+            # Health check existing instance
+            if self._ppt is not None and not self._is_ppt_alive():
+                self._ppt = None
+            
             if self._ppt is None:
                 try:
                     pythoncom.CoInitialize()

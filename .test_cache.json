@@ -558,5 +558,1265 @@
     "hash": "4e71897e2495dd7f4db3779e1a97ba30",
     "test_file": "tests\\test_generated_watchdog_v2.py",
     "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::split_excel": {
+    "hash": "8b9eb639547877f88e4bce8aba0489b3",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::merge_excel": {
+    "hash": "619c6b261476dd27018a1aaf17dc51ab",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::get_sheet_names": {
+    "hash": "c9c9ad829481bde4f97c157050066979",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::get_sheet_info": {
+    "hash": "c6d06d1c8f190739c3e905a9d0eb619d",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::excel_to_csv": {
+    "hash": "2f1b8f6be10d1a727931cd1147e64774",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::csv_to_excel": {
+    "hash": "3a664776394cc2708aae734930966dc4",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::protect_sheets": {
+    "hash": "6e7bf2fd2c4b8d84e3e17b25d6cb4a7d",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::unprotect_sheets": {
+    "hash": "3be89b773a690a0a7f5907931e00939a",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\excel_tools.py::rename_sheets": {
+    "hash": "a938f9ca990cff95d9c8897e01e7cfbd",
+    "test_file": "tests\\test_generated_excel_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.304329"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::merge_pdfs": {
+    "hash": "abf23f4bf4f61602aa336b2159029afa",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::split_pdf": {
+    "hash": "6c5bb815301762c1178bc098e520ef88",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::protect_pdf": {
+    "hash": "91bdb0807061056c02dcdcb86df24f43",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::post_process_pdf": {
+    "hash": "ebd28cf2a1fc8390ca5450a579674a8e",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::rasterize_pdf": {
+    "hash": "717e8586559ca3fa63700fb86248616b",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::compress_pdf": {
+    "hash": "4e2c2e0177922fd67cc54e5166252e2d",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::add_watermark": {
+    "hash": "45851a0f40a8a1d00d601dc97d13f9e4",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::pdf_to_images": {
+    "hash": "f8e87348c7755b1cbed4a4ce22d06300",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::images_to_pdf": {
+    "hash": "9bb161185880d90384bbf90547d542c9",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::rotate_pages": {
+    "hash": "b623fd3ec2b4735d631ece6c2f89abde",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::parse_page_range": {
+    "hash": "a9a29275452e84cd7e0b08661cd0cf5b",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::extract_pages": {
+    "hash": "54d5bd1983ab81e5a281141e344b5f0c",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::delete_pages": {
+    "hash": "13ab7a79fb06d799be4fb777448103c8",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::reorder_pages": {
+    "hash": "421c870623bc11e22bee65f37125ed5d",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::reverse_pages": {
+    "hash": "839a76fb9726a20bce8d51a766041d0a",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\pdf_tools.py::extract_pdf_pages": {
+    "hash": "c2e8556e772106b745f813383917c863",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.312376"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::remove_vietnamese_accents": {
+    "hash": "5ecf2d3b03e3b036dd287858abd01d67",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::has_changed": {
+    "hash": "00497e4d37c7730552ef9a5ec3abc678",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::apply": {
+    "hash": "7fe2ef72110df6e2a2c6b22e7718720f",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::description": {
+    "hash": "6834509f2e53400aa791e65a33539a6f",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::find_empty_folders": {
+    "hash": "3800f382d0858d35c10e7404f1c7e4f8",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::delete_folders": {
+    "hash": "bcc07cc658ad6308ae8ba7e405d3023f",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::set_dates": {
+    "hash": "cb6975d3f47abfe4e3782efc7205f331",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::set_attributes": {
+    "hash": "7577fd8e9f9ddef8d2c34d856253412c",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::abort": {
+    "hash": "216b3500d314b259143cef0c30a80738",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::find_duplicates": {
+    "hash": "044c044a5b36008322d53f0ae3778639",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::log": {
+    "hash": "878f1289d4bf8df911b51b3161464d85",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::get_last_transaction": {
+    "hash": "3c81212a20439d3633bf74a91d96a198",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::remove_transaction_file": {
+    "hash": "d0b47756e6e0be255de580925e193837",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::add_rule": {
+    "hash": "e570c80fb5eaf842509ddfd7b9461985",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::clear_rules": {
+    "hash": "4e0ae9ce77aa83b3b2233c315bbf083a",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::undo_last_transaction": {
+    "hash": "4955bdf052da58c80979abfdc79343fe",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::preview": {
+    "hash": "685391f3fd4f213c3e9b78a4e0161890",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\core\\file_tools.py::execute": {
+    "hash": "a5780cdace780fa94ef36f7bd0f26c94",
+    "test_file": "tests\\test_generated_file_tools_v2.py",
+    "timestamp": "2025-12-26T23:17:47.324390"
+  },
+  "C:\\Auto\\office_converter\\converters\\ppt.py::__init__": {
+    "hash": "76aeb79ab68b807b6e930192ce0bd19c",
+    "test_file": "tests\\test_generated_ppt_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\ppt.py::initialize": {
+    "hash": "8977114b6829dd620691681c76182bdb",
+    "test_file": "tests\\test_generated_ppt_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\ppt.py::cleanup": {
+    "hash": "ab006fec0cba22e45067c50cc37a3c92",
+    "test_file": "tests\\test_generated_ppt_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\ppt.py::convert": {
+    "hash": "350cbac26ef9e9f96a21173fcf927899",
+    "test_file": "tests\\test_generated_ppt_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\excel.py::__init__": {
+    "hash": "76aeb79ab68b807b6e930192ce0bd19c",
+    "test_file": "tests\\test_generated_excel_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\excel.py::initialize": {
+    "hash": "8977114b6829dd620691681c76182bdb",
+    "test_file": "tests\\test_generated_excel_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\excel.py::cleanup": {
+    "hash": "ab006fec0cba22e45067c50cc37a3c92",
+    "test_file": "tests\\test_generated_excel_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\excel.py::convert": {
+    "hash": "e8f3759c33ecf7f9e5886dae96b13bca",
+    "test_file": "tests\\test_generated_excel_v2.py",
+    "timestamp": "2025-12-26T23:17:48.667980"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::find_libreoffice": {
+    "hash": "d5c202d22a4a6c116edc20549c73cfd1",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::is_libreoffice_available": {
+    "hash": "24726a59fcca6c3312a51757b22cd49c",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::get_libreoffice_version": {
+    "hash": "8332ea50f62e157920b546e5df7eba3a",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::initialize": {
+    "hash": "8977114b6829dd620691681c76182bdb",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::convert": {
+    "hash": "350cbac26ef9e9f96a21173fcf927899",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\libreoffice.py::cleanup": {
+    "hash": "ab006fec0cba22e45067c50cc37a3c92",
+    "test_file": "tests\\test_generated_libreoffice_v2.py",
+    "timestamp": "2025-12-26T23:17:48.673518"
+  },
+  "C:\\Auto\\office_converter\\converters\\word.py::__init__": {
+    "hash": "76aeb79ab68b807b6e930192ce0bd19c",
+    "test_file": "tests\\test_generated_word_v2.py",
+    "timestamp": "2025-12-26T23:17:48.687245"
+  },
+  "C:\\Auto\\office_converter\\converters\\word.py::initialize": {
+    "hash": "8977114b6829dd620691681c76182bdb",
+    "test_file": "tests\\test_generated_word_v2.py",
+    "timestamp": "2025-12-26T23:17:48.687245"
+  },
+  "C:\\Auto\\office_converter\\converters\\word.py::cleanup": {
+    "hash": "ab006fec0cba22e45067c50cc37a3c92",
+    "test_file": "tests\\test_generated_word_v2.py",
+    "timestamp": "2025-12-26T23:17:48.687245"
+  },
+  "C:\\Auto\\office_converter\\converters\\word.py::convert": {
+    "hash": "350cbac26ef9e9f96a21173fcf927899",
+    "test_file": "tests\\test_generated_word_v2.py",
+    "timestamp": "2025-12-26T23:17:48.687245"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::ensure_com_initialized": {
+    "hash": "0c7348488dd6d6791c6b358feaa9bfeb",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::release_com": {
+    "hash": "cbdd12c667ed9d8f5a82e66342e8a1d2",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::get_converter_for_file": {
+    "hash": "1a85d5aab600582bc3b55d21ccfc7d4f",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::get_best_converter": {
+    "hash": "d862c2208db00e96644ac41f3b99f405",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::__init__": {
+    "hash": "76aeb79ab68b807b6e930192ce0bd19c",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::log": {
+    "hash": "8e2a6524c950065df9d012f945c7a9aa",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::update_progress": {
+    "hash": "8ce37cbb874e29a4d2ddb42161c43900",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::supports_file": {
+    "hash": "a5a2e4c3c296deef56b2098176b53847",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::initialize": {
+    "hash": "8977114b6829dd620691681c76182bdb",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::convert": {
+    "hash": "ffa3396e942af8efdd03bd58c794897a",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\converters\\base.py::cleanup": {
+    "hash": "ab006fec0cba22e45067c50cc37a3c92",
+    "test_file": "tests\\test_generated_base_v2.py",
+    "timestamp": "2025-12-26T23:17:48.689247"
+  },
+  "C:\\Auto\\office_converter\\grid\\models.py::with_status": {
+    "hash": "d5292657b55270ebb3982e8a0bdbe79f",
+    "test_file": "tests\\test_generated_models_v2.py",
+    "timestamp": "2025-12-26T23:17:50.154402"
+  },
+  "C:\\Auto\\office_converter\\grid\\models.py::compute_timeout": {
+    "hash": "def1846787bcb4037d5b8e221d3c922c",
+    "test_file": "tests\\test_generated_models_v2.py",
+    "timestamp": "2025-12-26T23:17:50.154402"
+  },
+  "C:\\Auto\\office_converter\\grid\\models.py::should_allow_attempt": {
+    "hash": "ef3a280c40edd8ae0be4b1dfd51ddcb0",
+    "test_file": "tests\\test_generated_models_v2.py",
+    "timestamp": "2025-12-26T23:17:50.154402"
+  },
+  "C:\\Auto\\office_converter\\grid\\models.py::record_failure": {
+    "hash": "e73685903276c32921cdb30f40752589",
+    "test_file": "tests\\test_generated_models_v2.py",
+    "timestamp": "2025-12-26T23:17:50.154402"
+  },
+  "C:\\Auto\\office_converter\\grid\\models.py::record_success": {
+    "hash": "b64c801fbd11e9495afda99e5bc140c0",
+    "test_file": "tests\\test_generated_models_v2.py",
+    "timestamp": "2025-12-26T23:17:50.154402"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::__init__": {
+    "hash": "302e63d2c5371fbaa62b433fd8c3160b",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::should_allow_attempt": {
+    "hash": "b058d27e730a2ce28b5663161f3abf77",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::record_failure": {
+    "hash": "05f4fa893de5ad0eb6f913a5923fa9d7",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::record_success": {
+    "hash": "1ab09266035a87069e6aca4f9e36a119",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::get_circuit_state": {
+    "hash": "4624139dbee812fbdb6dd06063d4bd4c",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::reset_circuit": {
+    "hash": "35a9b93614a9c34125787e82e30f99b4",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\circuit_breaker.py::cleanup_old_circuits": {
+    "hash": "b7c33225560e2a95a38985a048d02168",
+    "test_file": "tests\\test_generated_circuit_breaker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.167045"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::__init__": {
+    "hash": "c8acb2a89eb21152738514a308b91aa2",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::start": {
+    "hash": "f919aa17168466c11294eac020412cee",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::enqueue": {
+    "hash": "359f7771d29808610a077baaed2c8432",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::enqueue_batch": {
+    "hash": "ec4334d87ec7d4ca1aa849a87273c4a2",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::is_active": {
+    "hash": "695d5b44d5dc9d3cdd46336034a23b6e",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::wait_completion": {
+    "hash": "5664b23640b9802de2ebe9d0c66eb370",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::shutdown": {
+    "hash": "3ed55834ad26b1084dda43f909522685",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\grid.py::dispatch_loop": {
+    "hash": "65fb191e34e576259447b3a687d4dbc5",
+    "test_file": "tests\\test_generated_grid_v2.py",
+    "timestamp": "2025-12-26T23:17:50.168610"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::__init__": {
+    "hash": "d6abe6d7a898859687bae4c27988c8c7",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::start": {
+    "hash": "f919aa17168466c11294eac020412cee",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::submit": {
+    "hash": "faa393a9b67667783e0ee51fce1a5007",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::submit_batch": {
+    "hash": "6bd9fae2e130ac4a1f33152e6d1a036c",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::get_result": {
+    "hash": "eafd97c5330d8cf83deae717d28bfd09",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::is_idle": {
+    "hash": "1f9f5c4639edf7d388d8b9241245d51c",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::shutdown": {
+    "hash": "3ed55834ad26b1084dda43f909522685",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::monitor_loop": {
+    "hash": "c839cc0d5991128e4ad3a30001718f94",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\pool.py::process_loop": {
+    "hash": "05c4d4ca145c9390136dfffc74395db9",
+    "test_file": "tests\\test_generated_pool_v2.py",
+    "timestamp": "2025-12-26T23:17:50.188647"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::__init__": {
+    "hash": "11d5f294191d97203c81cceddd7e4ab3",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::add": {
+    "hash": "7417cd71e45d674df523a14e5c090b85",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::contains": {
+    "hash": "2614be1f3cdd0fcd2abce437e9993a63",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::contains_with_confidence": {
+    "hash": "98aad9d3afedb9adf77aaf968d818382",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::remove": {
+    "hash": "5a62abbc52a595ccd99a8ec78fe4f735",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::clear": {
+    "hash": "a1682d6bf9c4818629dd8bb72ec72275",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::rebuild_from_exact": {
+    "hash": "0a96d1e2874f43f6a469536d14a3a4d0",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::estimated_fpr": {
+    "hash": "091059c972c753a6dc66d67c3d9db1d6",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\quarantine.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_quarantine_v2.py",
+    "timestamp": "2025-12-26T23:17:50.204217"
+  },
+  "C:\\Auto\\office_converter\\grid\\worker.py::__init__": {
+    "hash": "ebe5c3dc4b4127bc81e29f7fa321a10e",
+    "test_file": "tests\\test_generated_worker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.215422"
+  },
+  "C:\\Auto\\office_converter\\grid\\worker.py::run": {
+    "hash": "eec06cefb04f46ae68ea95b5695d7089",
+    "test_file": "tests\\test_generated_worker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.215422"
+  },
+  "C:\\Auto\\office_converter\\grid\\worker.py::shutdown": {
+    "hash": "3ed55834ad26b1084dda43f909522685",
+    "test_file": "tests\\test_generated_worker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.215422"
+  },
+  "C:\\Auto\\office_converter\\grid\\worker.py::target": {
+    "hash": "6b98e46161aad49244151911ae7f72ef",
+    "test_file": "tests\\test_generated_worker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.215422"
+  },
+  "C:\\Auto\\office_converter\\grid\\worker.py::timeout_handler": {
+    "hash": "8562a13d7995a1acbcd15cb8e1b247d0",
+    "test_file": "tests\\test_generated_worker_v2.py",
+    "timestamp": "2025-12-26T23:17:50.215422"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\bridge.py::__init__": {
+    "hash": "8f3db99dc8c8a4e58ad956fcc92243d5",
+    "test_file": "tests\\test_generated_bridge_v2.py",
+    "timestamp": "2025-12-26T23:17:50.226964"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\bridge.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_bridge_v2.py",
+    "timestamp": "2025-12-26T23:17:50.226964"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::install_shim_layer": {
+    "hash": "3ad0f386a3d4e07cd596cc7dba886f8e",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::uninstall_shim_layer": {
+    "hash": "0841315da17184a7e0e00dfde22a431a",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::is_shim_installed": {
+    "hash": "25735458ef92c56c94427499f07d5da5",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::verify_neutralization": {
+    "hash": "f8c7065d26c503f6b8a6cbdd95b13a11",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::get_shim_stats": {
+    "hash": "2ed86c057daa939214a397d1982329d3",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::__init__": {
+    "hash": "e5e441f795446953547c21f70ffb04d4",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::create_module": {
+    "hash": "ee3122bee371096c246b0d90dc018f77",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::exec_module": {
+    "hash": "86950db442778c79e99626168aedbc4d",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::load_module": {
+    "hash": "51d20858eb4e042fca540feac0501ddc",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::find_spec": {
+    "hash": "761e436b8fc9289a1e209d51b03048fe",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\shim.py::find_module": {
+    "hash": "70af8802b6267346215c677e258af00e",
+    "test_file": "tests\\test_generated_shim_v2.py",
+    "timestamp": "2025-12-26T23:17:50.231472"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::enqueue": {
+    "hash": "77d4ee89d27931cc3f41006980e3193e",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::enqueue_batch": {
+    "hash": "ec4334d87ec7d4ca1aa849a87273c4a2",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::dequeue": {
+    "hash": "eb27713ed494de4fa50ab2215e1258f9",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::peek": {
+    "hash": "5ecdbd8f78883226b2978857811a0e27",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::peek_batch": {
+    "hash": "b8ac83d118c8b4af29626bf9870d82b3",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::remove": {
+    "hash": "5fc8709c28dddaf39678858674388699",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::clear": {
+    "hash": "9cac65efab3581985c27944d7ba7bac4",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::cluster_distribution": {
+    "hash": "2869ec87ee581c0752865b98937119c5",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::total_enqueued": {
+    "hash": "aa33242e379d590626066c54a1ed8cb0",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::is_empty": {
+    "hash": "e1db6f12577842e6b390e6766aae01b5",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\scheduler.py::drain": {
+    "hash": "4e3cc1d0f45df30a2a5fe1c842f3fea2",
+    "test_file": "tests\\test_generated_scheduler_v2.py",
+    "timestamp": "2025-12-26T23:17:50.244377"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\reactor_app.py::main": {
+    "hash": "edb53a45d9df6243ff168fee09e9649e",
+    "test_file": "tests\\test_generated_reactor_app_v2.py",
+    "timestamp": "2025-12-26T23:17:50.264760"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\reactor_app.py::__init__": {
+    "hash": "78bdfd656246b3e735bae160e45e03a2",
+    "test_file": "tests\\test_generated_reactor_app_v2.py",
+    "timestamp": "2025-12-26T23:17:50.264760"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::percent": {
+    "hash": "7775c87096d8478047b5e0b5ed5c7f14",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::__init__": {
+    "hash": "4dcd79a8e128b265692e8ca42a3f5351",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::subscribe": {
+    "hash": "eb2c6330770e074c98d7cc048780fa24",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::unsubscribe": {
+    "hash": "cb3999a5631d44ec70cdb8612c3f309b",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::publish": {
+    "hash": "35c4098e4189789b5ab69ac2a70c0096",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::publish_async": {
+    "hash": "d3fdbc5a0b133600d1f62cff8301b387",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\events.py::on_event": {
+    "hash": "9cb2dfc582f0e9abbfdb1d9e6238a686",
+    "test_file": "tests\\test_generated_events_v2.py",
+    "timestamp": "2025-12-26T23:17:50.278999"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::add_optimistic": {
+    "hash": "49c7d1a1ab825a9d5e164375b7369952",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::reconcile": {
+    "hash": "3ad8f63dd9a4826fd69e8209c1de06af",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::mark_failed": {
+    "hash": "38c632f12e072561eb7251d679f0ab8e",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::remove_optimistic": {
+    "hash": "c924041c4816b33d3cd09ae83a199e3a",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::get_merged_items": {
+    "hash": "346aefcb14ca342a341b1ae5693213aa",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::cleanup_old": {
+    "hash": "756e0383a8f3295c8f46040de8e6607e",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\optimistic.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_optimistic_v2.py",
+    "timestamp": "2025-12-26T23:17:50.287104"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::execute": {
+    "hash": "7c339bf67e8494c3a629e7ec0fa9dd5f",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::validate": {
+    "hash": "596055f7dfc08c3de4104d488f8a395a",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::__init__": {
+    "hash": "047b1862036c7d030e639c546413847b",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::execute_async": {
+    "hash": "4369c112903ac7af68cc4529ed16a842",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::execute_sync": {
+    "hash": "c18ed3f2f4794f640f88712eb615f63d",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::get_history": {
+    "hash": "32f8673dd2b0c510a9acc4edc9a93111",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::get_stats": {
+    "hash": "309ecd489a14895ede1657fca9e79ed4",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\commands.py::shutdown": {
+    "hash": "3ed55834ad26b1084dda43f909522685",
+    "test_file": "tests\\test_generated_commands_v2.py",
+    "timestamp": "2025-12-26T23:17:50.294611"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\virtual_list.py::default_file_renderer": {
+    "hash": "74127d55ef4daebaf313cbfa7dd03215",
+    "test_file": "tests\\test_generated_virtual_list_v2.py",
+    "timestamp": "2025-12-26T23:17:50.299673"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\virtual_list.py::__init__": {
+    "hash": "73d2853bac1960de6b30c18f3d217b4a",
+    "test_file": "tests\\test_generated_virtual_list_v2.py",
+    "timestamp": "2025-12-26T23:17:50.299673"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\virtual_list.py::set_items": {
+    "hash": "854db26d77d9abd7fc2fe5cde54436f2",
+    "test_file": "tests\\test_generated_virtual_list_v2.py",
+    "timestamp": "2025-12-26T23:17:50.299673"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\virtual_list.py::get_selected_item": {
+    "hash": "2375b517913912d3946140333e4a4dab",
+    "test_file": "tests\\test_generated_virtual_list_v2.py",
+    "timestamp": "2025-12-26T23:17:50.299673"
+  },
+  "C:\\Auto\\office_converter\\grid\\reactor\\virtual_list.py::clear": {
+    "hash": "a1682d6bf9c4818629dd8bb72ec72275",
+    "test_file": "tests\\test_generated_virtual_list_v2.py",
+    "timestamp": "2025-12-26T23:17:50.299673"
+  },
+  "C:\\Auto\\office_converter\\ui\\dialogs.py::show_settings": {
+    "hash": "49eb456cb42a60b0c48cf385d49e48a4",
+    "test_file": "tests\\test_generated_dialogs_v2.py",
+    "timestamp": "2025-12-26T23:17:51.752916"
+  },
+  "C:\\Auto\\office_converter\\ui\\dialogs.py::__init__": {
+    "hash": "32f7b4d485af993c3313368a523d11d0",
+    "test_file": "tests\\test_generated_dialogs_v2.py",
+    "timestamp": "2025-12-26T23:17:51.752916"
+  },
+  "C:\\Auto\\office_converter\\ui\\dialogs.py::update_label": {
+    "hash": "053c24ae229236a90b00a92e53474ba8",
+    "test_file": "tests\\test_generated_dialogs_v2.py",
+    "timestamp": "2025-12-26T23:17:51.752916"
+  },
+  "C:\\Auto\\office_converter\\ui\\file_tools_ui_v2.py::__init__": {
+    "hash": "983628855f522b2550a3d2786db2f0b3",
+    "test_file": "tests\\test_generated_file_tools_ui_v2_v2.py",
+    "timestamp": "2025-12-26T23:17:51.752916"
+  },
+  "C:\\Auto\\office_converter\\ui\\file_tools_ui_v2.py::run_scan": {
+    "hash": "73ed8006de89d8decf1bc9fedcb0d7cf",
+    "test_file": "tests\\test_generated_file_tools_ui_v2_v2.py",
+    "timestamp": "2025-12-26T23:17:51.752916"
+  },
+  "C:\\Auto\\office_converter\\ui\\excel_tools_ui.py::__init__": {
+    "hash": "d363f7dffd7db360cdc93cc1e7cfa2a6",
+    "test_file": "tests\\test_generated_excel_tools_ui_v2.py",
+    "timestamp": "2025-12-26T23:17:51.758956"
+  },
+  "C:\\Auto\\office_converter\\ui\\excel_tools_ui.py::on_progress": {
+    "hash": "9aa0d03b35d1d9c135e505c424489965",
+    "test_file": "tests\\test_generated_excel_tools_ui_v2.py",
+    "timestamp": "2025-12-26T23:17:51.758956"
+  },
+  "C:\\Auto\\office_converter\\ui\\file_tools_ui.py::__init__": {
+    "hash": "983628855f522b2550a3d2786db2f0b3",
+    "test_file": "tests\\test_generated_file_tools_ui_v2.py",
+    "timestamp": "2025-12-26T23:17:51.799966"
+  },
+  "C:\\Auto\\office_converter\\ui\\file_tools_ui.py::destroy": {
+    "hash": "a6558fea3b76e0268a33101bd1f07ddf",
+    "test_file": "tests\\test_generated_file_tools_ui_v2.py",
+    "timestamp": "2025-12-26T23:17:51.799966"
+  },
+  "C:\\Auto\\office_converter\\ui\\file_tools_ui.py::center_window": {
+    "hash": "103d718dd3ba715d7eb0a00ab84a0efa",
+    "test_file": "tests\\test_generated_file_tools_ui_v2.py",
+    "timestamp": "2025-12-26T23:17:51.799966"
+  },
+  "C:\\Auto\\office_converter\\ui\\pdf_tools_dialog.py::show_pdf_tools_dialog": {
+    "hash": "b8de00a6a72affe47ac8260464ab9f5e",
+    "test_file": "tests\\test_generated_pdf_tools_dialog_v2.py",
+    "timestamp": "2025-12-26T23:17:51.831643"
+  },
+  "C:\\Auto\\office_converter\\ui\\pdf_tools_dialog.py::__init__": {
+    "hash": "d363f7dffd7db360cdc93cc1e7cfa2a6",
+    "test_file": "tests\\test_generated_pdf_tools_dialog_v2.py",
+    "timestamp": "2025-12-26T23:17:51.831643"
+  },
+  "C:\\Auto\\office_converter\\ui\\pdf_tools_dialog.py::open_folder": {
+    "hash": "fa9750a494c7b4612d246f3fdee59afd",
+    "test_file": "tests\\test_generated_pdf_tools_dialog_v2.py",
+    "timestamp": "2025-12-26T23:17:51.831643"
+  },
+  "C:\\Auto\\office_converter\\ui\\pdf_tools_pro.py::show_pdf_tools_pro": {
+    "hash": "20d7b40fbf8b7205cf8b4da75d24ccf4",
+    "test_file": "tests\\test_generated_pdf_tools_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.876278"
+  },
+  "C:\\Auto\\office_converter\\ui\\pdf_tools_pro.py::__init__": {
+    "hash": "d363f7dffd7db360cdc93cc1e7cfa2a6",
+    "test_file": "tests\\test_generated_pdf_tools_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.876278"
+  },
+  "C:\\Auto\\office_converter\\ui\\pdf_tools_pro.py::update_dpi_label": {
+    "hash": "539d00aafab25bc60e8fa716f3023c19",
+    "test_file": "tests\\test_generated_pdf_tools_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.876278"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::main": {
+    "hash": "edb53a45d9df6243ff168fee09e9649e",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::start_pulse": {
+    "hash": "f640f7b0e8b66853ec441a9d4535209b",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::stop_pulse": {
+    "hash": "0994a7108d057a9f0a9e7d82a15afe61",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::update_distribution": {
+    "hash": "fa3612136b9dfe6c437dab4a458a5d7a",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::log": {
+    "hash": "8e2a6524c950065df9d012f945c7a9aa",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::add_files": {
+    "hash": "a4a39ba7b33b72acc375fec88b7cd016",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::add_folder": {
+    "hash": "2065d595291aedd48a97fd3c5983fd15",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::clear_list": {
+    "hash": "d3795886da1e485d226cf480320bccb7",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::delete_selected": {
+    "hash": "ff86b1f0e46d41b4ee107a342ea320f3",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::select_output_folder": {
+    "hash": "63bcd6942c4d62d73dfee4b7a80976d9",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::start_conversion": {
+    "hash": "7c6dc9763a1038cc95993e3bcd1ccdbc",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_ctk.py::open_pdf_tools": {
+    "hash": "7df6e8b47472da934ab634a28245f564",
+    "test_file": "tests\\test_generated_main_window_ctk_v2.py",
+    "timestamp": "2025-12-26T23:17:51.888910"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::main": {
+    "hash": "edb53a45d9df6243ff168fee09e9649e",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::filename": {
+    "hash": "f4da19167d8de148fd750a4b16bde271",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::icon": {
+    "hash": "8c58b73169d8356b4e6be59f2c47264c",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::stop": {
+    "hash": "ac0a2ce50e6a93cdf5e459557bb13265",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::reset": {
+    "hash": "83f70fbca8c7585c6e54b9e408e18499",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::convert_batch": {
+    "hash": "0c281dc213e43bbb4fd7317214496209",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::get_selected_files": {
+    "hash": "8f9dca448afbf9e727a59f61b9139f32",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::add_files": {
+    "hash": "2c335deb165627356839ce9082fb4fc6",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::clear": {
+    "hash": "a1682d6bf9c4818629dd8bb72ec72275",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::remove_completed": {
+    "hash": "6abf99bbac3fa3bb505ca904dd832729",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::do_restore": {
+    "hash": "662fb2834ef2b761a21b1e0dbbccd7ad",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::add_all": {
+    "hash": "8c596771863b6d219fb9f73dbc8415a9",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window_pro.py::animate_step": {
+    "hash": "6218506c7cdea3fbed3568674b45010c",
+    "test_file": "tests\\test_generated_main_window_pro_v2.py",
+    "timestamp": "2025-12-26T23:17:51.917917"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::main": {
+    "hash": "edb53a45d9df6243ff168fee09e9649e",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::__init__": {
+    "hash": "71a1ec48ea1f3831e0693b62ee047382",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::toggle_theme": {
+    "hash": "f52b2ecaf48f2e8d5fcaab739ea3bcbe",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::log": {
+    "hash": "8e2a6524c950065df9d012f945c7a9aa",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::add_files": {
+    "hash": "a4a39ba7b33b72acc375fec88b7cd016",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::add_folder": {
+    "hash": "2065d595291aedd48a97fd3c5983fd15",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::clear_list": {
+    "hash": "d3795886da1e485d226cf480320bccb7",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::delete_selected": {
+    "hash": "ff86b1f0e46d41b4ee107a342ea320f3",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::select_output_folder": {
+    "hash": "63bcd6942c4d62d73dfee4b7a80976d9",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::reset_output_folder": {
+    "hash": "fcf81db05a0d7e124d4b120bcec93923",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::merge_pdfs": {
+    "hash": "bb496b21088c650f172d546f7234d74a",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::split_pdf": {
+    "hash": "3b6862a887daaccece9adf9442122513",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::compress_pdf": {
+    "hash": "dca79e0cd1ad7699cbd3dc8409d5fbe5",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::add_watermark": {
+    "hash": "3118dee61f3389ef9de5d13b1e0d24cd",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::pdf_to_images": {
+    "hash": "c6847380746a1dcc362434b44cdc4526",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::images_to_pdf": {
+    "hash": "4eb6fc729d18bc6b88525ecadab4e6d1",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::rotate_pdf": {
+    "hash": "1398b5c6c2f8bb4568c2c40c0588d60a",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::extract_pdf_pages": {
+    "hash": "5a4243907ddc1ff8f78ceef7959450e5",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::delete_pdf_pages": {
+    "hash": "6c2ca20935bd5f082b8ba367f9892625",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::reverse_pdf": {
+    "hash": "8eeb811710144c893b64728a43a347c7",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::open_pdf_tools_dialog": {
+    "hash": "1e8bebd97631e0650debdaa7168db250",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::show_settings": {
+    "hash": "c11a07414b317816d96f779e95573a89",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::show_history": {
+    "hash": "8793bcacc280ada2a19854afa05a2c4e",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::handle_drop": {
+    "hash": "24ad88500cfa1645ba1d96fc1f164f84",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::start_conversion": {
+    "hash": "b30aeea70d7d8087f9dd48f872e7f1df",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::on_save": {
+    "hash": "dc46cbc8aede9bf98d3cc91a8166903d",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::clear_history": {
+    "hash": "717dc97b90e2811a2e69dccd3b0b8bbc",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::format_time": {
+    "hash": "978fe1224623ddda710eb280b4e9cc7c",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::update_time_display": {
+    "hash": "0a8a9deca5b5b5f4298aeab88cd43715",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::update_progress": {
+    "hash": "8f98866a25ef4c6da081d4308fd1f400",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::open_folder": {
+    "hash": "fa9750a494c7b4612d246f3fdee59afd",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
+  },
+  "C:\\Auto\\office_converter\\ui\\main_window.py::animate_progress": {
+    "hash": "8fe4469e3d410c00bab06c4786711909",
+    "test_file": "tests\\test_generated_main_window_v2.py",
+    "timestamp": "2025-12-26T23:17:51.941242"
   }
 }

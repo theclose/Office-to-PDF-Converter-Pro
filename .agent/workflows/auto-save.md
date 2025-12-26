@@ -1,8 +1,30 @@
 ---
 description: Auto-save code changes with version bump and git commit
 ---
-Run the auto-save script with a commit message.
+Tự động commit code với version bump.
 
-1. Execute auto-save script
+## Cách sử dụng
+
+1. Chạy với commit message mặc định (patch bump):
 // turbo
-python scripts/auto_save.py "${1:update}"
+```
+python scripts/auto_commit.py "update"
+```
+
+2. Hoặc với message cụ thể:
+```
+python scripts/auto_commit.py "feat: Add new feature"
+```
+
+3. Bump version khác (minor/major):
+```
+python scripts/auto_commit.py "New feature" minor
+python scripts/auto_commit.py "Breaking change" major
+```
+
+## Tự động chạy mỗi khi thay đổi code
+
+Nếu muốn tự động commit SAU MỖI thay đổi, chạy lệnh:
+```
+python scripts/auto_commit.py "auto-update"
+```

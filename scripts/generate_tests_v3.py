@@ -484,10 +484,21 @@ class EnhancedTestGeneratorV3:
         return str(test_file)
         
     def _generate_test_code(self, functions: List[FunctionSignature], source_file: str) -> str:
-        """Generate test code (same as v2.0 for now)."""
+        """Generate test code with proper imports."""
+        module_path = Path(source_file)
+        module_name = module_path.stem
+        
+        # Build import statement
+        relative_path = str(module_path.relative_to(Path.cwd())).replace('\\', '/').replace('.py', '').replace('/', '.')
+        if relative_path.startswith('.'):
+            relative_path = relative_path[1:]
+            
+        # Get function names to import
+        func_names = [f.name for f in functions]
+        
         lines = [
             '"""',
-            f'Auto-generated tests for {Path(source_file).stem} (v3.0 - AI Enhanced)',
+            f'Auto-generated tests for {module_name} (v3.0 - AI Enhanced)',
             f'Generated: {datetime.now().isoformat()}',
             'Generator: Coverage-Aware + Smart Prioritized + Pattern Learned',
             '"""',
@@ -496,9 +507,20 @@ class EnhancedTestGeneratorV3:
             'from unittest.mock import Mock, patch, MagicMock',
             '',
             f'# Import from {source_file}',
-            f'# TODO: Adjust import path',
-            '',
+            'try:',
+            f'    from {relative_path} import (',
         ]
+        
+        # Add function imports
+        for func in functions:
+            lines.append(f'        {func.name},')
+        
+        lines.extend([
+            '    )',
+            'except ImportError as e:',
+            f'    pytest.skip(f"Cannot import from {relative_path}: {{e}}")',
+            '',
+        ])
         
         for func in functions:
             template_type = self.template_engine.infer_template_type(func)

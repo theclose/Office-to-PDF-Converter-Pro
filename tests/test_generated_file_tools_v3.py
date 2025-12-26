@@ -1,7 +1,7 @@
 """
-Auto-generated tests for file_tools (v3.0 - AI Enhanced)
-Generated: 2025-12-27T00:12:50.430167
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for file_tools (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:13:32.055726
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
@@ -10,47 +10,21 @@ from unittest.mock import Mock, patch, MagicMock
 # Import from C:\Auto\office_converter\core\file_tools.py
 try:
     from core.file_tools import (
-        DuplicateFinder.find_duplicates,
-        AttributeManager.set_attributes,
-        FileToolsEngine.preview,
-        EmptyFolderCleaner.find_empty_folders,
-        FileToolsEngine.execute,
-        RenamePreview.has_changed,
-        RenameRule.apply,
-        RenameRule.description,
-        CaseRule.description,
-        ReplaceRule.description,
-        RemoveAccentsRule.description,
-        TrimRule.description,
-        AddStringRule.description,
-        SequenceRule.description,
-        ExtensionRule.description,
-        AttributeManager.set_dates,
-        FileToolsEngine.undo_last_transaction,
-        CaseRule.apply,
-        EmptyFolderCleaner.delete_folders,
-        ExtensionRule.apply,
-        ReplaceRule.apply,
-        TransactionLog.log,
-        TransactionLog.get_last_transaction,
+        AddStringRule,
+        AttributeManager,
+        CaseRule,
+        DuplicateFinder,
+        EmptyFolderCleaner,
+        ExtensionRule,
+        FileToolsEngine,
+        RemoveAccentsRule,
+        RenamePreview,
+        RenameRule,
+        ReplaceRule,
+        SequenceRule,
+        TransactionLog,
+        TrimRule,
         remove_vietnamese_accents,
-        RemoveAccentsRule.apply,
-        AddStringRule.apply,
-        SequenceRule.apply,
-        TransactionLog.remove_transaction_file,
-        CaseRule.__init__,
-        ReplaceRule.__init__,
-        RemoveAccentsRule.__init__,
-        TrimRule.apply,
-        AddStringRule.__init__,
-        SequenceRule.__init__,
-        ExtensionRule.__init__,
-        DuplicateFinder.__init__,
-        DuplicateFinder.abort,
-        TransactionLog.__init__,
-        FileToolsEngine.__init__,
-        FileToolsEngine.add_rule,
-        FileToolsEngine.clear_rules,
     )
 except ImportError as e:
     pytest.skip(f"Cannot import from core.file_tools: {e}")

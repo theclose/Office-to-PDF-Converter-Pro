@@ -1,7 +1,7 @@
 """
-Auto-generated tests for excel_tools (v3.0 - AI Enhanced)
-Generated: 2025-12-27T00:12:50.387110
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for excel_tools (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:13:31.982240
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest

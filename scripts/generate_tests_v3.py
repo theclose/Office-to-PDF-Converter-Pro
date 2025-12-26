@@ -528,15 +528,23 @@ class EnhancedTestGeneratorV3:
         relative_path = str(module_path.relative_to(Path.cwd())).replace('\\', '/').replace('.py', '').replace('/', '.')
         if relative_path.startswith('.'):
             relative_path = relative_path[1:]
-            
-        # Get function names to import
-        func_names = [f.name for f in functions]
+        
+        # Separate class methods from module functions
+        classes_needed = set()
+        module_functions = []
+        
+        for func in functions:
+            if '.' in func.name:  # Class method
+                class_name = func.name.split('.')[0]
+                classes_needed.add(class_name)
+            else:  # Module function
+                module_functions.append(func.name)
         
         lines = [
             '"""',
-            f'Auto-generated tests for {module_name} (v3.0 - AI Enhanced)',
+            f'Auto-generated tests for {module_name} (v3.1 - Class-Aware)',
             f'Generated: {datetime.now().isoformat()}',
-            'Generator: Coverage-Aware + Smart Prioritized + Pattern Learned',
+            'Generator: Class-Aware + Smart Prioritized',
             '"""',
             '',
             'import pytest',
@@ -544,13 +552,21 @@ class EnhancedTestGeneratorV3:
             '',
             f'# Import from {source_file}',
             'try:',
-            f'    from {relative_path} import (',
         ]
         
-        # Add function imports
-        for func in functions:
-            lines.append(f'        {func.name},')
-        
+        # Import classes
+        if classes_needed:
+            lines.append(f'    from {relative_path} import (')
+            for class_name in sorted(classes_needed):
+                lines.append(f'        {class_name},')
+                
+        # Import module functions  
+        if module_functions:
+            if not classes_needed:
+                lines.append(f'    from {relative_path} import (')
+            for func_name in module_functions:
+                lines.append(f'        {func_name},')
+                
         lines.extend([
             '    )',
             'except ImportError as e:',

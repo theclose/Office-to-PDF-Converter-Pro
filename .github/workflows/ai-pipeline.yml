@@ -1,0 +1,205 @@
+# AI-Driven CI/CD Pipeline
+# Triggered on push to develop or PR
+# 4 Jobs: Code Review → Test Gen → Test Exec → Self-Healing
+
+name: AI Pipeline
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  ai-code-review:
+    name: "🔍 AI Code Review"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          
+      - name: Install dependencies
+        run: |
+          pip install ruff pytest hypothesis
+          
+      - name: Run Code Analyzer
+        run: |
+          python scripts/code_analyzer.py . --threshold=15
+          
+      - name: Upload Analysis Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-report
+          path: .analysis/
+
+  auto-test-generation:
+    name: "🧪 Auto-Test Generation"
+    runs-on: windows-latest
+    needs: ai-code-review
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          
+      - name: Get changed files
+        id: changed
+        run: |
+          git diff --name-only HEAD~1 HEAD > changed_files.txt
+          echo "Changed files:"
+          cat changed_files.txt
+          
+      - name: Generate tests for changed modules
+        run: |
+          # Generate tests for changed core/utils files
+          Get-Content changed_files.txt | Where-Object { $_ -match "core/|utils/" } | ForEach-Object {
+            if (Test-Path $_) {
+              python scripts/test_generator.py $_
+            }
+          }
+        shell: pwsh
+        continue-on-error: true
+        
+      - name: Upload generated tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-tests
+          path: tests/test_generated_*.py
+
+  test-execution:
+    name: "🏃 Test Execution"
+    runs-on: windows-latest
+    needs: auto-test-generation
+    outputs:
+      test_result: ${{ steps.pytest.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-timeout hypothesis customtkinter pillow pywin32 pymupdf
+          
+      - name: Download generated tests
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-tests
+          path: tests/
+        continue-on-error: true
+        
+      - name: Run pytest
+        id: pytest
+        run: |
+          python -m pytest tests/ -v --tb=short --timeout=60 -x 2>&1 | Tee-Object -FilePath pytest_output.txt
+        continue-on-error: true
+        
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: pytest_output.txt
+
+  self-healing:
+    name: "🔧 Self-Healing"
+    runs-on: windows-latest
+    needs: test-execution
+    if: failure()
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          
+      - name: Analyze failures and generate fix prompts
+        run: |
+          # Parse pytest output and generate fix prompts
+          python -c "
+          import re
+          import os
+          
+          with open('pytest_output.txt', 'r') as f:
+              content = f.read()
+              
+          # Find failed tests
+          failures = re.findall(r'FAILED\s+([\w/]+\.py::\w+)', content)
+          
+          os.makedirs('.fixes', exist_ok=True)
+          
+          for i, failure in enumerate(failures[:5]):
+              prompt = f'''
+          # Auto-Fix Request #{i+1}
+          
+          **Failed Test**: {failure}
+          
+          **Action Required**: 
+          1. Review the test failure
+          2. Identify root cause
+          3. Apply minimal fix
+          
+          **Pytest Output**:
+          ```
+          {content[-2000:]}
+          ```
+          '''
+              with open(f'.fixes/fix_{i}.md', 'w') as f:
+                  f.write(prompt)
+                  
+          print(f'Generated {len(failures)} fix prompts')
+          "
+          
+      - name: Upload fix prompts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fix-prompts
+          path: .fixes/
+          
+      - name: Create issue for manual review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const fixes = fs.readdirSync('.fixes').filter(f => f.endsWith('.md'));
+            
+            if (fixes.length > 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🔧 AI Self-Healing: ${fixes.length} test failures detected`,
+                body: `## Automated Fix Prompts Generated
+                
+                The AI pipeline detected test failures and generated fix prompts.
+                
+                **Failures detected**: ${fixes.length}
+                **Run ID**: ${context.runId}
+                
+                ### Next Steps
+                1. Download the fix-prompts artifact
+                2. Review each fix prompt with AI assistant
+                3. Apply fixes and push
+                
+                ---
+                *Generated by AI Pipeline*`,
+                labels: ['bug', 'ai-generated']
+              });
+            }

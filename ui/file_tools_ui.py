@@ -30,21 +30,158 @@ class RuleWidget(ctk.CTkFrame):
         )
         self.lbl_name.pack(side="left", padx=10, pady=5)
         
+        # Helper frame for controls
+        ctrl_frame = ctk.CTkFrame(self, fg_color="transparent")
+        ctrl_frame.pack(side="right", padx=5)
+
+        # Move Up
+        self.btn_up = ctk.CTkButton(
+            ctrl_frame, text="▲", width=20, height=20,
+            fg_color="#4B5563", hover_color="#374151",
+            command=lambda: on_change(self, "up")
+        )
+        self.btn_up.pack(side="left", padx=1)
+        
+        # Move Down
+        self.btn_down = ctk.CTkButton(
+            ctrl_frame, text="▼", width=20, height=20,
+            fg_color="#4B5563", hover_color="#374151",
+            command=lambda: on_change(self, "down")
+        )
+        self.btn_down.pack(side="left", padx=1)
+
         # Remove Button
         self.btn_remove = ctk.CTkButton(
-            self,
+            ctrl_frame,
             text="✕",
             width=20,
             height=20,
             fg_color="transparent",
             text_color="#EF4444",
             hover_color="#374151",
-            command=lambda: on_remove(self)
+            command=lambda: on_change(self, "remove")
         )
-        self.btn_remove.pack(side="right", padx=5)
+        self.btn_remove.pack(side="left", padx=1)
         
-        # Config options (simple for now)
-        # TODO: Add specific config widgets based on rule type
+        # Config options container
+        self.config_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.config_frame.pack(fill="x", padx=10, pady=5)
+        
+        self._create_config_ui()
+        
+    def _create_config_ui(self):
+        """Create specific config widgets based on rule type."""
+        r = self.rule
+        
+        if isinstance(r, CaseRule):
+            modes = ["lower", "upper", "title", "capitalize"]
+            cb = ctk.CTkComboBox(
+                self.config_frame, 
+                values=modes,
+                command=self._on_config_change,
+                width=100
+            )
+            cb.set(r.mode)
+            cb.pack(side="left")
+            self.widgets = {"mode": cb}
+            
+        elif isinstance(r, ReplaceRule):
+            ctk.CTkLabel(self.config_frame, text="Find:").pack(side="left")
+            e1 = ctk.CTkEntry(self.config_frame, width=80)
+            e1.insert(0, r.old)
+            e1.pack(side="left", padx=2)
+            e1.bind("<KeyRelease>", self._on_config_change)
+            
+            ctk.CTkLabel(self.config_frame, text="Replace:").pack(side="left")
+            e2 = ctk.CTkEntry(self.config_frame, width=80)
+            e2.insert(0, r.new)
+            e2.pack(side="left", padx=2)
+            e2.bind("<KeyRelease>", self._on_config_change)
+            self.widgets = {"find": e1, "replace": e2}
+            
+        elif isinstance(r, AddStringRule):
+            ctk.CTkLabel(self.config_frame, text="Text:").pack(side="left")
+            e1 = ctk.CTkEntry(self.config_frame, width=100)
+            e1.insert(0, r.text)
+            e1.pack(side="left", padx=2)
+            e1.bind("<KeyRelease>", self._on_config_change)
+            
+            # Position (Start/End) - tricky with variable in customtk, using simple logic
+            self.pos_var = ctk.StringVar(value="start" if r.at_start else "end")
+            r1 = ctk.CTkRadioButton(self.config_frame, text="Start", variable=self.pos_var, value="start", command=self._on_config_change)
+            r2 = ctk.CTkRadioButton(self.config_frame, text="End", variable=self.pos_var, value="end", command=self._on_config_change)
+            r1.pack(side="left", padx=5)
+            r2.pack(side="left")
+            
+            self.widgets = {"text": e1}
+            
+        elif isinstance(r, ExtensionRule):
+            modes = ["preserve", "lower", "upper", "new"]
+            cb = ctk.CTkComboBox(
+                self.config_frame, 
+                values=modes,
+                command=self._on_config_change,
+                width=100
+            )
+            cb.set(r.mode)
+            cb.pack(side="left", padx=2)
+            
+            e1 = ctk.CTkEntry(self.config_frame, placeholder_text=".txt", width=60)
+            e1.insert(0, r.new_ext)
+            e1.pack(side="left", padx=2)
+            e1.bind("<KeyRelease>", self._on_config_change)
+            
+            self.widgets = {"mode": cb, "ext": e1}
+            
+        elif isinstance(r, SequenceRule):
+            ctk.CTkLabel(self.config_frame, text="Start:").pack(side="left")
+            e1 = ctk.CTkEntry(self.config_frame, width=40)
+            e1.insert(0, str(r.start))
+            e1.pack(side="left", padx=2)
+            e1.bind("<KeyRelease>", self._on_config_change)
+            
+            ctk.CTkLabel(self.config_frame, text="Step:").pack(side="left")
+            e2 = ctk.CTkEntry(self.config_frame, width=40)
+            e2.insert(0, str(r.step))
+            e2.pack(side="left", padx=2)
+            e2.bind("<KeyRelease>", self._on_config_change)
+            
+            self.widgets = {"start": e1, "step": e2}
+
+    def _on_config_change(self, event=None):
+        """Update rule object from widgets."""
+        r = self.rule
+        
+        try:
+            if isinstance(r, CaseRule):
+                r.mode = self.widgets["mode"].get()
+                r.description # Update desc if dynamic? No dynamic update needed for now
+                
+            elif isinstance(r, ReplaceRule):
+                r.old = self.widgets["find"].get()
+                r.new = self.widgets["replace"].get()
+                
+            elif isinstance(r, AddStringRule):
+                r.text = self.widgets["text"].get()
+                r.at_start = (self.pos_var.get() == "start")
+                
+            elif isinstance(r, ExtensionRule):
+                r.mode = self.widgets["mode"].get()
+                r.new_ext = self.widgets["ext"].get()
+                
+            elif isinstance(r, SequenceRule):
+                try:
+                    r.start = int(self.widgets["start"].get())
+                    r.step = int(self.widgets["step"].get())
+                except ValueError:
+                    pass # Ignore invalid numbers
+                    
+            # Trigger parent update
+            if self.on_change:
+                self.on_change(self, "update") # Send special 'update' action
+                
+        except Exception:
+            pass # Prevent crash during typing
 
 class FileToolsDialog(ctk.CTkToplevel):
     """File rename and tools dialog."""
@@ -186,7 +323,18 @@ class FileToolsDialog(ctk.CTkToplevel):
             font=ctk.CTkFont(size=16, weight="bold"),
             command=self._process
         )
-        self.btn_process.pack(fill="x", padx=10, pady=20)
+        self.btn_process.pack(fill="x", padx=10, pady=(20, 10))
+        
+        # Undo Button
+        self.btn_undo = ctk.CTkButton(
+            right_panel,
+            text="↺ UNDO",
+            height=40,
+            fg_color="#EF4444",
+            hover_color="#DC2626",
+            command=self._undo
+        )
+        self.btn_undo.pack(fill="x", padx=10, pady=5)
         
         # Summary
         self.lbl_summary = ctk.CTkLabel(right_panel, text="0 files selected")
@@ -200,22 +348,60 @@ class FileToolsDialog(ctk.CTkToplevel):
         widget = RuleWidget(
             self.rule_stack, 
             rule, 
-            on_remove=self._remove_rule_widget,
-            on_change=self._refresh_preview
+            on_remove=None, # Deprecated
+            on_change=self._handle_rule_action
         )
         widget.pack(fill="x", pady=2)
         self.rule_widgets.append(widget)
         
         self._refresh_preview()
         
-    def _remove_rule_widget(self, widget: RuleWidget):
-        """Remove rule."""
-        if widget in self.rule_widgets:
-            idx = self.rule_widgets.index(widget)
-            self.engine.rules.pop(idx) # Core logic
-            self.rule_widgets.remove(widget)
+    def _handle_rule_action(self, widget: RuleWidget, action: str):
+        """Handle actions from RuleWidget (up, down, remove)."""
+        idx = self.rule_widgets.index(widget)
+        
+        if action == "remove":
+            self.engine.rules.pop(idx)
+            self.rule_widgets.pop(idx)
             widget.destroy()
-            self._refresh_preview()
+            
+        elif action == "up":
+            if idx > 0:
+                # Swap in core
+                self.engine.rules[idx], self.engine.rules[idx-1] = self.engine.rules[idx-1], self.engine.rules[idx]
+                # Swap in UI list
+                self.rule_widgets[idx], self.rule_widgets[idx-1] = self.rule_widgets[idx-1], self.rule_widgets[idx]
+                # Repack All (Simplest way to reorder)
+                for w in self.rule_widgets:
+                    w.pack_forget()
+                    w.pack(fill="x", pady=2)
+                    
+        elif action == "down":
+            if idx < len(self.rule_widgets) - 1:
+                # Swap in core
+                self.engine.rules[idx], self.engine.rules[idx+1] = self.engine.rules[idx+1], self.engine.rules[idx]
+                # Swap in UI list
+                self.rule_widgets[idx], self.rule_widgets[idx+1] = self.rule_widgets[idx+1], self.rule_widgets[idx]
+                # Repack All
+                for w in self.rule_widgets:
+                    w.pack_forget()
+                    w.pack(fill="x", pady=2)
+                    
+        self._refresh_preview()
+
+    def _undo(self):
+        """Undo last rename."""
+        if not messagebox.askyesno("Undo", "Bạn có chắc chắn muốn hoàn tác lần đổi tên gần nhất?"):
+            return
+            
+        results = self.engine.undo_last_transaction()
+        if not results:
+            messagebox.showinfo("Undo", "Không có lịch sử để hoàn tác.")
+            return
+            
+        success_count = sum(1 for _, ok, _ in results if ok)
+        messagebox.showinfo("Undo", f"Đã hoàn tác {len(results)} files.\nThành công: {success_count}")
+        self._refresh_preview()
             
     def _refresh_preview(self):
         """Update preview table."""

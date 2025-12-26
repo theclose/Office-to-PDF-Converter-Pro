@@ -208,11 +208,68 @@ class ExtensionRule(RenameRule):
     def description(self) -> str:
         return f"Extension: {self.mode}"
 
+import json
+import time
+
+@dataclass
+class Transaction:
+    """A record of file rename operations for undo."""
+    timestamp: float
+    operations: List[dict] # [{"old": str, "new": str}]
+
+class TransactionLog:
+    """Manages transaction history for undo functionality."""
+    def __init__(self, log_dir: str = "logs/transactions"):
+        self.log_dir = log_dir
+        os.makedirs(log_dir, exist_ok=True)
+        
+    def log(self, operations: List[Tuple[str, str]]):
+        """Log a successful batch rename."""
+        if not operations:
+            return
+            
+        record = {
+            "timestamp": time.time(),
+            "operations": [{"old": op[0], "new": op[1]} for op in operations]
+        }
+        
+        filename = f"transaction_{int(record['timestamp'])}.json"
+        path = os.path.join(self.log_dir, filename)
+        
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(record, f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to write transaction log: {e}")
+
+    def get_last_transaction(self) -> Optional[Transaction]:
+        """Get the most recent transaction."""
+        try:
+            files = sorted([f for f in os.listdir(self.log_dir) if f.startswith("transaction_")], reverse=True)
+            if not files:
+                return None
+                
+            path = os.path.join(self.log_dir, files[0])
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return Transaction(timestamp=data['timestamp'], operations=data['operations'])
+        except Exception as e:
+            logger.error(f"Failed to read transaction log: {e}")
+            return None
+            
+    def remove_transaction_file(self, timestamp: float):
+        """Remove a transaction file after undo."""
+        filename = f"transaction_{int(timestamp)}.json"
+        path = os.path.join(self.log_dir, filename)
+        if os.path.exists(path):
+            os.remove(path)
+
 class FileToolsEngine:
     """Main engine for processing file rules."""
     
     def __init__(self):
         self.rules: List[RenameRule] = []
+        self.transaction_log = TransactionLog()
         
     def add_rule(self, rule: RenameRule):
         self.rules.append(rule)
@@ -220,17 +277,51 @@ class FileToolsEngine:
     def clear_rules(self):
         self.rules = []
         
+    def undo_last_transaction(self) -> List[Tuple[str, bool, str]]:
+        """
+        Undo the last rename operation.
+        Returns results similar to execute().
+        """
+        last_tx = self.transaction_log.get_last_transaction()
+        if not last_tx:
+            return []
+            
+        results = []
+        # Reverse operations: new -> old
+        # Process in reverse order to handle potential chains (A->B, B->C) correctly
+        for op in reversed(last_tx.operations):
+            old_path = op['old']
+            new_path_current = op['new'] # This is what it currently is
+            
+            try:
+                if not os.path.exists(new_path_current):
+                    results.append((new_path_current, False, "File not found"))
+                    continue
+                    
+                os.rename(new_path_current, old_path)
+                results.append((new_path_current, True, f"Restored -> {os.path.basename(old_path)}"))
+                
+            except Exception as e:
+                logger.error(f"Undo failed for {new_path_current}: {e}")
+                results.append((new_path_current, False, str(e)))
+                
+        # If any success, remove the log
+        if any(r[1] for r in results):
+            self.transaction_log.remove_transaction_file(last_tx.timestamp)
+            
+        return results
+
     def preview(self, files: List[str]) -> List[RenamePreview]:
         """Generate preview for a list of files."""
         results = []
         seen_names = set()
         
         for i, file_path in enumerate(files):
+            # Same preview logic as before ...
             directory = os.path.dirname(file_path)
             filename = os.path.basename(file_path)
             name, ext = os.path.splitext(filename)
             
-            # Apply all rules
             curr_name = name
             curr_ext = ext
             
@@ -242,7 +333,6 @@ class FileToolsEngine:
                     
             new_filename = f"{curr_name}{curr_ext}"
             
-            # Check status
             status = "ok"
             err = ""
             
@@ -250,10 +340,8 @@ class FileToolsEngine:
                 status = "unchanged"
             elif new_filename in seen_names:
                 status = "conflict"
-                err = "Trùng tên với file khác trong danh sách"
+                err = "Trùng tên với file khác trong list"
             elif os.path.exists(os.path.join(directory, new_filename)):
-                # If renaming case-only on Windows (e.g. abc.txt -> ABC.txt), existence check returns True
-                # but it IS allowed. We need to check if it's the SAME file.
                 if new_filename.lower() != filename.lower():
                      status = "conflict"
                      err = "File đã tồn tại"
@@ -276,6 +364,7 @@ class FileToolsEngine:
         """
         previews = self.preview(files)
         results = []
+        successful_ops = [] # Tuples of (old_path, new_full_path) for logging
         
         for p in previews:
             if p.status == "unchanged":
@@ -291,9 +380,14 @@ class FileToolsEngine:
                 
                 os.rename(p.original_path, new_path)
                 results.append((p.original_path, True, f"-> {p.new_filename}"))
+                successful_ops.append((p.original_path, new_path))
                 
             except Exception as e:
                 logger.error(f"Rename failed: {e}")
                 results.append((p.original_path, False, str(e)))
+        
+        # Log transaction if any success
+        if successful_ops:
+            self.transaction_log.log(successful_ops)
                 
         return results

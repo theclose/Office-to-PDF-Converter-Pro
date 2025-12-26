@@ -60,7 +60,7 @@ else:
     logger.warning("tkinterdnd2 not installed - drag drop disabled")
 
 # UI Components
-from office_converter.ui.file_tools_ui import FileToolsDialog
+from office_converter.ui.file_tools_ui_v2 import FileToolsDialog
 
 # Import fitz (PyMuPDF) at module level with proper fallback
 fitz = None
@@ -758,7 +758,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.2.12"
+    VERSION = "4.2.13"
 
     def __init__(self):
         super().__init__()

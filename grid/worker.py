@@ -24,8 +24,18 @@ from dataclasses import dataclass
 from typing import Optional, Callable
 from pathlib import Path
 
-# Add parent to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add paths for imports in multiprocessing context
+# Worker runs in separate process, needs explicit path setup
+_grid_dir = Path(__file__).parent
+_package_dir = _grid_dir.parent  # office_converter
+_project_dir = _package_dir.parent  # Auto (contains office_converter)
+
+# Add project dir first (for "from office_converter.xxx" imports)
+if str(_project_dir) not in sys.path:
+    sys.path.insert(0, str(_project_dir))
+# Add package dir (for relative "from grid.xxx" imports)
+if str(_package_dir) not in sys.path:
+    sys.path.insert(0, str(_package_dir))
 
 from grid.models import ConversionFile, CircuitBreakerState
 
@@ -270,12 +280,9 @@ class WorkerProcess(mp.Process):
         Returns:
             Dict with status, output_path, error
         """
-        # Import converter here (lazy load in worker process)
-        try:
-            from converters import get_converter_for_file
-        except ImportError:
-            # Fallback to old import path
-            from office_converter.converters import get_converter_for_file
+        # Import converter with absolute path (required for multiprocessing)
+        # The office_converter package must be importable from sys.path
+        from office_converter.converters.base import get_converter_for_file
         
         # Get converter class
         converter_class = get_converter_for_file(file.path)

@@ -21,7 +21,8 @@ if parent_dir not in sys.path:
 
 if __name__ == "__main__":
     from office_converter.grid.reactor.reactor_app import ReactorApp
-    from office_converter.grid.reactor.shim import install_shim_layer
+    # Note: shim is in grid/shim.py, not grid/reactor/shim.py
+    # from office_converter.grid.shim import install_shim_layer
 
     print("🚀 Initializing Reactor Grid...")
     

@@ -14,7 +14,12 @@ from typing import Optional, Callable, List
 import pythoncom
 
 from .base import BaseConverter
-from ..utils.com_pool import get_pool
+
+# Handle imports for both package and multiprocessing contexts
+try:
+    from ..utils.com_pool import get_pool
+except ImportError:
+    from office_converter.utils.com_pool import get_pool
 
 logger = logging.getLogger(__name__)
 

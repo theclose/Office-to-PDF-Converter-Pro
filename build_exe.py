@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Project info
 APP_NAME = "OfficeToPDF_Pro"
-VERSION = "4.2.1"
+VERSION = "4.2.3"
 MAIN_SCRIPT = "run_pro.py"
 
 # Directories
@@ -119,6 +119,20 @@ def get_hidden_imports():
         "office_converter.ui.pdf_tools_dialog",
         "office_converter.ui.pdf_tools_pro",
         "office_converter.ui.dialogs",
+        "office_converter.ui.excel_tools_ui",
+        
+        # Core modules
+        "office_converter.core.excel_tools",
+        
+        # Grid modules (optional - can comment out if not needed)
+        # "office_converter.grid",
+        # "office_converter.grid.grid",
+        
+        # openpyxl for Excel
+        "openpyxl",
+        "openpyxl.workbook",
+        "openpyxl.worksheet",
+        "openpyxl.utils",
         
         # CustomTkinter
         "customtkinter",

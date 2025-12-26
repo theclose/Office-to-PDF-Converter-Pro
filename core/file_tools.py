@@ -371,6 +371,11 @@ class DuplicateFinder:
         Find duplicates in given paths.
         Strategy: Size -> Quick Hash -> Full Hash.
         """
+        # FIX: Add None/empty check
+        if not paths:
+            logger.warning("find_duplicates called with empty paths")
+            return []
+        
         self._abort = False
         files_by_size = {}
         

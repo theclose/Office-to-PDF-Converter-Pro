@@ -578,14 +578,17 @@ class EnhancedTestGeneratorV3:
             # Safe name for test function (replace dots)
             safe_name = func.name.replace('.', '_')
             
+            # Store original name for proper calling
+            original_name = func.name  # Keep Class.method format
+            
             # Create modified signature for template
             func_for_template = FunctionSignature(
-                name=safe_name,  # Use safe name
+                name=safe_name,  # Use safe name for test function
                 file=func.file,
                 line=func.line,
                 args=func.args,
                 return_type=func.return_type,
-                docstring=func.docstring,
+                docstring=original_name,  # HACK: Store original in docstring for template
                 complexity=func.complexity,
                 is_async=func.is_async,
                 decorators=func.decorators,
@@ -597,7 +600,13 @@ class EnhancedTestGeneratorV3:
             template_type = self.template_engine.infer_template_type(func_for_template)
             test_code = self.template_engine.generate_from_template(func_for_template, template_type)
             
-            # But use original name in comments
+            # Replace placeholder with actual call
+            if '.' in original_name:
+                class_name, method_name = original_name.split('.', 1)
+                # Find function call pattern and replace
+                test_code = test_code.replace(f'{safe_name}(', f'{class_name}().{method_name}(')
+            
+            # Use original name in comments
             docstring_safe = ""
             if func.docstring:
                 docstring_safe = func.docstring.replace('\n', ' ').replace('\r', '')[:60]

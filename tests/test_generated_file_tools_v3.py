@@ -1,6 +1,6 @@
 """
 Auto-generated tests for file_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T00:15:59.571720
+Generated: 2025-12-27T00:16:38.023483
 Generator: Class-Aware + Smart Prioritized
 """
 
@@ -38,7 +38,7 @@ except ImportError as e:
 ])
 def test_DuplicateFinder_find_duplicates_parametrized(input, expected):
     """Test DuplicateFinder_find_duplicates with various inputs."""
-    result = DuplicateFinder_find_duplicates(input)
+    result = DuplicateFinder().find_duplicates(input)
     assert result == expected
 
 
@@ -47,7 +47,7 @@ def test_DuplicateFinder_find_duplicates_parametrized(input, expected):
 
 def test_AttributeManager_set_attributes_basic():
     """Test AttributeManager_set_attributes with valid input."""
-    result = AttributeManager_set_attributes('path_test', True, True)
+    result = AttributeManager().set_attributes('path_test', True, True)
     assert result is not None
 
 
@@ -60,7 +60,7 @@ def test_AttributeManager_set_attributes_basic():
 ])
 def test_FileToolsEngine_preview_parametrized(input, expected):
     """Test FileToolsEngine_preview with various inputs."""
-    result = FileToolsEngine_preview(input)
+    result = FileToolsEngine().preview(input)
     assert result == expected
 
 
@@ -73,7 +73,7 @@ def test_FileToolsEngine_preview_parametrized(input, expected):
 ])
 def test_EmptyFolderCleaner_find_empty_folders_parametrized(input, expected):
     """Test EmptyFolderCleaner_find_empty_folders with various inputs."""
-    result = EmptyFolderCleaner_find_empty_folders(input)
+    result = EmptyFolderCleaner().find_empty_folders(input)
     assert result == expected
 
 
@@ -86,7 +86,7 @@ def test_EmptyFolderCleaner_find_empty_folders_parametrized(input, expected):
 ])
 def test_FileToolsEngine_execute_parametrized(input, expected):
     """Test FileToolsEngine_execute with various inputs."""
-    result = FileToolsEngine_execute(input)
+    result = FileToolsEngine().execute(input)
     assert result == expected
 
 
@@ -98,7 +98,7 @@ def test_FileToolsEngine_execute_parametrized(input, expected):
 ])
 def test_RenamePreview_has_changed_parametrized(input, expected):
     """Test RenamePreview_has_changed with various inputs."""
-    result = RenamePreview_has_changed(input)
+    result = RenamePreview().has_changed(input)
     assert result == expected
 
 
@@ -111,7 +111,7 @@ def test_RenamePreview_has_changed_parametrized(input, expected):
 ])
 def test_RenameRule_apply_parametrized(input, expected):
     """Test RenameRule_apply with various inputs."""
-    result = RenameRule_apply(input)
+    result = RenameRule().apply(input)
     assert result == expected
 
 
@@ -124,7 +124,7 @@ def test_RenameRule_apply_parametrized(input, expected):
 ])
 def test_RenameRule_description_parametrized(input, expected):
     """Test RenameRule_description with various inputs."""
-    result = RenameRule_description(input)
+    result = RenameRule().description(input)
     assert result == expected
 
 
@@ -136,7 +136,7 @@ def test_RenameRule_description_parametrized(input, expected):
 ])
 def test_CaseRule_description_parametrized(input, expected):
     """Test CaseRule_description with various inputs."""
-    result = CaseRule_description(input)
+    result = CaseRule().description(input)
     assert result == expected
 
 
@@ -148,7 +148,7 @@ def test_CaseRule_description_parametrized(input, expected):
 ])
 def test_ReplaceRule_description_parametrized(input, expected):
     """Test ReplaceRule_description with various inputs."""
-    result = ReplaceRule_description(input)
+    result = ReplaceRule().description(input)
     assert result == expected
 
 
@@ -160,7 +160,7 @@ def test_ReplaceRule_description_parametrized(input, expected):
 ])
 def test_RemoveAccentsRule_description_parametrized(input, expected):
     """Test RemoveAccentsRule_description with various inputs."""
-    result = RemoveAccentsRule_description(input)
+    result = RemoveAccentsRule().description(input)
     assert result == expected
 
 
@@ -172,7 +172,7 @@ def test_RemoveAccentsRule_description_parametrized(input, expected):
 ])
 def test_TrimRule_description_parametrized(input, expected):
     """Test TrimRule_description with various inputs."""
-    result = TrimRule_description(input)
+    result = TrimRule().description(input)
     assert result == expected
 
 
@@ -184,7 +184,7 @@ def test_TrimRule_description_parametrized(input, expected):
 ])
 def test_AddStringRule_description_parametrized(input, expected):
     """Test AddStringRule_description with various inputs."""
-    result = AddStringRule_description(input)
+    result = AddStringRule().description(input)
     assert result == expected
 
 
@@ -196,7 +196,7 @@ def test_AddStringRule_description_parametrized(input, expected):
 ])
 def test_SequenceRule_description_parametrized(input, expected):
     """Test SequenceRule_description with various inputs."""
-    result = SequenceRule_description(input)
+    result = SequenceRule().description(input)
     assert result == expected
 
 
@@ -208,7 +208,7 @@ def test_SequenceRule_description_parametrized(input, expected):
 ])
 def test_ExtensionRule_description_parametrized(input, expected):
     """Test ExtensionRule_description with various inputs."""
-    result = ExtensionRule_description(input)
+    result = ExtensionRule().description(input)
     assert result == expected
 
 
@@ -217,7 +217,7 @@ def test_ExtensionRule_description_parametrized(input, expected):
 
 def test_AttributeManager_set_dates_basic():
     """Test AttributeManager_set_dates with valid input."""
-    result = AttributeManager_set_dates('path_test', None, None, None)
+    result = AttributeManager().set_dates('path_test', None, None, None)
     assert result is not None
 
 
@@ -230,7 +230,7 @@ def test_AttributeManager_set_dates_basic():
 ])
 def test_FileToolsEngine_undo_last_transaction_parametrized(input, expected):
     """Test FileToolsEngine_undo_last_transaction with various inputs."""
-    result = FileToolsEngine_undo_last_transaction(input)
+    result = FileToolsEngine().undo_last_transaction(input)
     assert result == expected
 
 
@@ -242,7 +242,7 @@ def test_FileToolsEngine_undo_last_transaction_parametrized(input, expected):
 ])
 def test_CaseRule_apply_parametrized(input, expected):
     """Test CaseRule_apply with various inputs."""
-    result = CaseRule_apply(input)
+    result = CaseRule().apply(input)
     assert result == expected
 
 
@@ -254,7 +254,7 @@ def test_CaseRule_apply_parametrized(input, expected):
 ])
 def test_EmptyFolderCleaner_delete_folders_parametrized(input, expected):
     """Test EmptyFolderCleaner_delete_folders with various inputs."""
-    result = EmptyFolderCleaner_delete_folders(input)
+    result = EmptyFolderCleaner().delete_folders(input)
     assert result == expected
 
 
@@ -266,7 +266,7 @@ def test_EmptyFolderCleaner_delete_folders_parametrized(input, expected):
 ])
 def test_ExtensionRule_apply_parametrized(input, expected):
     """Test ExtensionRule_apply with various inputs."""
-    result = ExtensionRule_apply(input)
+    result = ExtensionRule().apply(input)
     assert result == expected
 
 
@@ -278,7 +278,7 @@ def test_ExtensionRule_apply_parametrized(input, expected):
 ])
 def test_ReplaceRule_apply_parametrized(input, expected):
     """Test ReplaceRule_apply with various inputs."""
-    result = ReplaceRule_apply(input)
+    result = ReplaceRule().apply(input)
     assert result == expected
 
 
@@ -287,7 +287,7 @@ def test_ReplaceRule_apply_parametrized(input, expected):
 
 def test_TransactionLog_log_basic():
     """Test TransactionLog_log with valid input."""
-    result = TransactionLog_log('operations_test')
+    result = TransactionLog().log('operations_test')
     assert result is not None
 
 
@@ -300,7 +300,7 @@ def test_TransactionLog_log_basic():
 ])
 def test_TransactionLog_get_last_transaction_parametrized(input, expected):
     """Test TransactionLog_get_last_transaction with various inputs."""
-    result = TransactionLog_get_last_transaction(input)
+    result = TransactionLog().get_last_transaction(input)
     assert result == expected
 
 
@@ -325,7 +325,7 @@ def test_remove_vietnamese_accents_parametrized(input, expected):
 ])
 def test_RemoveAccentsRule_apply_parametrized(input, expected):
     """Test RemoveAccentsRule_apply with various inputs."""
-    result = RemoveAccentsRule_apply(input)
+    result = RemoveAccentsRule().apply(input)
     assert result == expected
 
 
@@ -337,7 +337,7 @@ def test_RemoveAccentsRule_apply_parametrized(input, expected):
 ])
 def test_AddStringRule_apply_parametrized(input, expected):
     """Test AddStringRule_apply with various inputs."""
-    result = AddStringRule_apply(input)
+    result = AddStringRule().apply(input)
     assert result == expected
 
 
@@ -349,7 +349,7 @@ def test_AddStringRule_apply_parametrized(input, expected):
 ])
 def test_SequenceRule_apply_parametrized(input, expected):
     """Test SequenceRule_apply with various inputs."""
-    result = SequenceRule_apply(input)
+    result = SequenceRule().apply(input)
     assert result == expected
 
 
@@ -358,7 +358,7 @@ def test_SequenceRule_apply_parametrized(input, expected):
 
 def test_TransactionLog_remove_transaction_file_basic():
     """Test TransactionLog_remove_transaction_file with valid input."""
-    result = TransactionLog_remove_transaction_file(None)
+    result = TransactionLog().remove_transaction_file(None)
     assert result is not None
 
 
@@ -366,7 +366,7 @@ def test_TransactionLog_remove_transaction_file_basic():
 
 def test_CaseRule___init___basic():
     """Test CaseRule___init__ with valid input."""
-    result = CaseRule___init__('mode_test')
+    result = CaseRule().__init__('mode_test')
     assert result is not None
 
 
@@ -374,7 +374,7 @@ def test_CaseRule___init___basic():
 
 def test_ReplaceRule___init___basic():
     """Test ReplaceRule___init__ with valid input."""
-    result = ReplaceRule___init__('old_test', 'new_test', True)
+    result = ReplaceRule().__init__('old_test', 'new_test', True)
     assert result is not None
 
 
@@ -382,7 +382,7 @@ def test_ReplaceRule___init___basic():
 
 def test_RemoveAccentsRule___init___basic():
     """Test RemoveAccentsRule___init__ with valid input."""
-    result = RemoveAccentsRule___init__(True)
+    result = RemoveAccentsRule().__init__(True)
     assert result is not None
 
 
@@ -394,7 +394,7 @@ def test_RemoveAccentsRule___init___basic():
 ])
 def test_TrimRule_apply_parametrized(input, expected):
     """Test TrimRule_apply with various inputs."""
-    result = TrimRule_apply(input)
+    result = TrimRule().apply(input)
     assert result == expected
 
 
@@ -402,7 +402,7 @@ def test_TrimRule_apply_parametrized(input, expected):
 
 def test_AddStringRule___init___basic():
     """Test AddStringRule___init__ with valid input."""
-    result = AddStringRule___init__('text_test', True)
+    result = AddStringRule().__init__('text_test', True)
     assert result is not None
 
 
@@ -410,7 +410,7 @@ def test_AddStringRule___init___basic():
 
 def test_SequenceRule___init___basic():
     """Test SequenceRule___init__ with valid input."""
-    result = SequenceRule___init__(42, 42, 42, 'separator_test', True)
+    result = SequenceRule().__init__(42, 42, 42, 'separator_test', True)
     assert result is not None
 
 
@@ -418,7 +418,7 @@ def test_SequenceRule___init___basic():
 
 def test_ExtensionRule___init___basic():
     """Test ExtensionRule___init__ with valid input."""
-    result = ExtensionRule___init__('mode_test', 'new_ext_test')
+    result = ExtensionRule().__init__('mode_test', 'new_ext_test')
     assert result is not None
 
 
@@ -426,7 +426,7 @@ def test_ExtensionRule___init___basic():
 
 def test_DuplicateFinder___init___basic():
     """Test DuplicateFinder___init__ with valid input."""
-    result = DuplicateFinder___init__()
+    result = DuplicateFinder().__init__()
     assert result is not None
 
 
@@ -434,7 +434,7 @@ def test_DuplicateFinder___init___basic():
 
 def test_DuplicateFinder_abort_basic():
     """Test DuplicateFinder_abort with valid input."""
-    result = DuplicateFinder_abort()
+    result = DuplicateFinder().abort()
     assert result is not None
 
 
@@ -442,7 +442,7 @@ def test_DuplicateFinder_abort_basic():
 
 def test_TransactionLog___init___basic():
     """Test TransactionLog___init__ with valid input."""
-    result = TransactionLog___init__('log_dir_test')
+    result = TransactionLog().__init__('log_dir_test')
     assert result is not None
 
 
@@ -450,7 +450,7 @@ def test_TransactionLog___init___basic():
 
 def test_FileToolsEngine___init___basic():
     """Test FileToolsEngine___init__ with valid input."""
-    result = FileToolsEngine___init__()
+    result = FileToolsEngine().__init__()
     assert result is not None
 
 
@@ -458,7 +458,7 @@ def test_FileToolsEngine___init___basic():
 
 def test_FileToolsEngine_add_rule_basic():
     """Test FileToolsEngine_add_rule with valid input."""
-    result = FileToolsEngine_add_rule(None)
+    result = FileToolsEngine().add_rule(None)
     assert result is not None
 
 
@@ -466,6 +466,6 @@ def test_FileToolsEngine_add_rule_basic():
 
 def test_FileToolsEngine_clear_rules_basic():
     """Test FileToolsEngine_clear_rules with valid input."""
-    result = FileToolsEngine_clear_rules()
+    result = FileToolsEngine().clear_rules()
     assert result is not None
 

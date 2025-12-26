@@ -74,13 +74,13 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
 
         # Window setup
         self.title("🛠️ PDF Tools Pro")
-        self.geometry("1000x700")
-        self.minsize(900, 600)
+        self.geometry("1000x750")
+        self.minsize(900, 700)
 
         # Center on screen
         self.update_idletasks()
         x = (self.winfo_screenwidth() - 1000) // 2
-        y = (self.winfo_screenheight() - 700) // 2
+        y = (self.winfo_screenheight() - 750) // 2
         self.geometry(f"+{x}+{y}")
 
         # Get last used operation from config (default to compress)
@@ -191,7 +191,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         ).pack(pady=15)
 
         # --- Operations Tabs ---
-        self.tab_view = ctk.CTkTabview(left_panel, height=250)
+        self.tab_view = ctk.CTkTabview(left_panel, height=200)
         self.tab_view.pack(fill="x", padx=10, pady=(0, 10))
 
         # Create tabs

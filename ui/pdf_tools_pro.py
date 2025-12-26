@@ -51,12 +51,13 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             ("protect", "🔒 Mật khẩu", "Bảo vệ bằng password"),
             ("watermark", "💧 Watermark", "Thêm watermark text"),
             ("rasterize", "🔐 Hóa ảnh (Secure)", "Flatten thành ảnh 1 lớp"),
+            ("scanmode", "📠 Scan Mode", "Giả lập scan vật lý"),
         ],
     }
 
     # All operation keys for validation
     ALL_OPERATIONS = ["merge", "split", "extract", "delete", "rotate", "reverse",
-                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark", "rasterize"]
+                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark", "rasterize", "scanmode"]
 
     def __init__(self, parent, lang: str = "vi"):
         super().__init__(parent)
@@ -162,7 +163,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 self.tab_view.set("✏️ Chỉnh sửa")
             elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
                 self.tab_view.set("🔄 Chuyển đổi")
-            elif op in ["compress", "protect", "watermark", "rasterize"]:
+            elif op in ["compress", "protect", "watermark", "rasterize", "scanmode"]:
                 self.tab_view.set("⚡ Tối ưu")
         except Exception:
             pass  # Tab may not exist yet
@@ -549,6 +550,38 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 font=ctk.CTkFont(size=12)
             ).pack(anchor="w", pady=5)
 
+        elif op == "scanmode":
+            ctk.CTkLabel(
+                self.options_content,
+                text="📠 Chuyển PDF thành dạng scan",
+                font=ctk.CTkFont(weight="bold")
+            ).pack(anchor="w", pady=(0, 5))
+            
+            ctk.CTkLabel(
+                self.options_content,
+                text="✓ Grayscale + Noise + Blur + Xoay nhẹ",
+                text_color="#10B981",
+                font=ctk.CTkFont(size=11)
+            ).pack(anchor="w")
+            
+            ctk.CTkLabel(
+                self.options_content,
+                text="⚠️ Không thể copy text sau khi convert",
+                text_color="#F59E0B",
+                font=ctk.CTkFont(size=11)
+            ).pack(anchor="w", pady=(0, 10))
+            
+            ctk.CTkLabel(self.options_content, text="Chất lượng (DPI):").pack(anchor="w")
+            self.var_scan_dpi = ctk.IntVar(value=150)
+            dpi_frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
+            dpi_frame.pack(anchor="w", fill="x")
+            
+            for dpi, label in [(100, "Nhanh"), (150, "Chuẩn"), (200, "Cao")]:
+                ctk.CTkRadioButton(
+                    dpi_frame, text=f"{label} ({dpi})",
+                    variable=self.var_scan_dpi, value=dpi
+                ).pack(side="left", padx=5)
+
         else:
             ctk.CTkLabel(
                 self.options_content,
@@ -772,6 +805,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             "img_to_pdf": ".pdf",
             "ocr": "_ocr",
             "rasterize": "_rasterized",
+            "scanmode": "_scanned",
         }
         suffix = suffixes.get(op, "_output")
 
@@ -857,6 +891,16 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     output_path, 
                     self.var_dpi.get(),
                     simulate_scan=self.var_simulate_scan.get()
+                )
+            elif op == "scanmode":
+                # Scan Mode always uses simulate_scan=True
+                dpi = getattr(self, 'var_scan_dpi', None)
+                dpi = dpi.get() if dpi else 150
+                return pdf_tools.rasterize_pdf(
+                    input_path,
+                    output_path,
+                    dpi,
+                    simulate_scan=True
                 )
             return False
         except Exception as e:

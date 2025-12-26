@@ -1,10 +1,12 @@
 ================================================================================
             OFFICE TO PDF CONVERTER PRO - HƯỚNG DẪN SỬ DỤNG
 ================================================================================
-Phiên bản hướng dẫn: 4.1
-Ngày cập nhật: 25/12/2024
+Phiên bản hướng dẫn: 4.1.7
+Ngày cập nhật: 26/12/2024
 Đối tượng: Người dùng phổ thông, người mới bắt đầu
-
+Tác giả: Đỗ Tùng
+Số điện thoại: 0914665866
+Email: dotungkh@gmail.com
 ================================================================================
 0) CÁCH SỬ DỤNG HƯỚNG DẪN NÀY
 ================================================================================
@@ -36,19 +38,6 @@ MỤC LỤC (TABLE OF CONTENTS)
 4) POWERPOINT TO PDF ....................................... [PP]
 5) SCAN MODE (Chế độ hóa ảnh) .............................. [SM]
 6) PDF TOOLS ............................................... [PT]
-   6.1) Gộp PDF (Merge)
-   6.2) Tách PDF (Split)
-   6.3) Trích xuất trang (Extract)
-   6.4) Xóa trang (Delete)
-   6.5) Xoay trang (Rotate)
-   6.6) Đảo ngược thứ tự (Reverse)
-   6.7) PDF sang Ảnh (PDF to Image)
-   6.8) Ảnh sang PDF (Image to PDF)
-   6.9) OCR (Nhận dạng chữ)
-   6.10) Nén PDF (Compress)
-   6.11) Đặt mật khẩu (Password)
-   6.12) Thêm Watermark
-   6.13) Hóa ảnh bảo mật (Rasterize)
 7) QUẢN LÝ FILE SAU CONVERT ................................ [FM]
 8) XỬ LÝ LỖI (TROUBLESHOOTING) ............................. [TS]
 9) CÂU HỎI THƯỜNG GẶP (FAQ) ................................ [FAQ]
@@ -63,12 +52,16 @@ Mục tiêu: Từ file Word/Excel/PowerPoint, tạo ra file PDF trong 3 phút.
 
 BƯỚC 1: Mở ứng dụng
 - Nhấp đôi vào biểu tượng "Office to PDF Converter Pro" trên màn hình.
+- Kiểm tra phiên bản hiển thị trên tiêu đề là v4.1.7.
 
 BƯỚC 2: Thêm file cần convert
 - Cách 1: Kéo thả file từ thư mục vào vùng "Kéo thả file vào đây".
+  * LƯU Ý: Hỗ trợ kéo thả nhiều file cùng lúc (drag & drop multi-files).
 - Cách 2: Nhấn nút "Chọn file" và chọn file từ máy tính.
+- Cách 3: Nhấn nút "Folder" để thêm cả thư mục.
 
-BƯỚC 3: Kiểm tra danh sách file
+BƯỚC 3: Kiểm tra thông báo và danh sách
+- Quan sát bảng Log phía dưới: Hiện thông báo "✅ Đã thêm X file(s) thành công".
 - File đã thêm sẽ hiển thị trong danh sách ở giữa màn hình.
 - Biểu tượng màu xanh lá = Excel, xanh dương = Word, cam = PowerPoint.
 
@@ -679,7 +672,8 @@ H4: File tôi có mất sau khi convert không?
 D4: KHÔNG. File gốc vẫn giữ nguyên. App chỉ TẠO THÊM file PDF mới.
 
 H5: Tôi có thể convert nhiều file cùng lúc không?
-D5: CÓ. Kéo nhiều file vào ứng dụng, tất cả sẽ được convert lần lượt.
+D5: CÓ. Bạn có thể kéo thả hàng chục file cùng lúc vào ứng dụng.
+    Tính năng này đã được nâng cấp để hỗ trợ tên file tiếng Việt và Unicode.
 
 H6: Scan Mode có chống copy 100% không?
 D6: KHÔNG. Scan Mode làm TĂNG ĐỘ KHÓ KHĂN cho việc copy/edit, nhưng

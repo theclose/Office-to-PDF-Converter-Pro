@@ -240,21 +240,10 @@ def _apply_scan_effects(img):
         return img
         
     try:
-        # 1. Grayscale
-        img = img.convert("L")
-        
-        # 2. Slight Blur (soften digital edges)
+        # 1. Slight Blur (soften digital edges)
         img = img.filter(ImageFilter.GaussianBlur(0.5))
         
-        # 3. Add Noise (simulate paper grain)
-        # Create noise image using os.urandom (fast)
-        w, h = img.size
-        noise_data = os.urandom(w * h)
-        noise_img = Image.frombytes("L", (w, h), noise_data)
-        # Blend noise (alpha 0.05-0.1 is usually enough)
-        img = Image.blend(img, noise_img, 0.05)
-        
-        # 4. Slight Skew/Rotate (-0.3 to 0.3 degrees)
+        # 2. Slight Skew/Rotate (-0.3 to 0.3 degrees)
         angle = random.uniform(-0.3, 0.3)
         img = img.rotate(angle, resample=Image.BICUBIC, expand=False, fillcolor="white")
         

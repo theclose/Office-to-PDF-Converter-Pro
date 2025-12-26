@@ -574,13 +574,15 @@ class ConversionEngine:
 class FileListPanel(ctk.CTkFrame):
     """Enhanced file list with drag & drop, selection and type indicators."""
 
-    def __init__(self, parent, on_selection_change: Optional[Callable] = None, **kwargs):
+    def __init__(self, parent, on_selection_change: Optional[Callable] = None, 
+                 app_instance=None, **kwargs):
         super().__init__(parent, **kwargs)
 
         self.files: List[ConversionFile] = []
         self.selected_indices: set = set()  # Track selected file indices
         self.anchor_index: int = -1  # For shift-selection
         self.on_selection_change = on_selection_change
+        self.app_instance = app_instance  # Store reference to main app for logging
 
         self._create_widgets()
         self._setup_drag_drop()
@@ -704,53 +706,36 @@ class FileListPanel(ctk.CTkFrame):
 
 
     def _on_drop(self, event):
-        """Handle dropped files."""
+        """Handle dropped files using production-grade Unicode parser."""
         try:
-            files = self._parse_drop_data(event.data)
-            self.add_files(files)
+            # Use parse_dropped_paths for robust multi-file Unicode support
+            file_paths = parse_dropped_paths(self, event.data)
+            added = self.add_files(file_paths)
+            
+            # Success log message
+            if added > 0:
+                logger.info(f"Drag & drop: Added {added} file(s)")
+                # Log to UI using app instance
+                if self.app_instance and hasattr(self.app_instance, '_log'):
+                    self.app_instance._log(f"✅ Đã thêm {added} file(s) thành công")
         except Exception as e:
             logger.error(f"Drop error: {e}")
 
-    def _parse_drop_data(self, data: str) -> List[str]:
-        """Parse dropped file data."""
-        # Handle different drop formats
-        if data.startswith('{'):
-            # Windows format with braces
-            files = []
-            current = ""
-            in_brace = False
-            for char in data:
-                if char == '{':
-                    in_brace = True
-                elif char == '}':
-                    in_brace = False
-                    if current:
-                        files.append(current)
-                        current = ""
-                elif char == ' ' and not in_brace:
-                    if current:
-                        files.append(current)
-                        current = ""
-                else:
-                    current += char
-            if current:
-                files.append(current)
-            return files
-        else:
-            return data.split()
-
     def add_files(self, paths: List[str]) -> int:
-        """Add files to the list."""
+        """Add files to the list with success logging."""
         added = 0
+        skipped = 0
         try:
             for path in paths:
                 # Check extension
                 ext = Path(path).suffix.lower()
                 if ext not in ALL_EXTENSIONS:
+                    skipped += 1
                     continue
 
                 # Check if already exists
                 if any(f.path == path for f in self.files):
+                    skipped += 1
                     continue
 
                 self.files.append(ConversionFile(path=path))
@@ -758,6 +743,10 @@ class FileListPanel(ctk.CTkFrame):
 
             if added > 0:
                 self._refresh_display()
+                # Log success to console
+                logger.info(f"Added {added} file(s) successfully" + 
+                          (f" (skipped {skipped})" if skipped > 0 else ""))
+                
         except Exception as e:
             logger.error(f"Add files error: {e}")
 
@@ -883,7 +872,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.1.7"
+    VERSION = "4.2.0"
 
     def __init__(self):
         super().__init__()
@@ -1107,7 +1096,8 @@ class ConverterProApp(TkDnDWrapper):
 
             self.file_panel = FileListPanel(
                 left_frame,
-                on_selection_change=self._on_files_changed
+                on_selection_change=self._on_files_changed,
+                app_instance=self  # Pass app reference for logging
             )
             self.file_panel.pack(fill="both", expand=True)
 
@@ -1120,9 +1110,12 @@ class ConverterProApp(TkDnDWrapper):
             ctk.CTkButton(file_btn_frame, text="📁 Folder", width=80,
                          command=self._add_folder,
                          fg_color="transparent", border_width=2).pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text="�️ PDF Tools", width=90,
+            ctk.CTkButton(file_btn_frame, text="🔧 PDF Tools", width=90,
                          command=self._open_pdf_tools,
                          fg_color="#3B82F6", hover_color="#2563EB").pack(side="left", padx=2)
+            ctk.CTkButton(file_btn_frame, text="📊 Excel Tools", width=95,
+                         command=self._open_excel_tools,
+                         fg_color="#10B981", hover_color="#059669").pack(side="left", padx=2)
             ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
                          command=self._clear_files,
                          fg_color="transparent", border_width=2,
@@ -1702,6 +1695,22 @@ class ConverterProApp(TkDnDWrapper):
         except Exception as e:
             logger.error(f"Open PDF Tools error: {e}")
             messagebox.showerror("Lỗi", f"Không thể mở PDF Tools: {e}")
+
+    def _open_excel_tools(self):
+        """Open Excel Tools dialog."""
+        try:
+            from office_converter.ui.excel_tools_ui import ExcelToolsDialog
+            ExcelToolsDialog(self, "vi")
+        except ImportError as e:
+            logger.error(f"Excel Tools import error: {e}")
+            messagebox.showerror(
+                "Thiếu thư viện",
+                "Cần cài đặt openpyxl để sử dụng Excel Tools.\n\n"
+                "Chạy lệnh: pip install openpyxl"
+            )
+        except Exception as e:
+            logger.error(f"Open Excel Tools error: {e}")
+            messagebox.showerror("Lỗi", f"Không thể mở Excel Tools: {e}")
 
     def _clear_files(self):
         """Clear file list."""

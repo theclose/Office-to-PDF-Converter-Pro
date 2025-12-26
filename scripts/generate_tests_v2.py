@@ -264,6 +264,12 @@ class SmartASTAnalyzer:
         cache = SmartTestCache()
         func_sig.hash = cache.get_function_hash(func_sig)
         
+        # v3.0 compatibility: Initialize coverage and priority
+        if hasattr(func_sig, 'coverage'):
+            func_sig.coverage = 0.0
+        if hasattr(func_sig, 'priority_score'):
+            func_sig.priority_score = 0.0
+        
         return func_sig
         
     def _estimate_complexity(self, node: ast.FunctionDef) -> int:

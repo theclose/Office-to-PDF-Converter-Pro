@@ -326,17 +326,17 @@ def main():
     print("=" * 60)
     
     # Parse test results
-    parser = TestResultParser()
+    result_parser = TestResultParser()  # Fixed: was shadowing argparse parser
     failures = []
     
     if args.results:
         if args.results.endswith('.xml'):
-            failures = parser.parse_junit_xml(args.results)
+            failures = result_parser.parse_junit_xml(args.results)
         else:
-            failures = parser.parse_json(args.results)
+            failures = result_parser.parse_json(args.results)
     elif args.console:
         with open(args.console, 'r') as f:
-            failures = parser.parse_console_output(f.read())
+            failures = result_parser.parse_console_output(f.read())
     else:
         # Try to find test results
         for pattern in ['test_results.xml', 'pytest_output.txt', '.pytest_cache']:

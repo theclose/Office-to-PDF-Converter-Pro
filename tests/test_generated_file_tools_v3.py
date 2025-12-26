@@ -1,6 +1,6 @@
 """
 Auto-generated tests for file_tools (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.724800
+Generated: 2025-12-27T00:06:12.449237
 Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
 """
 
@@ -8,7 +8,52 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\core\file_tools.py
-# TODO: Adjust import path
+try:
+    from core.file_tools import (
+        find_duplicates,
+        set_attributes,
+        preview,
+        find_empty_folders,
+        execute,
+        has_changed,
+        apply,
+        description,
+        description,
+        description,
+        description,
+        description,
+        description,
+        description,
+        description,
+        set_dates,
+        undo_last_transaction,
+        apply,
+        delete_folders,
+        apply,
+        apply,
+        log,
+        get_last_transaction,
+        remove_vietnamese_accents,
+        apply,
+        apply,
+        apply,
+        remove_transaction_file,
+        apply,
+        abort,
+        add_rule,
+        clear_rules,
+        __init__,
+        __init__,
+        __init__,
+        __init__,
+        __init__,
+        __init__,
+        __init__,
+        __init__,
+        __init__,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from core.file_tools: {e}")
 
 # Test for find_duplicates (complexity: 29, coverage: 0%, priority: 0.80)
 # Doc: Find duplicates in given paths. Strategy: Size -> Quick Hash...

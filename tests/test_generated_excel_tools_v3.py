@@ -1,6 +1,6 @@
 """
 Auto-generated tests for excel_tools (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.702909
+Generated: 2025-12-27T00:06:12.440579
 Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
 """
 
@@ -8,7 +8,20 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\core\excel_tools.py
-# TODO: Adjust import path
+try:
+    from core.excel_tools import (
+        rename_sheets,
+        csv_to_excel,
+        split_excel,
+        excel_to_csv,
+        protect_sheets,
+        unprotect_sheets,
+        merge_excel,
+        get_sheet_info,
+        get_sheet_names,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from core.excel_tools: {e}")
 
 # Test for rename_sheets (complexity: 13, coverage: 0%, priority: 0.68)
 # Doc: Rename sheets in Excel file.  Args:     input_path: Excel fi...

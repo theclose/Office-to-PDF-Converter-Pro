@@ -575,10 +575,29 @@ class EnhancedTestGeneratorV3:
         ])
         
         for func in functions:
-            template_type = self.template_engine.infer_template_type(func)
-            test_code = self.template_engine.generate_from_template(func, template_type)
+            # Safe name for test function (replace dots)
+            safe_name = func.name.replace('.', '_')
             
-            # Add metadata
+            # Create modified signature for template
+            func_for_template = FunctionSignature(
+                name=safe_name,  # Use safe name
+                file=func.file,
+                line=func.line,
+                args=func.args,
+                return_type=func.return_type,
+                docstring=func.docstring,
+                complexity=func.complexity,
+                is_async=func.is_async,
+                decorators=func.decorators,
+                hash=func.hash,
+                coverage=func.coverage,
+                priority_score=func.priority_score
+            )
+            
+            template_type = self.template_engine.infer_template_type(func_for_template)
+            test_code = self.template_engine.generate_from_template(func_for_template, template_type)
+            
+            # But use original name in comments
             docstring_safe = ""
             if func.docstring:
                 docstring_safe = func.docstring.replace('\n', ' ').replace('\r', '')[:60]

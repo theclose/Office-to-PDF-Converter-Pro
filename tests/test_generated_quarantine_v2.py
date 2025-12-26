@@ -1,6 +1,6 @@
 """
 Auto-generated tests for quarantine (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.201715
+Generated: 2025-12-26T23:23:07.642966
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize Bloom Filter with optimal parameters.
-
-Args:
-    ...
+# Doc: Initialize Bloom Filter with optimal parameters.  Args:     ...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -23,10 +20,7 @@ def test___init___basic():
 
 
 # Test for add (complexity: 3)
-# Original doc: Add file to quarantine.
-
-Args:
-    file_hash: SHA256 hash of...
+# Doc: Add file to quarantine.  Args:     file_hash: SHA256 hash of...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -39,10 +33,7 @@ def test_add_parametrized(input, expected):
 
 
 # Test for contains (complexity: 4)
-# Original doc: Check if file is quarantined.
-
-Args:
-    file_hash: SHA256 h...
+# Doc: Check if file is quarantined.  Args:     file_hash: SHA256 h...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -55,10 +46,7 @@ def test_contains_parametrized(input, expected):
 
 
 # Test for contains_with_confidence (complexity: 3)
-# Original doc: Check quarantine status with confidence level.
-
-Args:
-    fi...
+# Doc: Check quarantine status with confidence level.  Args:     fi...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -71,9 +59,7 @@ def test_contains_with_confidence_parametrized(input, expected):
 
 
 # Test for remove (complexity: 1)
-# Original doc: Remove file from exact set only.
-
-Note: Bloom filters don't ...
+# Doc: Remove file from exact set only.  Note: Bloom filters don't ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -86,9 +72,7 @@ def test_remove_parametrized(input, expected):
 
 
 # Test for clear (complexity: 1)
-# Original doc: Clear all quarantine data.
-
-Thread-safe: Yes...
+# Doc: Clear all quarantine data.  Thread-safe: Yes...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -101,9 +85,7 @@ def test_clear_parametrized(input, expected):
 
 
 # Test for rebuild_from_exact (complexity: 3)
-# Original doc: Rebuild Bloom filter from exact set.
-
-Useful after many remo...
+# Doc: Rebuild Bloom filter from exact set.  Useful after many remo...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -116,9 +98,7 @@ def test_rebuild_from_exact_parametrized(input, expected):
 
 
 # Test for estimated_fpr (complexity: 2)
-# Original doc: Calculate current false positive rate.
-
-Formula: (1 - e^(-kn...
+# Doc: Calculate current false positive rate.  Formula: (1 - e^(-kn...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -131,10 +111,7 @@ def test_estimated_fpr_parametrized(input, expected):
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get quarantine statistics.
-
-Returns:
-    Dict with capacity,...
+# Doc: Get quarantine statistics.  Returns:     Dict with capacity,...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

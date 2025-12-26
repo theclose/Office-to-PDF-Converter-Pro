@@ -1,6 +1,6 @@
 """
 Auto-generated tests for optimistic (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.283504
+Generated: 2025-12-26T23:23:07.684617
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize optimistic state manager....
+# Doc: Initialize optimistic state manager....
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -20,10 +20,7 @@ def test___init___basic():
 
 
 # Test for add_optimistic (complexity: 1)
-# Original doc: Add optimistic item.
-
-Args:
-    data: Temporary item data (d...
+# Doc: Add optimistic item.  Args:     data: Temporary item data (d...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -36,10 +33,7 @@ def test_add_optimistic_parametrized(input, expected):
 
 
 # Test for reconcile (complexity: 2)
-# Original doc: Reconcile optimistic item with real data.
-
-Args:
-    temp_id...
+# Doc: Reconcile optimistic item with real data.  Args:     temp_id...
 
 def test_reconcile_basic():
     """Test reconcile with valid input."""
@@ -48,10 +42,7 @@ def test_reconcile_basic():
 
 
 # Test for mark_failed (complexity: 2)
-# Original doc: Mark optimistic item as failed.
-
-Args:
-    temp_id: Temporar...
+# Doc: Mark optimistic item as failed.  Args:     temp_id: Temporar...
 
 def test_mark_failed_basic():
     """Test mark_failed with valid input."""
@@ -60,9 +51,7 @@ def test_mark_failed_basic():
 
 
 # Test for remove_optimistic (complexity: 3)
-# Original doc: Remove optimistic item (cleanup after reconciliation).
-
-Args...
+# Doc: Remove optimistic item (cleanup after reconciliation).  Args...
 
 def test_remove_optimistic_basic():
     """Test remove_optimistic with valid input."""
@@ -71,7 +60,7 @@ def test_remove_optimistic_basic():
 
 
 # Test for get_merged_items (complexity: 3)
-# Original doc: Get combined list of real items + un-reconciled optimistic i...
+# Doc: Get combined list of real items + un-reconciled optimistic i...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -84,10 +73,7 @@ def test_get_merged_items_parametrized(input, expected):
 
 
 # Test for cleanup_old (complexity: 6)
-# Original doc: Remove old reconciled items.
-
-Args:
-    max_age_seconds: Max...
+# Doc: Remove old reconciled items.  Args:     max_age_seconds: Max...
 
 def test_cleanup_old_basic():
     """Test cleanup_old with valid input."""
@@ -96,10 +82,7 @@ def test_cleanup_old_basic():
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get optimistic state statistics.
-
-Returns:
-    Dict with sta...
+# Doc: Get optimistic state statistics.  Returns:     Dict with sta...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

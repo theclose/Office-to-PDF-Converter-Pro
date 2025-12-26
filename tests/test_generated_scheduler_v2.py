@@ -1,6 +1,6 @@
 """
 Auto-generated tests for scheduler (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.239978
+Generated: 2025-12-26T23:23:07.656478
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize empty priority queue....
+# Doc: Initialize empty priority queue....
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -20,10 +20,7 @@ def test___init___basic():
 
 
 # Test for enqueue (complexity: 1)
-# Original doc: Add file to queue with O(log n) complexity.
-
-Args:
-    file:...
+# Doc: Add file to queue with O(log n) complexity.  Args:     file:...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -36,9 +33,7 @@ def test_enqueue_parametrized(input, expected):
 
 
 # Test for enqueue_batch (complexity: 2)
-# Original doc: Add multiple files efficiently.
-
-Uses heapify for O(n) batch...
+# Doc: Add multiple files efficiently.  Uses heapify for O(n) batch...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -51,9 +46,7 @@ def test_enqueue_batch_parametrized(input, expected):
 
 
 # Test for dequeue (complexity: 3)
-# Original doc: Extract highest priority file with O(log n) complexity.
-
-Ret...
+# Doc: Extract highest priority file with O(log n) complexity.  Ret...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -66,10 +59,7 @@ def test_dequeue_parametrized(input, expected):
 
 
 # Test for peek (complexity: 1)
-# Original doc: View next file without removing, O(1) complexity.
-
-Returns:
-...
+# Doc: View next file without removing, O(1) complexity.  Returns: ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -82,9 +72,7 @@ def test_peek_parametrized(input, expected):
 
 
 # Test for peek_batch (complexity: 1)
-# Original doc: Preview next N files without removing.
-
-Useful for worker po...
+# Doc: Preview next N files without removing.  Useful for worker po...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -97,9 +85,7 @@ def test_peek_batch_parametrized(input, expected):
 
 
 # Test for remove (complexity: 3)
-# Original doc: Remove specific file from queue.
-
-Used when user cancels a p...
+# Doc: Remove specific file from queue.  Used when user cancels a p...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -112,10 +98,7 @@ def test_remove_parametrized(input, expected):
 
 
 # Test for clear (complexity: 1)
-# Original doc: Remove all files from queue.
-
-Returns:
-    Number of files r...
+# Doc: Remove all files from queue.  Returns:     Number of files r...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -128,10 +111,7 @@ def test_clear_parametrized(input, expected):
 
 
 # Test for cluster_distribution (complexity: 1)
-# Original doc: Get current distribution of files by type.
-
-Returns:
-    Dic...
+# Doc: Get current distribution of files by type.  Returns:     Dic...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -144,9 +124,7 @@ def test_cluster_distribution_parametrized(input, expected):
 
 
 # Test for total_enqueued (complexity: 1)
-# Original doc: Get total files enqueued since creation.
-
-Thread-safe: Yes...
+# Doc: Get total files enqueued since creation.  Thread-safe: Yes...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -159,9 +137,7 @@ def test_total_enqueued_parametrized(input, expected):
 
 
 # Test for is_empty (complexity: 1)
-# Original doc: Check if queue is empty.
-
-Thread-safe: Yes...
+# Doc: Check if queue is empty.  Thread-safe: Yes...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -174,10 +150,7 @@ def test_is_empty_parametrized(input, expected):
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get queue statistics for monitoring.
-
-Returns:
-    Dict with...
+# Doc: Get queue statistics for monitoring.  Returns:     Dict with...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -190,9 +163,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for drain (complexity: 5)
-# Original doc: Extract multiple files efficiently.
-
-Used for batch assignme...
+# Doc: Extract multiple files efficiently.  Used for batch assignme...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

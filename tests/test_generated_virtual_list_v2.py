@@ -1,6 +1,6 @@
 """
 Auto-generated tests for virtual_list (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.297611
+Generated: 2025-12-26T23:23:07.689618
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for default_file_renderer (complexity: 4)
-# Original doc: Default renderer for ConversionFile items.
-
-Args:
-    item: ...
+# Doc: Default renderer for ConversionFile items.  Args:     item: ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -27,11 +24,7 @@ def test_default_file_renderer_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 3)
-# Original doc: Initialize virtual list.
-
-Args:
-    parent: Parent widget
-  ...
+# Doc: Initialize virtual list.  Args:     parent: Parent widget   ...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -40,9 +33,7 @@ def test___init___basic():
 
 
 # Test for set_items (complexity: 1)
-# Original doc: Update list items.
-
-Complexity: O(1) - Just stores reference...
+# Doc: Update list items.  Complexity: O(1) - Just stores reference...
 
 def test_set_items_basic():
     """Test set_items with valid input."""
@@ -51,7 +42,7 @@ def test_set_items_basic():
 
 
 # Test for get_selected_item (complexity: 3)
-# Original doc: Get currently selected item....
+# Doc: Get currently selected item....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -64,7 +55,7 @@ def test_get_selected_item_parametrized(input, expected):
 
 
 # Test for clear (complexity: 1)
-# Original doc: Clear all items....
+# Doc: Clear all items....
 
 def test_clear_basic():
     """Test clear with valid input."""

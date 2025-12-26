@@ -1,6 +1,6 @@
 """
 Auto-generated tests for file_tools (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:47.324390
+Generated: 2025-12-26T23:23:06.164098
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for remove_vietnamese_accents (complexity: 2)
-# Original doc: Remove Vietnamese accents from text....
+# Doc: Remove Vietnamese accents from text....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -36,8 +36,7 @@ def test_has_changed_parametrized(input, expected):
 
 
 # Test for apply (complexity: 1)
-# Original doc: Apply rule to filename.
-Returns (new_name, new_extension)...
+# Doc: Apply rule to filename. Returns (new_name, new_extension)...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -50,7 +49,7 @@ def test_apply_parametrized(input, expected):
 
 
 # Test for description (complexity: 1)
-# Original doc: User facing description of what this rule does....
+# Doc: User facing description of what this rule does....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -279,7 +278,7 @@ def test_description_parametrized(input, expected):
 
 
 # Test for find_empty_folders (complexity: 7)
-# Original doc: Find invalid/empty folders recursively (bottom-up)....
+# Doc: Find invalid/empty folders recursively (bottom-up)....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -304,7 +303,7 @@ def test_delete_folders_parametrized(input, expected):
 
 
 # Test for set_dates (complexity: 6)
-# Original doc: Set file timestamps....
+# Doc: Set file timestamps....
 
 def test_set_dates_basic():
     """Test set_dates with valid input."""
@@ -313,7 +312,7 @@ def test_set_dates_basic():
 
 
 # Test for set_attributes (complexity: 8)
-# Original doc: Set file attributes (Windows)....
+# Doc: Set file attributes (Windows)....
 
 def test_set_attributes_basic():
     """Test set_attributes with valid input."""
@@ -338,8 +337,7 @@ def test_abort_basic():
 
 
 # Test for find_duplicates (complexity: 29)
-# Original doc: Find duplicates in given paths.
-Strategy: Size -> Quick Hash...
+# Doc: Find duplicates in given paths. Strategy: Size -> Quick Hash...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -360,7 +358,7 @@ def test___init___basic():
 
 
 # Test for log (complexity: 3)
-# Original doc: Log a successful batch rename....
+# Doc: Log a successful batch rename....
 
 def test_log_basic():
     """Test log with valid input."""
@@ -369,7 +367,7 @@ def test_log_basic():
 
 
 # Test for get_last_transaction (complexity: 3)
-# Original doc: Get the most recent transaction....
+# Doc: Get the most recent transaction....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -382,7 +380,7 @@ def test_get_last_transaction_parametrized(input, expected):
 
 
 # Test for remove_transaction_file (complexity: 2)
-# Original doc: Remove a transaction file after undo....
+# Doc: Remove a transaction file after undo....
 
 def test_remove_transaction_file_basic():
     """Test remove_transaction_file with valid input."""
@@ -415,8 +413,7 @@ def test_clear_rules_basic():
 
 
 # Test for undo_last_transaction (complexity: 6)
-# Original doc: Undo the last rename operation.
-Returns results similar to e...
+# Doc: Undo the last rename operation. Returns results similar to e...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -429,7 +426,7 @@ def test_undo_last_transaction_parametrized(input, expected):
 
 
 # Test for preview (complexity: 8)
-# Original doc: Generate preview for a list of files....
+# Doc: Generate preview for a list of files....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -442,8 +439,7 @@ def test_preview_parametrized(input, expected):
 
 
 # Test for execute (complexity: 7)
-# Original doc: Execute rename.
-Returns list of (original, success, message)...
+# Doc: Execute rename. Returns list of (original, success, message)...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

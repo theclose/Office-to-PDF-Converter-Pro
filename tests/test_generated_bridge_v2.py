@@ -1,6 +1,6 @@
 """
 Auto-generated tests for bridge (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.222275
+Generated: 2025-12-26T23:23:07.654477
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,11 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize bridge.
-
-Args:
-    grid: ConversionGrid instance
-...
+# Doc: Initialize bridge.  Args:     grid: ConversionGrid instance ...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -24,10 +20,7 @@ def test___init___basic():
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get combined grid and event bus statistics.
-
-Returns:
-    Di...
+# Doc: Get combined grid and event bus statistics.  Returns:     Di...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

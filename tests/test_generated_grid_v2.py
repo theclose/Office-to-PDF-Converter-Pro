@@ -1,6 +1,6 @@
 """
 Auto-generated tests for grid (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.165542
+Generated: 2025-12-26T23:23:07.625923
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize conversion grid (does not start workers).
-
-Args:
-...
+# Doc: Initialize conversion grid (does not start workers).  Args: ...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -23,7 +20,7 @@ def test___init___basic():
 
 
 # Test for start (complexity: 1)
-# Original doc: Start the conversion grid....
+# Doc: Start the conversion grid....
 
 def test_start_basic():
     """Test start with valid input."""
@@ -32,10 +29,7 @@ def test_start_basic():
 
 
 # Test for enqueue (complexity: 4)
-# Original doc: Add file to conversion queue.
-
-Args:
-    file: ConversionFil...
+# Doc: Add file to conversion queue.  Args:     file: ConversionFil...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -48,10 +42,7 @@ def test_enqueue_parametrized(input, expected):
 
 
 # Test for enqueue_batch (complexity: 3)
-# Original doc: Add multiple files to queue.
-
-Args:
-    files: List of Conve...
+# Doc: Add multiple files to queue.  Args:     files: List of Conve...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -64,10 +55,7 @@ def test_enqueue_batch_parametrized(input, expected):
 
 
 # Test for is_active (complexity: 3)
-# Original doc: Check if grid is currently processing files.
-
-Returns:
-    T...
+# Doc: Check if grid is currently processing files.  Returns:     T...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -80,10 +68,7 @@ def test_is_active_parametrized(input, expected):
 
 
 # Test for wait_completion (complexity: 4)
-# Original doc: Wait for all files to complete.
-
-Args:
-    timeout: Maximum ...
+# Doc: Wait for all files to complete.  Args:     timeout: Maximum ...
 
 def test_wait_completion_basic():
     """Test wait_completion with valid input."""
@@ -92,10 +77,7 @@ def test_wait_completion_basic():
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get comprehensive grid statistics.
-
-Returns:
-    Dict with s...
+# Doc: Get comprehensive grid statistics.  Returns:     Dict with s...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -108,10 +90,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for shutdown (complexity: 2)
-# Original doc: Shutdown grid gracefully.
-
-Args:
-    timeout: Maximum second...
+# Doc: Shutdown grid gracefully.  Args:     timeout: Maximum second...
 
 def test_shutdown_basic():
     """Test shutdown with valid input."""

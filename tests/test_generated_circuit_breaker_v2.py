@@ -1,6 +1,6 @@
 """
 Auto-generated tests for circuit_breaker (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.163542
+Generated: 2025-12-26T23:23:07.615539
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 3)
-# Original doc: Initialize coordinator.
-
-Args:
-    config: Circuit breaker c...
+# Doc: Initialize coordinator.  Args:     config: Circuit breaker c...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -23,10 +20,7 @@ def test___init___basic():
 
 
 # Test for should_allow_attempt (complexity: 4)
-# Original doc: Check if file should be allowed for conversion.
-
-Args:
-    f...
+# Doc: Check if file should be allowed for conversion.  Args:     f...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -39,10 +33,7 @@ def test_should_allow_attempt_parametrized(input, expected):
 
 
 # Test for record_failure (complexity: 3)
-# Original doc: Record a conversion failure.
-
-Args:
-    file: ConversionFile...
+# Doc: Record a conversion failure.  Args:     file: ConversionFile...
 
 def test_record_failure_basic():
     """Test record_failure with valid input."""
@@ -51,10 +42,7 @@ def test_record_failure_basic():
 
 
 # Test for record_success (complexity: 3)
-# Original doc: Record a successful conversion.
-
-Args:
-    file: ConversionF...
+# Doc: Record a successful conversion.  Args:     file: ConversionF...
 
 def test_record_success_basic():
     """Test record_success with valid input."""
@@ -63,10 +51,7 @@ def test_record_success_basic():
 
 
 # Test for get_circuit_state (complexity: 1)
-# Original doc: Get circuit breaker state for file.
-
-Args:
-    file: Convers...
+# Doc: Get circuit breaker state for file.  Args:     file: Convers...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -79,9 +64,7 @@ def test_get_circuit_state_parametrized(input, expected):
 
 
 # Test for reset_circuit (complexity: 3)
-# Original doc: Manually reset circuit breaker for file.
-
-Useful for user-in...
+# Doc: Manually reset circuit breaker for file.  Useful for user-in...
 
 def test_reset_circuit_basic():
     """Test reset_circuit with valid input."""
@@ -90,10 +73,7 @@ def test_reset_circuit_basic():
 
 
 # Test for get_stats (complexity: 2)
-# Original doc: Get coordinator statistics.
-
-Returns:
-    Dict with failure ...
+# Doc: Get coordinator statistics.  Returns:     Dict with failure ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -106,9 +86,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for cleanup_old_circuits (complexity: 6)
-# Original doc: Remove circuit breaker states for old files.
-
-Prevents unbou...
+# Doc: Remove circuit breaker states for old files.  Prevents unbou...
 
 def test_cleanup_old_circuits_basic():
     """Test cleanup_old_circuits with valid input."""

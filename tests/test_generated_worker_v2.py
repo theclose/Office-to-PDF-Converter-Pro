@@ -1,6 +1,6 @@
 """
 Auto-generated tests for worker (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.213871
+Generated: 2025-12-26T23:23:07.645469
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for __init__ (complexity: 2)
-# Original doc: Initialize worker process.
-
-Args:
-    worker_id: Unique iden...
+# Doc: Initialize worker process.  Args:     worker_id: Unique iden...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -23,9 +20,7 @@ def test___init___basic():
 
 
 # Test for run (complexity: 7)
-# Original doc: Main worker loop (runs in child process).
-
-This method execu...
+# Doc: Main worker loop (runs in child process).  This method execu...
 
 def test_run_basic():
     """Test run with valid input."""
@@ -34,10 +29,7 @@ def test_run_basic():
 
 
 # Test for shutdown (complexity: 3)
-# Original doc: Request graceful shutdown.
-
-Args:
-    timeout: Seconds to wa...
+# Doc: Request graceful shutdown.  Args:     timeout: Seconds to wa...
 
 def test_shutdown_basic():
     """Test shutdown with valid input."""

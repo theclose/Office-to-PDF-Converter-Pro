@@ -1,6 +1,6 @@
 """
 Auto-generated tests for models (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.151401
+Generated: 2025-12-26T23:23:07.613539
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,9 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for with_status (complexity: 1)
-# Original doc: Create a copy with updated status.
-
-Implements copy-on-write...
+# Doc: Create a copy with updated status.  Implements copy-on-write...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -26,9 +24,7 @@ def test_with_status_parametrized(input, expected):
 
 
 # Test for compute_timeout (complexity: 1)
-# Original doc: Calculate adaptive timeout for this file.
-
-Formula: T = base...
+# Doc: Calculate adaptive timeout for this file.  Formula: T = base...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -41,10 +37,7 @@ def test_compute_timeout_parametrized(input, expected):
 
 
 # Test for should_allow_attempt (complexity: 4)
-# Original doc: Check if file should be allowed to retry.
-
-Args:
-    current...
+# Doc: Check if file should be allowed to retry.  Args:     current...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -57,10 +50,7 @@ def test_should_allow_attempt_parametrized(input, expected):
 
 
 # Test for record_failure (complexity: 2)
-# Original doc: Record a conversion failure.
-
-Args:
-    current_time: Curren...
+# Doc: Record a conversion failure.  Args:     current_time: Curren...
 
 def test_record_failure_basic():
     """Test record_failure with valid input."""
@@ -69,7 +59,7 @@ def test_record_failure_basic():
 
 
 # Test for record_success (complexity: 1)
-# Original doc: Record a successful conversion, resetting circuit....
+# Doc: Record a successful conversion, resetting circuit....
 
 def test_record_success_basic():
     """Test record_success with valid input."""

@@ -1,6 +1,6 @@
 """
 Auto-generated tests for commands (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.292610
+Generated: 2025-12-26T23:23:07.686617
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for execute (complexity: 1)
-# Original doc: Execute command with given context.
-
-Args:
-    context: Exec...
+# Doc: Execute command with given context.  Args:     context: Exec...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -27,10 +24,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for validate (complexity: 1)
-# Original doc: Pre-execution validation.
-
-Returns:
-    (is_valid, error_mes...
+# Doc: Pre-execution validation.  Returns:     (is_valid, error_mes...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -43,7 +37,7 @@ def test_validate_parametrized(input, expected):
 
 
 # Test for validate (complexity: 3)
-# Original doc: Validate file paths exist....
+# Doc: Validate file paths exist....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -56,7 +50,7 @@ def test_validate_parametrized(input, expected):
 
 
 # Test for execute (complexity: 5)
-# Original doc: Execute file addition....
+# Doc: Execute file addition....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -69,7 +63,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for execute (complexity: 1)
-# Original doc: Execute file removal....
+# Doc: Execute file removal....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -82,7 +76,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for execute (complexity: 2)
-# Original doc: Execute queue clear....
+# Doc: Execute queue clear....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -95,7 +89,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for execute (complexity: 2)
-# Original doc: Execute conversion start....
+# Doc: Execute conversion start....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -108,7 +102,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for execute (complexity: 3)
-# Original doc: Execute conversion stop....
+# Doc: Execute conversion stop....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -121,7 +115,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for execute (complexity: 2)
-# Original doc: Execute circuit breaker reset....
+# Doc: Execute circuit breaker reset....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -134,10 +128,7 @@ def test_execute_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize command bus.
-
-Args:
-    context: Execution contex...
+# Doc: Initialize command bus.  Args:     context: Execution contex...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -146,9 +137,7 @@ def test___init___basic():
 
 
 # Test for execute_async (complexity: 2)
-# Original doc: Post command for async execution.
-
-Complexity: O(1) - Just q...
+# Doc: Post command for async execution.  Complexity: O(1) - Just q...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -161,9 +150,7 @@ def test_execute_async_parametrized(input, expected):
 
 
 # Test for execute_sync (complexity: 1)
-# Original doc: Execute command synchronously (blocks until complete).
-
-Args...
+# Doc: Execute command synchronously (blocks until complete).  Args...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -176,10 +163,7 @@ def test_execute_sync_parametrized(input, expected):
 
 
 # Test for get_history (complexity: 1)
-# Original doc: Get recent command history.
-
-Args:
-    count: Number of rece...
+# Doc: Get recent command history.  Args:     count: Number of rece...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -192,7 +176,7 @@ def test_get_history_parametrized(input, expected):
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get command bus statistics....
+# Doc: Get command bus statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -205,10 +189,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for shutdown (complexity: 2)
-# Original doc: Shutdown command bus gracefully.
-
-Args:
-    timeout: Max sec...
+# Doc: Shutdown command bus gracefully.  Args:     timeout: Max sec...
 
 def test_shutdown_basic():
     """Test shutdown with valid input."""

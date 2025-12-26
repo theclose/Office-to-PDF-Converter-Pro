@@ -1,6 +1,6 @@
 """
 Auto-generated tests for pdf_tools (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:47.312376
+Generated: 2025-12-26T23:23:06.144948
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,10 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for merge_pdfs (complexity: 7)
-# Original doc: Merge multiple PDF files into one.
-
-Args:
-    pdf_paths: Lis...
+# Doc: Merge multiple PDF files into one.  Args:     pdf_paths: Lis...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -27,10 +24,7 @@ def test_merge_pdfs_parametrized(input, expected):
 
 
 # Test for split_pdf (complexity: 5)
-# Original doc: Split a PDF into individual pages.
-
-Args:
-    input_path: Pa...
+# Doc: Split a PDF into individual pages.  Args:     input_path: Pa...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -43,10 +37,7 @@ def test_split_pdf_parametrized(input, expected):
 
 
 # Test for protect_pdf (complexity: 6)
-# Original doc: Add password protection to a PDF file.
-
-Args:
-    input_path...
+# Doc: Add password protection to a PDF file.  Args:     input_path...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -59,9 +50,7 @@ def test_protect_pdf_parametrized(input, expected):
 
 
 # Test for post_process_pdf (complexity: 10)
-# Original doc: Apply password protection and/or metadata to PDF in-place.
-
-...
+# Doc: Apply password protection and/or metadata to PDF in-place.  ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -74,7 +63,7 @@ def test_post_process_pdf_parametrized(input, expected):
 
 
 # Test for rasterize_pdf (complexity: 11)
-# Original doc: Convert PDF pages to fully flattened images (rasterize) to p...
+# Doc: Convert PDF pages to fully flattened images (rasterize) to p...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -87,8 +76,7 @@ def test_rasterize_pdf_parametrized(input, expected):
 
 
 # Test for compress_pdf (complexity: 10)
-# Original doc: Compress a PDF file using multiple optimization techniques:
-...
+# Doc: Compress a PDF file using multiple optimization techniques: ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -101,7 +89,7 @@ def test_compress_pdf_parametrized(input, expected):
 
 
 # Test for add_watermark (complexity: 6)
-# Original doc: Add text watermark to all pages of a PDF....
+# Doc: Add text watermark to all pages of a PDF....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -114,7 +102,7 @@ def test_add_watermark_parametrized(input, expected):
 
 
 # Test for pdf_to_images (complexity: 6)
-# Original doc: Convert PDF pages to images....
+# Doc: Convert PDF pages to images....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -127,7 +115,7 @@ def test_pdf_to_images_parametrized(input, expected):
 
 
 # Test for images_to_pdf (complexity: 7)
-# Original doc: Combine multiple images into a single PDF....
+# Doc: Combine multiple images into a single PDF....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -140,10 +128,7 @@ def test_images_to_pdf_parametrized(input, expected):
 
 
 # Test for rotate_pages (complexity: 7)
-# Original doc: Rotate pages in a PDF.
-
-Args:
-    input_path: Path to input ...
+# Doc: Rotate pages in a PDF.  Args:     input_path: Path to input ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -156,9 +141,7 @@ def test_rotate_pages_parametrized(input, expected):
 
 
 # Test for parse_page_range (complexity: 16)
-# Original doc: Parse page range string to list of 0-indexed page numbers.
-
-...
+# Doc: Parse page range string to list of 0-indexed page numbers.  ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -171,10 +154,7 @@ def test_parse_page_range_parametrized(input, expected):
 
 
 # Test for extract_pages (complexity: 6)
-# Original doc: Extract specific pages from PDF to a new file.
-
-Args:
-    in...
+# Doc: Extract specific pages from PDF to a new file.  Args:     in...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -187,10 +167,7 @@ def test_extract_pages_parametrized(input, expected):
 
 
 # Test for delete_pages (complexity: 6)
-# Original doc: Delete specific pages from PDF.
-
-Args:
-    input_path: Path ...
+# Doc: Delete specific pages from PDF.  Args:     input_path: Path ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -203,10 +180,7 @@ def test_delete_pages_parametrized(input, expected):
 
 
 # Test for reorder_pages (complexity: 7)
-# Original doc: Reorder pages in a PDF.
-
-Args:
-    input_path: Path to input...
+# Doc: Reorder pages in a PDF.  Args:     input_path: Path to input...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -219,10 +193,7 @@ def test_reorder_pages_parametrized(input, expected):
 
 
 # Test for reverse_pages (complexity: 4)
-# Original doc: Reverse page order in a PDF.
-
-Args:
-    input_path: Path to ...
+# Doc: Reverse page order in a PDF.  Args:     input_path: Path to ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -235,8 +206,7 @@ def test_reverse_pages_parametrized(input, expected):
 
 
 # Test for extract_pdf_pages (complexity: 8)
-# Original doc: Extract specific pages from PDF and overwrite the original.
-...
+# Doc: Extract specific pages from PDF and overwrite the original. ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

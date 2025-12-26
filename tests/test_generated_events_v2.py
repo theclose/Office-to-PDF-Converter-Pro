@@ -1,6 +1,6 @@
 """
 Auto-generated tests for events (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:50.275349
+Generated: 2025-12-26T23:23:07.684617
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for percent (complexity: 2)
-# Original doc: Calculate progress percentage....
+# Doc: Calculate progress percentage....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_percent_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize event bus....
+# Doc: Initialize event bus....
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -33,10 +33,7 @@ def test___init___basic():
 
 
 # Test for subscribe (complexity: 1)
-# Original doc: Subscribe to an event type.
-
-Args:
-    event_type: Class of ...
+# Doc: Subscribe to an event type.  Args:     event_type: Class of ...
 
 def test_subscribe_basic():
     """Test subscribe with valid input."""
@@ -45,10 +42,7 @@ def test_subscribe_basic():
 
 
 # Test for unsubscribe (complexity: 2)
-# Original doc: Unsubscribe from an event type.
-
-Args:
-    event_type: Event...
+# Doc: Unsubscribe from an event type.  Args:     event_type: Event...
 
 def test_unsubscribe_basic():
     """Test unsubscribe with valid input."""
@@ -57,10 +51,7 @@ def test_unsubscribe_basic():
 
 
 # Test for publish (complexity: 2)
-# Original doc: Publish event to all subscribers.
-
-Args:
-    event: Event in...
+# Doc: Publish event to all subscribers.  Args:     event: Event in...
 
 def test_publish_basic():
     """Test publish with valid input."""
@@ -69,10 +60,7 @@ def test_publish_basic():
 
 
 # Test for publish_async (complexity: 1)
-# Original doc: Publish event in background thread (non-blocking).
-
-Args:
-  ...
+# Doc: Publish event in background thread (non-blocking).  Args:   ...
 
 def test_publish_async_basic():
     """Test publish_async with valid input."""
@@ -81,7 +69,7 @@ def test_publish_async_basic():
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get event bus statistics....
+# Doc: Get event bus statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -94,10 +82,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize aggregator.
-
-Args:
-    event_types: Types of even...
+# Doc: Initialize aggregator.  Args:     event_types: Types of even...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -106,7 +91,7 @@ def test___init___basic():
 
 
 # Test for on_event (complexity: 2)
-# Original doc: Receive an event (call from EventBus callback)....
+# Doc: Receive an event (call from EventBus callback)....
 
 def test_on_event_basic():
     """Test on_event with valid input."""

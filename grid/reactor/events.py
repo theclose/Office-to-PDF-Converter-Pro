@@ -135,7 +135,7 @@ class QuarantineEvent(Event):
         file: ConversionFile that was quarantined
         failure_count: Number of failures before quarantine
     """
-    file: Any  # ConversionFile
+    file: Any = None  # ConversionFile
     failure_count: int = 0
 
 

@@ -619,6 +619,12 @@ class FileToolsEngine:
                 directory = os.path.dirname(p.original_path)
                 new_path = os.path.join(directory, p.new_filename)
                 
+                # P0 Security: Normalize path and validate it stays within original directory
+                new_path = os.path.normpath(new_path)
+                if os.path.dirname(new_path) != os.path.normpath(directory):
+                    results.append((p.original_path, False, "Path traversal blocked"))
+                    continue
+                
                 os.rename(p.original_path, new_path)
                 results.append((p.original_path, True, f"-> {p.new_filename}"))
                 successful_ops.append((p.original_path, new_path))

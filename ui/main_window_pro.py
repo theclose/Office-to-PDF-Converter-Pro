@@ -59,6 +59,9 @@ if HAS_TKDND:
 else:
     logger.warning("tkinterdnd2 not installed - drag drop disabled")
 
+# UI Components
+from office_converter.ui.file_tools_ui import FileToolsDialog
+
 # Import fitz (PyMuPDF) at module level with proper fallback
 fitz = None
 if HAS_PYMUPDF:
@@ -872,7 +875,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.2.4"
+    VERSION = "4.2.5"
 
     def __init__(self):
         super().__init__()
@@ -1359,7 +1362,10 @@ class ConverterProApp(TkDnDWrapper):
             self.lang_dropdown.pack(side="left")
 
             ctk.CTkButton(log_header, text="🛠️ PDF Tools", width=100,
-                         command=self._open_pdf_tools).pack(side="right")
+                         command=self._open_pdf_tools).pack(side="right", padx=5)
+            
+            ctk.CTkButton(log_header, text="📂 File Tools", width=100,
+                         command=self._open_file_tools).pack(side="right", padx=5)
 
             self.log_textbox = ctk.CTkTextbox(log_frame, height=80,
                                               font=ctk.CTkFont(family="Consolas", size=11))
@@ -2159,6 +2165,21 @@ F1         Xem shortcuts
         
         # Schedule after 100ms to debounce
         self.after(100, do_restore)
+
+    def _open_file_tools(self):
+        """Open File Tools dialog."""
+        try:
+            # Check if already open
+            if hasattr(self, 'file_tools_dialog') and self.file_tools_dialog and self.file_tools_dialog.winfo_exists():
+                self.file_tools_dialog.lift()
+                self.file_tools_dialog.focus_force()
+                return
+
+            self.file_tools_dialog = FileToolsDialog(self)
+            self.file_tools_dialog.grab_set() # Modal
+        except Exception as e:
+            logger.error(f"Error opening File Tools: {e}")
+            messagebox.showerror("Error", f"Failed to open File Tools: {e}")
 
     def _on_closing(self):
         """Cleanup on close with forced termination."""

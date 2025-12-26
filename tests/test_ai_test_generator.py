@@ -263,7 +263,7 @@ def test_other():
         
     def test_suggest_assertion_bool_return(self):
         """Test assertion suggestion for bool return type."""
-        learner = TestPatternLearner()
+        learner = TestPatternLearner(test_dir="tests")
         
         func = FunctionSignature(
             name="is_valid",

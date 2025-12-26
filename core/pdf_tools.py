@@ -275,6 +275,14 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
     try:
         doc = fitz.open(pdf_path)
         new_doc = fitz.open()
+        
+        # P3 Performance: Warn for very large PDFs
+        page_count = len(doc)
+        if page_count > 500:
+            logger.warning(
+                f"Large PDF detected ({page_count} pages). "
+                "Consider splitting before rasterizing for better memory usage."
+            )
 
         for page in doc:
             mat = fitz.Matrix(dpi / 72, dpi / 72)
@@ -293,8 +301,13 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
                 # Save as JPEG with 80 quality for scan artifact
                 img.save(buf, format="JPEG", quality=80)
                 img_data = buf.getvalue()
+                buf.close()  # P3: Release buffer memory
+                del img  # P3: Explicit cleanup
             else:
                 img_data = pix.tobytes("png")
+
+            # P3: Release pixmap memory immediately after use
+            del pix
 
             page_rect = page.rect
             new_width = page_rect.width * (dpi / 72)
@@ -304,6 +317,9 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
             img_rect = fitz.Rect(0, 0, new_width, new_height)
             new_page.insert_image(img_rect, stream=img_data,
                                   keep_proportion=False, overlay=True)
+            
+            # P3: Release image data after insertion
+            del img_data
 
         doc.close()
 

@@ -1,6 +1,6 @@
 """
 Auto-generated tests for main_window_ctk (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:51.885357
+Generated: 2025-12-26T23:45:49.663230
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for main (complexity: 1)
-# Original doc: Main entry point....
+# Doc: Main entry point....
 
 def test_main_basic():
     """Test main with valid input."""
@@ -28,7 +28,7 @@ def test___init___basic():
 
 
 # Test for start_pulse (complexity: 3)
-# Original doc: Start pulsing animation....
+# Doc: Start pulsing animation....
 
 def test_start_pulse_basic():
     """Test start_pulse with valid input."""
@@ -37,7 +37,7 @@ def test_start_pulse_basic():
 
 
 # Test for stop_pulse (complexity: 1)
-# Original doc: Stop pulsing animation....
+# Doc: Stop pulsing animation....
 
 def test_stop_pulse_basic():
     """Test stop_pulse with valid input."""
@@ -54,7 +54,7 @@ def test___init___basic():
 
 
 # Test for update_distribution (complexity: 5)
-# Original doc: Update bars based on file type distribution....
+# Doc: Update bars based on file type distribution....
 
 def test_update_distribution_basic():
     """Test update_distribution with valid input."""
@@ -71,7 +71,7 @@ def test___init___basic():
 
 
 # Test for log (complexity: 1)
-# Original doc: Add message to log with timestamp....
+# Doc: Add message to log with timestamp....
 
 def test_log_basic():
     """Test log with valid input."""
@@ -80,7 +80,7 @@ def test_log_basic():
 
 
 # Test for add_files (complexity: 4)
-# Original doc: Add files via dialog....
+# Doc: Add files via dialog....
 
 def test_add_files_basic():
     """Test add_files with valid input."""
@@ -89,7 +89,7 @@ def test_add_files_basic():
 
 
 # Test for add_folder (complexity: 5)
-# Original doc: Add all Office files from folder....
+# Doc: Add all Office files from folder....
 
 def test_add_folder_basic():
     """Test add_folder with valid input."""
@@ -98,7 +98,7 @@ def test_add_folder_basic():
 
 
 # Test for clear_list (complexity: 2)
-# Original doc: Clear file list with animation....
+# Doc: Clear file list with animation....
 
 def test_clear_list_basic():
     """Test clear_list with valid input."""
@@ -107,7 +107,7 @@ def test_clear_list_basic():
 
 
 # Test for delete_selected (complexity: 1)
-# Original doc: Delete selected files....
+# Doc: Delete selected files....
 
 def test_delete_selected_basic():
     """Test delete_selected with valid input."""
@@ -116,7 +116,7 @@ def test_delete_selected_basic():
 
 
 # Test for select_output_folder (complexity: 2)
-# Original doc: Select output folder....
+# Doc: Select output folder....
 
 def test_select_output_folder_basic():
     """Test select_output_folder with valid input."""
@@ -125,7 +125,7 @@ def test_select_output_folder_basic():
 
 
 # Test for start_conversion (complexity: 3)
-# Original doc: Start conversion process with animation....
+# Doc: Start conversion process with animation....
 
 def test_start_conversion_basic():
     """Test start_conversion with valid input."""
@@ -134,7 +134,7 @@ def test_start_conversion_basic():
 
 
 # Test for open_pdf_tools (complexity: 2)
-# Original doc: Open PDF Tools dialog....
+# Doc: Open PDF Tools dialog....
 
 def test_open_pdf_tools_basic():
     """Test open_pdf_tools with valid input."""

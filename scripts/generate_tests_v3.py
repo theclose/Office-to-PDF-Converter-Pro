@@ -181,7 +181,7 @@ class SmartPrioritizer:
 class TestPatternLearner:
     """Learn test patterns from existing test suite."""
     
-    def __init__(self, test_dir: str = "tests/"):
+    def __init__(self, test_dir: str = "tests"):
         self.test_dir = Path(test_dir)
         self.patterns = {
             'assertions': {},

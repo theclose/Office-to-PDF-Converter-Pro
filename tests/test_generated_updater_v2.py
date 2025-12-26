@@ -1,6 +1,6 @@
 """
 Auto-generated tests for updater (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.596318
+Generated: 2025-12-26T23:45:49.896476
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for show_update_dialog (complexity: 4)
-# Original doc: Show update available dialog using CustomTkinter....
+# Doc: Show update available dialog using CustomTkinter....
 
 def test_show_update_dialog_basic():
     """Test show_update_dialog with valid input."""
@@ -20,7 +20,7 @@ def test_show_update_dialog_basic():
 
 
 # Test for check_for_updates_on_startup (complexity: 3)
-# Original doc: Check for updates and show dialog if available....
+# Doc: Check for updates and show dialog if available....
 
 def test_check_for_updates_on_startup_basic():
     """Test check_for_updates_on_startup with valid input."""
@@ -37,7 +37,7 @@ def test___init___basic():
 
 
 # Test for check_async (complexity: 1)
-# Original doc: Check for updates asynchronously....
+# Doc: Check for updates asynchronously....
 
 def test_check_async_basic():
     """Test check_async with valid input."""
@@ -46,7 +46,7 @@ def test_check_async_basic():
 
 
 # Test for check (complexity: 10)
-# Original doc: Check for updates synchronously....
+# Doc: Check for updates synchronously....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -59,7 +59,7 @@ def test_check_parametrized(input, expected):
 
 
 # Test for open_download (complexity: 1)
-# Original doc: Open download URL in browser....
+# Doc: Open download URL in browser....
 
 def test_open_download_basic():
     """Test open_download with valid input."""

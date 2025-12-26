@@ -1,6 +1,6 @@
 """
 Auto-generated tests for logging_setup (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.527567
+Generated: 2025-12-26T23:45:49.732930
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for setup_logging (complexity: 2)
-# Original doc: Setup application logging with file rotation and console han...
+# Doc: Setup application logging with file rotation and console han...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_setup_logging_parametrized(input, expected):
 
 
 # Test for get_logger (complexity: 1)
-# Original doc: Get a child logger for a specific module....
+# Doc: Get a child logger for a specific module....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

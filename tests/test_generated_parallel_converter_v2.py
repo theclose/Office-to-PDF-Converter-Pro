@@ -1,6 +1,6 @@
 """
 Auto-generated tests for parallel_converter (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.559962
+Generated: 2025-12-26T23:45:49.805082
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for get_parallel_converter (complexity: 3)
-# Original doc: Get or create global parallel converter....
+# Doc: Get or create global parallel converter....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_get_parallel_converter_parametrized(input, expected):
 
 
 # Test for shutdown_parallel_converter (complexity: 2)
-# Original doc: Shutdown global parallel converter....
+# Doc: Shutdown global parallel converter....
 
 def test_shutdown_parallel_converter_basic():
     """Test shutdown_parallel_converter with valid input."""
@@ -45,10 +45,7 @@ def test_to_dict_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 3)
-# Original doc: Initialize parallel converter.
-
-Args:
-    num_workers: Numbe...
+# Doc: Initialize parallel converter.  Args:     num_workers: Numbe...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -57,7 +54,7 @@ def test___init___basic():
 
 
 # Test for start (complexity: 3)
-# Original doc: Start the worker pool....
+# Doc: Start the worker pool....
 
 def test_start_basic():
     """Test start with valid input."""
@@ -66,7 +63,7 @@ def test_start_basic():
 
 
 # Test for stop (complexity: 6)
-# Original doc: Stop all workers gracefully....
+# Doc: Stop all workers gracefully....
 
 def test_stop_basic():
     """Test stop with valid input."""
@@ -75,10 +72,7 @@ def test_stop_basic():
 
 
 # Test for submit (complexity: 3)
-# Original doc: Submit a conversion job.
-
-Returns:
-    Job ID...
+# Doc: Submit a conversion job.  Returns:     Job ID...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -91,10 +85,7 @@ def test_submit_parametrized(input, expected):
 
 
 # Test for get_results (complexity: 7)
-# Original doc: Get completed results.
-
-Args:
-    block: Whether to block wa...
+# Doc: Get completed results.  Args:     block: Whether to block wa...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -107,7 +98,7 @@ def test_get_results_parametrized(input, expected):
 
 
 # Test for get_pending_count (complexity: 1)
-# Original doc: Get number of pending jobs....
+# Doc: Get number of pending jobs....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -120,7 +111,7 @@ def test_get_pending_count_parametrized(input, expected):
 
 
 # Test for is_running (complexity: 1)
-# Original doc: Check if converter is running....
+# Doc: Check if converter is running....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -133,7 +124,7 @@ def test_is_running_parametrized(input, expected):
 
 
 # Test for get_worker_status (complexity: 2)
-# Original doc: Get status of all workers....
+# Doc: Get status of all workers....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

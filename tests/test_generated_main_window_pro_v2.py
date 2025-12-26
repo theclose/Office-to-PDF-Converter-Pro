@@ -1,6 +1,6 @@
 """
 Auto-generated tests for main_window_pro (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:51.914851
+Generated: 2025-12-26T23:45:49.651145
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for main (complexity: 2)
-# Original doc: Application entry point....
+# Doc: Application entry point....
 
 def test_main_basic():
     """Test main with valid input."""
@@ -52,10 +52,7 @@ def test___init___basic():
 
 
 # Test for stop (complexity: 2)
-# Original doc: Request conversion stop.
-
-Args:
-    force: If True, attempt ...
+# Doc: Request conversion stop.  Args:     force: If True, attempt ...
 
 def test_stop_basic():
     """Test stop with valid input."""
@@ -64,7 +61,7 @@ def test_stop_basic():
 
 
 # Test for reset (complexity: 1)
-# Original doc: Reset stop flag....
+# Doc: Reset stop flag....
 
 def test_reset_basic():
     """Test reset with valid input."""
@@ -73,7 +70,7 @@ def test_reset_basic():
 
 
 # Test for convert_batch (complexity: 15)
-# Original doc: Convert a batch of files....
+# Doc: Convert a batch of files....
 
 def test_convert_batch_basic():
     """Test convert_batch with valid input."""
@@ -90,7 +87,7 @@ def test___init___basic():
 
 
 # Test for get_selected_files (complexity: 2)
-# Original doc: Get currently selected files (or all if none selected)....
+# Doc: Get currently selected files (or all if none selected)....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -103,7 +100,7 @@ def test_get_selected_files_parametrized(input, expected):
 
 
 # Test for add_files (complexity: 6)
-# Original doc: Add files to the list with success logging....
+# Doc: Add files to the list with success logging....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -116,7 +113,7 @@ def test_add_files_parametrized(input, expected):
 
 
 # Test for clear (complexity: 2)
-# Original doc: Clear all files....
+# Doc: Clear all files....
 
 def test_clear_basic():
     """Test clear with valid input."""
@@ -125,7 +122,7 @@ def test_clear_basic():
 
 
 # Test for remove_completed (complexity: 2)
-# Original doc: Remove completed files....
+# Doc: Remove completed files....
 
 def test_remove_completed_basic():
     """Test remove_completed with valid input."""

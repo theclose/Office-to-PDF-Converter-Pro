@@ -1,6 +1,6 @@
 """
 Auto-generated tests for dnd_helpers (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.513780
+Generated: 2025-12-26T23:45:49.678938
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for parse_dropped_paths (complexity: 5)
-# Original doc: Parse dropped file paths from TkinterDnD2 event data with pr...
+# Doc: Parse dropped file paths from TkinterDnD2 event data with pr...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

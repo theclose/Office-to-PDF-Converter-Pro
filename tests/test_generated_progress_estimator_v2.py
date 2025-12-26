@@ -1,6 +1,6 @@
 """
 Auto-generated tests for progress_estimator (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.571811
+Generated: 2025-12-26T23:45:49.911476
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for get_system_profiler (complexity: 2)
-# Original doc: Get global system profiler instance....
+# Doc: Get global system profiler instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_get_system_profiler_parametrized(input, expected):
 
 
 # Test for get_conversion_logger (complexity: 2)
-# Original doc: Get global conversion logger instance....
+# Doc: Get global conversion logger instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -37,7 +37,7 @@ def test_get_conversion_logger_parametrized(input, expected):
 
 
 # Test for get_adaptive_estimator (complexity: 2)
-# Original doc: Get global adaptive estimator instance....
+# Doc: Get global adaptive estimator instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -50,10 +50,7 @@ def test_get_adaptive_estimator_parametrized(input, expected):
 
 
 # Test for estimate_conversion_time (complexity: 1)
-# Original doc: Convenience function to estimate conversion time.
-
-Args:
-   ...
+# Doc: Convenience function to estimate conversion time.  Args:    ...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -66,10 +63,7 @@ def test_estimate_conversion_time_parametrized(input, expected):
 
 
 # Test for log_conversion_result (complexity: 1)
-# Original doc: Log a conversion result for learning.
-
-Args:
-    file_path: ...
+# Doc: Log a conversion result for learning.  Args:     file_path: ...
 
 def test_log_conversion_result_basic():
     """Test log_conversion_result with valid input."""
@@ -110,7 +104,7 @@ def test___init___basic():
 
 
 # Test for get_current_load (complexity: 3)
-# Original doc: Get current CPU and RAM usage....
+# Doc: Get current CPU and RAM usage....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -147,7 +141,7 @@ def test_from_dict_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 2)
-# Original doc: Initialize logger with storage directory....
+# Doc: Initialize logger with storage directory....
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -156,8 +150,7 @@ def test___init___basic():
 
 
 # Test for log_conversion (complexity: 3)
-# Original doc: Log a conversion result (minimal data only).
-Uses append-onl...
+# Doc: Log a conversion result (minimal data only). Uses append-onl...
 
 def test_log_conversion_basic():
     """Test log_conversion with valid input."""
@@ -166,7 +159,7 @@ def test_log_conversion_basic():
 
 
 # Test for get_records_by_type (complexity: 2)
-# Original doc: Get records filtered by file type....
+# Doc: Get records filtered by file type....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -179,7 +172,7 @@ def test_get_records_by_type_parametrized(input, expected):
 
 
 # Test for get_statistics (complexity: 2)
-# Original doc: Get summary statistics....
+# Doc: Get summary statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -192,7 +185,7 @@ def test_get_statistics_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 1)
-# Original doc: Initialize with logger....
+# Doc: Initialize with logger....
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -201,9 +194,7 @@ def test___init___basic():
 
 
 # Test for estimate (complexity: 2)
-# Original doc: Estimate conversion time for a file.
-
-Formula: max(MIN_TIME,...
+# Doc: Estimate conversion time for a file.  Formula: max(MIN_TIME,...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -216,10 +207,7 @@ def test_estimate_parametrized(input, expected):
 
 
 # Test for update_after_conversion (complexity: 1)
-# Original doc: Log conversion and update average.
-
-Args:
-    file_path: Pat...
+# Doc: Log conversion and update average.  Args:     file_path: Pat...
 
 def test_update_after_conversion_basic():
     """Test update_after_conversion with valid input."""

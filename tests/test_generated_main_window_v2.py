@@ -1,6 +1,6 @@
 """
 Auto-generated tests for main_window (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:51.940242
+Generated: 2025-12-26T23:45:49.768837
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for main (complexity: 1)
-# Original doc: Main entry point....
+# Doc: Main entry point....
 
 def test_main_basic():
     """Test main with valid input."""
@@ -28,7 +28,7 @@ def test___init___basic():
 
 
 # Test for toggle_theme (complexity: 2)
-# Original doc: Toggle dark/light theme....
+# Doc: Toggle dark/light theme....
 
 def test_toggle_theme_basic():
     """Test toggle_theme with valid input."""
@@ -37,7 +37,7 @@ def test_toggle_theme_basic():
 
 
 # Test for log (complexity: 1)
-# Original doc: Add message to log....
+# Doc: Add message to log....
 
 def test_log_basic():
     """Test log with valid input."""
@@ -46,7 +46,7 @@ def test_log_basic():
 
 
 # Test for add_files (complexity: 3)
-# Original doc: Add files via dialog....
+# Doc: Add files via dialog....
 
 def test_add_files_basic():
     """Test add_files with valid input."""
@@ -55,7 +55,7 @@ def test_add_files_basic():
 
 
 # Test for add_folder (complexity: 5)
-# Original doc: Add all Office files from folder....
+# Doc: Add all Office files from folder....
 
 def test_add_folder_basic():
     """Test add_folder with valid input."""
@@ -64,7 +64,7 @@ def test_add_folder_basic():
 
 
 # Test for clear_list (complexity: 1)
-# Original doc: Clear file list....
+# Doc: Clear file list....
 
 def test_clear_list_basic():
     """Test clear_list with valid input."""
@@ -73,7 +73,7 @@ def test_clear_list_basic():
 
 
 # Test for delete_selected (complexity: 2)
-# Original doc: Delete selected files....
+# Doc: Delete selected files....
 
 def test_delete_selected_basic():
     """Test delete_selected with valid input."""
@@ -82,7 +82,7 @@ def test_delete_selected_basic():
 
 
 # Test for select_output_folder (complexity: 2)
-# Original doc: Select output folder....
+# Doc: Select output folder....
 
 def test_select_output_folder_basic():
     """Test select_output_folder with valid input."""
@@ -91,7 +91,7 @@ def test_select_output_folder_basic():
 
 
 # Test for reset_output_folder (complexity: 1)
-# Original doc: Reset to default output....
+# Doc: Reset to default output....
 
 def test_reset_output_folder_basic():
     """Test reset_output_folder with valid input."""
@@ -100,7 +100,7 @@ def test_reset_output_folder_basic():
 
 
 # Test for merge_pdfs (complexity: 4)
-# Original doc: Merge PDF files....
+# Doc: Merge PDF files....
 
 def test_merge_pdfs_basic():
     """Test merge_pdfs with valid input."""
@@ -109,7 +109,7 @@ def test_merge_pdfs_basic():
 
 
 # Test for split_pdf (complexity: 4)
-# Original doc: Split PDF file into pages....
+# Doc: Split PDF file into pages....
 
 def test_split_pdf_basic():
     """Test split_pdf with valid input."""
@@ -118,7 +118,7 @@ def test_split_pdf_basic():
 
 
 # Test for compress_pdf (complexity: 6)
-# Original doc: Compress PDF files (batch support)....
+# Doc: Compress PDF files (batch support)....
 
 def test_compress_pdf_basic():
     """Test compress_pdf with valid input."""
@@ -127,7 +127,7 @@ def test_compress_pdf_basic():
 
 
 # Test for add_watermark (complexity: 5)
-# Original doc: Add watermark to PDF....
+# Doc: Add watermark to PDF....
 
 def test_add_watermark_basic():
     """Test add_watermark with valid input."""
@@ -136,7 +136,7 @@ def test_add_watermark_basic():
 
 
 # Test for pdf_to_images (complexity: 5)
-# Original doc: Convert PDF to images....
+# Doc: Convert PDF to images....
 
 def test_pdf_to_images_basic():
     """Test pdf_to_images with valid input."""
@@ -145,7 +145,7 @@ def test_pdf_to_images_basic():
 
 
 # Test for images_to_pdf (complexity: 4)
-# Original doc: Convert images to PDF....
+# Doc: Convert images to PDF....
 
 def test_images_to_pdf_basic():
     """Test images_to_pdf with valid input."""
@@ -154,7 +154,7 @@ def test_images_to_pdf_basic():
 
 
 # Test for rotate_pdf (complexity: 5)
-# Original doc: Rotate PDF pages....
+# Doc: Rotate PDF pages....
 
 def test_rotate_pdf_basic():
     """Test rotate_pdf with valid input."""
@@ -163,7 +163,7 @@ def test_rotate_pdf_basic():
 
 
 # Test for extract_pdf_pages (complexity: 5)
-# Original doc: Extract specific pages from PDF....
+# Doc: Extract specific pages from PDF....
 
 def test_extract_pdf_pages_basic():
     """Test extract_pdf_pages with valid input."""
@@ -172,7 +172,7 @@ def test_extract_pdf_pages_basic():
 
 
 # Test for delete_pdf_pages (complexity: 5)
-# Original doc: Delete specific pages from PDF....
+# Doc: Delete specific pages from PDF....
 
 def test_delete_pdf_pages_basic():
     """Test delete_pdf_pages with valid input."""
@@ -181,7 +181,7 @@ def test_delete_pdf_pages_basic():
 
 
 # Test for reverse_pdf (complexity: 4)
-# Original doc: Reverse page order in PDF....
+# Doc: Reverse page order in PDF....
 
 def test_reverse_pdf_basic():
     """Test reverse_pdf with valid input."""
@@ -190,7 +190,7 @@ def test_reverse_pdf_basic():
 
 
 # Test for open_pdf_tools_dialog (complexity: 1)
-# Original doc: Open unified PDF Tools dialog....
+# Doc: Open unified PDF Tools dialog....
 
 def test_open_pdf_tools_dialog_basic():
     """Test open_pdf_tools_dialog with valid input."""
@@ -199,7 +199,7 @@ def test_open_pdf_tools_dialog_basic():
 
 
 # Test for show_settings (complexity: 1)
-# Original doc: Show settings dialog....
+# Doc: Show settings dialog....
 
 def test_show_settings_basic():
     """Test show_settings with valid input."""
@@ -208,7 +208,7 @@ def test_show_settings_basic():
 
 
 # Test for show_history (complexity: 3)
-# Original doc: Show conversion history dialog....
+# Doc: Show conversion history dialog....
 
 def test_show_history_basic():
     """Test show_history with valid input."""
@@ -217,7 +217,7 @@ def test_show_history_basic():
 
 
 # Test for handle_drop (complexity: 5)
-# Original doc: Handle drag & drop files....
+# Doc: Handle drag & drop files....
 
 def test_handle_drop_basic():
     """Test handle_drop with valid input."""
@@ -226,7 +226,7 @@ def test_handle_drop_basic():
 
 
 # Test for start_conversion (complexity: 3)
-# Original doc: Start conversion thread....
+# Doc: Start conversion thread....
 
 def test_start_conversion_basic():
     """Test start_conversion with valid input."""
@@ -251,7 +251,7 @@ def test_clear_history_basic():
 
 
 # Test for format_time (complexity: 2)
-# Original doc: Format seconds as Xm Ys....
+# Doc: Format seconds as Xm Ys....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -264,7 +264,7 @@ def test_format_time_parametrized(input, expected):
 
 
 # Test for update_time_display (complexity: 1)
-# Original doc: Update elapsed and remaining time labels....
+# Doc: Update elapsed and remaining time labels....
 
 def test_update_time_display_basic():
     """Test update_time_display with valid input."""
@@ -273,7 +273,7 @@ def test_update_time_display_basic():
 
 
 # Test for update_progress (complexity: 1)
-# Original doc: Update progress bar (0-100) for current file....
+# Doc: Update progress bar (0-100) for current file....
 
 def test_update_progress_basic():
     """Test update_progress with valid input."""

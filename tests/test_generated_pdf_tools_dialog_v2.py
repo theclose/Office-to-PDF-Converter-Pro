@@ -1,6 +1,6 @@
 """
 Auto-generated tests for pdf_tools_dialog (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:51.829642
+Generated: 2025-12-26T23:45:49.567158
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for show_pdf_tools_dialog (complexity: 1)
-# Original doc: Show the PDF Tools dialog....
+# Doc: Show the PDF Tools dialog....
 
 def test_show_pdf_tools_dialog_basic():
     """Test show_pdf_tools_dialog with valid input."""

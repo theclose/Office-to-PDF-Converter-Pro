@@ -1,6 +1,6 @@
 """
 Auto-generated tests for recent_files (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.578597
+Generated: 2025-12-26T23:45:49.863955
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for get_recent_files_db (complexity: 2)
-# Original doc: Get global RecentFilesDB instance....
+# Doc: Get global RecentFilesDB instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,10 +24,7 @@ def test_get_recent_files_db_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 2)
-# Original doc: Initialize database.
-
-Args:
-    db_path: Path to SQLite data...
+# Doc: Initialize database.  Args:     db_path: Path to SQLite data...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -36,7 +33,7 @@ def test___init___basic():
 
 
 # Test for add_recent (complexity: 2)
-# Original doc: Add or update recent file....
+# Doc: Add or update recent file....
 
 def test_add_recent_basic():
     """Test add_recent with valid input."""
@@ -45,7 +42,7 @@ def test_add_recent_basic():
 
 
 # Test for get_recent (complexity: 2)
-# Original doc: Get recent files ordered by last used....
+# Doc: Get recent files ordered by last used....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -58,7 +55,7 @@ def test_get_recent_parametrized(input, expected):
 
 
 # Test for log_conversion (complexity: 2)
-# Original doc: Log conversion result....
+# Doc: Log conversion result....
 
 def test_log_conversion_basic():
     """Test log_conversion with valid input."""
@@ -67,7 +64,7 @@ def test_log_conversion_basic():
 
 
 # Test for get_stats (complexity: 7)
-# Original doc: Get conversion statistics....
+# Doc: Get conversion statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -80,7 +77,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for clear_history (complexity: 2)
-# Original doc: Clear all conversion history (keep recent files)....
+# Doc: Clear all conversion history (keep recent files)....
 
 def test_clear_history_basic():
     """Test clear_history with valid input."""
@@ -89,7 +86,7 @@ def test_clear_history_basic():
 
 
 # Test for close (complexity: 2)
-# Original doc: Close database connection....
+# Doc: Close database connection....
 
 def test_close_basic():
     """Test close with valid input."""

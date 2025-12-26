@@ -1,6 +1,6 @@
 """
 Auto-generated tests for com_pool (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.510779
+Generated: 2025-12-26T23:45:49.683440
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for get_pool (complexity: 2)
-# Original doc: Get global COM pool instance....
+# Doc: Get global COM pool instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_get_pool_parametrized(input, expected):
 
 
 # Test for release_pool (complexity: 2)
-# Original doc: Release global COM pool....
+# Doc: Release global COM pool....
 
 def test_release_pool_basic():
     """Test release_pool with valid input."""
@@ -33,7 +33,7 @@ def test_release_pool_basic():
 
 
 # Test for get_excel (complexity: 7)
-# Original doc: Get or create Excel COM instance....
+# Doc: Get or create Excel COM instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -46,7 +46,7 @@ def test_get_excel_parametrized(input, expected):
 
 
 # Test for get_word (complexity: 7)
-# Original doc: Get or create Word COM instance....
+# Doc: Get or create Word COM instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -59,7 +59,7 @@ def test_get_word_parametrized(input, expected):
 
 
 # Test for get_ppt (complexity: 7)
-# Original doc: Get or create PowerPoint COM instance....
+# Doc: Get or create PowerPoint COM instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -72,7 +72,7 @@ def test_get_ppt_parametrized(input, expected):
 
 
 # Test for release_all (complexity: 1)
-# Original doc: Release all COM instances. Call on app exit....
+# Doc: Release all COM instances. Call on app exit....
 
 def test_release_all_basic():
     """Test release_all with valid input."""
@@ -81,7 +81,7 @@ def test_release_all_basic():
 
 
 # Test for get_stats (complexity: 1)
-# Original doc: Get usage statistics....
+# Doc: Get usage statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

@@ -1,6 +1,6 @@
 """
 Auto-generated tests for file_tools_ui (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:51.780848
+Generated: 2025-12-26T23:45:49.472154
 Generator: Smart Template Engine with Type Inference
 """
 

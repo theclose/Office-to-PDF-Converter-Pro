@@ -1,6 +1,6 @@
 """
 Auto-generated tests for tkdnd_wrapper (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.573885
+Generated: 2025-12-26T23:45:49.848637
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,9 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for setup_widget_dnd (complexity: 5)
-# Original doc: Setup drag-and-drop on a CustomTkinter widget.
-
-This is a he...
+# Doc: Setup drag-and-drop on a CustomTkinter widget.  This is a he...
 
 def test_setup_widget_dnd_basic():
     """Test setup_widget_dnd with valid input."""
@@ -22,9 +20,7 @@ def test_setup_widget_dnd_basic():
 
 
 # Test for __init__ (complexity: 2)
-# Original doc: Initialize both parent classes.
-
-CRITICAL: We must call BOTH...
+# Doc: Initialize both parent classes.  CRITICAL: We must call BOTH...
 
 def test___init___basic():
     """Test __init__ with valid input."""

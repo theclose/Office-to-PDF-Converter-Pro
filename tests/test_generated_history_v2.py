@@ -1,6 +1,6 @@
 """
 Auto-generated tests for history (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.533567
+Generated: 2025-12-26T23:45:49.731882
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for get_history (complexity: 2)
-# Original doc: Get global history instance....
+# Doc: Get global history instance....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -56,7 +56,7 @@ def test___init___basic():
 
 
 # Test for add (complexity: 1)
-# Original doc: Add a conversion record....
+# Doc: Add a conversion record....
 
 def test_add_basic():
     """Test add with valid input."""
@@ -65,7 +65,7 @@ def test_add_basic():
 
 
 # Test for get_recent (complexity: 1)
-# Original doc: Get most recent records....
+# Doc: Get most recent records....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -78,7 +78,7 @@ def test_get_recent_parametrized(input, expected):
 
 
 # Test for get_stats (complexity: 3)
-# Original doc: Get conversion statistics....
+# Doc: Get conversion statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -91,7 +91,7 @@ def test_get_stats_parametrized(input, expected):
 
 
 # Test for clear (complexity: 1)
-# Original doc: Clear all history....
+# Doc: Clear all history....
 
 def test_clear_basic():
     """Test clear with valid input."""
@@ -100,7 +100,7 @@ def test_clear_basic():
 
 
 # Test for search (complexity: 2)
-# Original doc: Search records by filename....
+# Doc: Search records by filename....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

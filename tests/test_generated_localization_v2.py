@@ -1,6 +1,6 @@
 """
 Auto-generated tests for localization (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.527567
+Generated: 2025-12-26T23:45:49.712509
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for set_language (complexity: 2)
-# Original doc: Set the current language....
+# Doc: Set the current language....
 
 def test_set_language_basic():
     """Test set_language with valid input."""
@@ -20,7 +20,7 @@ def test_set_language_basic():
 
 
 # Test for get_current_language (complexity: 1)
-# Original doc: Get current language code....
+# Doc: Get current language code....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -33,10 +33,7 @@ def test_get_current_language_parametrized(input, expected):
 
 
 # Test for get_text (complexity: 5)
-# Original doc: Get translated text for a key.
-
-Args:
-    key: Translation k...
+# Doc: Get translated text for a key.  Args:     key: Translation k...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -49,7 +46,7 @@ def test_get_text_parametrized(input, expected):
 
 
 # Test for get_language_names (complexity: 1)
-# Original doc: Get dictionary of language code -> display name....
+# Doc: Get dictionary of language code -> display name....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

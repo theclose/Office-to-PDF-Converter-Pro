@@ -1,6 +1,6 @@
 """
 Auto-generated tests for dialogs (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:51.748895
+Generated: 2025-12-26T23:45:49.423081
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for show_settings (complexity: 1)
-# Original doc: Show settings dialog....
+# Doc: Show settings dialog....
 
 def test_show_settings_basic():
     """Test show_settings with valid input."""

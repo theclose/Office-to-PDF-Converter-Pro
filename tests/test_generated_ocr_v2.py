@@ -1,6 +1,6 @@
 """
 Auto-generated tests for ocr (v2.0 - Enhanced)
-Generated: 2025-12-26T23:13:59.553269
+Generated: 2025-12-26T23:45:49.793901
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for is_ocr_available (complexity: 3)
-# Original doc: Check if OCR is available....
+# Doc: Check if OCR is available....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_is_ocr_available_parametrized(input, expected):
 
 
 # Test for get_tesseract_languages (complexity: 3)
-# Original doc: Get list of installed Tesseract languages....
+# Doc: Get list of installed Tesseract languages....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -37,10 +37,7 @@ def test_get_tesseract_languages_parametrized(input, expected):
 
 
 # Test for ocr_image (complexity: 3)
-# Original doc: Perform OCR on an image file.
-
-Args:
-    image_path: Path to...
+# Doc: Perform OCR on an image file.  Args:     image_path: Path to...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -53,7 +50,7 @@ def test_ocr_image_parametrized(input, expected):
 
 
 # Test for get_best_language (complexity: 6)
-# Original doc: Get the best available language for OCR....
+# Doc: Get the best available language for OCR....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -66,7 +63,7 @@ def test_get_best_language_parametrized(input, expected):
 
 
 # Test for ocr_pdf_to_searchable (complexity: 8)
-# Original doc: Convert a scanned PDF to a searchable PDF with OCR text laye...
+# Doc: Convert a scanned PDF to a searchable PDF with OCR text laye...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -79,10 +76,7 @@ def test_ocr_pdf_to_searchable_parametrized(input, expected):
 
 
 # Test for extract_text_from_pdf (complexity: 6)
-# Original doc: Extract text from a PDF using OCR.
-
-Args:
-    pdf_path: Path...
+# Doc: Extract text from a PDF using OCR.  Args:     pdf_path: Path...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -95,7 +89,7 @@ def test_extract_text_from_pdf_parametrized(input, expected):
 
 
 # Test for get_ocr_status (complexity: 1)
-# Original doc: Get OCR module status....
+# Doc: Get OCR module status....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

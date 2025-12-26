@@ -208,6 +208,95 @@ class ExtensionRule(RenameRule):
     def description(self) -> str:
         return f"Extension: {self.mode}"
 
+import hashlib
+
+@dataclass
+class DuplicateGroup:
+    """Group of duplicate files."""
+    hash_val: str
+    size: int
+    files: List[str] # List of absolute paths
+
+class DuplicateFinder:
+    """Finds duplicate files efficiently."""
+    
+    def __init__(self):
+        self._abort = False
+        
+    def abort(self):
+        self._abort = True
+        
+    def _calculate_hash(self, filepath: str, block_size: int = 65536) -> str:
+        """Calculate MD5 hash of a file."""
+        md5 = hashlib.md5()
+        try:
+            with open(filepath, 'rb') as f:
+                while True:
+                    if self._abort: return ""
+                    data = f.read(block_size)
+                    if not data:
+                        break
+                    md5.update(data)
+            return md5.hexdigest()
+        except Exception as e:
+            logger.error(f"Hash error {filepath}: {e}")
+            return ""
+
+    def find_duplicates(self, paths: List[str], recursive: bool = True) -> List[DuplicateGroup]:
+        """
+        Find duplicates in given paths.
+        Strategy: Size -> Hash.
+        """
+        self._abort = False
+        files_by_size = {}
+        
+        # 1. Scan and group by size
+        all_files = []
+        for path in paths:
+            if os.path.isfile(path):
+                all_files.append(path)
+            elif os.path.isdir(path):
+                for root, _, files in os.walk(path):
+                    if self._abort: return []
+                    for f in files:
+                        all_files.append(os.path.join(root, f))
+                        
+        for fpath in all_files:
+            try:
+                size = os.path.getsize(fpath)
+                if size not in files_by_size:
+                    files_by_size[size] = []
+                files_by_size[size].append(fpath)
+            except OSError:
+                continue
+                
+        # 2. Filter groups with > 1 file
+        potential_dupes = {s: fs for s, fs in files_by_size.items() if len(fs) > 1}
+        
+        # 3. Hash check for collisions
+        results = []
+        
+        for size, file_list in potential_dupes.items():
+            if self._abort: break
+            
+            # Group by hash within size group
+            files_by_hash = {}
+            for fpath in file_list:
+                if self._abort: break
+                file_hash = self._calculate_hash(fpath)
+                if not file_hash: continue
+                
+                if file_hash not in files_by_hash:
+                    files_by_hash[file_hash] = []
+                files_by_hash[file_hash].append(fpath)
+                
+            # Add confirmed duplicates
+            for h, paths in files_by_hash.items():
+                if len(paths) > 1:
+                    results.append(DuplicateGroup(hash_val=h, size=size, files=paths))
+                    
+        return results
+
 import json
 import time
 

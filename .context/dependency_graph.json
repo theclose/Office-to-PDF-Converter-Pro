@@ -1,0 +1,5149 @@
+{
+  "project_root": "c:\\Auto\\office_converter",
+  "modules": {
+    "build_exe.py": {
+      "path": "build_exe.py",
+      "package": "",
+      "name": "build_exe",
+      "imports": [
+        "sys",
+        "shutil",
+        "subprocess"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "clean",
+        "create_version_info",
+        "get_hidden_imports",
+        "get_excludes",
+        "get_data_files",
+        "build",
+        "main"
+      ],
+      "docstring": "Office to PDF Converter Pro - Build Script\nVersion 4.0.7 - Optimized Build\n\nUsage:\n    python build_exe.py          # Build .exe\n    python build_exe.py --clean  # Clean build files",
+      "lines": 352,
+      "category": "other"
+    },
+    "build_script.py": {
+      "path": "build_script.py",
+      "package": "",
+      "name": "build_script",
+      "imports": [
+        "subprocess",
+        "os",
+        "shutil",
+        "sys"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "print_step",
+        "run_command",
+        "main"
+      ],
+      "docstring": "Build script for Office to PDF Converter Pro EXE\nAutomates the entire build process with optimization",
+      "lines": 129,
+      "category": "other"
+    },
+    "deploy_automation.py": {
+      "path": "deploy_automation.py",
+      "package": "",
+      "name": "deploy_automation",
+      "imports": [
+        "subprocess",
+        "sys",
+        "os"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "run_cmd",
+        "main"
+      ],
+      "docstring": "Automated Deployment Script for Office Converter Pro v4.1.6\nSafely automates deployment steps with user confirmation",
+      "lines": 166,
+      "category": "other"
+    },
+    "deploy_simple.py": {
+      "path": "deploy_simple.py",
+      "package": "",
+      "name": "deploy_simple",
+      "imports": [
+        "subprocess",
+        "sys",
+        "os"
+      ],
+      "from_imports": {
+        "datetime": [
+          "datetime"
+        ],
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": "Simple Deployment Automation for Office Converter Pro v4.1.7\nWindows PowerShell compatible version",
+      "lines": 92,
+      "category": "other"
+    },
+    "main.py": {
+      "path": "main.py",
+      "package": "",
+      "name": "main",
+      "imports": [
+        "os",
+        "sys"
+      ],
+      "from_imports": {
+        "office_converter.utils.logging_setup": [
+          "setup_logging",
+          "get_logger"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.converters": [
+          "ExcelConverter"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "test_modules"
+      ],
+      "docstring": "Office Converter - Main Entry Point\nConverts Office documents (Excel, Word, PowerPoint) to PDF.",
+      "lines": 86,
+      "category": "other"
+    },
+    "merge_project.py": {
+      "path": "merge_project.py",
+      "package": "",
+      "name": "merge_project",
+      "imports": [
+        "argparse",
+        "os",
+        "sys",
+        "fnmatch",
+        "pyperclip"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "datetime": [
+          "datetime"
+        ]
+      },
+      "classes": [
+        "ProjectMerger"
+      ],
+      "functions": [
+        "main"
+      ],
+      "docstring": "RetroAuto v2 - Project Context Merger (Advanced Version)\n\nGộp toàn bộ source code của dự án vào một file văn bản duy nhất.\nTối ưu hóa cho việc chia sẻ context với LLM (ChatGPT, Claude, Gemini).\n\nFeatu",
+      "lines": 292,
+      "category": "other"
+    },
+    "run_grid.py": {
+      "path": "run_grid.py",
+      "package": "",
+      "name": "run_grid",
+      "imports": [
+        "sys",
+        "logging",
+        "time"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "grid.shim": [
+          "install_shim_layer"
+        ],
+        "grid": [
+          "ConversionGrid"
+        ],
+        "grid.reactor.commands": [
+          "CommandBus",
+          "ExecutionContext"
+        ],
+        "grid.reactor.events": [
+          "EventBus"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "main"
+      ],
+      "docstring": "Autonomous Conversion Grid - Production Entry Point\n\nThis is the new, hardened entry point using the grid architecture.\n\nCRITICAL: Shim layer is installed FIRST to neutralize legacy UI.\n\nUsage:\n    py",
+      "lines": 131,
+      "category": "other"
+    },
+    "run_pro.py": {
+      "path": "run_pro.py",
+      "package": "",
+      "name": "run_pro",
+      "imports": [
+        "sys",
+        "os",
+        "warnings"
+      ],
+      "from_imports": {
+        "office_converter.ui.main_window_pro": [
+          "ConverterProApp"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": "Office to PDF Converter Pro - Entry Point (LEGACY)\n\n⚠️ DEPRECATED: This entry point uses the legacy monolithic UI.\n   Please use run_reactor.py for the modern event-driven UI:\n   \n   python run_reacto",
+      "lines": 37,
+      "category": "other"
+    },
+    "run_reactor.py": {
+      "path": "run_reactor.py",
+      "package": "",
+      "name": "run_reactor",
+      "imports": [
+        "sys",
+        "os"
+      ],
+      "from_imports": {
+        "office_converter.grid.reactor.reactor_app": [
+          "ReactorApp"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": "Office Converter Reactor UI - Entry Point\n=========================================\nLaunches the modern, event-driven, autonomous grid UI.\n\nUsage:\n    python run_reactor.py",
+      "lines": 35,
+      "category": "other"
+    },
+    "temp_verify.py": {
+      "path": "temp_verify.py",
+      "package": "",
+      "name": "temp_verify",
+      "imports": [],
+      "from_imports": {},
+      "classes": [],
+      "functions": [],
+      "docstring": null,
+      "lines": 0,
+      "category": "other"
+    },
+    "test_all.py": {
+      "path": "test_all.py",
+      "package": "",
+      "name": "test_all",
+      "imports": [
+        "sys",
+        "os"
+      ],
+      "from_imports": {
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.localization": [
+          "get_text"
+        ],
+        "office_converter.utils.pdf_tools": [
+          "parse_page_range",
+          "HAS_PYMUPDF"
+        ],
+        "office_converter.converters": [
+          "ExcelConverter",
+          "WordConverter",
+          "PPTConverter",
+          "get_converter_for_file"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "run_tests"
+      ],
+      "docstring": "Comprehensive Test Script for Office Converter",
+      "lines": 98,
+      "category": "other"
+    },
+    "validate_core.py": {
+      "path": "validate_core.py",
+      "package": "",
+      "name": "validate_core",
+      "imports": [
+        "sys",
+        "time"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "grid.models": [
+          "ConversionFile",
+          "FileType",
+          "Priority"
+        ],
+        "grid.scheduler": [
+          "ClusteredPriorityQueue"
+        ],
+        "grid.quarantine": [
+          "BloomFilterQuarantine"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "test_basic_functionality"
+      ],
+      "docstring": "Quick validation script for core data structures.\n\nRun with: python validate_core.py",
+      "lines": 117,
+      "category": "other"
+    },
+    "validate_shim.py": {
+      "path": "validate_shim.py",
+      "package": "",
+      "name": "validate_shim",
+      "imports": [
+        "sys"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "grid.shim": [
+          "install_shim_layer",
+          "get_shim_stats"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "validate"
+      ],
+      "docstring": "Validate Shim Layer - Comprehensive Test\n\nThis script demonstrates that the shim layer successfully neutralizes\nlegacy UI modules without deleting any files.\n\nRun: python validate_shim.py",
+      "lines": 128,
+      "category": "other"
+    },
+    "__init__.py": {
+      "path": "__init__.py",
+      "package": "",
+      "name": "__init__",
+      "imports": [],
+      "from_imports": {},
+      "classes": [],
+      "functions": [],
+      "docstring": null,
+      "lines": 5,
+      "category": "other"
+    },
+    "converters\\base.py": {
+      "path": "converters\\base.py",
+      "package": "converters",
+      "name": "base",
+      "imports": [
+        "os",
+        "logging",
+        "threading"
+      ],
+      "from_imports": {
+        "abc": [
+          "ABC",
+          "abstractmethod"
+        ],
+        "typing": [
+          "Optional",
+          "Callable",
+          "List"
+        ]
+      },
+      "classes": [
+        "BaseConverter"
+      ],
+      "functions": [
+        "ensure_com_initialized",
+        "release_com",
+        "get_converter_for_file",
+        "get_best_converter"
+      ],
+      "docstring": "Base Converter - Abstract class for all Office converters.\nAll specific converters (Excel, Word, PPT) inherit from this.",
+      "lines": 194,
+      "category": "controller"
+    },
+    "converters\\excel.py": {
+      "path": "converters\\excel.py",
+      "package": "converters",
+      "name": "excel",
+      "imports": [
+        "os",
+        "time",
+        "logging",
+        "shutil",
+        "gc",
+        "uuid",
+        "pythoncom"
+      ],
+      "from_imports": {
+        "typing": [
+          "Optional",
+          "Callable",
+          "List"
+        ],
+        "base": [
+          "BaseConverter"
+        ],
+        "utils.com_pool": [
+          "get_pool"
+        ],
+        "office_converter.utils.com_pool": [
+          "get_pool"
+        ]
+      },
+      "classes": [
+        "ExcelConverter"
+      ],
+      "functions": [],
+      "docstring": "Excel Converter - Converts Excel files to PDF using COM automation.\nUses COM Pool for connection reuse and memory optimization.",
+      "lines": 392,
+      "category": "controller"
+    },
+    "converters\\libreoffice.py": {
+      "path": "converters\\libreoffice.py",
+      "package": "converters",
+      "name": "libreoffice",
+      "imports": [
+        "os",
+        "subprocess",
+        "logging",
+        "shutil"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "typing": [
+          "Optional",
+          "List"
+        ],
+        "base": [
+          "BaseConverter"
+        ]
+      },
+      "classes": [
+        "LibreOfficeConverter"
+      ],
+      "functions": [
+        "find_libreoffice",
+        "is_libreoffice_available",
+        "get_libreoffice_version"
+      ],
+      "docstring": "LibreOffice Converter - Fallback converter when MS Office is not available.\nUses LibreOffice in headless mode for document conversion.\n\nRequirements:\n- LibreOffice must be installed (https://www.libre",
+      "lines": 200,
+      "category": "controller"
+    },
+    "converters\\ppt.py": {
+      "path": "converters\\ppt.py",
+      "package": "converters",
+      "name": "ppt",
+      "imports": [
+        "os",
+        "logging",
+        "shutil",
+        "gc",
+        "uuid",
+        "pythoncom"
+      ],
+      "from_imports": {
+        "typing": [
+          "Optional",
+          "Callable"
+        ],
+        "base": [
+          "BaseConverter"
+        ],
+        "utils.com_pool": [
+          "get_pool"
+        ]
+      },
+      "classes": [
+        "PPTConverter"
+      ],
+      "functions": [],
+      "docstring": "PowerPoint Converter - Converts presentations to PDF using COM automation.",
+      "lines": 136,
+      "category": "controller"
+    },
+    "converters\\word.py": {
+      "path": "converters\\word.py",
+      "package": "converters",
+      "name": "word",
+      "imports": [
+        "os",
+        "time",
+        "logging",
+        "shutil",
+        "gc",
+        "uuid",
+        "pythoncom"
+      ],
+      "from_imports": {
+        "typing": [
+          "Optional",
+          "Callable"
+        ],
+        "base": [
+          "BaseConverter"
+        ],
+        "utils.com_pool": [
+          "get_pool"
+        ]
+      },
+      "classes": [
+        "WordConverter"
+      ],
+      "functions": [],
+      "docstring": "Word Converter - Converts Word documents to PDF using COM automation.",
+      "lines": 159,
+      "category": "controller"
+    },
+    "converters\\__init__.py": {
+      "path": "converters\\__init__.py",
+      "package": "converters",
+      "name": "__init__",
+      "imports": [],
+      "from_imports": {
+        "base": [
+          "BaseConverter",
+          "get_converter_for_file",
+          "get_best_converter"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "__getattr__"
+      ],
+      "docstring": "Lazy-loads converter classes on first access to improve app startup time.\nHeavy COM-dependent modules are only loaded when actually needed.",
+      "lines": 80,
+      "category": "controller"
+    },
+    "core\\excel_tools.py": {
+      "path": "core\\excel_tools.py",
+      "package": "core",
+      "name": "excel_tools",
+      "imports": [
+        "os",
+        "logging",
+        "csv"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "typing": [
+          "List",
+          "Optional",
+          "Callable",
+          "Tuple"
+        ],
+        "copy": [
+          "copy"
+        ],
+        "openpyxl": [
+          "Workbook",
+          "load_workbook"
+        ],
+        "openpyxl.utils": [
+          "get_column_letter"
+        ],
+        "openpyxl.worksheet.worksheet": [
+          "Worksheet"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "split_excel",
+        "merge_excel",
+        "_merge_as_sheets",
+        "_merge_as_rows",
+        "_copy_sheet_data",
+        "_sanitize_filename",
+        "_make_unique_name",
+        "get_sheet_names",
+        "get_sheet_info",
+        "excel_to_csv",
+        "csv_to_excel",
+        "protect_sheets",
+        "unprotect_sheets",
+        "rename_sheets"
+      ],
+      "docstring": "Excel Tools - Core operations for Excel file manipulation.\n\nFunctions:\n- split_excel: Export each sheet as separate Excel file\n- merge_excel: Combine multiple Excel files into one\n\nDependencies:\n- ope",
+      "lines": 826,
+      "category": "model"
+    },
+    "core\\file_tools.py": {
+      "path": "core\\file_tools.py",
+      "package": "core",
+      "name": "file_tools",
+      "imports": [
+        "os",
+        "re",
+        "logging",
+        "hashlib",
+        "hashlib",
+        "stat",
+        "ctypes",
+        "json",
+        "time"
+      ],
+      "from_imports": {
+        "abc": [
+          "ABC",
+          "abstractmethod"
+        ],
+        "typing": [
+          "List",
+          "Optional",
+          "Tuple"
+        ],
+        "dataclasses": [
+          "dataclass"
+        ],
+        "datetime": [
+          "datetime"
+        ]
+      },
+      "classes": [
+        "RenamePreview",
+        "RenameRule",
+        "CaseRule",
+        "ReplaceRule",
+        "RemoveAccentsRule",
+        "TrimRule",
+        "AddStringRule",
+        "SequenceRule",
+        "ExtensionRule",
+        "DuplicateGroup",
+        "EmptyFolderCleaner",
+        "AttributeManager",
+        "DuplicateFinder",
+        "Transaction",
+        "TransactionLog",
+        "FileToolsEngine"
+      ],
+      "functions": [
+        "remove_vietnamese_accents"
+      ],
+      "docstring": "Core logic for File Tools (Rename, Manage).\nImplements Command Pattern for rename rules.",
+      "lines": 640,
+      "category": "model"
+    },
+    "core\\pdf_tools.py": {
+      "path": "core\\pdf_tools.py",
+      "package": "core",
+      "name": "pdf_tools",
+      "imports": [
+        "os",
+        "logging",
+        "shutil",
+        "fitz",
+        "random"
+      ],
+      "from_imports": {
+        "typing": [
+          "List",
+          "Optional",
+          "Tuple"
+        ],
+        "PIL": [
+          "Image",
+          "ImageFilter",
+          "ImageEnhance",
+          "ImageChops"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "merge_pdfs",
+        "split_pdf",
+        "protect_pdf",
+        "post_process_pdf",
+        "_apply_scan_effects",
+        "rasterize_pdf",
+        "compress_pdf",
+        "add_watermark",
+        "pdf_to_images",
+        "images_to_pdf",
+        "rotate_pages",
+        "parse_page_range",
+        "extract_pages",
+        "delete_pages",
+        "reorder_pages",
+        "reverse_pages",
+        "extract_pdf_pages"
+      ],
+      "docstring": "PDF Tools Module - Professional PDF Compression, Watermark, PDF↔Images\nBased on PyMuPDF best practices from official documentation.",
+      "lines": 933,
+      "category": "model"
+    },
+    "grid\\circuit_breaker.py": {
+      "path": "grid\\circuit_breaker.py",
+      "package": "grid",
+      "name": "circuit_breaker",
+      "imports": [
+        "time",
+        "logging",
+        "threading"
+      ],
+      "from_imports": {
+        "typing": [
+          "Dict",
+          "Optional",
+          "Tuple"
+        ],
+        "dataclasses": [
+          "dataclass"
+        ],
+        "grid.models": [
+          "ConversionFile",
+          "CircuitBreakerState"
+        ],
+        "grid.quarantine": [
+          "BloomFilterQuarantine"
+        ]
+      },
+      "classes": [
+        "CircuitBreakerConfig",
+        "CircuitBreakerCoordinator"
+      ],
+      "functions": [],
+      "docstring": "Circuit Breaker Coordinator - Cross-Worker Failure Tracking\n\nAggregates circuit breaker states across all workers to implement\ngrid-wide quarantine decisions.\n\nProblem:\n- Each worker has its own circu",
+      "lines": 262,
+      "category": "controller"
+    },
+    "grid\\grid.py": {
+      "path": "grid\\grid.py",
+      "package": "grid",
+      "name": "grid",
+      "imports": [
+        "logging",
+        "time",
+        "threading"
+      ],
+      "from_imports": {
+        "typing": [
+          "List",
+          "Optional",
+          "Callable"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "grid.models": [
+          "ConversionFile"
+        ],
+        "grid.scheduler": [
+          "ClusteredPriorityQueue"
+        ],
+        "grid.worker": [
+          "WorkerConfig"
+        ],
+        "grid.pool": [
+          "WorkerPool",
+          "PoolConfig"
+        ],
+        "grid.circuit_breaker": [
+          "CircuitBreakerCoordinator",
+          "CircuitBreakerConfig"
+        ],
+        "grid.quarantine": [
+          "BloomFilterQuarantine"
+        ]
+      },
+      "classes": [
+        "ConversionGrid"
+      ],
+      "functions": [],
+      "docstring": "Conversion Grid Controller - High-Level Orchestration\n\nIntegrates all components into a unified conversion system:\n- Scheduler: Clustered priority queue\n- Worker Pool: Multi-process execution with hot",
+      "lines": 405,
+      "category": "controller"
+    },
+    "grid\\models.py": {
+      "path": "grid\\models.py",
+      "package": "grid",
+      "name": "models",
+      "imports": [
+        "hashlib",
+        "time"
+      ],
+      "from_imports": {
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ],
+        "enum": [
+          "IntEnum",
+          "auto"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "typing": [
+          "Optional"
+        ]
+      },
+      "classes": [
+        "FileType",
+        "Priority",
+        "ConversionFile",
+        "CircuitBreakerState"
+      ],
+      "functions": [],
+      "docstring": "Core Data Models for Conversion Grid\n\nDefines immutable data structures with strong typing and validation.",
+      "lines": 273,
+      "category": "controller"
+    },
+    "grid\\pool.py": {
+      "path": "grid\\pool.py",
+      "package": "grid",
+      "name": "pool",
+      "imports": [
+        "time",
+        "logging",
+        "multiprocessing",
+        "psutil"
+      ],
+      "from_imports": {
+        "typing": [
+          "List",
+          "Optional",
+          "Dict",
+          "Callable"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ],
+        "enum": [
+          "Enum"
+        ],
+        "grid.worker": [
+          "WorkerProcess",
+          "WorkerConfig"
+        ],
+        "grid.models": [
+          "ConversionFile"
+        ],
+        "grid.scheduler": [
+          "ClusteredPriorityQueue"
+        ],
+        "grid.quarantine": [
+          "BloomFilterQuarantine"
+        ]
+      },
+      "classes": [
+        "PoolState",
+        "PoolConfig",
+        "WorkerInfo",
+        "WorkerPool"
+      ],
+      "functions": [],
+      "docstring": "Worker Pool - Multi-Process Conversion Grid with Hot Spare\n\nManages a pool of worker processes with:\n- Dynamic scaling (add/remove workers)\n- Hot spare for zero-downtime failover\n- Health monitoring a",
+      "lines": 606,
+      "category": "controller"
+    },
+    "grid\\quarantine.py": {
+      "path": "grid\\quarantine.py",
+      "package": "grid",
+      "name": "quarantine",
+      "imports": [
+        "hashlib",
+        "math",
+        "threading"
+      ],
+      "from_imports": {
+        "typing": [
+          "Set",
+          "Optional"
+        ]
+      },
+      "classes": [
+        "BloomFilterQuarantine"
+      ],
+      "functions": [],
+      "docstring": "Bloom Filter Quarantine System\n\nSpace-efficient quarantine tracking with O(1) lookup complexity.\nUsed to blacklist files that repeatedly crash converters.\n\nPerformance Characteristics:\n- Insert: O(k) ",
+      "lines": 327,
+      "category": "controller"
+    },
+    "grid\\scheduler.py": {
+      "path": "grid\\scheduler.py",
+      "package": "grid",
+      "name": "scheduler",
+      "imports": [
+        "heapq",
+        "threading"
+      ],
+      "from_imports": {
+        "typing": [
+          "List",
+          "Optional",
+          "Iterator"
+        ],
+        "collections": [
+          "defaultdict"
+        ],
+        "models": [
+          "ConversionFile",
+          "FileType"
+        ]
+      },
+      "classes": [
+        "ClusteredPriorityQueue"
+      ],
+      "functions": [],
+      "docstring": "Clustered Priority Queue - Min-Heap Scheduler\n\nContext-aware batch scheduling with O(log n) complexity.\nGroups files by type to minimize COM initialization overhead.\n\nPerformance Characteristics:\n- In",
+      "lines": 293,
+      "category": "controller"
+    },
+    "grid\\shim.py": {
+      "path": "grid\\shim.py",
+      "package": "grid",
+      "name": "shim",
+      "imports": [
+        "sys",
+        "logging",
+        "types"
+      ],
+      "from_imports": {
+        "importlib.abc": [
+          "MetaPathFinder",
+          "Loader"
+        ],
+        "typing": [
+          "Optional",
+          "List"
+        ]
+      },
+      "classes": [
+        "ShimLoader",
+        "LegacyUIShim"
+      ],
+      "functions": [
+        "install_shim_layer",
+        "uninstall_shim_layer",
+        "is_shim_installed",
+        "verify_neutralization",
+        "get_shim_stats"
+      ],
+      "docstring": "Shim Layer - Import Hook for Legacy UI Neutralization\n\nIntercepts imports of legacy UI modules and returns stub modules instead.\nThis allows us to logically isolate legacy code WITHOUT physically dele",
+      "lines": 373,
+      "category": "controller"
+    },
+    "grid\\worker.py": {
+      "path": "grid\\worker.py",
+      "package": "grid",
+      "name": "worker",
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "signal",
+        "logging",
+        "multiprocessing"
+      ],
+      "from_imports": {
+        "dataclasses": [
+          "dataclass"
+        ],
+        "typing": [
+          "Optional",
+          "Callable"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "grid.models": [
+          "ConversionFile",
+          "CircuitBreakerState"
+        ]
+      },
+      "classes": [
+        "WorkerConfig",
+        "WorkerProcess"
+      ],
+      "functions": [],
+      "docstring": "Worker Process - Isolated Conversion Executor\n\nEach worker runs in a separate process to:\n1. Isolate COM crashes (one worker dies, others continue)\n2. Enable parallel processing across CPU cores\n3. Im",
+      "lines": 437,
+      "category": "controller"
+    },
+    "grid\\__init__.py": {
+      "path": "grid\\__init__.py",
+      "package": "grid",
+      "name": "__init__",
+      "imports": [],
+      "from_imports": {
+        "models": [
+          "FileType",
+          "ConversionFile",
+          "Priority",
+          "CircuitBreakerState"
+        ],
+        "scheduler": [
+          "ClusteredPriorityQueue"
+        ],
+        "quarantine": [
+          "BloomFilterQuarantine"
+        ],
+        "worker": [
+          "WorkerProcess",
+          "WorkerConfig"
+        ],
+        "pool": [
+          "WorkerPool",
+          "PoolConfig",
+          "PoolState"
+        ],
+        "circuit_breaker": [
+          "CircuitBreakerCoordinator",
+          "CircuitBreakerConfig"
+        ],
+        "grid": [
+          "ConversionGrid"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": "Autonomous Conversion Grid - Core Module\n\nHigh-performance, fault-tolerant document conversion system.\n\nArchitecture:\n- Clustered Priority Queue (Min-Heap) for O(log n) scheduling\n- Bloom Filter for O",
+      "lines": 55,
+      "category": "controller"
+    },
+    "grid\\reactor\\bridge.py": {
+      "path": "grid\\reactor\\bridge.py",
+      "package": "grid.reactor",
+      "name": "bridge",
+      "imports": [
+        "logging"
+      ],
+      "from_imports": {
+        "typing": [
+          "Any"
+        ],
+        "grid": [
+          "ConversionGrid"
+        ],
+        "grid.reactor.events": [
+          "EventBus",
+          "FileAddedEvent",
+          "FileCompletedEvent",
+          "FileFailedEvent",
+          "ProgressEvent",
+          "WorkerDeathEvent",
+          "LoadSheddingEvent",
+          "QuarantineEvent",
+          "CircuitBreakerEvent"
+        ]
+      },
+      "classes": [
+        "GridBridge"
+      ],
+      "functions": [],
+      "docstring": "GridBridge - Connects ConversionGrid to UI Events\n\nTranslates grid callbacks into EventBus events for reactive UI updates.\n\nArchitecture:\n┌─────────────┐\n│    Grid     │ (Phase 2 - Worker Pool)\n└─────",
+      "lines": 192,
+      "category": "controller"
+    },
+    "grid\\reactor\\commands.py": {
+      "path": "grid\\reactor\\commands.py",
+      "package": "grid.reactor",
+      "name": "commands",
+      "imports": [
+        "time",
+        "uuid",
+        "queue",
+        "threading",
+        "logging"
+      ],
+      "from_imports": {
+        "abc": [
+          "ABC",
+          "abstractmethod"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ],
+        "typing": [
+          "Any",
+          "Optional",
+          "Dict",
+          "List"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "concurrent.futures": [
+          "Future"
+        ],
+        "collections": [
+          "deque"
+        ]
+      },
+      "classes": [
+        "CommandResult",
+        "ExecutionContext",
+        "Command",
+        "AddFilesCommand",
+        "RemoveFilesCommand",
+        "ClearQueueCommand",
+        "StartConversionCommand",
+        "StopConversionCommand",
+        "ResetCircuitBreakerCommand",
+        "CommandBus"
+      ],
+      "functions": [],
+      "docstring": "Command Pattern - Decouple UI actions from Grid execution\n\nAll user actions flow through Commands:\n- User clicks button → Create Command → Post to CommandBus\n- CommandBus executes async in background ",
+      "lines": 474,
+      "category": "controller"
+    },
+    "grid\\reactor\\events.py": {
+      "path": "grid\\reactor\\events.py",
+      "package": "grid.reactor",
+      "name": "events",
+      "imports": [
+        "time",
+        "uuid",
+        "threading",
+        "logging"
+      ],
+      "from_imports": {
+        "abc": [
+          "ABC"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ],
+        "typing": [
+          "Type",
+          "Callable",
+          "Dict",
+          "List",
+          "Any",
+          "Optional"
+        ],
+        "collections": [
+          "defaultdict"
+        ]
+      },
+      "classes": [
+        "Event",
+        "FileAddedEvent",
+        "FileCompletedEvent",
+        "FileFailedEvent",
+        "ProgressEvent",
+        "WorkerDeathEvent",
+        "LoadSheddingEvent",
+        "QuarantineEvent",
+        "CircuitBreakerEvent",
+        "EventBus",
+        "EventAggregator"
+      ],
+      "functions": [],
+      "docstring": "Event System - Pub/Sub for Grid → UI Communication\n\nGrid emits events when work completes:\n- Worker completes file → FileCompletedEvent\n- Worker fails file → FileFailedEvent\n- Progress updates → Progr",
+      "lines": 383,
+      "category": "controller"
+    },
+    "grid\\reactor\\optimistic.py": {
+      "path": "grid\\reactor\\optimistic.py",
+      "package": "grid.reactor",
+      "name": "optimistic",
+      "imports": [
+        "uuid",
+        "time",
+        "logging",
+        "threading"
+      ],
+      "from_imports": {
+        "typing": [
+          "Dict",
+          "Any",
+          "Optional",
+          "List"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ]
+      },
+      "classes": [
+        "OptimisticItem",
+        "OptimisticState"
+      ],
+      "functions": [],
+      "docstring": "Optimistic State Management - Instant UI Feedback\n\nProvides immediate UI updates while background operations complete.\n\nFlow:\n1. User action → Create optimistic item with temp ID\n2. UI shows optimisti",
+      "lines": 217,
+      "category": "controller"
+    },
+    "grid\\reactor\\reactor_app.py": {
+      "path": "grid\\reactor\\reactor_app.py",
+      "package": "grid.reactor",
+      "name": "reactor_app",
+      "imports": [
+        "tkinter",
+        "customtkinter",
+        "logging"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "filedialog"
+        ],
+        "typing": [
+          "Optional"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "grid": [
+          "ConversionGrid"
+        ],
+        "grid.models": [
+          "ConversionFile"
+        ],
+        "grid.reactor.commands": [
+          "CommandBus",
+          "ExecutionContext",
+          "AddFilesCommand",
+          "ClearQueueCommand",
+          "StopConversionCommand"
+        ],
+        "grid.reactor.events": [
+          "EventBus",
+          "FileAddedEvent",
+          "FileCompletedEvent",
+          "FileFailedEvent",
+          "ProgressEvent",
+          "WorkerDeathEvent"
+        ],
+        "grid.reactor.optimistic": [
+          "OptimisticState"
+        ],
+        "grid.reactor.bridge": [
+          "GridBridge"
+        ],
+        "grid.reactor.virtual_list": [
+          "VirtualListView",
+          "VirtualListConfig",
+          "default_file_renderer"
+        ]
+      },
+      "classes": [
+        "ReactorApp"
+      ],
+      "functions": [
+        "main"
+      ],
+      "docstring": "ReactorApp - Main Application Window\n\nEvent-driven UI with Command Pattern and reactive updates.\n\nFeatures:\n- CustomTkinter modern UI\n- VirtualListView for file display\n- Command-based actions (non-bl",
+      "lines": 466,
+      "category": "controller"
+    },
+    "grid\\reactor\\virtual_list.py": {
+      "path": "grid\\reactor\\virtual_list.py",
+      "package": "grid.reactor",
+      "name": "virtual_list",
+      "imports": [
+        "tkinter",
+        "customtkinter",
+        "threading",
+        "logging"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "ttk"
+        ],
+        "typing": [
+          "List",
+          "Callable",
+          "Any",
+          "Optional"
+        ],
+        "dataclasses": [
+          "dataclass"
+        ]
+      },
+      "classes": [
+        "VirtualListConfig",
+        "VirtualListView"
+      ],
+      "functions": [
+        "default_file_renderer"
+      ],
+      "docstring": "Virtual List Widget - O(1) Memory Rendering for Large Lists\n\nRenders only visible items in viewport, regardless of total item count.\n\nKey Features:\n- Widget recycling (fixed pool of 20 widgets)\n- Smoo",
+      "lines": 389,
+      "category": "controller"
+    },
+    "grid\\reactor\\__init__.py": {
+      "path": "grid\\reactor\\__init__.py",
+      "package": "grid.reactor",
+      "name": "__init__",
+      "imports": [],
+      "from_imports": {
+        "commands": [
+          "Command",
+          "CommandBus",
+          "CommandResult",
+          "ExecutionContext"
+        ],
+        "events": [
+          "Event",
+          "EventBus"
+        ],
+        "reactor_app": [
+          "ReactorApp"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": "Reactor UI Module - Event-Driven Architecture\n\nPhase 3: Decoupled UI with Command Pattern and Event Bus.\n\nComponents:\n- commands.py: Command Pattern (UI actions → Commands → Grid)\n- events.py: Event B",
+      "lines": 30,
+      "category": "controller"
+    },
+    "scripts\\auto_commit.py": {
+      "path": "scripts\\auto_commit.py",
+      "package": "scripts",
+      "name": "auto_commit",
+      "imports": [
+        "sys",
+        "os",
+        "re",
+        "subprocess"
+      ],
+      "from_imports": {
+        "datetime": [
+          "datetime"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "get_current_version",
+        "bump_version",
+        "update_version_in_file",
+        "git_commit",
+        "main"
+      ],
+      "docstring": "Auto-commit script with version bump\nUsage: python scripts/auto_commit.py \"commit message\"",
+      "lines": 89,
+      "category": "script"
+    },
+    "scripts\\auto_save.py": {
+      "path": "scripts\\auto_save.py",
+      "package": "scripts",
+      "name": "auto_save",
+      "imports": [
+        "os",
+        "sys",
+        "re",
+        "subprocess",
+        "argparse"
+      ],
+      "from_imports": {},
+      "classes": [],
+      "functions": [
+        "bump_version",
+        "git_commit"
+      ],
+      "docstring": null,
+      "lines": 70,
+      "category": "script"
+    },
+    "scripts\\benchmark.py": {
+      "path": "scripts\\benchmark.py",
+      "package": "scripts",
+      "name": "benchmark",
+      "imports": [
+        "time",
+        "sys",
+        "os"
+      ],
+      "from_imports": {},
+      "classes": [],
+      "functions": [
+        "benchmark_legacy_import",
+        "benchmark_reactor_import",
+        "benchmark_grid_init",
+        "main"
+      ],
+      "docstring": "Performance Benchmark: Legacy UI vs Reactor UI\nMeasures startup time and basic initialization.",
+      "lines": 86,
+      "category": "script"
+    },
+    "scripts\\check_code.py": {
+      "path": "scripts\\check_code.py",
+      "package": "scripts",
+      "name": "check_code",
+      "imports": [
+        "subprocess",
+        "sys",
+        "os",
+        "time",
+        "colorama"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "print_header",
+        "print_result",
+        "run_command",
+        "check_syntax",
+        "check_ruff",
+        "check_imports",
+        "check_tests",
+        "main"
+      ],
+      "docstring": "Post-Code Check Script for Office Converter\n============================================\nRun: python scripts/check_code.py [--quick] [--fix]",
+      "lines": 182,
+      "category": "script"
+    },
+    "scripts\\context_mapper.py": {
+      "path": "scripts\\context_mapper.py",
+      "package": "scripts",
+      "name": "context_mapper",
+      "imports": [
+        "ast",
+        "os",
+        "sys",
+        "json",
+        "argparse",
+        "re"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field",
+          "asdict"
+        ],
+        "typing": [
+          "List",
+          "Dict",
+          "Set",
+          "Optional",
+          "Tuple"
+        ],
+        "collections": [
+          "defaultdict"
+        ]
+      },
+      "classes": [
+        "ModuleInfo",
+        "DependencyGraph",
+        "ASTAnalyzer"
+      ],
+      "functions": [
+        "categorize_module",
+        "analyze_file",
+        "build_dependency_graph",
+        "generate_context_chunks",
+        "generate_markdown_report",
+        "generate_json_output",
+        "main"
+      ],
+      "docstring": "Project Context Mapper - AST-based Dependency Graph Generator\n=============================================================\nCreates an \"architecture map\" of the entire project by:\n1. Parsing all Pytho",
+      "lines": 391,
+      "category": "script"
+    },
+    "tests\\conftest.py": {
+      "path": "tests\\conftest.py",
+      "package": "tests",
+      "name": "conftest",
+      "imports": [
+        "os",
+        "sys",
+        "pytest",
+        "tempfile",
+        "shutil"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "unittest.mock": [
+          "Mock",
+          "MagicMock"
+        ],
+        "multiprocessing": [
+          "Queue"
+        ],
+        "hypothesis": [
+          "strategies"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "mock_com_object",
+        "mock_worker",
+        "mock_psutil",
+        "temp_dir",
+        "sample_pdf",
+        "pytest_configure"
+      ],
+      "docstring": "Enhanced Pytest Configuration - Military-Grade Fixtures\n\nComprehensive test infrastructure with:\n- COM object mocking\n- Worker process simulation\n- System resource mocking (psutil)\n- Hypothesis strate",
+      "lines": 168,
+      "category": "test"
+    },
+    "tests\\test_bug_fixes.py": {
+      "path": "tests\\test_bug_fixes.py",
+      "package": "tests",
+      "name": "test_bug_fixes",
+      "imports": [
+        "pytest",
+        "os",
+        "tempfile"
+      ],
+      "from_imports": {},
+      "classes": [
+        "TestParsePageRange",
+        "TestPdfToolsImports",
+        "TestMainWindowButtons",
+        "TestExceptionHandling"
+      ],
+      "functions": [],
+      "docstring": "Tests for bug fixes in Office Converter.",
+      "lines": 130,
+      "category": "test"
+    },
+    "tests\\test_core.py": {
+      "path": "tests\\test_core.py",
+      "package": "tests",
+      "name": "test_core",
+      "imports": [],
+      "from_imports": {},
+      "classes": [
+        "TestImports",
+        "TestConfig",
+        "TestPdfTools",
+        "TestConverters"
+      ],
+      "functions": [],
+      "docstring": "Unit tests for Office Converter.",
+      "lines": 97,
+      "category": "test"
+    },
+    "tests\\test_file_tools.py": {
+      "path": "tests\\test_file_tools.py",
+      "package": "tests",
+      "name": "test_file_tools",
+      "imports": [
+        "os",
+        "sys",
+        "shutil",
+        "tempfile",
+        "unittest",
+        "time",
+        "stat"
+      ],
+      "from_imports": {
+        "office_converter.core.file_tools": [
+          "FileToolsEngine",
+          "DuplicateFinder",
+          "CaseRule",
+          "ReplaceRule",
+          "RemoveAccentsRule",
+          "SequenceRule",
+          "TrimRule",
+          "AddStringRule"
+        ]
+      },
+      "classes": [
+        "TestFileTools"
+      ],
+      "functions": [],
+      "docstring": null,
+      "lines": 199,
+      "category": "test"
+    },
+    "tests\\test_grid_core.py": {
+      "path": "tests\\test_grid_core.py",
+      "package": "tests",
+      "name": "test_grid_core",
+      "imports": [
+        "pytest",
+        "time",
+        "threading",
+        "tempfile",
+        "os"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "typing": [
+          "List"
+        ],
+        "grid.models": [
+          "FileType",
+          "ConversionFile",
+          "Priority",
+          "CircuitBreakerState",
+          "FILE_TYPE_MAP"
+        ],
+        "grid.scheduler": [
+          "ClusteredPriorityQueue"
+        ],
+        "grid.quarantine": [
+          "BloomFilterQuarantine"
+        ]
+      },
+      "classes": [
+        "TestPriority",
+        "TestConversionFile",
+        "TestClusteredPriorityQueue",
+        "TestBloomFilterQuarantine",
+        "TestCircuitBreakerState",
+        "TestIntegration"
+      ],
+      "functions": [
+        "temp_files"
+      ],
+      "docstring": "Comprehensive Test Suite for Core Data Structures\n\nTests verify:\n1. Algorithmic complexity guarantees (O(log n), O(1))\n2. Thread safety under concurrent access\n3. Context-aware clustering behavior\n4. ",
+      "lines": 616,
+      "category": "test"
+    },
+    "tests\\test_grid_phase2.py": {
+      "path": "tests\\test_grid_phase2.py",
+      "package": "tests",
+      "name": "test_grid_phase2",
+      "imports": [
+        "pytest",
+        "time",
+        "tempfile",
+        "os",
+        "multiprocessing"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "unittest.mock": [
+          "Mock",
+          "patch"
+        ],
+        "grid.models": [
+          "ConversionFile",
+          "CircuitBreakerState"
+        ],
+        "grid.worker": [
+          "WorkerProcess",
+          "WorkerConfig"
+        ],
+        "grid.pool": [
+          "WorkerPool",
+          "PoolConfig",
+          "PoolState"
+        ],
+        "grid.circuit_breaker": [
+          "CircuitBreakerCoordinator",
+          "CircuitBreakerConfig"
+        ],
+        "grid.grid": [
+          "ConversionGrid"
+        ]
+      },
+      "classes": [
+        "TestCircuitBreakerCoordinator",
+        "TestWorkerPool",
+        "TestConversionGrid",
+        "TestStress"
+      ],
+      "functions": [
+        "temp_test_file",
+        "mock_converter"
+      ],
+      "docstring": "Test Suite for Worker Pool & Circuit Breaker (Phase 2)\n\nTests verify:\n1. Worker process isolation and COM independence\n2. Hot spare failover (<500ms recovery time)\n3. Circuit breaker aggregation acros",
+      "lines": 390,
+      "category": "test"
+    },
+    "tests\\test_integration.py": {
+      "path": "tests\\test_integration.py",
+      "package": "tests",
+      "name": "test_integration",
+      "imports": [
+        "pytest",
+        "time",
+        "threading"
+      ],
+      "from_imports": {
+        "unittest.mock": [
+          "Mock",
+          "MagicMock",
+          "patch"
+        ],
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [
+        "TestQueueIntegration",
+        "TestTemporaryFileFiltering",
+        "TestStateTransitions",
+        "TestErrorPropagation"
+      ],
+      "functions": [],
+      "docstring": "Phase 4: Integration Tests - Queue & State Management\n\nTests that validate component integration and state consistency.\n\nFocus Areas:\n- FileQueue → Worker → ResultQueue flow\n- Temporary file filtering",
+      "lines": 367,
+      "category": "test"
+    },
+    "tests\\test_performance.py": {
+      "path": "tests\\test_performance.py",
+      "package": "tests",
+      "name": "test_performance",
+      "imports": [
+        "pytest",
+        "os",
+        "sys",
+        "time",
+        "tempfile",
+        "threading"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "unittest.mock": [
+          "Mock",
+          "patch",
+          "MagicMock"
+        ]
+      },
+      "classes": [
+        "TestBackgroundPDFPreview",
+        "TestVirtualFileList",
+        "TestAppendOnlyLog",
+        "TestCOMPoolHealthCheck",
+        "TestLazyImports",
+        "TestPerformanceBenchmarks",
+        "TestIntegration"
+      ],
+      "functions": [],
+      "docstring": "Comprehensive Performance and Integration Tests\n=================================================\nTests for Month 2 optimization items and overall system health.",
+      "lines": 285,
+      "category": "test"
+    },
+    "tests\\test_property_based.py": {
+      "path": "tests\\test_property_based.py",
+      "package": "tests",
+      "name": "test_property_based",
+      "imports": [
+        "pytest",
+        "math"
+      ],
+      "from_imports": {
+        "hypothesis": [
+          "given",
+          "assume",
+          "strategies",
+          "settings"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "tests.conftest": [
+          "file_size_strategy",
+          "timeout_strategy",
+          "memory_strategy",
+          "filename_strategy"
+        ]
+      },
+      "classes": [
+        "TestAdaptiveTimeoutProperties",
+        "TestMemoryThresholdProperties",
+        "TestBatchSplittingProperties",
+        "TestFileTypeDetectionProperties",
+        "TestHashCalculationProperties",
+        "TestSchedulerPriorityProperties"
+      ],
+      "functions": [],
+      "docstring": "Phase 2: Property-Based Testing with Hypothesis\n\nLogic Stress Testing for Utils and Calculations.\n\nTests use Hypothesis to generate thousands of random inputs and verify\nmathematical invariants hold t",
+      "lines": 369,
+      "category": "test"
+    },
+    "tests\\test_resilience.py": {
+      "path": "tests\\test_resilience.py",
+      "package": "tests",
+      "name": "test_resilience",
+      "imports": [
+        "pytest",
+        "time"
+      ],
+      "from_imports": {
+        "unittest.mock": [
+          "Mock",
+          "MagicMock",
+          "patch",
+          "call"
+        ],
+        "multiprocessing": [
+          "Queue"
+        ]
+      },
+      "classes": [
+        "TestZombieProcessHandling",
+        "TestCOMCrashHandling",
+        "TestMemoryLeakDetection",
+        "TestQueueOverflowProtection"
+      ],
+      "functions": [],
+      "docstring": "Phase 3: Resilience Tests - Mocking Failures\n\nTests that validate failure handling and recovery mechanisms.\n\nScenarios:\nA. Zombie Process Detection & Termination\nB. COM Crash Handling\nC. Memory Leak D",
+      "lines": 360,
+      "category": "test"
+    },
+    "tests\\test_shim.py": {
+      "path": "tests\\test_shim.py",
+      "package": "tests",
+      "name": "test_shim",
+      "imports": [
+        "pytest",
+        "sys"
+      ],
+      "from_imports": {
+        "unittest.mock": [
+          "patch"
+        ],
+        "grid.shim": [
+          "install_shim_layer",
+          "uninstall_shim_layer",
+          "is_shim_installed",
+          "verify_neutralization",
+          "get_shim_stats",
+          "NEUTRALIZED_MODULES"
+        ]
+      },
+      "classes": [
+        "TestShimLayer"
+      ],
+      "functions": [],
+      "docstring": "Test Suite for Shim Layer\n\nVerifies that import hook correctly neutralizes legacy UI modules.",
+      "lines": 155,
+      "category": "test"
+    },
+    "ui\\dialogs.py": {
+      "path": "ui\\dialogs.py",
+      "package": "ui",
+      "name": "dialogs",
+      "imports": [
+        "os",
+        "tkinter",
+        "sys"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "ttk"
+        ],
+        "typing": [
+          "Optional",
+          "Callable"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.localization": [
+          "get_text",
+          "LANGUAGES"
+        ]
+      },
+      "classes": [
+        "SettingsDialog"
+      ],
+      "functions": [
+        "show_settings"
+      ],
+      "docstring": "Settings Dialog - Popup for application settings.",
+      "lines": 153,
+      "category": "view"
+    },
+    "ui\\excel_tools_ui.py": {
+      "path": "ui\\excel_tools_ui.py",
+      "package": "ui",
+      "name": "excel_tools_ui",
+      "imports": [
+        "os",
+        "threading",
+        "customtkinter",
+        "tkinter",
+        "logging"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List",
+          "Optional"
+        ],
+        "pathlib": [
+          "Path"
+        ],
+        "office_converter.core.excel_tools": [
+          "split_excel",
+          "merge_excel",
+          "get_sheet_info",
+          "HAS_OPENPYXL",
+          "excel_to_csv",
+          "csv_to_excel",
+          "protect_sheets",
+          "unprotect_sheets",
+          "rename_sheets"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.tkdnd_wrapper": [
+          "HAS_TKDND",
+          "DND_FILES"
+        ],
+        "office_converter.utils.dnd_helpers": [
+          "parse_dropped_paths"
+        ]
+      },
+      "classes": [
+        "ExcelToolsDialog"
+      ],
+      "functions": [],
+      "docstring": "Excel Tools Dialog - Modern CustomTkinter interface for Excel operations.\n\nFeatures:\n- Split Excel: Export each sheet as separate file\n- Merge Excel: Combine multiple files into one\n- Drag & drop supp",
+      "lines": 867,
+      "category": "view"
+    },
+    "ui\\file_tools_ui.py": {
+      "path": "ui\\file_tools_ui.py",
+      "package": "ui",
+      "name": "file_tools_ui",
+      "imports": [
+        "tkinter",
+        "customtkinter",
+        "os",
+        "threading",
+        "time"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "ttk",
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List",
+          "Optional"
+        ],
+        "office_converter.core.file_tools": [
+          "FileToolsEngine",
+          "CaseRule",
+          "ReplaceRule",
+          "RemoveAccentsRule",
+          "TrimRule",
+          "AddStringRule",
+          "SequenceRule",
+          "ExtensionRule",
+          "RenameRule",
+          "DuplicateFinder",
+          "DuplicateGroup",
+          "EmptyFolderCleaner",
+          "AttributeManager"
+        ],
+        "office_converter.utils.tkdnd_wrapper": [
+          "TkDnDWrapper"
+        ],
+        "datetime": [
+          "datetime"
+        ]
+      },
+      "classes": [
+        "DuplicateResultWidget",
+        "RuleWidget",
+        "FileToolsDialog"
+      ],
+      "functions": [],
+      "docstring": "UI for File Tools (Rename, etc).",
+      "lines": 797,
+      "category": "view"
+    },
+    "ui\\file_tools_ui_v2.py": {
+      "path": "ui\\file_tools_ui_v2.py",
+      "package": "ui",
+      "name": "file_tools_ui_v2",
+      "imports": [
+        "tkinter",
+        "customtkinter",
+        "os",
+        "threading",
+        "logging"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "ttk",
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List",
+          "Optional"
+        ],
+        "datetime": [
+          "datetime"
+        ],
+        "office_converter.core.file_tools": [
+          "FileToolsEngine",
+          "CaseRule",
+          "ReplaceRule",
+          "RemoveAccentsRule",
+          "TrimRule",
+          "AddStringRule",
+          "SequenceRule",
+          "ExtensionRule",
+          "RenameRule",
+          "DuplicateFinder",
+          "DuplicateGroup",
+          "EmptyFolderCleaner",
+          "AttributeManager"
+        ]
+      },
+      "classes": [
+        "FileToolsDialogV2"
+      ],
+      "functions": [],
+      "docstring": "File Tools UI V2 - 3 Tab Vietnamese Interface\nBased on user reference design with:\n- Tab 1: Rename cơ bản (Basic Rename)\n- Tab 2: Rename nâng cao (Advanced Rename)\n- Tab 3: Các chức năng khác (Other F",
+      "lines": 461,
+      "category": "view"
+    },
+    "ui\\main_window.py": {
+      "path": "ui\\main_window.py",
+      "package": "ui",
+      "name": "main_window",
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "threading",
+        "tkinter",
+        "windnd"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "ttk",
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List"
+        ],
+        "office_converter.utils.logging_setup": [
+          "setup_logging",
+          "get_logger"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.localization": [
+          "get_text",
+          "set_language",
+          "get_language_names",
+          "LANGUAGES"
+        ],
+        "office_converter.utils.pdf_tools": [
+          "post_process_pdf",
+          "rasterize_pdf",
+          "merge_pdfs",
+          "split_pdf",
+          "parse_page_range",
+          "extract_pdf_pages",
+          "HAS_PYMUPDF"
+        ],
+        "office_converter.utils.history": [
+          "get_history"
+        ],
+        "office_converter": [
+          "__version__"
+        ],
+        "office_converter.utils.progress_estimator": [
+          "estimate_conversion_time",
+          "log_conversion_result"
+        ],
+        "office_converter.converters": [
+          "get_converter_for_file",
+          "ExcelConverter",
+          "WordConverter",
+          "PPTConverter"
+        ],
+        "office_converter.ui.dialogs": [
+          "show_settings"
+        ]
+      },
+      "classes": [
+        "ConverterApp"
+      ],
+      "functions": [
+        "main"
+      ],
+      "docstring": "Office Converter - Complete UI\nFull-featured interface for converting Office documents to PDF.\nSupports: Excel, Word, PowerPoint",
+      "lines": 1425,
+      "category": "view"
+    },
+    "ui\\main_window_ctk.py": {
+      "path": "ui\\main_window_ctk.py",
+      "package": "ui",
+      "name": "main_window_ctk",
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "threading",
+        "customtkinter"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List",
+          "Set"
+        ],
+        "office_converter.utils.logging_setup": [
+          "setup_logging"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.pdf_tools": [
+          "post_process_pdf",
+          "rasterize_pdf",
+          "parse_page_range",
+          "extract_pdf_pages",
+          "HAS_PYMUPDF"
+        ],
+        "office_converter.utils.com_pool": [
+          "release_pool"
+        ],
+        "office_converter.utils.history": [
+          "get_history"
+        ],
+        "office_converter": [
+          "__version__"
+        ],
+        "office_converter.utils.progress_estimator": [
+          "log_conversion_result"
+        ],
+        "office_converter.converters": [
+          "get_converter_for_file",
+          "ExcelConverter"
+        ]
+      },
+      "classes": [
+        "AnimatedButton",
+        "FileTypeIndicator",
+        "ModernConverterApp"
+      ],
+      "functions": [
+        "main"
+      ],
+      "docstring": "Office Converter - Modern UI with CustomTkinter\nVersion 3.1.0 - Enhanced UX with animations and context-aware options\nPhase 2 + Phase 3: Collapsible panels, context-aware options, animations, microint",
+      "lines": 977,
+      "category": "view"
+    },
+    "ui\\main_window_pro.py": {
+      "path": "ui\\main_window_pro.py",
+      "package": "ui",
+      "name": "main_window_pro",
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "sqlite3",
+        "threading",
+        "customtkinter",
+        "tkinter",
+        "fitz"
+      ],
+      "from_imports": {
+        "pathlib": [
+          "Path"
+        ],
+        "datetime": [
+          "datetime"
+        ],
+        "typing": [
+          "List",
+          "Optional",
+          "Set",
+          "Dict",
+          "Any",
+          "Callable"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ],
+        "enum": [
+          "Enum",
+          "auto"
+        ],
+        "tkinter": [
+          "filedialog",
+          "messagebox"
+        ],
+        "PIL": [
+          "Image",
+          "ImageTk"
+        ],
+        "office_converter.utils.logging_setup": [
+          "setup_logging"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.com_pool": [
+          "release_pool"
+        ],
+        "office_converter.utils.pdf_tools": [
+          "post_process_pdf",
+          "rasterize_pdf",
+          "parse_page_range",
+          "extract_pdf_pages",
+          "HAS_PYMUPDF"
+        ],
+        "office_converter.converters": [
+          "get_converter_for_file"
+        ],
+        "office_converter.utils.tkdnd_wrapper": [
+          "TkDnDWrapper",
+          "HAS_TKDND",
+          "DND_FILES"
+        ],
+        "office_converter.utils.dnd_helpers": [
+          "parse_dropped_paths"
+        ],
+        "office_converter.ui.file_tools_ui_v2": [
+          "FileToolsDialog"
+        ],
+        "office_converter.utils.recent_files": [
+          "RecentFilesDB",
+          "get_recent_files_db"
+        ]
+      },
+      "classes": [
+        "FileType",
+        "ConversionFile",
+        "ConversionOptions",
+        "ConversionEngine",
+        "FileListPanel",
+        "ConverterProApp"
+      ],
+      "functions": [
+        "main"
+      ],
+      "docstring": "Office Converter Pro - Refactored Architecture (FIXED)\nVersion 4.0.1 - Professional Grade with Preview, DnD, Recent Files\n\nHOTFIX CHANGES:\n- Fixed fitz import (moved to global scope with fallback)\n- A",
+      "lines": 2134,
+      "category": "view"
+    },
+    "ui\\pdf_tools_dialog.py": {
+      "path": "ui\\pdf_tools_dialog.py",
+      "package": "ui",
+      "name": "pdf_tools_dialog",
+      "imports": [
+        "os",
+        "threading",
+        "tkinter"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "ttk",
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List"
+        ],
+        "office_converter.core": [
+          "pdf_tools"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ]
+      },
+      "classes": [
+        "PDFToolsDialog"
+      ],
+      "functions": [
+        "show_pdf_tools_dialog"
+      ],
+      "docstring": "PDF Tools Dialog - Unified interface for all PDF operations\nSupports batch processing with progress tracking\nCompact layout to show all controls without scrolling",
+      "lines": 595,
+      "category": "view"
+    },
+    "ui\\pdf_tools_pro.py": {
+      "path": "ui\\pdf_tools_pro.py",
+      "package": "ui",
+      "name": "pdf_tools_pro",
+      "imports": [
+        "os",
+        "threading",
+        "customtkinter",
+        "tkinter",
+        "logging"
+      ],
+      "from_imports": {
+        "tkinter": [
+          "filedialog",
+          "messagebox"
+        ],
+        "typing": [
+          "List"
+        ],
+        "office_converter.core": [
+          "pdf_tools"
+        ],
+        "office_converter.utils.config": [
+          "Config"
+        ],
+        "office_converter.utils.tkdnd_wrapper": [
+          "HAS_TKDND",
+          "DND_FILES",
+          "setup_widget_dnd"
+        ],
+        "office_converter.utils.dnd_helpers": [
+          "parse_dropped_paths"
+        ]
+      },
+      "classes": [
+        "PDFToolsDialogPro"
+      ],
+      "functions": [
+        "show_pdf_tools_pro"
+      ],
+      "docstring": "PDF Tools Dialog Pro - Modern CustomTkinter interface for PDF operations\nProfessional UI with dark theme, smooth animations, and batch processing",
+      "lines": 997,
+      "category": "view"
+    },
+    "ui\\__init__.py": {
+      "path": "ui\\__init__.py",
+      "package": "ui",
+      "name": "__init__",
+      "imports": [],
+      "from_imports": {
+        "main_window": [
+          "ConverterApp",
+          "main"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": null,
+      "lines": 4,
+      "category": "view"
+    },
+    "utils\\com_pool.py": {
+      "path": "utils\\com_pool.py",
+      "package": "utils",
+      "name": "com_pool",
+      "imports": [
+        "logging",
+        "threading",
+        "pythoncom",
+        "win32com.client",
+        "gc"
+      ],
+      "from_imports": {
+        "typing": [
+          "Optional",
+          "Dict",
+          "Any"
+        ]
+      },
+      "classes": [
+        "COMPool"
+      ],
+      "functions": [
+        "get_pool",
+        "release_pool"
+      ],
+      "docstring": "COM Connection Pool - Manages and reuses COM application instances.\nImplements Singleton pattern for each Office application.",
+      "lines": 271,
+      "category": "util"
+    },
+    "utils\\config.py": {
+      "path": "utils\\config.py",
+      "package": "utils",
+      "name": "config",
+      "imports": [
+        "os",
+        "json",
+        "copy",
+        "logging"
+      ],
+      "from_imports": {
+        "typing": [
+          "Any",
+          "Dict",
+          "Optional"
+        ]
+      },
+      "classes": [
+        "Config"
+      ],
+      "functions": [],
+      "docstring": "Configuration Management - Centralized settings handling.",
+      "lines": 115,
+      "category": "util"
+    },
+    "utils\\dnd_helpers.py": {
+      "path": "utils\\dnd_helpers.py",
+      "package": "utils",
+      "name": "dnd_helpers",
+      "imports": [
+        "os",
+        "logging"
+      ],
+      "from_imports": {
+        "typing": [
+          "List"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "parse_dropped_paths"
+      ],
+      "docstring": "Drag & Drop Helper Utilities\nProvides robust path parsing for TkinterDnD2 events with full Unicode support.",
+      "lines": 71,
+      "category": "util"
+    },
+    "utils\\history.py": {
+      "path": "utils\\history.py",
+      "package": "utils",
+      "name": "history",
+      "imports": [
+        "os",
+        "json",
+        "logging"
+      ],
+      "from_imports": {
+        "datetime": [
+          "datetime"
+        ],
+        "typing": [
+          "List",
+          "Dict",
+          "Optional"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "asdict"
+        ]
+      },
+      "classes": [
+        "ConversionRecord",
+        "ConversionHistory"
+      ],
+      "functions": [
+        "get_history"
+      ],
+      "docstring": "Conversion History - Track and display conversion history.",
+      "lines": 134,
+      "category": "util"
+    },
+    "utils\\localization.py": {
+      "path": "utils\\localization.py",
+      "package": "utils",
+      "name": "localization",
+      "imports": [],
+      "from_imports": {
+        "typing": [
+          "Dict"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "set_language",
+        "get_current_language",
+        "get_text",
+        "get_language_names"
+      ],
+      "docstring": "Localization Module - Multi-language support.",
+      "lines": 524,
+      "category": "util"
+    },
+    "utils\\logging_setup.py": {
+      "path": "utils\\logging_setup.py",
+      "package": "utils",
+      "name": "logging_setup",
+      "imports": [
+        "os",
+        "logging"
+      ],
+      "from_imports": {
+        "logging.handlers": [
+          "RotatingFileHandler"
+        ],
+        "typing": [
+          "Optional"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "setup_logging",
+        "get_logger"
+      ],
+      "docstring": "Logging Setup - Configures application-wide logging with rotation.",
+      "lines": 65,
+      "category": "util"
+    },
+    "utils\\ocr.py": {
+      "path": "utils\\ocr.py",
+      "package": "utils",
+      "name": "ocr",
+      "imports": [
+        "os",
+        "logging",
+        "tempfile",
+        "shutil",
+        "pytesseract",
+        "fitz"
+      ],
+      "from_imports": {
+        "typing": [
+          "List"
+        ],
+        "pdf2image": [
+          "convert_from_path"
+        ]
+      },
+      "classes": [],
+      "functions": [
+        "is_ocr_available",
+        "get_tesseract_languages",
+        "ocr_image",
+        "get_best_language",
+        "ocr_pdf_to_searchable",
+        "_ocr_with_pymupdf",
+        "_ocr_with_pdf2image",
+        "extract_text_from_pdf",
+        "get_ocr_status"
+      ],
+      "docstring": "OCR Module - Optical Character Recognition for scanned PDFs.\nUses Tesseract OCR to make scanned PDFs searchable.\n\nRequirements:\n- Tesseract OCR must be installed (https://github.com/UB-Mannheim/tesser",
+      "lines": 368,
+      "category": "util"
+    },
+    "utils\\parallel_converter.py": {
+      "path": "utils\\parallel_converter.py",
+      "package": "utils",
+      "name": "parallel_converter",
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "logging",
+        "multiprocessing"
+      ],
+      "from_imports": {
+        "multiprocessing": [
+          "Process",
+          "Queue",
+          "Event"
+        ],
+        "typing": [
+          "Optional",
+          "List",
+          "Dict",
+          "Any",
+          "Callable"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "asdict"
+        ],
+        "enum": [
+          "Enum"
+        ],
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [
+        "JobStatus",
+        "ConversionJob",
+        "ConversionResult",
+        "ParallelConverter"
+      ],
+      "functions": [
+        "_worker_process",
+        "get_parallel_converter",
+        "shutdown_parallel_converter"
+      ],
+      "docstring": "Parallel Conversion System\n============================\nMulti-process conversion for 2-4x throughput improvement.\n\nEach worker process has its own COM instance to avoid threading issues.\nUses multipro",
+      "lines": 365,
+      "category": "util"
+    },
+    "utils\\pdf_tools.py": {
+      "path": "utils\\pdf_tools.py",
+      "package": "utils",
+      "name": "pdf_tools",
+      "imports": [
+        "logging",
+        "fitz"
+      ],
+      "from_imports": {
+        "office_converter.core.pdf_tools": [
+          "HAS_PYMUPDF",
+          "merge_pdfs",
+          "split_pdf",
+          "compress_pdf",
+          "protect_pdf",
+          "post_process_pdf",
+          "rasterize_pdf",
+          "add_watermark",
+          "pdf_to_images",
+          "images_to_pdf",
+          "parse_page_range",
+          "extract_pages",
+          "extract_pdf_pages",
+          "delete_pages",
+          "rotate_pages",
+          "reorder_pages",
+          "reverse_pages"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": "PDF Tools - Utilities for PDF manipulation.\nRe-exports from core.pdf_tools for backward compatibility.\n\nDEPRECATED: Import from office_converter.core.pdf_tools instead.",
+      "lines": 71,
+      "category": "util"
+    },
+    "utils\\progress_estimator.py": {
+      "path": "utils\\progress_estimator.py",
+      "package": "utils",
+      "name": "progress_estimator",
+      "imports": [
+        "os",
+        "json",
+        "logging",
+        "psutil"
+      ],
+      "from_imports": {
+        "datetime": [
+          "datetime"
+        ],
+        "typing": [
+          "Optional",
+          "Dict",
+          "List",
+          "Any"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "asdict"
+        ],
+        "pathlib": [
+          "Path"
+        ]
+      },
+      "classes": [
+        "SystemProfile",
+        "SystemProfiler",
+        "ConversionRecord",
+        "ConversionLogger",
+        "AdaptiveEstimator"
+      ],
+      "functions": [
+        "get_system_profiler",
+        "get_conversion_logger",
+        "get_adaptive_estimator",
+        "estimate_conversion_time",
+        "log_conversion_result"
+      ],
+      "docstring": "Adaptive Progress Estimation System\n====================================\nIntelligent progress estimation using machine learning from historical data.\n\nComponents:\n- SystemProfiler: Detects and records",
+      "lines": 466,
+      "category": "util"
+    },
+    "utils\\recent_files.py": {
+      "path": "utils\\recent_files.py",
+      "package": "utils",
+      "name": "recent_files",
+      "imports": [
+        "os",
+        "sqlite3",
+        "threading",
+        "logging"
+      ],
+      "from_imports": {
+        "typing": [
+          "List",
+          "Dict",
+          "Any",
+          "Optional"
+        ]
+      },
+      "classes": [
+        "RecentFilesDB"
+      ],
+      "functions": [
+        "get_recent_files_db"
+      ],
+      "docstring": "Recent Files Database - SQLite-based storage for file history.\nExtracted from main_window_pro.py for better modularity.",
+      "lines": 173,
+      "category": "util"
+    },
+    "utils\\tkdnd_wrapper.py": {
+      "path": "utils\\tkdnd_wrapper.py",
+      "package": "utils",
+      "name": "tkdnd_wrapper",
+      "imports": [
+        "logging",
+        "customtkinter"
+      ],
+      "from_imports": {
+        "tkinterdnd2": [
+          "TkinterDnD",
+          "DND_FILES"
+        ]
+      },
+      "classes": [
+        "TkinterDnD",
+        "TkDnDWrapper"
+      ],
+      "functions": [
+        "setup_widget_dnd"
+      ],
+      "docstring": "TkinterDnD2 + CustomTkinter Integration\nProvides wrapper class for combining tkinterdnd2 with customtkinter.",
+      "lines": 161,
+      "category": "util"
+    },
+    "utils\\updater.py": {
+      "path": "utils\\updater.py",
+      "package": "utils",
+      "name": "updater",
+      "imports": [
+        "os",
+        "sys",
+        "json",
+        "threading",
+        "webbrowser"
+      ],
+      "from_imports": {
+        "typing": [
+          "Optional",
+          "Callable"
+        ],
+        "dataclasses": [
+          "dataclass"
+        ],
+        "urllib.request": [
+          "urlopen",
+          "Request"
+        ],
+        "urllib.error": [
+          "URLError",
+          "HTTPError"
+        ],
+        "office_converter": [
+          "__version__"
+        ]
+      },
+      "classes": [
+        "UpdateInfo",
+        "UpdateChecker"
+      ],
+      "functions": [
+        "show_update_dialog",
+        "check_for_updates_on_startup",
+        "_show_no_update_message"
+      ],
+      "docstring": "Office to PDF Converter Pro - Auto Update Checker\nVersion 4.0.0\n\nChecks GitHub releases for new versions.",
+      "lines": 269,
+      "category": "util"
+    },
+    "utils\\watchdog.py": {
+      "path": "utils\\watchdog.py",
+      "package": "utils",
+      "name": "watchdog",
+      "imports": [
+        "os",
+        "time",
+        "logging",
+        "threading",
+        "psutil"
+      ],
+      "from_imports": {
+        "typing": [
+          "Optional",
+          "Dict",
+          "List",
+          "Any",
+          "Callable"
+        ],
+        "dataclasses": [
+          "dataclass",
+          "field"
+        ],
+        "datetime": [
+          "datetime",
+          "timedelta"
+        ],
+        "collections": [
+          "deque"
+        ]
+      },
+      "classes": [
+        "HealthMetrics",
+        "ConversionTracker",
+        "Watchdog"
+      ],
+      "functions": [
+        "get_watchdog",
+        "start_watchdog",
+        "stop_watchdog"
+      ],
+      "docstring": "Watchdog & Health Monitoring System\n=====================================\nMonitors application and worker health for 24/7 stability.\n\nFeatures:\n- Worker health monitoring\n- Automatic worker restart on",
+      "lines": 294,
+      "category": "util"
+    },
+    "utils\\__init__.py": {
+      "path": "utils\\__init__.py",
+      "package": "utils",
+      "name": "__init__",
+      "imports": [],
+      "from_imports": {
+        "config": [
+          "Config"
+        ],
+        "localization": [
+          "get_text",
+          "LANGUAGES",
+          "set_language",
+          "get_current_language"
+        ],
+        "pdf_tools": [
+          "merge_pdfs",
+          "split_pdf",
+          "rasterize_pdf",
+          "post_process_pdf",
+          "parse_page_range",
+          "HAS_PYMUPDF"
+        ],
+        "logging_setup": [
+          "setup_logging",
+          "get_logger"
+        ],
+        "com_pool": [
+          "COMPool",
+          "get_pool",
+          "release_pool"
+        ],
+        "history": [
+          "ConversionHistory",
+          "get_history"
+        ]
+      },
+      "classes": [],
+      "functions": [],
+      "docstring": null,
+      "lines": 16,
+      "category": "util"
+    }
+  },
+  "edges": [
+    [
+      "build_exe",
+      "sys"
+    ],
+    [
+      "build_exe",
+      "shutil"
+    ],
+    [
+      "build_exe",
+      "subprocess"
+    ],
+    [
+      "build_exe",
+      "pathlib"
+    ],
+    [
+      "build_script",
+      "subprocess"
+    ],
+    [
+      "build_script",
+      "os"
+    ],
+    [
+      "build_script",
+      "shutil"
+    ],
+    [
+      "build_script",
+      "sys"
+    ],
+    [
+      "build_script",
+      "pathlib"
+    ],
+    [
+      "deploy_automation",
+      "subprocess"
+    ],
+    [
+      "deploy_automation",
+      "sys"
+    ],
+    [
+      "deploy_automation",
+      "os"
+    ],
+    [
+      "deploy_automation",
+      "pathlib"
+    ],
+    [
+      "deploy_simple",
+      "subprocess"
+    ],
+    [
+      "deploy_simple",
+      "sys"
+    ],
+    [
+      "deploy_simple",
+      "os"
+    ],
+    [
+      "deploy_simple",
+      "datetime"
+    ],
+    [
+      "deploy_simple",
+      "pathlib"
+    ],
+    [
+      "main",
+      "os"
+    ],
+    [
+      "main",
+      "sys"
+    ],
+    [
+      "main",
+      "office_converter.utils.logging_setup"
+    ],
+    [
+      "main",
+      "office_converter.utils.config"
+    ],
+    [
+      "main",
+      "office_converter.converters"
+    ],
+    [
+      "merge_project",
+      "argparse"
+    ],
+    [
+      "merge_project",
+      "os"
+    ],
+    [
+      "merge_project",
+      "sys"
+    ],
+    [
+      "merge_project",
+      "fnmatch"
+    ],
+    [
+      "merge_project",
+      "pyperclip"
+    ],
+    [
+      "merge_project",
+      "pathlib"
+    ],
+    [
+      "merge_project",
+      "datetime"
+    ],
+    [
+      "run_grid",
+      "sys"
+    ],
+    [
+      "run_grid",
+      "logging"
+    ],
+    [
+      "run_grid",
+      "time"
+    ],
+    [
+      "run_grid",
+      "pathlib"
+    ],
+    [
+      "run_grid",
+      "grid.shim"
+    ],
+    [
+      "run_grid",
+      "grid"
+    ],
+    [
+      "run_grid",
+      "grid.reactor.commands"
+    ],
+    [
+      "run_grid",
+      "grid.reactor.events"
+    ],
+    [
+      "run_pro",
+      "sys"
+    ],
+    [
+      "run_pro",
+      "os"
+    ],
+    [
+      "run_pro",
+      "warnings"
+    ],
+    [
+      "run_pro",
+      "office_converter.ui.main_window_pro"
+    ],
+    [
+      "run_reactor",
+      "sys"
+    ],
+    [
+      "run_reactor",
+      "os"
+    ],
+    [
+      "run_reactor",
+      "office_converter.grid.reactor.reactor_app"
+    ],
+    [
+      "test_all",
+      "sys"
+    ],
+    [
+      "test_all",
+      "os"
+    ],
+    [
+      "test_all",
+      "office_converter.utils.config"
+    ],
+    [
+      "test_all",
+      "office_converter.utils.localization"
+    ],
+    [
+      "test_all",
+      "office_converter.utils.pdf_tools"
+    ],
+    [
+      "test_all",
+      "office_converter.converters"
+    ],
+    [
+      "validate_core",
+      "sys"
+    ],
+    [
+      "validate_core",
+      "time"
+    ],
+    [
+      "validate_core",
+      "pathlib"
+    ],
+    [
+      "validate_core",
+      "grid.models"
+    ],
+    [
+      "validate_core",
+      "grid.scheduler"
+    ],
+    [
+      "validate_core",
+      "grid.quarantine"
+    ],
+    [
+      "validate_shim",
+      "sys"
+    ],
+    [
+      "validate_shim",
+      "pathlib"
+    ],
+    [
+      "validate_shim",
+      "grid.shim"
+    ],
+    [
+      "converters.base",
+      "os"
+    ],
+    [
+      "converters.base",
+      "logging"
+    ],
+    [
+      "converters.base",
+      "threading"
+    ],
+    [
+      "converters.base",
+      "abc"
+    ],
+    [
+      "converters.base",
+      "typing"
+    ],
+    [
+      "converters.excel",
+      "os"
+    ],
+    [
+      "converters.excel",
+      "time"
+    ],
+    [
+      "converters.excel",
+      "logging"
+    ],
+    [
+      "converters.excel",
+      "shutil"
+    ],
+    [
+      "converters.excel",
+      "gc"
+    ],
+    [
+      "converters.excel",
+      "uuid"
+    ],
+    [
+      "converters.excel",
+      "pythoncom"
+    ],
+    [
+      "converters.excel",
+      "typing"
+    ],
+    [
+      "converters.excel",
+      "base"
+    ],
+    [
+      "converters.excel",
+      "utils.com_pool"
+    ],
+    [
+      "converters.excel",
+      "office_converter.utils.com_pool"
+    ],
+    [
+      "converters.libreoffice",
+      "os"
+    ],
+    [
+      "converters.libreoffice",
+      "subprocess"
+    ],
+    [
+      "converters.libreoffice",
+      "logging"
+    ],
+    [
+      "converters.libreoffice",
+      "shutil"
+    ],
+    [
+      "converters.libreoffice",
+      "pathlib"
+    ],
+    [
+      "converters.libreoffice",
+      "typing"
+    ],
+    [
+      "converters.libreoffice",
+      "base"
+    ],
+    [
+      "converters.ppt",
+      "os"
+    ],
+    [
+      "converters.ppt",
+      "logging"
+    ],
+    [
+      "converters.ppt",
+      "shutil"
+    ],
+    [
+      "converters.ppt",
+      "gc"
+    ],
+    [
+      "converters.ppt",
+      "uuid"
+    ],
+    [
+      "converters.ppt",
+      "pythoncom"
+    ],
+    [
+      "converters.ppt",
+      "typing"
+    ],
+    [
+      "converters.ppt",
+      "base"
+    ],
+    [
+      "converters.ppt",
+      "utils.com_pool"
+    ],
+    [
+      "converters.word",
+      "os"
+    ],
+    [
+      "converters.word",
+      "time"
+    ],
+    [
+      "converters.word",
+      "logging"
+    ],
+    [
+      "converters.word",
+      "shutil"
+    ],
+    [
+      "converters.word",
+      "gc"
+    ],
+    [
+      "converters.word",
+      "uuid"
+    ],
+    [
+      "converters.word",
+      "pythoncom"
+    ],
+    [
+      "converters.word",
+      "typing"
+    ],
+    [
+      "converters.word",
+      "base"
+    ],
+    [
+      "converters.word",
+      "utils.com_pool"
+    ],
+    [
+      "converters.__init__",
+      "base"
+    ],
+    [
+      "core.excel_tools",
+      "os"
+    ],
+    [
+      "core.excel_tools",
+      "logging"
+    ],
+    [
+      "core.excel_tools",
+      "csv"
+    ],
+    [
+      "core.excel_tools",
+      "pathlib"
+    ],
+    [
+      "core.excel_tools",
+      "typing"
+    ],
+    [
+      "core.excel_tools",
+      "copy"
+    ],
+    [
+      "core.excel_tools",
+      "openpyxl"
+    ],
+    [
+      "core.excel_tools",
+      "openpyxl.utils"
+    ],
+    [
+      "core.excel_tools",
+      "openpyxl.worksheet.worksheet"
+    ],
+    [
+      "core.file_tools",
+      "os"
+    ],
+    [
+      "core.file_tools",
+      "re"
+    ],
+    [
+      "core.file_tools",
+      "logging"
+    ],
+    [
+      "core.file_tools",
+      "hashlib"
+    ],
+    [
+      "core.file_tools",
+      "hashlib"
+    ],
+    [
+      "core.file_tools",
+      "stat"
+    ],
+    [
+      "core.file_tools",
+      "ctypes"
+    ],
+    [
+      "core.file_tools",
+      "json"
+    ],
+    [
+      "core.file_tools",
+      "time"
+    ],
+    [
+      "core.file_tools",
+      "abc"
+    ],
+    [
+      "core.file_tools",
+      "typing"
+    ],
+    [
+      "core.file_tools",
+      "dataclasses"
+    ],
+    [
+      "core.file_tools",
+      "datetime"
+    ],
+    [
+      "core.pdf_tools",
+      "os"
+    ],
+    [
+      "core.pdf_tools",
+      "logging"
+    ],
+    [
+      "core.pdf_tools",
+      "shutil"
+    ],
+    [
+      "core.pdf_tools",
+      "fitz"
+    ],
+    [
+      "core.pdf_tools",
+      "random"
+    ],
+    [
+      "core.pdf_tools",
+      "typing"
+    ],
+    [
+      "core.pdf_tools",
+      "PIL"
+    ],
+    [
+      "grid.circuit_breaker",
+      "time"
+    ],
+    [
+      "grid.circuit_breaker",
+      "logging"
+    ],
+    [
+      "grid.circuit_breaker",
+      "threading"
+    ],
+    [
+      "grid.circuit_breaker",
+      "typing"
+    ],
+    [
+      "grid.circuit_breaker",
+      "dataclasses"
+    ],
+    [
+      "grid.circuit_breaker",
+      "grid.models"
+    ],
+    [
+      "grid.circuit_breaker",
+      "grid.quarantine"
+    ],
+    [
+      "grid.grid",
+      "logging"
+    ],
+    [
+      "grid.grid",
+      "time"
+    ],
+    [
+      "grid.grid",
+      "threading"
+    ],
+    [
+      "grid.grid",
+      "typing"
+    ],
+    [
+      "grid.grid",
+      "pathlib"
+    ],
+    [
+      "grid.grid",
+      "grid.models"
+    ],
+    [
+      "grid.grid",
+      "grid.scheduler"
+    ],
+    [
+      "grid.grid",
+      "grid.worker"
+    ],
+    [
+      "grid.grid",
+      "grid.pool"
+    ],
+    [
+      "grid.grid",
+      "grid.circuit_breaker"
+    ],
+    [
+      "grid.grid",
+      "grid.quarantine"
+    ],
+    [
+      "grid.models",
+      "hashlib"
+    ],
+    [
+      "grid.models",
+      "time"
+    ],
+    [
+      "grid.models",
+      "dataclasses"
+    ],
+    [
+      "grid.models",
+      "enum"
+    ],
+    [
+      "grid.models",
+      "pathlib"
+    ],
+    [
+      "grid.models",
+      "typing"
+    ],
+    [
+      "grid.pool",
+      "time"
+    ],
+    [
+      "grid.pool",
+      "logging"
+    ],
+    [
+      "grid.pool",
+      "multiprocessing"
+    ],
+    [
+      "grid.pool",
+      "psutil"
+    ],
+    [
+      "grid.pool",
+      "typing"
+    ],
+    [
+      "grid.pool",
+      "dataclasses"
+    ],
+    [
+      "grid.pool",
+      "enum"
+    ],
+    [
+      "grid.pool",
+      "grid.worker"
+    ],
+    [
+      "grid.pool",
+      "grid.models"
+    ],
+    [
+      "grid.pool",
+      "grid.scheduler"
+    ],
+    [
+      "grid.pool",
+      "grid.quarantine"
+    ],
+    [
+      "grid.quarantine",
+      "hashlib"
+    ],
+    [
+      "grid.quarantine",
+      "math"
+    ],
+    [
+      "grid.quarantine",
+      "threading"
+    ],
+    [
+      "grid.quarantine",
+      "typing"
+    ],
+    [
+      "grid.scheduler",
+      "heapq"
+    ],
+    [
+      "grid.scheduler",
+      "threading"
+    ],
+    [
+      "grid.scheduler",
+      "typing"
+    ],
+    [
+      "grid.scheduler",
+      "collections"
+    ],
+    [
+      "grid.scheduler",
+      "models"
+    ],
+    [
+      "grid.shim",
+      "sys"
+    ],
+    [
+      "grid.shim",
+      "logging"
+    ],
+    [
+      "grid.shim",
+      "types"
+    ],
+    [
+      "grid.shim",
+      "importlib.abc"
+    ],
+    [
+      "grid.shim",
+      "typing"
+    ],
+    [
+      "grid.worker",
+      "os"
+    ],
+    [
+      "grid.worker",
+      "sys"
+    ],
+    [
+      "grid.worker",
+      "time"
+    ],
+    [
+      "grid.worker",
+      "signal"
+    ],
+    [
+      "grid.worker",
+      "logging"
+    ],
+    [
+      "grid.worker",
+      "multiprocessing"
+    ],
+    [
+      "grid.worker",
+      "dataclasses"
+    ],
+    [
+      "grid.worker",
+      "typing"
+    ],
+    [
+      "grid.worker",
+      "pathlib"
+    ],
+    [
+      "grid.worker",
+      "grid.models"
+    ],
+    [
+      "grid.__init__",
+      "models"
+    ],
+    [
+      "grid.__init__",
+      "scheduler"
+    ],
+    [
+      "grid.__init__",
+      "quarantine"
+    ],
+    [
+      "grid.__init__",
+      "worker"
+    ],
+    [
+      "grid.__init__",
+      "pool"
+    ],
+    [
+      "grid.__init__",
+      "circuit_breaker"
+    ],
+    [
+      "grid.__init__",
+      "grid"
+    ],
+    [
+      "grid.reactor.bridge",
+      "logging"
+    ],
+    [
+      "grid.reactor.bridge",
+      "typing"
+    ],
+    [
+      "grid.reactor.bridge",
+      "grid"
+    ],
+    [
+      "grid.reactor.bridge",
+      "grid.reactor.events"
+    ],
+    [
+      "grid.reactor.commands",
+      "time"
+    ],
+    [
+      "grid.reactor.commands",
+      "uuid"
+    ],
+    [
+      "grid.reactor.commands",
+      "queue"
+    ],
+    [
+      "grid.reactor.commands",
+      "threading"
+    ],
+    [
+      "grid.reactor.commands",
+      "logging"
+    ],
+    [
+      "grid.reactor.commands",
+      "abc"
+    ],
+    [
+      "grid.reactor.commands",
+      "dataclasses"
+    ],
+    [
+      "grid.reactor.commands",
+      "typing"
+    ],
+    [
+      "grid.reactor.commands",
+      "pathlib"
+    ],
+    [
+      "grid.reactor.commands",
+      "concurrent.futures"
+    ],
+    [
+      "grid.reactor.commands",
+      "collections"
+    ],
+    [
+      "grid.reactor.events",
+      "time"
+    ],
+    [
+      "grid.reactor.events",
+      "uuid"
+    ],
+    [
+      "grid.reactor.events",
+      "threading"
+    ],
+    [
+      "grid.reactor.events",
+      "logging"
+    ],
+    [
+      "grid.reactor.events",
+      "abc"
+    ],
+    [
+      "grid.reactor.events",
+      "dataclasses"
+    ],
+    [
+      "grid.reactor.events",
+      "typing"
+    ],
+    [
+      "grid.reactor.events",
+      "collections"
+    ],
+    [
+      "grid.reactor.optimistic",
+      "uuid"
+    ],
+    [
+      "grid.reactor.optimistic",
+      "time"
+    ],
+    [
+      "grid.reactor.optimistic",
+      "logging"
+    ],
+    [
+      "grid.reactor.optimistic",
+      "threading"
+    ],
+    [
+      "grid.reactor.optimistic",
+      "typing"
+    ],
+    [
+      "grid.reactor.optimistic",
+      "dataclasses"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "tkinter"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "customtkinter"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "logging"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "tkinter"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "typing"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "pathlib"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid.models"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid.reactor.commands"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid.reactor.events"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid.reactor.optimistic"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid.reactor.bridge"
+    ],
+    [
+      "grid.reactor.reactor_app",
+      "grid.reactor.virtual_list"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "tkinter"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "customtkinter"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "threading"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "logging"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "tkinter"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "typing"
+    ],
+    [
+      "grid.reactor.virtual_list",
+      "dataclasses"
+    ],
+    [
+      "grid.reactor.__init__",
+      "commands"
+    ],
+    [
+      "grid.reactor.__init__",
+      "events"
+    ],
+    [
+      "grid.reactor.__init__",
+      "reactor_app"
+    ],
+    [
+      "scripts.auto_commit",
+      "sys"
+    ],
+    [
+      "scripts.auto_commit",
+      "os"
+    ],
+    [
+      "scripts.auto_commit",
+      "re"
+    ],
+    [
+      "scripts.auto_commit",
+      "subprocess"
+    ],
+    [
+      "scripts.auto_commit",
+      "datetime"
+    ],
+    [
+      "scripts.auto_save",
+      "os"
+    ],
+    [
+      "scripts.auto_save",
+      "sys"
+    ],
+    [
+      "scripts.auto_save",
+      "re"
+    ],
+    [
+      "scripts.auto_save",
+      "subprocess"
+    ],
+    [
+      "scripts.auto_save",
+      "argparse"
+    ],
+    [
+      "scripts.benchmark",
+      "time"
+    ],
+    [
+      "scripts.benchmark",
+      "sys"
+    ],
+    [
+      "scripts.benchmark",
+      "os"
+    ],
+    [
+      "scripts.check_code",
+      "subprocess"
+    ],
+    [
+      "scripts.check_code",
+      "sys"
+    ],
+    [
+      "scripts.check_code",
+      "os"
+    ],
+    [
+      "scripts.check_code",
+      "time"
+    ],
+    [
+      "scripts.check_code",
+      "colorama"
+    ],
+    [
+      "scripts.check_code",
+      "pathlib"
+    ],
+    [
+      "scripts.context_mapper",
+      "ast"
+    ],
+    [
+      "scripts.context_mapper",
+      "os"
+    ],
+    [
+      "scripts.context_mapper",
+      "sys"
+    ],
+    [
+      "scripts.context_mapper",
+      "json"
+    ],
+    [
+      "scripts.context_mapper",
+      "argparse"
+    ],
+    [
+      "scripts.context_mapper",
+      "re"
+    ],
+    [
+      "scripts.context_mapper",
+      "pathlib"
+    ],
+    [
+      "scripts.context_mapper",
+      "dataclasses"
+    ],
+    [
+      "scripts.context_mapper",
+      "typing"
+    ],
+    [
+      "scripts.context_mapper",
+      "collections"
+    ],
+    [
+      "tests.conftest",
+      "os"
+    ],
+    [
+      "tests.conftest",
+      "sys"
+    ],
+    [
+      "tests.conftest",
+      "pytest"
+    ],
+    [
+      "tests.conftest",
+      "tempfile"
+    ],
+    [
+      "tests.conftest",
+      "shutil"
+    ],
+    [
+      "tests.conftest",
+      "pathlib"
+    ],
+    [
+      "tests.conftest",
+      "unittest.mock"
+    ],
+    [
+      "tests.conftest",
+      "multiprocessing"
+    ],
+    [
+      "tests.conftest",
+      "hypothesis"
+    ],
+    [
+      "tests.test_bug_fixes",
+      "pytest"
+    ],
+    [
+      "tests.test_bug_fixes",
+      "os"
+    ],
+    [
+      "tests.test_bug_fixes",
+      "tempfile"
+    ],
+    [
+      "tests.test_file_tools",
+      "os"
+    ],
+    [
+      "tests.test_file_tools",
+      "sys"
+    ],
+    [
+      "tests.test_file_tools",
+      "shutil"
+    ],
+    [
+      "tests.test_file_tools",
+      "tempfile"
+    ],
+    [
+      "tests.test_file_tools",
+      "unittest"
+    ],
+    [
+      "tests.test_file_tools",
+      "time"
+    ],
+    [
+      "tests.test_file_tools",
+      "stat"
+    ],
+    [
+      "tests.test_file_tools",
+      "office_converter.core.file_tools"
+    ],
+    [
+      "tests.test_grid_core",
+      "pytest"
+    ],
+    [
+      "tests.test_grid_core",
+      "time"
+    ],
+    [
+      "tests.test_grid_core",
+      "threading"
+    ],
+    [
+      "tests.test_grid_core",
+      "tempfile"
+    ],
+    [
+      "tests.test_grid_core",
+      "os"
+    ],
+    [
+      "tests.test_grid_core",
+      "pathlib"
+    ],
+    [
+      "tests.test_grid_core",
+      "typing"
+    ],
+    [
+      "tests.test_grid_core",
+      "grid.models"
+    ],
+    [
+      "tests.test_grid_core",
+      "grid.scheduler"
+    ],
+    [
+      "tests.test_grid_core",
+      "grid.quarantine"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "pytest"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "time"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "tempfile"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "os"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "multiprocessing"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "pathlib"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "unittest.mock"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "grid.models"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "grid.worker"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "grid.pool"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "grid.circuit_breaker"
+    ],
+    [
+      "tests.test_grid_phase2",
+      "grid.grid"
+    ],
+    [
+      "tests.test_integration",
+      "pytest"
+    ],
+    [
+      "tests.test_integration",
+      "time"
+    ],
+    [
+      "tests.test_integration",
+      "threading"
+    ],
+    [
+      "tests.test_integration",
+      "unittest.mock"
+    ],
+    [
+      "tests.test_integration",
+      "pathlib"
+    ],
+    [
+      "tests.test_performance",
+      "pytest"
+    ],
+    [
+      "tests.test_performance",
+      "os"
+    ],
+    [
+      "tests.test_performance",
+      "sys"
+    ],
+    [
+      "tests.test_performance",
+      "time"
+    ],
+    [
+      "tests.test_performance",
+      "tempfile"
+    ],
+    [
+      "tests.test_performance",
+      "threading"
+    ],
+    [
+      "tests.test_performance",
+      "pathlib"
+    ],
+    [
+      "tests.test_performance",
+      "unittest.mock"
+    ],
+    [
+      "tests.test_property_based",
+      "pytest"
+    ],
+    [
+      "tests.test_property_based",
+      "math"
+    ],
+    [
+      "tests.test_property_based",
+      "hypothesis"
+    ],
+    [
+      "tests.test_property_based",
+      "pathlib"
+    ],
+    [
+      "tests.test_property_based",
+      "tests.conftest"
+    ],
+    [
+      "tests.test_resilience",
+      "pytest"
+    ],
+    [
+      "tests.test_resilience",
+      "time"
+    ],
+    [
+      "tests.test_resilience",
+      "unittest.mock"
+    ],
+    [
+      "tests.test_resilience",
+      "multiprocessing"
+    ],
+    [
+      "tests.test_shim",
+      "pytest"
+    ],
+    [
+      "tests.test_shim",
+      "sys"
+    ],
+    [
+      "tests.test_shim",
+      "unittest.mock"
+    ],
+    [
+      "tests.test_shim",
+      "grid.shim"
+    ],
+    [
+      "ui.dialogs",
+      "os"
+    ],
+    [
+      "ui.dialogs",
+      "tkinter"
+    ],
+    [
+      "ui.dialogs",
+      "sys"
+    ],
+    [
+      "ui.dialogs",
+      "tkinter"
+    ],
+    [
+      "ui.dialogs",
+      "typing"
+    ],
+    [
+      "ui.dialogs",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.dialogs",
+      "office_converter.utils.localization"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "os"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "threading"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "customtkinter"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "tkinter"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "logging"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "tkinter"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "typing"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "pathlib"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "office_converter.core.excel_tools"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "office_converter.utils.tkdnd_wrapper"
+    ],
+    [
+      "ui.excel_tools_ui",
+      "office_converter.utils.dnd_helpers"
+    ],
+    [
+      "ui.file_tools_ui",
+      "tkinter"
+    ],
+    [
+      "ui.file_tools_ui",
+      "customtkinter"
+    ],
+    [
+      "ui.file_tools_ui",
+      "os"
+    ],
+    [
+      "ui.file_tools_ui",
+      "threading"
+    ],
+    [
+      "ui.file_tools_ui",
+      "time"
+    ],
+    [
+      "ui.file_tools_ui",
+      "tkinter"
+    ],
+    [
+      "ui.file_tools_ui",
+      "typing"
+    ],
+    [
+      "ui.file_tools_ui",
+      "office_converter.core.file_tools"
+    ],
+    [
+      "ui.file_tools_ui",
+      "office_converter.utils.tkdnd_wrapper"
+    ],
+    [
+      "ui.file_tools_ui",
+      "datetime"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "tkinter"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "customtkinter"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "os"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "threading"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "logging"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "tkinter"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "typing"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "datetime"
+    ],
+    [
+      "ui.file_tools_ui_v2",
+      "office_converter.core.file_tools"
+    ],
+    [
+      "ui.main_window",
+      "os"
+    ],
+    [
+      "ui.main_window",
+      "sys"
+    ],
+    [
+      "ui.main_window",
+      "time"
+    ],
+    [
+      "ui.main_window",
+      "threading"
+    ],
+    [
+      "ui.main_window",
+      "tkinter"
+    ],
+    [
+      "ui.main_window",
+      "windnd"
+    ],
+    [
+      "ui.main_window",
+      "tkinter"
+    ],
+    [
+      "ui.main_window",
+      "typing"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.utils.logging_setup"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.utils.localization"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.utils.pdf_tools"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.utils.history"
+    ],
+    [
+      "ui.main_window",
+      "office_converter"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.utils.progress_estimator"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.converters"
+    ],
+    [
+      "ui.main_window",
+      "office_converter.ui.dialogs"
+    ],
+    [
+      "ui.main_window_ctk",
+      "os"
+    ],
+    [
+      "ui.main_window_ctk",
+      "sys"
+    ],
+    [
+      "ui.main_window_ctk",
+      "time"
+    ],
+    [
+      "ui.main_window_ctk",
+      "threading"
+    ],
+    [
+      "ui.main_window_ctk",
+      "customtkinter"
+    ],
+    [
+      "ui.main_window_ctk",
+      "tkinter"
+    ],
+    [
+      "ui.main_window_ctk",
+      "typing"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.utils.logging_setup"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.utils.pdf_tools"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.utils.com_pool"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.utils.history"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.utils.progress_estimator"
+    ],
+    [
+      "ui.main_window_ctk",
+      "office_converter.converters"
+    ],
+    [
+      "ui.main_window_pro",
+      "os"
+    ],
+    [
+      "ui.main_window_pro",
+      "sys"
+    ],
+    [
+      "ui.main_window_pro",
+      "time"
+    ],
+    [
+      "ui.main_window_pro",
+      "sqlite3"
+    ],
+    [
+      "ui.main_window_pro",
+      "threading"
+    ],
+    [
+      "ui.main_window_pro",
+      "customtkinter"
+    ],
+    [
+      "ui.main_window_pro",
+      "tkinter"
+    ],
+    [
+      "ui.main_window_pro",
+      "fitz"
+    ],
+    [
+      "ui.main_window_pro",
+      "pathlib"
+    ],
+    [
+      "ui.main_window_pro",
+      "datetime"
+    ],
+    [
+      "ui.main_window_pro",
+      "typing"
+    ],
+    [
+      "ui.main_window_pro",
+      "dataclasses"
+    ],
+    [
+      "ui.main_window_pro",
+      "enum"
+    ],
+    [
+      "ui.main_window_pro",
+      "tkinter"
+    ],
+    [
+      "ui.main_window_pro",
+      "PIL"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.logging_setup"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.com_pool"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.pdf_tools"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.converters"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.tkdnd_wrapper"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.dnd_helpers"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.ui.file_tools_ui_v2"
+    ],
+    [
+      "ui.main_window_pro",
+      "office_converter.utils.recent_files"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "os"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "threading"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "tkinter"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "tkinter"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "typing"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "office_converter.core"
+    ],
+    [
+      "ui.pdf_tools_dialog",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "os"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "threading"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "customtkinter"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "tkinter"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "logging"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "tkinter"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "typing"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "office_converter.core"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "office_converter.utils.config"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "office_converter.utils.tkdnd_wrapper"
+    ],
+    [
+      "ui.pdf_tools_pro",
+      "office_converter.utils.dnd_helpers"
+    ],
+    [
+      "ui.__init__",
+      "main_window"
+    ],
+    [
+      "utils.com_pool",
+      "logging"
+    ],
+    [
+      "utils.com_pool",
+      "threading"
+    ],
+    [
+      "utils.com_pool",
+      "pythoncom"
+    ],
+    [
+      "utils.com_pool",
+      "win32com.client"
+    ],
+    [
+      "utils.com_pool",
+      "gc"
+    ],
+    [
+      "utils.com_pool",
+      "typing"
+    ],
+    [
+      "utils.config",
+      "os"
+    ],
+    [
+      "utils.config",
+      "json"
+    ],
+    [
+      "utils.config",
+      "copy"
+    ],
+    [
+      "utils.config",
+      "logging"
+    ],
+    [
+      "utils.config",
+      "typing"
+    ],
+    [
+      "utils.dnd_helpers",
+      "os"
+    ],
+    [
+      "utils.dnd_helpers",
+      "logging"
+    ],
+    [
+      "utils.dnd_helpers",
+      "typing"
+    ],
+    [
+      "utils.history",
+      "os"
+    ],
+    [
+      "utils.history",
+      "json"
+    ],
+    [
+      "utils.history",
+      "logging"
+    ],
+    [
+      "utils.history",
+      "datetime"
+    ],
+    [
+      "utils.history",
+      "typing"
+    ],
+    [
+      "utils.history",
+      "dataclasses"
+    ],
+    [
+      "utils.localization",
+      "typing"
+    ],
+    [
+      "utils.logging_setup",
+      "os"
+    ],
+    [
+      "utils.logging_setup",
+      "logging"
+    ],
+    [
+      "utils.logging_setup",
+      "logging.handlers"
+    ],
+    [
+      "utils.logging_setup",
+      "typing"
+    ],
+    [
+      "utils.ocr",
+      "os"
+    ],
+    [
+      "utils.ocr",
+      "logging"
+    ],
+    [
+      "utils.ocr",
+      "tempfile"
+    ],
+    [
+      "utils.ocr",
+      "shutil"
+    ],
+    [
+      "utils.ocr",
+      "pytesseract"
+    ],
+    [
+      "utils.ocr",
+      "fitz"
+    ],
+    [
+      "utils.ocr",
+      "typing"
+    ],
+    [
+      "utils.ocr",
+      "pdf2image"
+    ],
+    [
+      "utils.parallel_converter",
+      "os"
+    ],
+    [
+      "utils.parallel_converter",
+      "sys"
+    ],
+    [
+      "utils.parallel_converter",
+      "time"
+    ],
+    [
+      "utils.parallel_converter",
+      "logging"
+    ],
+    [
+      "utils.parallel_converter",
+      "multiprocessing"
+    ],
+    [
+      "utils.parallel_converter",
+      "multiprocessing"
+    ],
+    [
+      "utils.parallel_converter",
+      "typing"
+    ],
+    [
+      "utils.parallel_converter",
+      "dataclasses"
+    ],
+    [
+      "utils.parallel_converter",
+      "enum"
+    ],
+    [
+      "utils.parallel_converter",
+      "pathlib"
+    ],
+    [
+      "utils.pdf_tools",
+      "logging"
+    ],
+    [
+      "utils.pdf_tools",
+      "fitz"
+    ],
+    [
+      "utils.pdf_tools",
+      "office_converter.core.pdf_tools"
+    ],
+    [
+      "utils.progress_estimator",
+      "os"
+    ],
+    [
+      "utils.progress_estimator",
+      "json"
+    ],
+    [
+      "utils.progress_estimator",
+      "logging"
+    ],
+    [
+      "utils.progress_estimator",
+      "psutil"
+    ],
+    [
+      "utils.progress_estimator",
+      "datetime"
+    ],
+    [
+      "utils.progress_estimator",
+      "typing"
+    ],
+    [
+      "utils.progress_estimator",
+      "dataclasses"
+    ],
+    [
+      "utils.progress_estimator",
+      "pathlib"
+    ],
+    [
+      "utils.recent_files",
+      "os"
+    ],
+    [
+      "utils.recent_files",
+      "sqlite3"
+    ],
+    [
+      "utils.recent_files",
+      "threading"
+    ],
+    [
+      "utils.recent_files",
+      "logging"
+    ],
+    [
+      "utils.recent_files",
+      "typing"
+    ],
+    [
+      "utils.tkdnd_wrapper",
+      "logging"
+    ],
+    [
+      "utils.tkdnd_wrapper",
+      "customtkinter"
+    ],
+    [
+      "utils.tkdnd_wrapper",
+      "tkinterdnd2"
+    ],
+    [
+      "utils.updater",
+      "os"
+    ],
+    [
+      "utils.updater",
+      "sys"
+    ],
+    [
+      "utils.updater",
+      "json"
+    ],
+    [
+      "utils.updater",
+      "threading"
+    ],
+    [
+      "utils.updater",
+      "webbrowser"
+    ],
+    [
+      "utils.updater",
+      "typing"
+    ],
+    [
+      "utils.updater",
+      "dataclasses"
+    ],
+    [
+      "utils.updater",
+      "urllib.request"
+    ],
+    [
+      "utils.updater",
+      "urllib.error"
+    ],
+    [
+      "utils.updater",
+      "office_converter"
+    ],
+    [
+      "utils.watchdog",
+      "os"
+    ],
+    [
+      "utils.watchdog",
+      "time"
+    ],
+    [
+      "utils.watchdog",
+      "logging"
+    ],
+    [
+      "utils.watchdog",
+      "threading"
+    ],
+    [
+      "utils.watchdog",
+      "psutil"
+    ],
+    [
+      "utils.watchdog",
+      "typing"
+    ],
+    [
+      "utils.watchdog",
+      "dataclasses"
+    ],
+    [
+      "utils.watchdog",
+      "datetime"
+    ],
+    [
+      "utils.watchdog",
+      "collections"
+    ],
+    [
+      "utils.__init__",
+      "config"
+    ],
+    [
+      "utils.__init__",
+      "localization"
+    ],
+    [
+      "utils.__init__",
+      "pdf_tools"
+    ],
+    [
+      "utils.__init__",
+      "logging_setup"
+    ],
+    [
+      "utils.__init__",
+      "com_pool"
+    ],
+    [
+      "utils.__init__",
+      "history"
+    ]
+  ],
+  "clusters": {
+    "other": [
+      "build_exe.py",
+      "build_script.py",
+      "deploy_automation.py",
+      "deploy_simple.py",
+      "main.py",
+      "merge_project.py",
+      "run_grid.py",
+      "run_pro.py",
+      "run_reactor.py",
+      "temp_verify.py",
+      "test_all.py",
+      "validate_core.py",
+      "validate_shim.py",
+      "__init__.py"
+    ],
+    "controller": [
+      "converters\\base.py",
+      "converters\\excel.py",
+      "converters\\libreoffice.py",
+      "converters\\ppt.py",
+      "converters\\word.py",
+      "converters\\__init__.py",
+      "grid\\circuit_breaker.py",
+      "grid\\grid.py",
+      "grid\\models.py",
+      "grid\\pool.py",
+      "grid\\quarantine.py",
+      "grid\\scheduler.py",
+      "grid\\shim.py",
+      "grid\\worker.py",
+      "grid\\__init__.py",
+      "grid\\reactor\\bridge.py",
+      "grid\\reactor\\commands.py",
+      "grid\\reactor\\events.py",
+      "grid\\reactor\\optimistic.py",
+      "grid\\reactor\\reactor_app.py",
+      "grid\\reactor\\virtual_list.py",
+      "grid\\reactor\\__init__.py"
+    ],
+    "model": [
+      "core\\excel_tools.py",
+      "core\\file_tools.py",
+      "core\\pdf_tools.py"
+    ],
+    "script": [
+      "scripts\\auto_commit.py",
+      "scripts\\auto_save.py",
+      "scripts\\benchmark.py",
+      "scripts\\check_code.py",
+      "scripts\\context_mapper.py"
+    ],
+    "test": [
+      "tests\\conftest.py",
+      "tests\\test_bug_fixes.py",
+      "tests\\test_core.py",
+      "tests\\test_file_tools.py",
+      "tests\\test_grid_core.py",
+      "tests\\test_grid_phase2.py",
+      "tests\\test_integration.py",
+      "tests\\test_performance.py",
+      "tests\\test_property_based.py",
+      "tests\\test_resilience.py",
+      "tests\\test_shim.py"
+    ],
+    "view": [
+      "ui\\dialogs.py",
+      "ui\\excel_tools_ui.py",
+      "ui\\file_tools_ui.py",
+      "ui\\file_tools_ui_v2.py",
+      "ui\\main_window.py",
+      "ui\\main_window_ctk.py",
+      "ui\\main_window_pro.py",
+      "ui\\pdf_tools_dialog.py",
+      "ui\\pdf_tools_pro.py",
+      "ui\\__init__.py"
+    ],
+    "util": [
+      "utils\\com_pool.py",
+      "utils\\config.py",
+      "utils\\dnd_helpers.py",
+      "utils\\history.py",
+      "utils\\localization.py",
+      "utils\\logging_setup.py",
+      "utils\\ocr.py",
+      "utils\\parallel_converter.py",
+      "utils\\pdf_tools.py",
+      "utils\\progress_estimator.py",
+      "utils\\recent_files.py",
+      "utils\\tkdnd_wrapper.py",
+      "utils\\updater.py",
+      "utils\\watchdog.py",
+      "utils\\__init__.py"
+    ]
+  }
+}

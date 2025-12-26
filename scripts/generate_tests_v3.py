@@ -271,7 +271,7 @@ class SmartASTAnalyzerV3:
     """v3.0-native AST analyzer using v3.0 FunctionSignature."""
     
     def analyze_file(self, file_path: str) -> List[FunctionSignature]:
-        """Analyze file and extract function signatures."""
+        """Analyze file and extract function signatures (both module and class methods)."""
         functions = []
         
         try:
@@ -280,22 +280,58 @@ class SmartASTAnalyzerV3:
                 
             tree = ast.parse(content)
             
-            for node in list(ast.walk(tree)):  # Use list() to avoid dict iteration errors
+            # First pass: Find module-level functions
+            for node in list(ast.walk(tree)):
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    func_sig = self._extract_signature(node, file_path, content)
-                    if func_sig:
-                        functions.append(func_sig)
+                    # Only if not inside a class
+                    if not self._is_inside_class(node, tree):
+                        func_sig = self._extract_signature(node, file_path, content)
+                        if func_sig:
+                            functions.append(func_sig)
+            
+            # Second pass: Find classes and their methods
+            for node in ast.iter_child_nodes(tree):
+                if isinstance(node, ast.ClassDef):
+                    class_functions = self._analyze_class(node, file_path, content)
+                    functions.extend(class_functions)
                         
         except Exception as e:
             print(f"Error analyzing {file_path}: {e}")
             
         return functions
+    
+    def _is_inside_class(self, func_node: ast.FunctionDef, tree: ast.Module) -> bool:
+        """Check if a function is inside a class."""
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                if func_node in ast.walk(node):
+                    return True
+        return False
+    
+    def _analyze_class(self, class_node: ast.ClassDef, file_path: str, content: str) -> List[FunctionSignature]:
+        """Analyze a class and extract its methods."""
+        methods = []
         
-    def _extract_signature(self, node: ast.FunctionDef, file_path: str, content: str) -> Optional[FunctionSignature]:
+        for node in class_node.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Skip special methods except __init__
+                if node.name.startswith('__') and node.name not in ['__init__', '__call__']:
+                    continue
+                    
+                func_sig = self._extract_signature(node, file_path, content, class_name=class_node.name)
+                if func_sig:
+                    methods.append(func_sig)
+                    
+        return methods
+        
+    def _extract_signature(self, node: ast.FunctionDef, file_path: str, content: str, class_name: str = None) -> Optional[FunctionSignature]:
         """Extract detailed function signature using v3.0 FunctionSignature."""
         # Skip private methods (except __init__)
         if node.name.startswith('_') and node.name != '__init__':
             return None
+        
+        # Build qualified name (ClassName.method_name or just function_name)
+        func_name = f"{class_name}.{node.name}" if class_name else node.name
             
         # Extract args with type hints
         args = []
@@ -333,12 +369,12 @@ class SmartASTAnalyzerV3:
         docstring = ast.get_docstring(node)
         
         # Compute hash
-        content = f"{node.name}:{args}:{return_type}"
-        hash_value = hashlib.md5(content.encode()).hexdigest()
+        hash_content = f"{func_name}:{args}:{return_type}"
+        hash_value = hashlib.md5(hash_content.encode()).hexdigest()
         
         # Create v3.0 FunctionSignature with ALL fields
         func_sig = FunctionSignature(
-            name=node.name,
+            name=func_name,  # Now includes class name if method
             file=file_path,
             line=node.lineno,
             args=args,

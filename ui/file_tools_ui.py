@@ -249,8 +249,17 @@ class FileToolsDialog(ctk.CTkToplevel):
         
         # UI State
         self.current_mode = "rename" # rename, duplicates, cleanup, attributes
+        self._monitoring = False
+        self._monitor_thread = None
         
         self._create_ui()
+        
+        # Start monitor
+        self._start_monitor()
+
+    def destroy(self):
+        self._monitoring = False
+        super().destroy()
         
     def _create_ui(self):
         self.grid_columnconfigure(1, weight=1) 
@@ -302,6 +311,10 @@ class FileToolsDialog(ctk.CTkToplevel):
             
         rule_btn_frame.grid_columnconfigure(0, weight=1)
         rule_btn_frame.grid_columnconfigure(1, weight=1)
+
+        # Auto Refresh Toggle
+        self.var_auto_refresh = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(self.rename_frame, text="Auto-Refresh Preview", variable=self.var_auto_refresh).pack(pady=5)
 
         self.rule_stack = ctk.CTkScrollableFrame(self.rename_frame)
         self.rule_stack.pack(fill="both", expand=True, padx=5, pady=10)
@@ -738,3 +751,47 @@ class FileToolsDialog(ctk.CTkToplevel):
         # For now, clear to avoid confusion
         self.files = []
         self._refresh_preview()
+
+    # --- MONITORING ---
+    def _start_monitor(self):
+        self._monitoring = True
+        self._monitor_thread = threading.Thread(target=self._monitor_loop, daemon=True)
+        self._monitor_thread.start()
+        
+    def _monitor_loop(self):
+        """Poll for file changes."""
+        last_state = {}
+        
+        while self._monitoring:
+            if not getattr(self, 'var_auto_refresh', None) or not self.var_auto_refresh.get() or not self.files:
+                time.sleep(2)
+                continue
+                
+            changed = False
+            current_state = {}
+            
+            # Check files
+            for f in self.files:
+                try:
+                    if not os.path.exists(f):
+                        # File deleted?
+                        if f in last_state: changed = True
+                        continue
+                        
+                    mtime = os.path.getmtime(f)
+                    current_state[f] = mtime
+                    
+                    if f not in last_state or last_state[f] != mtime:
+                        changed = True
+                except: pass
+            
+            # Check length diff (deleted files)
+            if len(current_state) != len(last_state):
+                changed = True
+                
+            if changed:
+                # Update UI
+                self.after(0, self._refresh_preview)
+                last_state = current_state
+                
+            time.sleep(2)

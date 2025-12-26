@@ -326,8 +326,32 @@ class DuplicateFinder:
     def abort(self):
         self._abort = True
         
+    def _calculate_quick_hash(self, filepath: str) -> str:
+        """
+        Calculate hash of first 4KB and last 4KB.
+        Fast for rejecting non-duplicates.
+        """
+        try:
+            h = hashlib.md5()
+            with open(filepath, 'rb') as f:
+                # Read start
+                chunk = f.read(4096)
+                h.update(chunk)
+                
+                # Read end
+                f.seek(0, os.SEEK_END)
+                size = f.tell()
+                if size > 4096:
+                    f.seek(max(4096, size - 4096))
+                    chunk = f.read(4096)
+                    h.update(chunk)
+                    
+            return h.hexdigest()
+        except OSError:
+            return ""
+
     def _calculate_hash(self, filepath: str, block_size: int = 65536) -> str:
-        """Calculate MD5 hash of a file."""
+        """Calculate full MD5 hash of a file."""
         md5 = hashlib.md5()
         try:
             with open(filepath, 'rb') as f:
@@ -345,7 +369,7 @@ class DuplicateFinder:
     def find_duplicates(self, paths: List[str], recursive: bool = True) -> List[DuplicateGroup]:
         """
         Find duplicates in given paths.
-        Strategy: Size -> Hash.
+        Strategy: Size -> Quick Hash -> Full Hash.
         """
         self._abort = False
         files_by_size = {}
@@ -359,7 +383,11 @@ class DuplicateFinder:
                 for root, _, files in os.walk(path):
                     if self._abort: return []
                     for f in files:
-                        all_files.append(os.path.join(root, f))
+                        try:
+                            full_path = os.path.join(root, f)
+                            if os.path.exists(full_path):
+                                all_files.append(full_path)
+                        except OSError: continue
                         
         for fpath in all_files:
             try:
@@ -370,16 +398,41 @@ class DuplicateFinder:
             except OSError:
                 continue
                 
-        # 2. Filter groups with > 1 file
+        # 2. Filter groups with > 1 file (Same Size)
         potential_dupes = {s: fs for s, fs in files_by_size.items() if len(fs) > 1}
         
-        # 3. Hash check for collisions
-        results = []
+        # 3. Quick Hash Check
+        # Group by Quick Hash within Size groups
+        quick_hash_groups = [] # List of (size, [files])
         
         for size, file_list in potential_dupes.items():
             if self._abort: break
             
-            # Group by hash within size group
+            # Small files (< 8KB) -> Quick hash IS full hash, so just compute full hash later
+            if size < 8192:
+                quick_hash_groups.append((size, file_list))
+                continue
+
+            qhash_map = {}
+            for fpath in file_list:
+                if self._abort: break
+                qh = self._calculate_quick_hash(fpath)
+                if not qh: continue
+                
+                if qh not in qhash_map:
+                    qhash_map[qh] = []
+                qhash_map[qh].append(fpath)
+            
+            for qh, paths in qhash_map.items():
+                if len(paths) > 1:
+                    quick_hash_groups.append((size, paths))
+
+        # 4. Full Hash Check (Only for survivors)
+        results = []
+        
+        for size, file_list in quick_hash_groups:
+            if self._abort: break
+            
             files_by_hash = {}
             for fpath in file_list:
                 if self._abort: break
@@ -390,7 +443,6 @@ class DuplicateFinder:
                     files_by_hash[file_hash] = []
                 files_by_hash[file_hash].append(fpath)
                 
-            # Add confirmed duplicates
             for h, paths in files_by_hash.items():
                 if len(paths) > 1:
                     results.append(DuplicateGroup(hash_val=h, size=size, files=paths))

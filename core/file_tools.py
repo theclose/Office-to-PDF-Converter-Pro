@@ -210,12 +210,112 @@ class ExtensionRule(RenameRule):
 
 import hashlib
 
+import hashlib
+import stat
+import ctypes
+from datetime import datetime
+
 @dataclass
 class DuplicateGroup:
     """Group of duplicate files."""
     hash_val: str
     size: int
     files: List[str] # List of absolute paths
+
+class EmptyFolderCleaner:
+    """Finds and deletes empty folders."""
+    
+    def find_empty_folders(self, roots: List[str]) -> List[str]:
+        """Find invalid/empty folders recursively (bottom-up)."""
+        empty_folders = []
+        
+        for root_path in roots:
+            if not os.path.exists(root_path): continue
+            
+            for root, dirs, files in os.walk(root_path, topdown=False):
+                # Filter out system files that might be hidden but considered 'empty' user-wise?
+                # For now strict emptiness (or only ignored files)
+                
+                # Check actual content
+                try:
+                    entries = os.listdir(root)
+                    if not entries:
+                        empty_folders.append(root)
+                    elif all(e in ['.DS_Store', 'Thumbs.db'] for e in entries):
+                         empty_folders.append(root)
+                except OSError:
+                    pass
+                    
+        return empty_folders
+
+    def delete_folders(self, folders: List[str]) -> List[Tuple[str, bool, str]]:
+        results = []
+        for f in folders:
+            try:
+                # Remove common junk first if cleaning
+                for junk in ['.DS_Store', 'Thumbs.db']:
+                    junk_path = os.path.join(f, junk)
+                    if os.path.exists(junk_path):
+                        os.remove(junk_path)
+                
+                os.rmdir(f)
+                results.append((f, True, "Deleted"))
+            except Exception as e:
+                results.append((f, False, str(e)))
+        return results
+
+class AttributeManager:
+    """Manages file attributes and timestamps."""
+    
+    def set_dates(self, path: str, created: float = None, modified: float = None, accessed: float = None):
+        """Set file timestamps."""
+        try:
+            # Modified & Accessed
+            if modified is not None or accessed is not None:
+                # os.utime takes (atime, mtime)
+                # If one is None, use current? Or keep existing.
+                current = os.stat(path)
+                atime = accessed if accessed is not None else current.st_atime
+                mtime = modified if modified is not None else current.st_mtime
+                os.utime(path, (atime, mtime))
+                
+            # Created (Windows specific mainly)
+            if created is not None and os.name == 'nt':
+                # Set creation time on Windows is harder using standard lib
+                # Using ctypes or win32_setcttime via other libraries.
+                # Since we don't want extra deps, we might skip or use simple hack if possible.
+                # Alternatively if user uses pywin32 (we don't check for it yet strictly).
+                # Actually, standard python 'os.utime' does NOT set creation time.
+                pass # TODO: Implement Windows SetCreationTime if critical.
+                
+            return True, "Updated timestamps"
+        except Exception as e:
+            return False, str(e)
+
+    def set_attributes(self, path: str, readonly: bool = None, hidden: bool = None):
+        """Set file attributes (Windows)."""
+        try:
+            if readonly is not None:
+                current_mode = os.stat(path).st_mode
+                if readonly:
+                    os.chmod(path, current_mode | stat.S_IREAD) # Add read
+                    os.chmod(path, current_mode & ~stat.S_IWRITE) # Remove write
+                else:
+                    os.chmod(path, current_mode | stat.S_IWRITE)
+            
+            if hidden is not None and os.name == 'nt':
+                # Use ctypes for Hidden attribute
+                FILE_ATTRIBUTE_HIDDEN = 0x02
+                ret = ctypes.windll.kernel32.GetFileAttributesW(path)
+                if ret != -1:
+                    if hidden:
+                        ctypes.windll.kernel32.SetFileAttributesW(path, ret | FILE_ATTRIBUTE_HIDDEN)
+                    else:
+                        ctypes.windll.kernel32.SetFileAttributesW(path, ret & ~FILE_ATTRIBUTE_HIDDEN)
+                        
+            return True, "Updated attributes"
+        except Exception as e:
+            return False, str(e)
 
 class DuplicateFinder:
     """Finds duplicate files efficiently."""

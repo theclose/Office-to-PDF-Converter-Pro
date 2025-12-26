@@ -11,9 +11,11 @@ from typing import List, Optional
 from office_converter.core.file_tools import (
     FileToolsEngine, CaseRule, ReplaceRule, RemoveAccentsRule,
     TrimRule, AddStringRule, SequenceRule, ExtensionRule, RenameRule,
-    DuplicateFinder, DuplicateGroup
+    DuplicateFinder, DuplicateGroup, EmptyFolderCleaner, AttributeManager
 )
 from office_converter.utils.tkdnd_wrapper import TkDnDWrapper
+from datetime import datetime
+import time
 
 class DuplicateResultWidget(ctk.CTkFrame):
     """Widget for duplicate group."""
@@ -239,12 +241,14 @@ class FileToolsDialog(ctk.CTkToplevel):
         # Engine
         self.engine = FileToolsEngine()
         self.dup_finder = DuplicateFinder()
+        self.cleaner = EmptyFolderCleaner()
+        self.attrib_mgr = AttributeManager()
         
         self.files: List[str] = []
         self.rule_widgets: List[RuleWidget] = []
         
         # UI State
-        self.current_mode = "rename" # rename, duplicates
+        self.current_mode = "rename" # rename, duplicates, cleanup, attributes
         
         self._create_ui()
         
@@ -265,7 +269,7 @@ class FileToolsDialog(ctk.CTkToplevel):
         self.mode_var = ctk.StringVar(value="rename")
         ctk.CTkSegmentedButton(
             mode_frame,
-            values=["Rename", "Duplicates"],
+            values=["Rename", "Duplicates", "Cleanup", "Attribs"],
             variable=self.mode_var,
             command=self._switch_mode
         ).pack(fill="x")
@@ -325,6 +329,25 @@ class FileToolsDialog(ctk.CTkToplevel):
         ctk.CTkButton(self.dup_frame, text="Select All Except First", command=lambda: self._dup_select("rest")).pack(fill="x", padx=10, pady=2)
         ctk.CTkButton(self.dup_frame, text="Select Newest", command=lambda: self._dup_select("newest")).pack(fill="x", padx=10, pady=2)
         
+        # --- CLEANUP CONTENT ---
+        self.cleanup_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
+        ctk.CTkLabel(self.cleanup_frame, text="Empty Folder Cleaner", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=5)
+        self.btn_scan_empty = ctk.CTkButton(self.cleanup_frame, text="🗑️ SCAN EMPTY FOLDERS", height=40, font=ctk.CTkFont(weight="bold"), command=self._scan_empty_folders)
+        self.btn_scan_empty.pack(fill="x", padx=10, pady=20)
+        
+        # --- ATTRIBUTES CONTENT ---
+        self.attrib_frame = ctk.CTkFrame(self.left_panel, fg_color="transparent")
+        ctk.CTkLabel(self.attrib_frame, text="Attribute Changer", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=5)
+        
+        ctk.CTkLabel(self.attrib_frame, text="Set Flags:", anchor="w").pack(fill="x", padx=10, pady=(10,0))
+        self.var_readonly = ctk.BooleanVar()
+        self.var_hidden = ctk.BooleanVar()
+        ctk.CTkCheckBox(self.attrib_frame, text="Read-only", variable=self.var_readonly).pack(anchor="w", padx=20, pady=5)
+        ctk.CTkCheckBox(self.attrib_frame, text="Hidden", variable=self.var_hidden).pack(anchor="w", padx=20, pady=5)
+        
+        self.btn_apply_attribs = ctk.CTkButton(self.attrib_frame, text="Apply Attributes", command=self._apply_attributes)
+        self.btn_apply_attribs.pack(fill="x", padx=10, pady=10)
+        
         # === MIDDLE PANEL ===
         mid_panel = ctk.CTkFrame(self, corner_radius=0)
         mid_panel.grid(row=0, column=1, sticky="nsew", padx=2)
@@ -365,6 +388,11 @@ class FileToolsDialog(ctk.CTkToplevel):
         # -- Duplicate Results (Scrollable) --
         self.dup_results_frame = ctk.CTkScrollableFrame(mid_panel, label_text="Duplicate Groups")
         # Hidden by default
+        
+        # -- Cleanup Results (Listbox) --
+        self.cleanup_results_frame = ctk.CTkFrame(mid_panel, fg_color="transparent")
+        self.list_empty_folders = tk.Listbox(self.cleanup_results_frame, bg="#1F2937", fg="white", borderwidth=0, highlightthickness=0)
+        self.list_empty_folders.pack(fill="both", expand=True, padx=5, pady=5)
 
         # === RIGHT PANEL ===
         self.right_panel = ctk.CTkFrame(self, width=200, corner_radius=0)
@@ -393,12 +421,21 @@ class FileToolsDialog(ctk.CTkToplevel):
         
         # Duplicate Actions
         self.dup_actions = ctk.CTkFrame(self.right_panel, fg_color="transparent")
-        # Hidden
         
         ctk.CTkButton(
             self.dup_actions, text="DELETE CHECKED", height=50, fg_color="#DC2626", hover_color="#B91C1C",
             font=ctk.CTkFont(size=14, weight="bold"), command=self._delete_duplicates
         ).pack(fill="x", padx=10, pady=20)
+        
+        # Cleanup Actions
+        self.cleanup_actions = ctk.CTkFrame(self.right_panel, fg_color="transparent")
+        ctk.CTkButton(
+            self.cleanup_actions, text="DELETE EMPTY", height=50, fg_color="#DC2626", hover_color="#B91C1C",
+            font=ctk.CTkFont(size=14, weight="bold"), command=self._delete_empty_folders
+        ).pack(fill="x", padx=10, pady=20)
+        
+        # Attrib Actions
+        self.attrib_actions = ctk.CTkFrame(self.right_panel, fg_color="transparent")
         
         self.center_window()
 
@@ -411,27 +448,87 @@ class FileToolsDialog(ctk.CTkToplevel):
         except: pass
 
     def _switch_mode(self, mode):
-        self.current_mode = mode
-        if mode == "rename":
-            self.dup_frame.pack_forget()
+        self.current_mode = mode.lower()
+        
+        # Hide all
+        self.rename_frame.pack_forget()
+        self.dup_frame.pack_forget()
+        self.cleanup_frame.pack_forget()
+        self.attrib_frame.pack_forget()
+        
+        self.preview_frame.pack_forget()
+        self.dup_results_frame.pack_forget()
+        self.cleanup_results_frame.pack_forget()
+        
+        self.rename_actions.pack_forget()
+        self.dup_actions.pack_forget()
+        self.cleanup_actions.pack_forget()
+        self.attrib_actions.pack_forget()
+        
+        # Show specific
+        if self.current_mode == "rename":
             self.rename_frame.pack(fill="both", expand=True)
-            
-            self.dup_results_frame.pack_forget()
             self.preview_frame.pack(fill="both", expand=True)
-            
-            self.dup_actions.pack_forget()
             self.rename_actions.pack(fill="both", expand=True)
             
-        else: # duplicates
-            self.rename_frame.pack_forget()
+        elif self.current_mode == "duplicates":
             self.dup_frame.pack(fill="both", expand=True)
-            
-            self.preview_frame.pack_forget()
             self.dup_results_frame.pack(fill="both", expand=True)
-            
-            self.rename_actions.pack_forget()
             self.dup_actions.pack(fill="both", expand=True)
             
+        elif self.current_mode == "cleanup":
+            self.cleanup_frame.pack(fill="both", expand=True)
+            self.cleanup_results_frame.pack(fill="both", expand=True)
+            self.cleanup_actions.pack(fill="both", expand=True)
+            
+        elif self.current_mode == "attribs":
+            self.attrib_frame.pack(fill="both", expand=True)
+            self.preview_frame.pack(fill="both", expand=True) # Use same file list
+            self.attrib_actions.pack(fill="both", expand=True)
+    
+    # --- CLEANUP LOGIC ---
+    def _scan_empty_folders(self):
+        # We need a root folder to scan
+        folder = filedialog.askdirectory(title="Chọn Folder để quét Rác")
+        if not folder: return
+        
+        self.empty_folders = self.cleaner.find_empty_folders([folder])
+        self.list_empty_folders.delete(0, tk.END)
+        for f in self.empty_folders:
+            self.list_empty_folders.insert(tk.END, f)
+            
+        messagebox.showinfo("Scan", f"Tìm thấy {len(self.empty_folders)} folder rỗng.")
+        
+    def _delete_empty_folders(self):
+        if not hasattr(self, 'empty_folders') or not self.empty_folders:
+            return
+            
+        if not messagebox.askyesno("Delete", f"Xóa {len(self.empty_folders)} folder rỗng?"):
+            return
+            
+        results = self.cleaner.delete_folders(self.empty_folders)
+        success = sum(1 for _, ok, _ in results if ok)
+        messagebox.showinfo("Done", f"Đã xóa {success} folder.")
+        
+        self.list_empty_folders.delete(0, tk.END)
+        self.empty_folders = []
+        
+    # --- ATTRIB LOGIC ---
+    def _apply_attributes(self):
+        if not self.files:
+            messagebox.showinfo("Info", "Chưa có file nào được chọn.")
+            return
+            
+        ro = self.var_readonly.get()
+        hid = self.var_hidden.get()
+        
+        count = 0
+        for f in self.files:
+            ok, msg = self.attrib_mgr.set_attributes(f, readonly=ro, hidden=hid)
+            if ok: count += 1
+            
+        messagebox.showinfo("Done", f"Đã áp dụng thuộc tính cho {count} file.")
+
     def _scan_duplicates(self):
         if not self.files:
             messagebox.showinfo("Info", "Chọn File hoặc Folder trước.")

@@ -1,0 +1,562 @@
+{
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::get_pool": {
+    "hash": "b1531ad161a29de574d3ba3363e0364c",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::release_pool": {
+    "hash": "dd4da6fd9143925e54921745661e1b2c",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::get_excel": {
+    "hash": "c8de08978b141648de47ff42a7dfa56d",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::get_word": {
+    "hash": "7643c5a41b135334ab725e65f5b85382",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::get_ppt": {
+    "hash": "91619c711409dd99beaee3d7b9a9cddd",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::release_all": {
+    "hash": "a99ebf593731dd184d188b4dc9a7bf29",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\com_pool.py::get_stats": {
+    "hash": "5cee01adcd97bdd350c52916b1c70762",
+    "test_file": "tests\\test_generated_com_pool_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\dnd_helpers.py::parse_dropped_paths": {
+    "hash": "5b19772719b305909e106150d1f2b733",
+    "test_file": "tests\\test_generated_dnd_helpers_v2.py",
+    "timestamp": "2025-12-26T23:13:59.516007"
+  },
+  "C:\\Auto\\office_converter\\utils\\localization.py::set_language": {
+    "hash": "3b24d9e00f1f77bbf6547e227cf5a43c",
+    "test_file": "tests\\test_generated_localization_v2.py",
+    "timestamp": "2025-12-26T23:13:59.528567"
+  },
+  "C:\\Auto\\office_converter\\utils\\localization.py::get_current_language": {
+    "hash": "0de730b577803b1fd48e7a437e80e693",
+    "test_file": "tests\\test_generated_localization_v2.py",
+    "timestamp": "2025-12-26T23:13:59.528567"
+  },
+  "C:\\Auto\\office_converter\\utils\\localization.py::get_text": {
+    "hash": "8a3578d6619328d390c0d77353e77322",
+    "test_file": "tests\\test_generated_localization_v2.py",
+    "timestamp": "2025-12-26T23:13:59.528567"
+  },
+  "C:\\Auto\\office_converter\\utils\\localization.py::get_language_names": {
+    "hash": "d05720d04989463564825bd1f01998a1",
+    "test_file": "tests\\test_generated_localization_v2.py",
+    "timestamp": "2025-12-26T23:13:59.528567"
+  },
+  "C:\\Auto\\office_converter\\utils\\logging_setup.py::setup_logging": {
+    "hash": "122deb4ae7ec4b66b647958806bf6ec1",
+    "test_file": "tests\\test_generated_logging_setup_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\logging_setup.py::get_logger": {
+    "hash": "56aee62e0986f1e4eabad990ae3959fa",
+    "test_file": "tests\\test_generated_logging_setup_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::__init__": {
+    "hash": "9981539c29a7fbf173261bd84403b0be",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::load": {
+    "hash": "0496c6d998f2ea1999aad7c232b15b7b",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::save": {
+    "hash": "40559dcc5512f307d836f86ee5267e50",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::get": {
+    "hash": "528ff29f315bdc47b20054e1ec594a7d",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::set": {
+    "hash": "a4b57875018ebcf7e849f98149a4857d",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::language": {
+    "hash": "ed252102b975919333d378f77e87bc80",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::theme": {
+    "hash": "478065d88712f9a0240bfcb79b5c0863",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\config.py::pdf_quality": {
+    "hash": "177e9b5a291ccb6d7873b48a8ba62000",
+    "test_file": "tests\\test_generated_config_v2.py",
+    "timestamp": "2025-12-26T23:13:59.529567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::get_history": {
+    "hash": "1d77b400a998bc7c0acecadb84fed375",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::to_dict": {
+    "hash": "cbed7edd630f15969d11dd8de54f8669",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::from_dict": {
+    "hash": "67b92146b1d76ab30e103ba3eb9043fa",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::__init__": {
+    "hash": "57256dbefa409b803e1b1a6f32f144ae",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::add": {
+    "hash": "40bf66a38471bd2a58c15d67e2a9d5b8",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::get_recent": {
+    "hash": "902bb38df4c798f126ce33dbe5f82369",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::get_stats": {
+    "hash": "b20b84454db9cb54176591312bb841ac",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::clear": {
+    "hash": "a1682d6bf9c4818629dd8bb72ec72275",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\history.py::search": {
+    "hash": "c374de6635fa42d2faea8ab5775a8180",
+    "test_file": "tests\\test_generated_history_v2.py",
+    "timestamp": "2025-12-26T23:13:59.536567"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::is_ocr_available": {
+    "hash": "11ddb5413f947e9a1ef537350e42c954",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::get_tesseract_languages": {
+    "hash": "2842944764de50ebeb6e4813f9f6a08c",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::ocr_image": {
+    "hash": "b4f5db49a8388b2b0a1302e3e8c7e6e5",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::get_best_language": {
+    "hash": "1c2be7d6b81d3ea9dfb74ee833b69ca6",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::ocr_pdf_to_searchable": {
+    "hash": "8ae13b25a758b92b23100d8192605e47",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::extract_text_from_pdf": {
+    "hash": "72f8f19da72aae5ea17920d1c21d34f1",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\ocr.py::get_ocr_status": {
+    "hash": "5ffa4c603accd947187766e8cea1c9c7",
+    "test_file": "tests\\test_generated_ocr_v2.py",
+    "timestamp": "2025-12-26T23:13:59.554268"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::get_parallel_converter": {
+    "hash": "56ef5d01557884378250d464dd33d637",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::shutdown_parallel_converter": {
+    "hash": "04a120ba7118b48171a9eacf1fa5fef4",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::to_dict": {
+    "hash": "f539401bd66bfcf8c605c9ddb4e89d4e",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::__init__": {
+    "hash": "cc9f64b94136712667a760eb45f19307",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::start": {
+    "hash": "f919aa17168466c11294eac020412cee",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::stop": {
+    "hash": "0dd7b9d88f298c19b5047c23ffba6138",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::submit": {
+    "hash": "069026e826cfc38df01b64baf1264de9",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::get_results": {
+    "hash": "1cc486a8aaccf0d17a251b04f96e1add",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::get_pending_count": {
+    "hash": "1c43c73e6cea88906f7b5257fecfac48",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::is_running": {
+    "hash": "b76891392cbdcb883b35ae1bccef2afd",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\parallel_converter.py::get_worker_status": {
+    "hash": "d2b32a49e70178ee1c98c718d4e89163",
+    "test_file": "tests\\test_generated_parallel_converter_v2.py",
+    "timestamp": "2025-12-26T23:13:59.561962"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::get_system_profiler": {
+    "hash": "9a791c1daeb082db3c40f08a95051168",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::get_conversion_logger": {
+    "hash": "560a986251725d1890b751f829eb6272",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::get_adaptive_estimator": {
+    "hash": "8714894993a0fb3e0538def225d82111",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::estimate_conversion_time": {
+    "hash": "a3a6ca744092e18d6a20aae48dd53b64",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::log_conversion_result": {
+    "hash": "43f51db1bc34dd61c42885e8b52212cc",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::to_dict": {
+    "hash": "f539401bd66bfcf8c605c9ddb4e89d4e",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::from_dict": {
+    "hash": "0a936c943e78599fde4e5d10fb0038ab",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::__init__": {
+    "hash": "e88a5455ac8a08b1ae30741ae8cabf6e",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::get_current_load": {
+    "hash": "ceb6da1b7f0ae70dd5985f7e37a62004",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::log_conversion": {
+    "hash": "ea92e9b47ea40b836175f5ce21831c80",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::get_records_by_type": {
+    "hash": "6817866f2ee3b0e20332788a9c2f32eb",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::get_statistics": {
+    "hash": "ba3ced5e5547e564f49e6246baafad83",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::estimate": {
+    "hash": "d5972059bd39a13d3f6f985a259285e6",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\progress_estimator.py::update_after_conversion": {
+    "hash": "7d1a8fc275e8c7ba61103e75aca4c4d8",
+    "test_file": "tests\\test_generated_progress_estimator_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::merge_pdfs": {
+    "hash": "bb496b21088c650f172d546f7234d74a",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::split_pdf": {
+    "hash": "3b6862a887daaccece9adf9442122513",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::compress_pdf": {
+    "hash": "dca79e0cd1ad7699cbd3dc8409d5fbe5",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::protect_pdf": {
+    "hash": "ea37bf94c669db111205b507c5295dba",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::post_process_pdf": {
+    "hash": "8cfcc922b1c1e49f5a1725405e39c921",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::rasterize_pdf": {
+    "hash": "734f3dc47b02ccae0c4da474e74cfa3d",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::add_watermark": {
+    "hash": "3118dee61f3389ef9de5d13b1e0d24cd",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::pdf_to_images": {
+    "hash": "c6847380746a1dcc362434b44cdc4526",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::images_to_pdf": {
+    "hash": "4eb6fc729d18bc6b88525ecadab4e6d1",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::parse_page_range": {
+    "hash": "cf9c5f9ec1c909cd88e44dba3bc67aa5",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::extract_pages": {
+    "hash": "80d87b9506b9f61eca5278f8ce680e85",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::extract_pdf_pages": {
+    "hash": "5a4243907ddc1ff8f78ceef7959450e5",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::delete_pages": {
+    "hash": "defb634f99f746d8ed267b4847917c7d",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::rotate_pages": {
+    "hash": "822d8747d1d67c85605f61833eecbdcc",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::reorder_pages": {
+    "hash": "864a0d656c09fb8c91c1150bea0e0537",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\pdf_tools.py::reverse_pages": {
+    "hash": "311619aa2b2c835151d8f7caa85a730e",
+    "test_file": "tests\\test_generated_pdf_tools_v2.py",
+    "timestamp": "2025-12-26T23:13:59.572379"
+  },
+  "C:\\Auto\\office_converter\\utils\\tkdnd_wrapper.py::setup_widget_dnd": {
+    "hash": "87749beb39d6a5029a97eb978994cbe4",
+    "test_file": "tests\\test_generated_tkdnd_wrapper_v2.py",
+    "timestamp": "2025-12-26T23:13:59.576597"
+  },
+  "C:\\Auto\\office_converter\\utils\\tkdnd_wrapper.py::__init__": {
+    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
+    "test_file": "tests\\test_generated_tkdnd_wrapper_v2.py",
+    "timestamp": "2025-12-26T23:13:59.576597"
+  },
+  "C:\\Auto\\office_converter\\utils\\tkdnd_wrapper.py::handle_drop": {
+    "hash": "5e9c70cf732d6de5a0d37b09e98ad9ad",
+    "test_file": "tests\\test_generated_tkdnd_wrapper_v2.py",
+    "timestamp": "2025-12-26T23:13:59.576597"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::get_recent_files_db": {
+    "hash": "bc2ae51ced1859f0ee171a6de52b3663",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::__init__": {
+    "hash": "7758bef63a7b25e683a4222333f9d7f9",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::add_recent": {
+    "hash": "40fe870731b3b86223d5509d75d1ce5f",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::get_recent": {
+    "hash": "1b3499ea3df008065453f6f08b94d432",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::log_conversion": {
+    "hash": "671b010aa6446e7599f7d2e1c74fec48",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::get_stats": {
+    "hash": "e10039653d083a51083cf9e9d90eafe6",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::clear_history": {
+    "hash": "717dc97b90e2811a2e69dccd3b0b8bbc",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\recent_files.py::close": {
+    "hash": "be5d4b003f80b666748dc3814c3f20ec",
+    "test_file": "tests\\test_generated_recent_files_v2.py",
+    "timestamp": "2025-12-26T23:13:59.582102"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::show_update_dialog": {
+    "hash": "0628f061511ce73e1eaf38bf1349a02b",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::check_for_updates_on_startup": {
+    "hash": "b1c28b748f6192e85043309a225fcf15",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::__init__": {
+    "hash": "fb91a4c3d0bd80686aadadcb63cf6d6a",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::check_async": {
+    "hash": "8a7c9e0fa527dc9b7033c9d938c2c862",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::check": {
+    "hash": "876579a0e3e7ba0aa6472ea30a17d22b",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::open_download": {
+    "hash": "abff30b7bd94a44743732b8690ab4086",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::on_result": {
+    "hash": "c4ea599483ae269d5c61950f1215ee2d",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\updater.py::download": {
+    "hash": "c95696bac1afe150667c0ee8ba3f60f3",
+    "test_file": "tests\\test_generated_updater_v2.py",
+    "timestamp": "2025-12-26T23:13:59.596318"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::get_watchdog": {
+    "hash": "9378099623e443e2c1eb6df32e9eb0ba",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::start_watchdog": {
+    "hash": "2cb50a28dbf2c433fcc08bb84481c291",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::stop_watchdog": {
+    "hash": "cf64f7e224326712f424c23596acc04d",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::is_healthy": {
+    "hash": "5ac2d8c92656caa6124283011245a5db",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::__init__": {
+    "hash": "5a191acf002baccdc49776dbf476bbc5",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::record": {
+    "hash": "2ced368b9a96a96266cebcec449cda42",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::get_success_rate": {
+    "hash": "087c738cd547e37f15f68e60d32f6ab6",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::get_avg_duration": {
+    "hash": "e6f563736e2d197b626122867146fc96",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::get_total": {
+    "hash": "104f70bd4f8b290a66180a1a02a81236",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::get_failed": {
+    "hash": "75ebfe01034095cf2e873062f2a24363",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::start": {
+    "hash": "f919aa17168466c11294eac020412cee",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::stop": {
+    "hash": "bfd87e5853591be5726aaddfdf58f7c8",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::record_conversion": {
+    "hash": "8dea5329b39b26846ed8c2e23320512e",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  },
+  "C:\\Auto\\office_converter\\utils\\watchdog.py::get_metrics": {
+    "hash": "4e71897e2495dd7f4db3779e1a97ba30",
+    "test_file": "tests\\test_generated_watchdog_v2.py",
+    "timestamp": "2025-12-26T23:13:59.601392"
+  }
+}

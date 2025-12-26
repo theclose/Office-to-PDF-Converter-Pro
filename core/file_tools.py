@@ -225,11 +225,16 @@ class DuplicateGroup:
 class EmptyFolderCleaner:
     """Finds and deletes empty folders."""
     
-    def find_empty_folders(self, roots: List[str]) -> List[str]:
-        """Find invalid/empty folders recursively (bottom-up)."""
+    def find_empty_folders(self, root_paths: List[str]) -> List[str]:
+        """Recursively find empty folders."""
+        # FIX: Add None/empty validation
+        if not root_paths:
+            logger.warning("find_empty_folders called with empty paths")
+            return []
+        
         empty_folders = []
         
-        for root_path in roots:
+        for root_path in root_paths:
             if not os.path.exists(root_path): continue
             
             for root, dirs, files in os.walk(root_path, topdown=False):
@@ -476,14 +481,26 @@ class TransactionLog:
         self.log_dir = log_dir
         os.makedirs(log_dir, exist_ok=True)
         
-    def log(self, operations: List[Tuple[str, str]]):
-        """Log a successful batch rename."""
-        if not operations:
+    def log(self, operation_type: str, old_paths: List[str], new_paths: List[str]):
+        """Log a transaction for potential undo."""
+        # FIX: Add validation
+        if not operation_type:
+            raise ValueError("operation_type cannot be None or empty")
+        
+        if not old_paths or not new_paths:
+            logger.warning("log called with empty path lists")
+            return
+        
+        if len(old_paths) != len(new_paths):
+            logger.error("old_paths and new_paths must have the same length for logging.")
             return
             
+        operations_list = [{"old": old_p, "new": new_p} for old_p, new_p in zip(old_paths, new_paths)]
+        
         record = {
             "timestamp": time.time(),
-            "operations": [{"old": op[0], "new": op[1]} for op in operations]
+            "type": operation_type,
+            "operations": operations_list
         }
         
         filename = f"transaction_{int(record['timestamp'])}.json"
@@ -564,9 +581,18 @@ class FileToolsEngine:
             
         return results
 
-    def preview(self, files: List[str]) -> List[RenamePreview]:
+    def preview(self, files: List[str], rules: List['RenameRule']) -> List['RenamePreview']:
         """Generate preview for a list of files."""
-        results = []
+        # FIX: Add None/empty validation
+        if not files:
+            logger.warning("preview called with empty files list")
+            return []
+        
+        if not rules:
+            logger.warning("preview called with empty rules list")
+            return []
+        
+        previews = []
         seen_names = set()
         
         for i, file_path in enumerate(files):

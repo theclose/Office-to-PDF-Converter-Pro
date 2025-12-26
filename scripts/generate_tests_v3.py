@@ -259,12 +259,110 @@ class TestPatternLearner:
         return "assert result is not None"
 
 
-# Import rest of v2.0 code
-from generate_tests_v2 import (
-    SmartTestCache,
-    TestTemplateEngine,
-    SmartASTAnalyzer
-)
+# Import only utilities from v2.0, NOT dataclasses
+import sys
+from pathlib import Path as PathLib
+sys.path.insert(0, str(PathLib(__file__).parent))
+
+from generate_tests_v2 import SmartTestCache, TestTemplateEngine
+
+
+class SmartASTAnalyzerV3:
+    """v3.0-native AST analyzer using v3.0 FunctionSignature."""
+    
+    def analyze_file(self, file_path: str) -> List[FunctionSignature]:
+        """Analyze file and extract function signatures."""
+        functions = []
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            tree = ast.parse(content)
+            
+            for node in list(ast.walk(tree)):  # Use list() to avoid dict iteration errors
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    func_sig = self._extract_signature(node, file_path, content)
+                    if func_sig:
+                        functions.append(func_sig)
+                        
+        except Exception as e:
+            print(f"Error analyzing {file_path}: {e}")
+            
+        return functions
+        
+    def _extract_signature(self, node: ast.FunctionDef, file_path: str, content: str) -> Optional[FunctionSignature]:
+        """Extract detailed function signature using v3.0 FunctionSignature."""
+        # Skip private methods (except __init__)
+        if node.name.startswith('_') and node.name != '__init__':
+            return None
+            
+        # Extract args with type hints
+        args = []
+        for arg in node.args.args:
+            if arg.arg == 'self' or arg.arg == 'cls':
+                continue
+            type_hint = None
+            if arg.annotation:
+                try:
+                    type_hint = ast.unparse(arg.annotation)
+                except:
+                    pass
+            args.append((arg.arg, type_hint))
+            
+        # Extract return type
+        return_type = None
+        if node.returns:
+            try:
+                return_type = ast.unparse(node.returns)
+            except:
+                pass
+                
+        # Extract decorators
+        decorators = []
+        for dec in node.decorator_list:
+            try:
+                decorators.append(ast.unparse(dec))
+            except:
+                pass
+                
+        # Estimate complexity
+        complexity = self._estimate_complexity(node)
+        
+        # Get docstring
+        docstring = ast.get_docstring(node)
+        
+        # Compute hash
+        content = f"{node.name}:{args}:{return_type}"
+        hash_value = hashlib.md5(content.encode()).hexdigest()
+        
+        # Create v3.0 FunctionSignature with ALL fields
+        func_sig = FunctionSignature(
+            name=node.name,
+            file=file_path,
+            line=node.lineno,
+            args=args,
+            return_type=return_type,
+            docstring=docstring,
+            complexity=complexity,
+            is_async=isinstance(node, ast.AsyncFunctionDef),
+            decorators=decorators,
+            hash=hash_value,
+            coverage=0.0,  # v3.0 field
+            priority_score=0.0  # v3.0 field
+        )
+        
+        return func_sig
+        
+    def _estimate_complexity(self, node: ast.FunctionDef) -> int:
+        """Estimate cyclomatic complexity."""
+        complexity = 1
+        for child in ast.walk(node):
+            if isinstance(child, (ast.If, ast.For, ast.While, ast.ExceptHandler)):
+                complexity += 1
+            elif isinstance(child, ast.BoolOp):
+                complexity += len(child.values) - 1
+        return complexity
 
 
 class EnhancedTestGeneratorV3:
@@ -279,7 +377,7 @@ class EnhancedTestGeneratorV3:
         self.cache = SmartTestCache() if use_cache else None
         self.parallel = parallel
         self.template_engine = TestTemplateEngine()
-        self.analyzer = SmartASTAnalyzer()
+        self.analyzer = SmartASTAnalyzerV3()  # Use v3.0-native analyzer
         
         # v3.0 features
         self.coverage = CoverageIntegrator() if coverage_aware else None

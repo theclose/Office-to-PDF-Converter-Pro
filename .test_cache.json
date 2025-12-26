@@ -705,9 +705,9 @@
     "timestamp": "2025-12-26T23:17:47.324390"
   },
   "C:\\Auto\\office_converter\\core\\file_tools.py::__init__": {
-    "hash": "2797d8f90b43cea5e9f3bb3d5b0a8f25",
-    "test_file": "tests\\test_generated_file_tools_v2.py",
-    "timestamp": "2025-12-26T23:17:47.324390"
+    "hash": "fa91a089aa74c9a7552e4b4a011fbbc0",
+    "test_file": "tests\\test_generated_file_tools_v3.py",
+    "timestamp": "2025-12-26T23:56:36.167741"
   },
   "C:\\Auto\\office_converter\\core\\file_tools.py::find_empty_folders": {
     "hash": "3800f382d0858d35c10e7404f1c7e4f8",

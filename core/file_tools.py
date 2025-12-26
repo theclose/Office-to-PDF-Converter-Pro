@@ -294,6 +294,13 @@ class AttributeManager:
 
     def set_attributes(self, path: str, readonly: bool = None, hidden: bool = None):
         """Set file attributes (Windows)."""
+        # FIX: Add path validation
+        if not path:
+            raise ValueError("path cannot be None or empty")
+        
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Path does not exist: {path}")
+        
         try:
             if readonly is not None:
                 current_mode = os.stat(path).st_mode

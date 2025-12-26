@@ -1,6 +1,6 @@
 """
 Auto-generated tests for word (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:48.685567
+Generated: 2025-12-26T23:22:43.608428
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -19,7 +19,7 @@ def test___init___basic():
 
 
 # Test for initialize (complexity: 4)
-# Original doc: Get Word COM from pool....
+# Doc: Get Word COM from pool....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -32,7 +32,7 @@ def test_initialize_parametrized(input, expected):
 
 
 # Test for cleanup (complexity: 4)
-# Original doc: Release Word resources....
+# Doc: Release Word resources....
 
 def test_cleanup_basic():
     """Test cleanup with valid input."""
@@ -41,7 +41,7 @@ def test_cleanup_basic():
 
 
 # Test for convert (complexity: 14)
-# Original doc: Convert Word document to PDF....
+# Doc: Convert Word document to PDF....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),

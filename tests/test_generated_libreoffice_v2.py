@@ -1,6 +1,6 @@
 """
 Auto-generated tests for libreoffice (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:48.669983
+Generated: 2025-12-26T23:22:43.604924
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for find_libreoffice (complexity: 9)
-# Original doc: Find LibreOffice soffice executable....
+# Doc: Find LibreOffice soffice executable....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -24,7 +24,7 @@ def test_find_libreoffice_parametrized(input, expected):
 
 
 # Test for is_libreoffice_available (complexity: 1)
-# Original doc: Check if LibreOffice is available on this system....
+# Doc: Check if LibreOffice is available on this system....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -37,7 +37,7 @@ def test_is_libreoffice_available_parametrized(input, expected):
 
 
 # Test for get_libreoffice_version (complexity: 4)
-# Original doc: Get LibreOffice version string....
+# Doc: Get LibreOffice version string....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -58,7 +58,7 @@ def test___init___basic():
 
 
 # Test for initialize (complexity: 3)
-# Original doc: Check if LibreOffice is available....
+# Doc: Check if LibreOffice is available....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -71,10 +71,7 @@ def test_initialize_parametrized(input, expected):
 
 
 # Test for convert (complexity: 9)
-# Original doc: Convert document to PDF using LibreOffice.
-
-Args:
-    input_...
+# Doc: Convert document to PDF using LibreOffice.  Args:     input_...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -87,7 +84,7 @@ def test_convert_parametrized(input, expected):
 
 
 # Test for cleanup (complexity: 1)
-# Original doc: No cleanup needed for LibreOffice....
+# Doc: No cleanup needed for LibreOffice....
 
 def test_cleanup_basic():
     """Test cleanup with valid input."""

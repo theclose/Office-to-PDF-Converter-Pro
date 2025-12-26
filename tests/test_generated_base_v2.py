@@ -1,6 +1,6 @@
 """
 Auto-generated tests for base (v2.0 - Enhanced)
-Generated: 2025-12-26T23:17:48.686567
+Generated: 2025-12-26T23:22:43.609429
 Generator: Smart Template Engine with Type Inference
 """
 
@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 # TODO: Adjust import path
 
 # Test for ensure_com_initialized (complexity: 3)
-# Original doc: Ensure COM is initialized for the current thread. Returns Tr...
+# Doc: Ensure COM is initialized for the current thread. Returns Tr...
 
 def test_ensure_com_initialized_basic():
     """Test ensure_com_initialized with valid input."""
@@ -20,7 +20,7 @@ def test_ensure_com_initialized_basic():
 
 
 # Test for release_com (complexity: 5)
-# Original doc: Release COM for the current thread if this was the last user...
+# Doc: Release COM for the current thread if this was the last user...
 
 def test_release_com_basic():
     """Test release_com with valid input."""
@@ -29,7 +29,7 @@ def test_release_com_basic():
 
 
 # Test for get_converter_for_file (complexity: 3)
-# Original doc: Factory function to get appropriate converter class for a fi...
+# Doc: Factory function to get appropriate converter class for a fi...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -42,8 +42,7 @@ def test_get_converter_for_file_parametrized(input, expected):
 
 
 # Test for get_best_converter (complexity: 9)
-# Original doc: Get the best available converter for a file.
-Tries MS Office...
+# Doc: Get the best available converter for a file. Tries MS Office...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -56,10 +55,7 @@ def test_get_best_converter_parametrized(input, expected):
 
 
 # Test for __init__ (complexity: 3)
-# Original doc: Initialize converter.
-
-Args:
-    log_callback: Function to c...
+# Doc: Initialize converter.  Args:     log_callback: Function to c...
 
 def test___init___basic():
     """Test __init__ with valid input."""
@@ -68,7 +64,7 @@ def test___init___basic():
 
 
 # Test for log (complexity: 1)
-# Original doc: Log a message to both file and UI callback....
+# Doc: Log a message to both file and UI callback....
 
 def test_log_basic():
     """Test log with valid input."""
@@ -77,7 +73,7 @@ def test_log_basic():
 
 
 # Test for update_progress (complexity: 1)
-# Original doc: Update progress (0.0 to 1.0)....
+# Doc: Update progress (0.0 to 1.0)....
 
 def test_update_progress_basic():
     """Test update_progress with valid input."""
@@ -86,7 +82,7 @@ def test_update_progress_basic():
 
 
 # Test for supports_file (complexity: 1)
-# Original doc: Check if this converter supports the given file....
+# Doc: Check if this converter supports the given file....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -99,8 +95,7 @@ def test_supports_file_parametrized(input, expected):
 
 
 # Test for initialize (complexity: 1)
-# Original doc: Initialize the COM application.
-Returns True if successful....
+# Doc: Initialize the COM application. Returns True if successful....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -113,10 +108,7 @@ def test_initialize_parametrized(input, expected):
 
 
 # Test for convert (complexity: 1)
-# Original doc: Convert a single file to PDF.
-
-Args:
-    input_path: Path to...
+# Doc: Convert a single file to PDF.  Args:     input_path: Path to...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
@@ -129,7 +121,7 @@ def test_convert_parametrized(input, expected):
 
 
 # Test for cleanup (complexity: 1)
-# Original doc: Release COM resources....
+# Doc: Release COM resources....
 
 def test_cleanup_basic():
     """Test cleanup with valid input."""

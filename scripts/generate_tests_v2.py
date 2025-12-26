@@ -384,9 +384,15 @@ class EnhancedTestGenerator:
             template_type = self.template_engine.infer_template_type(func)
             test_code = self.template_engine.generate_from_template(func, template_type)
             
-            lines.append(f'# Test for {func.name} (complexity: {func.complexity})')
+            # Safely format docstring (escape newlines, limit length)
+            docstring_safe = ""
             if func.docstring:
-                lines.append(f'# Original doc: {func.docstring[:60]}...')
+                # Replace newlines with spaces, limit to 60 chars
+                docstring_safe = func.docstring.replace('\n', ' ').replace('\r', '')[:60]
+                
+            lines.append(f'# Test for {func.name} (complexity: {func.complexity})')
+            if docstring_safe:
+                lines.append(f'# Doc: {docstring_safe}...')
             lines.append(test_code)
             lines.append('')
             

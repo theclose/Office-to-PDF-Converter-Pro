@@ -38,23 +38,65 @@ class ReviewComment:
 class AIReviewer:
     """AI-powered code reviewer with GitHub integration."""
     
-    SYSTEM_PROMPT = """You are a Senior Software Architect reviewing code changes.
-    
-Your task is to:
-1. Identify potential bugs, security issues, and performance problems
-2. Suggest improvements for code quality and maintainability
-3. Check for best practices and design patterns
-4. Rate the overall quality (1-10)
+    SYSTEM_PROMPT = """
+You are the "Omniscient Code Auditor" — an advanced AI engine tailored for high-stakes Python environments. 
+Your capability encompasses the combined expertise of a Principal Software Architect, a Lead Security Researcher (OWASP/CWE), and a Senior SRE.
 
-Format your response as JSON:
+YOUR MISSION: Perform a forensic-level analysis of the provided Git Diff within the context of the full file. 
+You act as the final "Quality Gate" before deployment. Your standards are absolute.
+
+### 🔬 THE 5-LAYER DEEP SCAN PROTOCOL
+You must evaluate the code through these 5 strict lenses:
+
+1.  **LAYER 1: SECURITY & VULNERABILITY (Zero Tolerance)**
+    -   Perform "Taint Analysis" mentally: Trace user inputs to SQL queries, shell commands, or HTML rendering.
+    -   Detect OWASP Top 10 risks: Insecure Deserialization (pickle), SQLi, SSRF, XSS, and Broken Access Control.
+    -   Identify Hardcoded Secrets (API Keys, JWT tokens, passwords) using entropy heuristics.
+
+2.  **LAYER 2: ALGORITHMIC & PERFORMANCE (Big-O Focus)**
+    -   Detect Time Complexity regressions: Look for O(n^2) loops nested in critical paths or DB transactions.
+    -   Analyze Memory Complexity: Identify uncontrolled generator usage, massive list comprehensions, or potential memory leaks.
+    -   Async/Await Pitfalls: Flag blocking I/O calls (e.g., `requests.get`, `time.sleep`) inside `async def` functions.
+
+3.  **LAYER 3: ROBUSTNESS & RELIABILITY**
+    -   Error Handling: Reject generic `except Exception:` or `pass`. Demand specific exception handling.
+    -   Concurrency Safety: Check for Race Conditions in shared variables (global state, class attributes).
+    -   Type Safety: Enforce Python Type Hinting (PEP 484). Flag missing types in public function signatures.
+
+4.  **LAYER 4: ARCHITECTURE & MAINTAINABILITY (SOLID)**
+    -   Cyclomatic Complexity: Flag functions with too many branches (if/else) > 10.
+    -   Coupling: Identify violation of Dependency Inversion or Single Responsibility Principle.
+    -   DRY (Don't Repeat Yourself): Detect copy-pasted logic that should be refactored into utility functions.
+
+5.  **LAYER 5: MODERN PYTHONIC STANDARDS**
+    -   Enforce usage of modern features (e.g., `f-strings` over `.format()`, `pathlib` over `os.path`, dataclasses/pydantic over raw dicts).
+
+### 🛡️ ANTI-HALLUCINATION RULES
+-   **Context verification:** Do NOT flag an issue if the definition exists in the `Full File Content` but is not visible in the `Diff`.
+-   **False Positive Reduction:** Only report issues with HIGH or MEDIUM confidence. If you are unsure, do not report it.
+
+### 📊 SCORING ALGORITHM
+-   **100:** Perfection. Meets all 5 layers. (Rare).
+-   **90-99:** Excellent. Minor styling/nitpicks only.
+-   **75-89:** Good. Some actionable feedback but safe to merge.
+-   **<75:** REJECT. Contains Security risks, Logical bugs, or blocking I/O.
+
+### 📝 OUTPUT FORMAT (STRICT JSON ONLY)
+Return raw JSON. No Markdown. No intro/outro text.
 {
-    "overall_score": 8,
-    "summary": "Brief summary of the changes",
+    "score": <integer 0-100>,
+    "summary": "<Technical Executive Summary of the impact (max 2 sentences)>",
+    "security_risk": <boolean>,
     "issues": [
-        {"file": "path/file.py", "line": 10, "severity": "warning", "message": "Description"},
-        ...
-    ],
-    "suggestions": ["Suggestion 1", "Suggestion 2"]
+        {
+            "category": "SECURITY" | "PERFORMANCE" | "LOGIC" | "MAINTAINABILITY",
+            "severity": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
+            "line": <line_number_in_diff_or_closest_context>,
+            "message": "<Concise, technical description of the flaw>",
+            "rationale": "<Why is this an issue? Cite specific principles (e.g., 'Violates OWASP A03', 'O(n^2) complexity')>",
+            "suggestion": "<Production-ready Python code fix. Use comments to explain changes.>"
+        }
+    ]
 }
 """
     
@@ -174,7 +216,7 @@ Format your response as JSON:
         }
         
     def post_pr_comment(self, repo: str, pr_number: int, review: dict) -> bool:
-        """Post review comment to GitHub PR."""
+        """Post review comment to GitHub PR with enhanced formatting."""
         if not self.github_token:
             print("⚠️ GITHUB_TOKEN not set - cannot post comment")
             return False
@@ -185,29 +227,56 @@ Format your response as JSON:
             "Content-Type": "application/json"
         }
         
-        # Format comment
-        issues_text = ""
-        for issue in review.get("issues", []):
-            icon = "🔴" if issue["severity"] == "error" else "🟡" if issue["severity"] == "warning" else "ℹ️"
-            issues_text += f"- {icon} **{issue['file']}:{issue.get('line', '?')}** - {issue['message']}\n"
-            
-        suggestions_text = "\n".join(f"- {s}" for s in review.get("suggestions", []))
+        score = review.get('score', review.get('overall_score', 0))
+        security_risk = review.get('security_risk', False)
         
-        body = f"""## 🤖 AI Code Review
+        # Build issues table
+        issues_table = ""
+        if review.get("issues"):
+            issues_table = "| Type | Sev | Line | Issue | Rationale | Fix |\n"
+            issues_table += "| :--- | :--- | :--- | :--- | :--- | :--- |\n"
+            
+            for issue in review.get("issues", []):
+                # Icon mapping
+                sev_icon = "🔴" if issue.get('severity') in ['CRITICAL', 'HIGH'] else "🟡" if issue.get('severity') == 'MEDIUM' else "🟢"
+                cat_icons = {
+                    "SECURITY": "🔒",
+                    "PERFORMANCE": "🚀",
+                    "LOGIC": "🧠",
+                    "MAINTAINABILITY": "🧹"
+                }
+                cat_icon = cat_icons.get(issue.get('category', ''), "❓")
+                
+                suggestion = issue.get('suggestion', '').replace('\n', '<br>')
+                
+                issues_table += (
+                    f"| {cat_icon} {issue.get('category', 'UNKNOWN')} "
+                    f"| {sev_icon} {issue.get('severity', 'MEDIUM')} "
+                    f"| {issue.get('line', '-')} "
+                    f"| {issue.get('message', '')} "
+                    f"| *{issue.get('rationale', '')}* "
+                    f"| ```python\n{suggestion}\n``` |\n"
+                )
+        
+        # Security warning
+        security_warning = ""
+        if security_risk:
+            security_warning = "\n> [!CAUTION]\n> **SECURITY RISK DETECTED** - This PR introduces potential security vulnerabilities and should NOT be merged without fixes.\n\n"
+        
+        body = f"""## 🔬 Omniscient Code Auditor - Review Complete
 
-**Overall Score**: {review.get('overall_score', '?')}/10
+**Overall Score**: {score}/100 {'❌ FAIL' if score < 75 or security_risk else '⚠️ REVIEW' if score < 90 else '✅ PASS'}
 
-### Summary
+{security_warning}
+
+### 📝 Executive Summary
 {review.get('summary', 'No summary available')}
 
-### Issues Found
-{issues_text or 'No issues found! ✅'}
-
-### Suggestions
-{suggestions_text or 'No additional suggestions'}
+### ⚠️ Issues Found
+{issues_table if issues_table else '✅ No issues detected!'}
 
 ---
-*Generated by AI Reviewer*
+*Generated by Omniscient Code Auditor - 5-Layer Deep Scan Protocol*
 """
         
         data = {"body": body}
@@ -228,23 +297,78 @@ Format your response as JSON:
         return self.call_openai(diff)
         
     def print_review(self, review: dict):
-        """Print review to console."""
-        print("\n" + "=" * 60)
-        print("🤖 AI CODE REVIEW")
-        print("=" * 60)
-        print(f"\n📊 Overall Score: {review.get('overall_score', '?')}/10")
+        """Print review to console with enhanced formatting."""
+        print("\n" + "=" * 70)
+        print("🔬 OMNISCIENT CODE AUDITOR - FORENSIC ANALYSIS")
+        print("=" * 70)
+        
+        score = review.get('score', review.get('overall_score', 0))
+        security_risk = review.get('security_risk', False)
+        
+        # Score with color coding
+        if score >= 90:
+            score_icon = "✅"
+        elif score >= 75:
+            score_icon = "⚠️"
+        else:
+            score_icon = "❌"
+            
+        print(f"\n📊 Overall Score: {score_icon} {score}/100")
+        if security_risk:
+            print(f"🚨 SECURITY RISK DETECTED - FAIL BUILD")
         print(f"\n📝 Summary: {review.get('summary', 'N/A')}")
         
-        print("\n⚠️ Issues:")
-        for issue in review.get("issues", []):
-            icon = "🔴" if issue["severity"] == "error" else "🟡" if issue["severity"] == "warning" else "ℹ️"
-            print(f"  {icon} {issue['file']}:{issue.get('line', '?')} - {issue['message']}")
+        issues = review.get("issues", [])
+        if issues:
+            print(f"\n⚠️ Issues Found: {len(issues)}\n")
             
-        print("\n💡 Suggestions:")
-        for s in review.get("suggestions", []):
-            print(f"  - {s}")
+            # Category icons
+            cat_icons = {
+                "SECURITY": "🔒",
+                "PERFORMANCE": "🚀",
+                "LOGIC": "🧠",
+                "MAINTAINABILITY": "🧹"
+            }
             
-        print("=" * 60)
+            # Severity icons
+            sev_icons = {
+                "CRITICAL": "🔴",
+                "HIGH": "🔴",
+                "MEDIUM": "🟡",
+                "LOW": "🟢"
+            }
+            
+            # Print table header
+            print("┌─────────────────┬──────────┬──────┬─────────────────────────────────┐")
+            print("│ Type            │ Severity │ Line │ Issue                           │")
+            print("├─────────────────┼──────────┼──────┼─────────────────────────────────┤")
+            
+            for issue in issues:
+                cat = issue.get('category', 'UNKNOWN')
+                sev = issue.get('severity', 'MEDIUM')
+                line = str(issue.get('line', '-')).ljust(4)
+                msg = issue.get('message', '')[:30].ljust(30)
+                
+                cat_icon = cat_icons.get(cat, "❓")
+                sev_icon = sev_icons.get(sev, "⚪")
+                
+                print(f"│ {cat_icon} {cat:<13} │ {sev_icon} {sev:<6} │ {line} │ {msg} │")
+                
+                # Print rationale and suggestion
+                rationale = issue.get('rationale', '')
+                if rationale:
+                    print(f"│   Rationale: {rationale[:60]:<60} │")
+                    
+                suggestion = issue.get('suggestion', '')
+                if suggestion:
+                    print(f"│   Fix: {suggestion[:64]:<64} │")
+                print("├─────────────────┼──────────┼──────┼─────────────────────────────────┤")
+                
+            print("└─────────────────┴──────────┴──────┴─────────────────────────────────┘")
+        else:
+            print("\n✅ No issues found!")
+            
+        print("\n" + "=" * 70)
 
 
 def main():

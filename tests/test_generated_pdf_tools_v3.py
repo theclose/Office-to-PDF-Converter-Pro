@@ -1,6 +1,6 @@
 """
 Auto-generated tests for pdf_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T00:14:55.568910
+Generated: 2025-12-27T00:15:59.613975
 Generator: Class-Aware + Smart Prioritized
 """
 

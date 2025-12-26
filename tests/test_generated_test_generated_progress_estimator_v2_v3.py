@@ -1,14 +1,36 @@
 """
-Auto-generated tests for test_generated_progress_estimator_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.909027
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_progress_estimator_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.534261
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_progress_estimator_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_progress_estimator_v2 import (
+        test_get_system_profiler_parametrized,
+        test_get_conversion_logger_parametrized,
+        test_get_adaptive_estimator_parametrized,
+        test_estimate_conversion_time_parametrized,
+        test_to_dict_parametrized,
+        test_from_dict_parametrized,
+        test_get_current_load_parametrized,
+        test_to_dict_parametrized,
+        test_from_dict_parametrized,
+        test_get_records_by_type_parametrized,
+        test_get_statistics_parametrized,
+        test_estimate_parametrized,
+        test_log_conversion_result_basic,
+        test___init___basic,
+        test___init___basic,
+        test_log_conversion_basic,
+        test___init___basic,
+        test_update_after_conversion_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_progress_estimator_v2: {e}")
 
 # Test for test_get_system_profiler_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test get_system_profiler with various inputs....

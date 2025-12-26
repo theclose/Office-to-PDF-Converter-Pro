@@ -1,14 +1,38 @@
 """
-Auto-generated tests for test_generated_test_grid_phase2_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.992619
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_grid_phase2_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.720380
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_grid_phase2_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_grid_phase2_v2 import (
+        test_temp_test_file_basic,
+        test_mock_converter_basic,
+        test_test_initial_state_allows_attempts_basic,
+        test_test_failure_threshold_opens_circuit_basic,
+        test_test_success_resets_circuit_basic,
+        test_test_manual_reset_basic,
+        test_test_stats_tracking_basic,
+        test_test_pool_initialization_basic,
+        test_test_hot_spare_initialization_basic,
+        test_test_submit_and_get_result_basic,
+        test_test_pool_state_transitions_basic,
+        test_test_grid_initialization_basic,
+        test_test_enqueue_file_basic,
+        test_test_quarantined_file_rejected_basic,
+        test_test_callbacks_invoked_basic,
+        test_test_batch_enqueue_basic,
+        test_test_statistics_tracking_basic,
+        test_test_many_files_single_worker_basic,
+        test_test_concurrent_operations_basic,
+        test_enqueue_worker_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_grid_phase2_v2: {e}")
 
 # Test for test_temp_test_file_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test temp_test_file with valid input....

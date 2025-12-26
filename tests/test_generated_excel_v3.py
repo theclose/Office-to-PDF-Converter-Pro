@@ -1,54 +1,59 @@
 """
-Auto-generated tests for excel (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.694273
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for excel (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.739548
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\converters\excel.py
-# TODO: Adjust import path
+try:
+    from converters.excel import (
+        ExcelConverter,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from converters.excel: {e}")
 
-# Test for convert (complexity: 21, coverage: 0%, priority: 0.80)
+# Test for ExcelConverter.convert (complexity: 21, coverage: 0%, priority: 0.80)
 # Doc: Convert Excel file to PDF....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_convert_parametrized(input, expected):
-    """Test convert with various inputs."""
-    result = convert(input)
+def test_ExcelConverter_convert_parametrized(input, expected):
+    """Test ExcelConverter_convert with various inputs."""
+    result = ExcelConverter().convert(input)
     assert result == expected
 
 
-# Test for initialize (complexity: 4, coverage: 0%, priority: 0.52)
+# Test for ExcelConverter.initialize (complexity: 4, coverage: 0%, priority: 0.52)
 # Doc: Get Excel COM from pool....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_initialize_parametrized(input, expected):
-    """Test initialize with various inputs."""
-    result = initialize(input)
+def test_ExcelConverter_initialize_parametrized(input, expected):
+    """Test ExcelConverter_initialize with various inputs."""
+    result = ExcelConverter().initialize(input)
     assert result == expected
 
 
-# Test for cleanup (complexity: 4, coverage: 0%, priority: 0.52)
+# Test for ExcelConverter.cleanup (complexity: 4, coverage: 0%, priority: 0.52)
 # Doc: Release Excel resources (pool handles actual cleanup)....
 
-def test_cleanup_basic():
-    """Test cleanup with valid input."""
-    result = cleanup()
+def test_ExcelConverter_cleanup_basic():
+    """Test ExcelConverter_cleanup with valid input."""
+    result = ExcelConverter().cleanup()
     assert result is not None
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for ExcelConverter.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('log_callback_test', None)
+def test_ExcelConverter___init___basic():
+    """Test ExcelConverter___init__ with valid input."""
+    result = ExcelConverter().__init__('log_callback_test', None)
     assert result is not None
 

@@ -1,14 +1,30 @@
 """
-Auto-generated tests for test_generated_generate_tests_v2_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.882599
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_generate_tests_v2_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.391308
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_generate_tests_v2_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_generate_tests_v2_v2 import (
+        test_get_function_hash_parametrized,
+        test_is_tested_parametrized,
+        test_generate_from_template_parametrized,
+        test_infer_template_type_parametrized,
+        test_analyze_file_parametrized,
+        test_generate_tests_parallel_parametrized,
+        test_main_basic,
+        test___init___basic,
+        test_load_basic,
+        test_save_basic,
+        test_mark_tested_basic,
+        test___init___basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_generate_tests_v2_v2: {e}")
 
 # Test for test_get_function_hash_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test get_function_hash with various inputs....

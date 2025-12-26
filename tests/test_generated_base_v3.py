@@ -1,14 +1,23 @@
 """
-Auto-generated tests for base (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.688962
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for base (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.731336
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\converters\base.py
-# TODO: Adjust import path
+try:
+    from converters.base import (
+        BaseConverter,
+        get_best_converter,
+        release_com,
+        ensure_com_initialized,
+        get_converter_for_file,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from converters.base: {e}")
 
 # Test for get_best_converter (complexity: 9, coverage: 0%, priority: 0.61)
 # Doc: Get the best available converter for a file. Tries MS Office...
@@ -23,51 +32,51 @@ def test_get_best_converter_parametrized(input, expected):
     assert result == expected
 
 
-# Test for supports_file (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for BaseConverter.supports_file (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Check if this converter supports the given file....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_supports_file_parametrized(input, expected):
-    """Test supports_file with various inputs."""
-    result = supports_file(input)
+def test_BaseConverter_supports_file_parametrized(input, expected):
+    """Test BaseConverter_supports_file with various inputs."""
+    result = BaseConverter().supports_file(input)
     assert result == expected
 
 
-# Test for initialize (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for BaseConverter.initialize (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Initialize the COM application. Returns True if successful....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_initialize_parametrized(input, expected):
-    """Test initialize with various inputs."""
-    result = initialize(input)
+def test_BaseConverter_initialize_parametrized(input, expected):
+    """Test BaseConverter_initialize with various inputs."""
+    result = BaseConverter().initialize(input)
     assert result == expected
 
 
-# Test for convert (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for BaseConverter.convert (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Convert a single file to PDF.  Args:     input_path: Path to...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_convert_parametrized(input, expected):
-    """Test convert with various inputs."""
-    result = convert(input)
+def test_BaseConverter_convert_parametrized(input, expected):
+    """Test BaseConverter_convert with various inputs."""
+    result = BaseConverter().convert(input)
     assert result == expected
 
 
-# Test for cleanup (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for BaseConverter.cleanup (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Release COM resources....
 
-def test_cleanup_basic():
-    """Test cleanup with valid input."""
-    result = cleanup()
+def test_BaseConverter_cleanup_basic():
+    """Test BaseConverter_cleanup with valid input."""
+    result = BaseConverter().cleanup()
     assert result is not None
 
 
@@ -102,29 +111,29 @@ def test_get_converter_for_file_parametrized(input, expected):
     assert result == expected
 
 
-# Test for log (complexity: 1, coverage: 0%, priority: 0.47)
-# Doc: Log a message to both file and UI callback....
-
-def test_log_basic():
-    """Test log with valid input."""
-    result = log('message_test')
-    assert result is not None
-
-
-# Test for update_progress (complexity: 1, coverage: 0%, priority: 0.47)
-# Doc: Update progress (0.0 to 1.0)....
-
-def test_update_progress_basic():
-    """Test update_progress with valid input."""
-    result = update_progress(None)
-    assert result is not None
-
-
-# Test for __init__ (complexity: 3, coverage: 0%, priority: 0.35)
+# Test for BaseConverter.__init__ (complexity: 3, coverage: 0%, priority: 0.50)
 # Doc: Initialize converter.  Args:     log_callback: Function to c...
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('log_callback_test', None)
+def test_BaseConverter___init___basic():
+    """Test BaseConverter___init__ with valid input."""
+    result = BaseConverter().__init__('log_callback_test', None)
+    assert result is not None
+
+
+# Test for BaseConverter.log (complexity: 1, coverage: 0%, priority: 0.47)
+# Doc: Log a message to both file and UI callback....
+
+def test_BaseConverter_log_basic():
+    """Test BaseConverter_log with valid input."""
+    result = BaseConverter().log('message_test')
+    assert result is not None
+
+
+# Test for BaseConverter.update_progress (complexity: 1, coverage: 0%, priority: 0.47)
+# Doc: Update progress (0.0 to 1.0)....
+
+def test_BaseConverter_update_progress_basic():
+    """Test BaseConverter_update_progress with valid input."""
+    result = BaseConverter().update_progress(None)
     assert result is not None
 

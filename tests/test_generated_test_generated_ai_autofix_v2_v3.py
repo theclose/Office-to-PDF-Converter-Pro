@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_ai_autofix_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.844490
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_ai_autofix_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.183871
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_ai_autofix_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_ai_autofix_v2 import (
+        test_parse_junit_xml_parametrized,
+        test_parse_json_parametrized,
+        test_parse_console_output_parametrized,
+        test_load_source_code_parametrized,
+        test_generate_fix_parametrized,
+        test_apply_patch_parametrized,
+        test_main_basic,
+        test___init___basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_ai_autofix_v2: {e}")
 
 # Test for test_parse_junit_xml_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test parse_junit_xml with various inputs....

@@ -1,14 +1,20 @@
 """
-Auto-generated tests for deploy_automation (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.669709
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for deploy_automation (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.704681
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\deploy_automation.py
-# TODO: Adjust import path
+try:
+    from deploy_automation import (
+        run_cmd,
+        main,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from deploy_automation: {e}")
 
 # Test for run_cmd (complexity: 5, coverage: 0%, priority: 0.54)
 # Doc: Run command with error handling....

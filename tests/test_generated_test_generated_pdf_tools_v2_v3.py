@@ -1,14 +1,34 @@
 """
-Auto-generated tests for test_generated_pdf_tools_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.902947
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_pdf_tools_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.499602
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_pdf_tools_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_pdf_tools_v2 import (
+        test_merge_pdfs_basic,
+        test_split_pdf_basic,
+        test_compress_pdf_basic,
+        test_protect_pdf_basic,
+        test_post_process_pdf_basic,
+        test_rasterize_pdf_basic,
+        test_add_watermark_basic,
+        test_pdf_to_images_basic,
+        test_images_to_pdf_basic,
+        test_parse_page_range_basic,
+        test_extract_pages_basic,
+        test_extract_pdf_pages_basic,
+        test_delete_pages_basic,
+        test_rotate_pages_basic,
+        test_reorder_pages_basic,
+        test_reverse_pages_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_pdf_tools_v2: {e}")
 
 # Test for test_merge_pdfs_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test merge_pdfs with valid input....

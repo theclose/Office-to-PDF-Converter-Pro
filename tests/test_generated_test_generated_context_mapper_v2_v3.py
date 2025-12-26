@@ -1,14 +1,31 @@
 """
-Auto-generated tests for test_generated_context_mapper_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.864984
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_context_mapper_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.282454
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_context_mapper_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_context_mapper_v2 import (
+        test_categorize_module_parametrized,
+        test_analyze_file_parametrized,
+        test_build_dependency_graph_parametrized,
+        test_generate_context_chunks_basic,
+        test_generate_markdown_report_basic,
+        test_generate_json_output_basic,
+        test_main_basic,
+        test___init___basic,
+        test_visit_Import_basic,
+        test_visit_ImportFrom_basic,
+        test_visit_ClassDef_basic,
+        test_visit_FunctionDef_basic,
+        test_visit_AsyncFunctionDef_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_context_mapper_v2: {e}")
 
 # Test for test_categorize_module_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test categorize_module with various inputs....

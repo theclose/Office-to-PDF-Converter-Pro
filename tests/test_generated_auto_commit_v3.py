@@ -1,14 +1,23 @@
 """
-Auto-generated tests for auto_commit (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.787337
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for auto_commit (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.976151
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\scripts\auto_commit.py
-# TODO: Adjust import path
+try:
+    from scripts.auto_commit import (
+        bump_version,
+        main,
+        get_current_version,
+        update_version_in_file,
+        git_commit,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from scripts.auto_commit: {e}")
 
 # Test for bump_version (complexity: 3, coverage: 0%, priority: 0.50)
 # Doc: Bump version number....

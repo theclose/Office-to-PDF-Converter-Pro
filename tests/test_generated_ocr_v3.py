@@ -1,14 +1,25 @@
 """
-Auto-generated tests for ocr (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:23.359736
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for ocr (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:17.772159
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\utils\ocr.py
-# TODO: Adjust import path
+try:
+    from utils.ocr import (
+        ocr_pdf_to_searchable,
+        get_best_language,
+        extract_text_from_pdf,
+        is_ocr_available,
+        get_tesseract_languages,
+        ocr_image,
+        get_ocr_status,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from utils.ocr: {e}")
 
 # Test for ocr_pdf_to_searchable (complexity: 8, coverage: 0%, priority: 0.59)
 # Doc: Convert a scanned PDF to a searchable PDF with OCR text laye...

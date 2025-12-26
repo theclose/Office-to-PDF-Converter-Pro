@@ -1,14 +1,27 @@
 """
-Auto-generated tests for test_generated_test_generated_quarantine_v2_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.972596
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_generated_quarantine_v2_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:15.524901
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_generated_quarantine_v2_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_generated_quarantine_v2_v2 import (
+        test_test___init___basic_basic,
+        test_test_add_parametrized_basic,
+        test_test_contains_parametrized_basic,
+        test_test_contains_with_confidence_parametrized_basic,
+        test_test_remove_parametrized_basic,
+        test_test_clear_parametrized_basic,
+        test_test_rebuild_from_exact_parametrized_basic,
+        test_test_estimated_fpr_parametrized_basic,
+        test_test_get_stats_parametrized_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_generated_quarantine_v2_v2: {e}")
 
 # Test for test_test___init___basic_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test___init___basic with valid input....

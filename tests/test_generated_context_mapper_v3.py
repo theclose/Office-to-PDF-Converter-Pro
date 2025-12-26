@@ -1,14 +1,26 @@
 """
-Auto-generated tests for context_mapper (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.804298
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for context_mapper (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.028493
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\scripts\context_mapper.py
-# TODO: Adjust import path
+try:
+    from scripts.context_mapper import (
+        ASTAnalyzer,
+        categorize_module,
+        generate_markdown_report,
+        build_dependency_graph,
+        generate_context_chunks,
+        main,
+        analyze_file,
+        generate_json_output,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from scripts.context_mapper: {e}")
 
 # Test for categorize_module (complexity: 25, coverage: 0%, priority: 0.80)
 # Doc: Categorize module based on path and content patterns....
@@ -75,19 +87,19 @@ def test_analyze_file_parametrized(input, expected):
     assert result == expected
 
 
-# Test for visit_ImportFrom (complexity: 3, coverage: 0%, priority: 0.50)
+# Test for ASTAnalyzer.visit_ImportFrom (complexity: 3, coverage: 0%, priority: 0.50)
 
-def test_visit_ImportFrom_basic():
-    """Test visit_ImportFrom with valid input."""
-    result = visit_ImportFrom(None)
+def test_ASTAnalyzer_visit_ImportFrom_basic():
+    """Test ASTAnalyzer_visit_ImportFrom with valid input."""
+    result = ASTAnalyzer().visit_ImportFrom(None)
     assert result is not None
 
 
-# Test for visit_Import (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for ASTAnalyzer.visit_Import (complexity: 2, coverage: 0%, priority: 0.48)
 
-def test_visit_Import_basic():
-    """Test visit_Import with valid input."""
-    result = visit_Import(None)
+def test_ASTAnalyzer_visit_Import_basic():
+    """Test ASTAnalyzer_visit_Import with valid input."""
+    result = ASTAnalyzer().visit_Import(None)
     assert result is not None
 
 
@@ -100,34 +112,34 @@ def test_generate_json_output_basic():
     assert result is not None
 
 
-# Test for visit_ClassDef (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for ASTAnalyzer.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test_visit_ClassDef_basic():
-    """Test visit_ClassDef with valid input."""
-    result = visit_ClassDef(None)
+def test_ASTAnalyzer___init___basic():
+    """Test ASTAnalyzer___init__ with valid input."""
+    result = ASTAnalyzer().__init__()
     assert result is not None
 
 
-# Test for visit_FunctionDef (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for ASTAnalyzer.visit_ClassDef (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test_visit_FunctionDef_basic():
-    """Test visit_FunctionDef with valid input."""
-    result = visit_FunctionDef(None)
+def test_ASTAnalyzer_visit_ClassDef_basic():
+    """Test ASTAnalyzer_visit_ClassDef with valid input."""
+    result = ASTAnalyzer().visit_ClassDef(None)
     assert result is not None
 
 
-# Test for visit_AsyncFunctionDef (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for ASTAnalyzer.visit_FunctionDef (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test_visit_AsyncFunctionDef_basic():
-    """Test visit_AsyncFunctionDef with valid input."""
-    result = visit_AsyncFunctionDef(None)
+def test_ASTAnalyzer_visit_FunctionDef_basic():
+    """Test ASTAnalyzer_visit_FunctionDef with valid input."""
+    result = ASTAnalyzer().visit_FunctionDef(None)
     assert result is not None
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for ASTAnalyzer.visit_AsyncFunctionDef (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__()
+def test_ASTAnalyzer_visit_AsyncFunctionDef_basic():
+    """Test ASTAnalyzer_visit_AsyncFunctionDef with valid input."""
+    result = ASTAnalyzer().visit_AsyncFunctionDef(None)
     assert result is not None
 

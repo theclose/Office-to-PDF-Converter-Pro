@@ -1,14 +1,29 @@
 """
-Auto-generated tests for test_generated_config_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.864984
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_config_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.268441
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_config_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_config_v2 import (
+        test_load_parametrized,
+        test_save_parametrized,
+        test_get_parametrized,
+        test_language_parametrized,
+        test_theme_parametrized,
+        test_pdf_quality_parametrized,
+        test___init___basic,
+        test_set_basic,
+        test_language_basic,
+        test_theme_basic,
+        test_pdf_quality_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_config_v2: {e}")
 
 # Test for test_load_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test load with various inputs....

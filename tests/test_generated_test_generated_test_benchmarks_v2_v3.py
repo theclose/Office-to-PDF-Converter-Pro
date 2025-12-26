@@ -1,14 +1,66 @@
 """
-Auto-generated tests for test_generated_test_benchmarks_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.923147
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_benchmarks_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.632666
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_benchmarks_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_benchmarks_v2 import (
+        test_test_benchmark_get_converter_for_file_basic,
+        test_test_benchmark_get_best_converter_basic,
+        test_test_benchmark_multiple_extensions_basic,
+        test_test_benchmark_converter_factory_pattern_basic,
+        test_engine_basic,
+        test_temp_files_basic,
+        test_test_benchmark_case_conversion_basic,
+        test_test_benchmark_replace_operation_basic,
+        test_test_benchmark_batch_rename_100_files_basic,
+        test_test_benchmark_rule_chain_complexity_basic,
+        test_test_benchmark_config_load_basic,
+        test_test_benchmark_config_save_basic,
+        test_test_benchmark_config_get_set_operations_basic,
+        test_test_benchmark_queue_enqueue_dequeue_basic,
+        test_test_benchmark_priority_queue_basic,
+        test_test_benchmark_file_read_small_basic,
+        test_test_benchmark_file_read_medium_basic,
+        test_test_benchmark_file_write_basic,
+        test_test_benchmark_directory_listing_basic,
+        test_test_benchmark_large_list_operations_basic,
+        test_test_benchmark_dict_operations_basic,
+        test_test_benchmark_string_concatenation_basic,
+        test_test_converter_lookup_under_1ms_basic,
+        test_test_file_rename_preview_under_100ms_basic,
+        test_test_string_format_percent_basic,
+        test_test_string_format_method_basic,
+        test_test_string_format_fstring_basic,
+        test_create_converters_basic,
+        test_apply_case_basic,
+        test_apply_replace_basic,
+        test_batch_rename_basic,
+        test_complex_chain_basic,
+        test_load_config_basic,
+        test_save_config_basic,
+        test_rapid_get_set_basic,
+        test_queue_ops_basic,
+        test_priority_ops_basic,
+        test_read_file_basic,
+        test_read_file_basic,
+        test_write_file_basic,
+        test_list_dir_basic,
+        test_list_ops_basic,
+        test_dict_ops_basic,
+        test_string_concat_basic,
+        test_preview_basic,
+        test_format_percent_basic,
+        test_format_method_basic,
+        test_format_fstring_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_benchmarks_v2: {e}")
 
 # Test for test_test_benchmark_get_converter_for_file_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test_benchmark_get_converter_for_file with valid input....

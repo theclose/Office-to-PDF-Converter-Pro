@@ -1,25 +1,31 @@
 """
-Auto-generated tests for recent_files (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:23.370240
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for recent_files (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:17.843145
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\utils\recent_files.py
-# TODO: Adjust import path
+try:
+    from utils.recent_files import (
+        RecentFilesDB,
+        get_recent_files_db,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from utils.recent_files: {e}")
 
-# Test for get_stats (complexity: 7, coverage: 0%, priority: 0.57)
+# Test for RecentFilesDB.get_stats (complexity: 7, coverage: 0%, priority: 0.57)
 # Doc: Get conversion statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_get_stats_parametrized(input, expected):
-    """Test get_stats with various inputs."""
-    result = get_stats(input)
+def test_RecentFilesDB_get_stats_parametrized(input, expected):
+    """Test RecentFilesDB_get_stats with various inputs."""
+    result = RecentFilesDB().get_stats(input)
     assert result == expected
 
 
@@ -36,60 +42,60 @@ def test_get_recent_files_db_parametrized(input, expected):
     assert result == expected
 
 
-# Test for add_recent (complexity: 2, coverage: 0%, priority: 0.48)
-# Doc: Add or update recent file....
+# Test for RecentFilesDB.__init__ (complexity: 2, coverage: 0%, priority: 0.48)
+# Doc: Initialize database.  Args:     db_path: Path to SQLite data...
 
-def test_add_recent_basic():
-    """Test add_recent with valid input."""
-    result = add_recent('path_test')
+def test_RecentFilesDB___init___basic():
+    """Test RecentFilesDB___init__ with valid input."""
+    result = RecentFilesDB().__init__('db_path_test')
     assert result is not None
 
 
-# Test for get_recent (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for RecentFilesDB.add_recent (complexity: 2, coverage: 0%, priority: 0.48)
+# Doc: Add or update recent file....
+
+def test_RecentFilesDB_add_recent_basic():
+    """Test RecentFilesDB_add_recent with valid input."""
+    result = RecentFilesDB().add_recent('path_test')
+    assert result is not None
+
+
+# Test for RecentFilesDB.get_recent (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Get recent files ordered by last used....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_get_recent_parametrized(input, expected):
-    """Test get_recent with various inputs."""
-    result = get_recent(input)
+def test_RecentFilesDB_get_recent_parametrized(input, expected):
+    """Test RecentFilesDB_get_recent with various inputs."""
+    result = RecentFilesDB().get_recent(input)
     assert result == expected
 
 
-# Test for log_conversion (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for RecentFilesDB.log_conversion (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Log conversion result....
 
-def test_log_conversion_basic():
-    """Test log_conversion with valid input."""
-    result = log_conversion('input_path_test', 'output_path_test', 'status_test', None)
+def test_RecentFilesDB_log_conversion_basic():
+    """Test RecentFilesDB_log_conversion with valid input."""
+    result = RecentFilesDB().log_conversion('input_path_test', 'output_path_test', 'status_test', None)
     assert result is not None
 
 
-# Test for clear_history (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for RecentFilesDB.clear_history (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Clear all conversion history (keep recent files)....
 
-def test_clear_history_basic():
-    """Test clear_history with valid input."""
-    result = clear_history()
+def test_RecentFilesDB_clear_history_basic():
+    """Test RecentFilesDB_clear_history with valid input."""
+    result = RecentFilesDB().clear_history()
     assert result is not None
 
 
-# Test for close (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for RecentFilesDB.close (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Close database connection....
 
-def test_close_basic():
-    """Test close with valid input."""
-    result = close()
-    assert result is not None
-
-
-# Test for __init__ (complexity: 2, coverage: 0%, priority: 0.33)
-# Doc: Initialize database.  Args:     db_path: Path to SQLite data...
-
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('db_path_test')
+def test_RecentFilesDB_close_basic():
+    """Test RecentFilesDB_close with valid input."""
+    result = RecentFilesDB().close()
     assert result is not None
 

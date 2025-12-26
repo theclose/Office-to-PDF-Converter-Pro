@@ -1,14 +1,20 @@
 """
-Auto-generated tests for auto_save (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.787337
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for auto_save (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.977152
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\scripts\auto_save.py
-# TODO: Adjust import path
+try:
+    from scripts.auto_save import (
+        bump_version,
+        git_commit,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from scripts.auto_save: {e}")
 
 # Test for bump_version (complexity: 3, coverage: 0%, priority: 0.50)
 

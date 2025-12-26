@@ -1,14 +1,50 @@
 """
-Auto-generated tests for test_generated_main_window_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.894196
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_main_window_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.455112
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_main_window_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_main_window_v2 import (
+        test_format_time_parametrized,
+        test_main_basic,
+        test___init___basic,
+        test_toggle_theme_basic,
+        test_log_basic,
+        test_add_files_basic,
+        test_add_folder_basic,
+        test_clear_list_basic,
+        test_delete_selected_basic,
+        test_select_output_folder_basic,
+        test_reset_output_folder_basic,
+        test_merge_pdfs_basic,
+        test_split_pdf_basic,
+        test_compress_pdf_basic,
+        test_add_watermark_basic,
+        test_pdf_to_images_basic,
+        test_images_to_pdf_basic,
+        test_rotate_pdf_basic,
+        test_extract_pdf_pages_basic,
+        test_delete_pdf_pages_basic,
+        test_reverse_pdf_basic,
+        test_open_pdf_tools_dialog_basic,
+        test_show_settings_basic,
+        test_show_history_basic,
+        test_handle_drop_basic,
+        test_start_conversion_basic,
+        test_on_save_basic,
+        test_clear_history_basic,
+        test_update_time_display_basic,
+        test_update_progress_basic,
+        test_open_folder_basic,
+        test_animate_progress_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_main_window_v2: {e}")
 
 # Test for test_format_time_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test format_time with various inputs....

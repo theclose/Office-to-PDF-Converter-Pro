@@ -1,14 +1,30 @@
 """
-Auto-generated tests for test_generated_test_integration_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.993159
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_integration_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.753334
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_integration_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_integration_v2 import (
+        test_test_task_flows_from_input_to_output_queue_basic,
+        test_test_multiple_tasks_processed_in_order_basic,
+        test_test_empty_queue_blocks_until_task_arrives_basic,
+        test_test_temp_files_are_ignored_by_scanner_basic,
+        test_test_various_temp_file_patterns_are_filtered_basic,
+        test_test_file_transitions_through_states_correctly_basic,
+        test_test_failed_conversion_transitions_to_failed_state_basic,
+        test_test_concurrent_state_updates_are_safe_basic,
+        test_test_worker_error_propagates_to_main_thread_basic,
+        test_test_multiple_errors_dont_block_processing_basic,
+        test_worker_thread_basic,
+        test_update_state_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_integration_v2: {e}")
 
 # Test for test_test_task_flows_from_input_to_output_queue_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test_task_flows_from_input_to_output_queue with valid i...

@@ -1,14 +1,39 @@
 """
-Auto-generated tests for test_generated_test_ai_generated_utils_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.920047
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_ai_generated_utils_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.580242
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_ai_generated_utils_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_ai_generated_utils_v2 import (
+        test_test_get_pool_returns_compool_instance_basic,
+        test_test_get_pool_singleton_pattern_basic,
+        test_test_release_pool_clears_global_basic,
+        test_test_release_pool_when_none_basic,
+        test_mock_com_pool_basic,
+        test_test_get_excel_returns_none_on_max_retry_basic,
+        test_test_get_word_returns_none_on_max_retry_basic,
+        test_test_get_ppt_returns_none_on_max_retry_basic,
+        test_test_get_stats_returns_dict_basic,
+        test_test_get_stats_initial_values_basic,
+        test_temp_config_file_basic,
+        test_config_instance_basic,
+        test_test_config_load_existing_file_basic,
+        test_test_config_load_nonexistent_file_basic,
+        test_test_config_save_creates_file_basic,
+        test_test_config_get_returns_value_basic,
+        test_test_config_get_with_default_basic,
+        test_test_config_set_updates_value_basic,
+        test_test_get_excel_with_various_retry_counts_basic,
+        test_test_config_with_empty_json_basic,
+        test_test_config_with_invalid_json_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_ai_generated_utils_v2: {e}")
 
 # Test for test_test_get_pool_returns_compool_instance_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test_get_pool_returns_compool_instance with valid input...

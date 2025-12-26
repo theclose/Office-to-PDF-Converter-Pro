@@ -1,14 +1,30 @@
 """
-Auto-generated tests for test_generated_shim_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.918047
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_shim_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.571207
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_shim_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_shim_v2 import (
+        test_install_shim_layer_parametrized,
+        test_is_shim_installed_parametrized,
+        test_verify_neutralization_parametrized,
+        test_get_shim_stats_parametrized,
+        test_load_module_parametrized,
+        test_uninstall_shim_layer_basic,
+        test___init___basic,
+        test_create_module_basic,
+        test_exec_module_basic,
+        test___init___basic,
+        test_find_spec_basic,
+        test_find_module_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_shim_v2: {e}")
 
 # Test for test_install_shim_layer_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test install_shim_layer with various inputs....

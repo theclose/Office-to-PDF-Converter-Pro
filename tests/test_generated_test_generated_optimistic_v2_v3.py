@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_optimistic_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.900294
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_optimistic_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.487006
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_optimistic_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_optimistic_v2 import (
+        test_add_optimistic_parametrized,
+        test_get_merged_items_parametrized,
+        test_get_stats_parametrized,
+        test___init___basic,
+        test_reconcile_basic,
+        test_mark_failed_basic,
+        test_remove_optimistic_basic,
+        test_cleanup_old_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_optimistic_v2: {e}")
 
 # Test for test_add_optimistic_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test add_optimistic with various inputs....

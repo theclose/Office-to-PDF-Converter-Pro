@@ -1,14 +1,32 @@
 """
-Auto-generated tests for test_generated_test_performance_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.994163
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_performance_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.784209
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_performance_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_performance_v2 import (
+        test_test_render_id_increments_basic,
+        test_test_loading_state_management_basic,
+        test_test_large_file_list_truncation_basic,
+        test_test_batch_text_join_performance_basic,
+        test_test_jsonl_format_write_basic,
+        test_test_jsonl_append_vs_full_write_basic,
+        test_test_health_check_methods_exist_basic,
+        test_test_pool_singleton_basic,
+        test_test_converters_module_lazy_load_basic,
+        test_test_getattr_mechanism_basic,
+        test_test_import_time_under_threshold_basic,
+        test_test_no_memory_leak_in_record_list_basic,
+        test_test_converter_module_structure_basic,
+        test_test_pdf_tools_exports_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_performance_v2: {e}")
 
 # Test for test_test_render_id_increments_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test_render_id_increments with valid input....

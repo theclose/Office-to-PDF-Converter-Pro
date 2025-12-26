@@ -1,65 +1,72 @@
 """
-Auto-generated tests for test_generated_excel (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.868987
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_excel (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.294013
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_excel.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_excel import (
+        TestCleanup,
+        TestConvert,
+        TestInitialize,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_excel: {e}")
 
-# Test for test_initialize_basic (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for TestInitialize.test_initialize_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test initialize with valid input....
 
-def test_test_initialize_basic_basic():
-    """Test test_initialize_basic with valid input."""
-    result = test_initialize_basic()
+def test_TestInitialize_test_initialize_basic_basic():
+    """Test TestInitialize_test_initialize_basic with valid input."""
+    result = TestInitialize().test_initialize_basic()
     assert result is not None
 
 
-# Test for test_initialize_edge_cases (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for TestInitialize.test_initialize_edge_cases (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test initialize with edge cases....
 
-def test_test_initialize_edge_cases_basic():
-    """Test test_initialize_edge_cases with valid input."""
-    result = test_initialize_edge_cases()
+def test_TestInitialize_test_initialize_edge_cases_basic():
+    """Test TestInitialize_test_initialize_edge_cases with valid input."""
+    result = TestInitialize().test_initialize_edge_cases()
     assert result is not None
 
 
-# Test for test_cleanup_basic (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for TestCleanup.test_cleanup_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test cleanup with valid input....
 
-def test_test_cleanup_basic_basic():
-    """Test test_cleanup_basic with valid input."""
-    result = test_cleanup_basic()
+def test_TestCleanup_test_cleanup_basic_basic():
+    """Test TestCleanup_test_cleanup_basic with valid input."""
+    result = TestCleanup().test_cleanup_basic()
     assert result is not None
 
 
-# Test for test_cleanup_edge_cases (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for TestCleanup.test_cleanup_edge_cases (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test cleanup with edge cases....
 
-def test_test_cleanup_edge_cases_basic():
-    """Test test_cleanup_edge_cases with valid input."""
-    result = test_cleanup_edge_cases()
+def test_TestCleanup_test_cleanup_edge_cases_basic():
+    """Test TestCleanup_test_cleanup_edge_cases with valid input."""
+    result = TestCleanup().test_cleanup_edge_cases()
     assert result is not None
 
 
-# Test for test_convert_basic (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for TestConvert.test_convert_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test convert with valid input....
 
-def test_test_convert_basic_basic():
-    """Test test_convert_basic with valid input."""
-    result = test_convert_basic()
+def test_TestConvert_test_convert_basic_basic():
+    """Test TestConvert_test_convert_basic with valid input."""
+    result = TestConvert().test_convert_basic()
     assert result is not None
 
 
-# Test for test_convert_edge_cases (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for TestConvert.test_convert_edge_cases (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test convert with edge cases....
 
-def test_test_convert_edge_cases_basic():
-    """Test test_convert_edge_cases with valid input."""
-    result = test_convert_edge_cases()
+def test_TestConvert_test_convert_edge_cases_basic():
+    """Test TestConvert_test_convert_edge_cases with valid input."""
+    result = TestConvert().test_convert_edge_cases()
     assert result is not None
 

@@ -1,34 +1,43 @@
 """
-Auto-generated tests for updater (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:23.386992
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for updater (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:17.866690
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\utils\updater.py
-# TODO: Adjust import path
+try:
+    from utils.updater import (
+        UpdateChecker,
+        show_update_dialog,
+        check_for_updates_on_startup,
+        on_result,
+        download,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from utils.updater: {e}")
 
-# Test for check (complexity: 10, coverage: 0%, priority: 0.62)
+# Test for UpdateChecker.check (complexity: 10, coverage: 0%, priority: 0.62)
 # Doc: Check for updates synchronously....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_check_parametrized(input, expected):
-    """Test check with various inputs."""
-    result = check(input)
+def test_UpdateChecker_check_parametrized(input, expected):
+    """Test UpdateChecker_check with various inputs."""
+    result = UpdateChecker().check(input)
     assert result == expected
 
 
-# Test for open_download (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for UpdateChecker.open_download (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Open download URL in browser....
 
-def test_open_download_basic():
-    """Test open_download with valid input."""
-    result = open_download('url_test')
+def test_UpdateChecker_open_download_basic():
+    """Test UpdateChecker_open_download with valid input."""
+    result = UpdateChecker().open_download('url_test')
     assert result is not None
 
 
@@ -58,12 +67,11 @@ def test_on_result_basic():
     assert result is not None
 
 
-# Test for check_async (complexity: 1, coverage: 0%, priority: 0.47)
-# Doc: Check for updates asynchronously....
+# Test for UpdateChecker.__init__ (complexity: 2, coverage: 0%, priority: 0.48)
 
-def test_check_async_basic():
-    """Test check_async with valid input."""
-    result = check_async(None)
+def test_UpdateChecker___init___basic():
+    """Test UpdateChecker___init__ with valid input."""
+    result = UpdateChecker().__init__('current_version_test')
     assert result is not None
 
 
@@ -75,10 +83,11 @@ def test_download_basic():
     assert result is not None
 
 
-# Test for __init__ (complexity: 2, coverage: 0%, priority: 0.33)
+# Test for UpdateChecker.check_async (complexity: 1, coverage: 0%, priority: 0.47)
+# Doc: Check for updates asynchronously....
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('current_version_test')
+def test_UpdateChecker_check_async_basic():
+    """Test UpdateChecker_check_async with valid input."""
+    result = UpdateChecker().check_async(None)
     assert result is not None
 

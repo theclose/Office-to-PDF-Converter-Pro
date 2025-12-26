@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_check_code_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.854846
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_check_code_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.221107
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_check_code_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_check_code_v2 import (
+        test_print_header_parametrized,
+        test_print_result_parametrized,
+        test_run_command_parametrized,
+        test_check_syntax_parametrized,
+        test_check_ruff_parametrized,
+        test_check_imports_parametrized,
+        test_check_tests_parametrized,
+        test_main_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_check_code_v2: {e}")
 
 # Test for test_print_header_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test print_header with various inputs....

@@ -1,14 +1,22 @@
 """
-Auto-generated tests for libreoffice (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.687962
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for libreoffice (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.737548
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\converters\libreoffice.py
-# TODO: Adjust import path
+try:
+    from converters.libreoffice import (
+        LibreOfficeConverter,
+        find_libreoffice,
+        get_libreoffice_version,
+        is_libreoffice_available,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from converters.libreoffice: {e}")
 
 # Test for find_libreoffice (complexity: 9, coverage: 0%, priority: 0.61)
 # Doc: Find LibreOffice soffice executable....
@@ -23,16 +31,16 @@ def test_find_libreoffice_parametrized(input, expected):
     assert result == expected
 
 
-# Test for convert (complexity: 9, coverage: 0%, priority: 0.61)
+# Test for LibreOfficeConverter.convert (complexity: 9, coverage: 0%, priority: 0.61)
 # Doc: Convert document to PDF using LibreOffice.  Args:     input_...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_convert_parametrized(input, expected):
-    """Test convert with various inputs."""
-    result = convert(input)
+def test_LibreOfficeConverter_convert_parametrized(input, expected):
+    """Test LibreOfficeConverter_convert with various inputs."""
+    result = LibreOfficeConverter().convert(input)
     assert result == expected
 
 
@@ -49,16 +57,16 @@ def test_get_libreoffice_version_parametrized(input, expected):
     assert result == expected
 
 
-# Test for initialize (complexity: 3, coverage: 0%, priority: 0.50)
+# Test for LibreOfficeConverter.initialize (complexity: 3, coverage: 0%, priority: 0.50)
 # Doc: Check if LibreOffice is available....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_initialize_parametrized(input, expected):
-    """Test initialize with various inputs."""
-    result = initialize(input)
+def test_LibreOfficeConverter_initialize_parametrized(input, expected):
+    """Test LibreOfficeConverter_initialize with various inputs."""
+    result = LibreOfficeConverter().initialize(input)
     assert result == expected
 
 
@@ -75,19 +83,19 @@ def test_is_libreoffice_available_parametrized(input, expected):
     assert result == expected
 
 
-# Test for cleanup (complexity: 1, coverage: 0%, priority: 0.47)
-# Doc: No cleanup needed for LibreOffice....
+# Test for LibreOfficeConverter.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test_cleanup_basic():
-    """Test cleanup with valid input."""
-    result = cleanup()
+def test_LibreOfficeConverter___init___basic():
+    """Test LibreOfficeConverter___init__ with valid input."""
+    result = LibreOfficeConverter().__init__()
     assert result is not None
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for LibreOfficeConverter.cleanup (complexity: 1, coverage: 0%, priority: 0.47)
+# Doc: No cleanup needed for LibreOffice....
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__()
+def test_LibreOfficeConverter_cleanup_basic():
+    """Test LibreOfficeConverter_cleanup with valid input."""
+    result = LibreOfficeConverter().cleanup()
     assert result is not None
 

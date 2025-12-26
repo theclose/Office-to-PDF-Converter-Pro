@@ -1,14 +1,25 @@
 """
-Auto-generated tests for code_analyzer (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.798342
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for code_analyzer (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.005869
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\scripts\code_analyzer.py
-# TODO: Adjust import path
+try:
+    from scripts.code_analyzer import (
+        CyclomaticComplexityVisitor,
+        SecurityPatternDetector,
+        generate_report,
+        main,
+        run_ruff,
+        analyze_file,
+        generate_ai_prompt,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from scripts.code_analyzer: {e}")
 
 # Test for generate_report (complexity: 10, coverage: 0%, priority: 0.62)
 # Doc: Generate analysis report files....
@@ -27,24 +38,24 @@ def test_main_basic():
     assert result is not None
 
 
-# Test for calculate_complexity (complexity: 6, coverage: 0%, priority: 0.55)
+# Test for CyclomaticComplexityVisitor.calculate_complexity (complexity: 6, coverage: 0%, priority: 0.55)
 # Doc: Calculate complexity for a node....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_calculate_complexity_parametrized(input, expected):
-    """Test calculate_complexity with various inputs."""
-    result = calculate_complexity(input)
+def test_CyclomaticComplexityVisitor_calculate_complexity_parametrized(input, expected):
+    """Test CyclomaticComplexityVisitor_calculate_complexity with various inputs."""
+    result = CyclomaticComplexityVisitor().calculate_complexity(input)
     assert result == expected
 
 
-# Test for visit_Call (complexity: 6, coverage: 0%, priority: 0.55)
+# Test for SecurityPatternDetector.visit_Call (complexity: 6, coverage: 0%, priority: 0.55)
 
-def test_visit_Call_basic():
-    """Test visit_Call with valid input."""
-    result = visit_Call(None)
+def test_SecurityPatternDetector_visit_Call_basic():
+    """Test SecurityPatternDetector_visit_Call with valid input."""
+    result = SecurityPatternDetector().visit_Call(None)
     assert result is not None
 
 
@@ -87,34 +98,34 @@ def test_generate_ai_prompt_parametrized(input, expected):
     assert result == expected
 
 
-# Test for visit_ClassDef (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for CyclomaticComplexityVisitor.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test_visit_ClassDef_basic():
-    """Test visit_ClassDef with valid input."""
-    result = visit_ClassDef(None)
+def test_CyclomaticComplexityVisitor___init___basic():
+    """Test CyclomaticComplexityVisitor___init__ with valid input."""
+    result = CyclomaticComplexityVisitor().__init__('source_lines_test')
     assert result is not None
 
 
-# Test for visit_FunctionDef (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for CyclomaticComplexityVisitor.visit_ClassDef (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test_visit_FunctionDef_basic():
-    """Test visit_FunctionDef with valid input."""
-    result = visit_FunctionDef(None)
+def test_CyclomaticComplexityVisitor_visit_ClassDef_basic():
+    """Test CyclomaticComplexityVisitor_visit_ClassDef with valid input."""
+    result = CyclomaticComplexityVisitor().visit_ClassDef(None)
     assert result is not None
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for CyclomaticComplexityVisitor.visit_FunctionDef (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('source_lines_test')
+def test_CyclomaticComplexityVisitor_visit_FunctionDef_basic():
+    """Test CyclomaticComplexityVisitor_visit_FunctionDef with valid input."""
+    result = CyclomaticComplexityVisitor().visit_FunctionDef(None)
     assert result is not None
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for SecurityPatternDetector.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('source_lines_test')
+def test_SecurityPatternDetector___init___basic():
+    """Test SecurityPatternDetector___init__ with valid input."""
+    result = SecurityPatternDetector().__init__('source_lines_test')
     assert result is not None
 

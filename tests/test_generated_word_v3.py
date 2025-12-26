@@ -1,54 +1,59 @@
 """
-Auto-generated tests for word (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.695898
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for word (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.743879
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\converters\word.py
-# TODO: Adjust import path
+try:
+    from converters.word import (
+        WordConverter,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from converters.word: {e}")
 
-# Test for convert (complexity: 14, coverage: 0%, priority: 0.69)
+# Test for WordConverter.convert (complexity: 14, coverage: 0%, priority: 0.69)
 # Doc: Convert Word document to PDF....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_convert_parametrized(input, expected):
-    """Test convert with various inputs."""
-    result = convert(input)
+def test_WordConverter_convert_parametrized(input, expected):
+    """Test WordConverter_convert with various inputs."""
+    result = WordConverter().convert(input)
     assert result == expected
 
 
-# Test for initialize (complexity: 4, coverage: 0%, priority: 0.52)
+# Test for WordConverter.initialize (complexity: 4, coverage: 0%, priority: 0.52)
 # Doc: Get Word COM from pool....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_initialize_parametrized(input, expected):
-    """Test initialize with various inputs."""
-    result = initialize(input)
+def test_WordConverter_initialize_parametrized(input, expected):
+    """Test WordConverter_initialize with various inputs."""
+    result = WordConverter().initialize(input)
     assert result == expected
 
 
-# Test for cleanup (complexity: 4, coverage: 0%, priority: 0.52)
+# Test for WordConverter.cleanup (complexity: 4, coverage: 0%, priority: 0.52)
 # Doc: Release Word resources....
 
-def test_cleanup_basic():
-    """Test cleanup with valid input."""
-    result = cleanup()
+def test_WordConverter_cleanup_basic():
+    """Test WordConverter_cleanup with valid input."""
+    result = WordConverter().cleanup()
     assert result is not None
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for WordConverter.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('log_callback_test', None)
+def test_WordConverter___init___basic():
+    """Test WordConverter___init__ with valid input."""
+    result = WordConverter().__init__('log_callback_test', None)
     assert result is not None
 

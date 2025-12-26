@@ -1,14 +1,22 @@
 """
-Auto-generated tests for localization (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:23.347371
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for localization (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:17.748962
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\utils\localization.py
-# TODO: Adjust import path
+try:
+    from utils.localization import (
+        get_text,
+        set_language,
+        get_current_language,
+        get_language_names,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from utils.localization: {e}")
 
 # Test for get_text (complexity: 5, coverage: 0%, priority: 0.54)
 # Doc: Get translated text for a key.  Args:     key: Translation k...

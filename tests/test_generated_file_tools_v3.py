@@ -1,6 +1,6 @@
 """
 Auto-generated tests for file_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T00:16:38.023483
+Generated: 2025-12-27T00:19:13.825158
 Generator: Class-Aware + Smart Prioritized
 """
 

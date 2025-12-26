@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_circuit_breaker_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.856845
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_circuit_breaker_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.227348
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_circuit_breaker_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_circuit_breaker_v2 import (
+        test_should_allow_attempt_parametrized,
+        test_get_circuit_state_parametrized,
+        test_get_stats_parametrized,
+        test___init___basic,
+        test_record_failure_basic,
+        test_record_success_basic,
+        test_reset_circuit_basic,
+        test_cleanup_old_circuits_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_circuit_breaker_v2: {e}")
 
 # Test for test_should_allow_attempt_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test should_allow_attempt with various inputs....

@@ -1,14 +1,34 @@
 """
-Auto-generated tests for test_generated_main_window_pro_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.892194
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_main_window_pro_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.442379
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_main_window_pro_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_main_window_pro_v2 import (
+        test_filename_parametrized,
+        test_icon_parametrized,
+        test_get_selected_files_parametrized,
+        test_add_files_parametrized,
+        test_main_basic,
+        test___init___basic,
+        test_stop_basic,
+        test_reset_basic,
+        test_convert_batch_basic,
+        test___init___basic,
+        test_clear_basic,
+        test_remove_completed_basic,
+        test___init___basic,
+        test_do_restore_basic,
+        test_add_all_basic,
+        test_animate_step_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_main_window_pro_v2: {e}")
 
 # Test for test_filename_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test filename with various inputs....

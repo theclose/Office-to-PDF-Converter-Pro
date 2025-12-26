@@ -1,14 +1,28 @@
 """
-Auto-generated tests for test_generated_test_shim_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.996503
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_shim_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.806346
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_shim_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_shim_v2 import (
+        test_setup_method_basic,
+        test_teardown_method_basic,
+        test_test_installation_basic,
+        test_test_uninstallation_basic,
+        test_test_legacy_import_neutralization_basic,
+        test_test_multiple_legacy_imports_basic,
+        test_test_normal_imports_unaffected_basic,
+        test_test_shim_stats_basic,
+        test_test_uninstall_clears_shimmed_modules_basic,
+        test_test_custom_neutralized_modules_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_shim_v2: {e}")
 
 # Test for test_setup_method_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test setup_method with valid input....

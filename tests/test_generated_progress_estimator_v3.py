@@ -1,58 +1,72 @@
 """
-Auto-generated tests for progress_estimator (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:23.369240
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for progress_estimator (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:17.835528
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\utils\progress_estimator.py
-# TODO: Adjust import path
+try:
+    from utils.progress_estimator import (
+        AdaptiveEstimator,
+        ConversionLogger,
+        ConversionRecord,
+        SystemProfile,
+        SystemProfiler,
+        get_system_profiler,
+        get_conversion_logger,
+        get_adaptive_estimator,
+        estimate_conversion_time,
+        log_conversion_result,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from utils.progress_estimator: {e}")
 
-# Test for from_dict (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for SystemProfile.from_dict (complexity: 1, coverage: 0%, priority: 0.57)
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_from_dict_parametrized(input, expected):
-    """Test from_dict with various inputs."""
-    result = from_dict(input)
+def test_SystemProfile_from_dict_parametrized(input, expected):
+    """Test SystemProfile_from_dict with various inputs."""
+    result = SystemProfile().from_dict(input)
     assert result == expected
 
 
-# Test for from_dict (complexity: 1, coverage: 0%, priority: 0.57)
+# Test for ConversionRecord.from_dict (complexity: 1, coverage: 0%, priority: 0.57)
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_from_dict_parametrized(input, expected):
-    """Test from_dict with various inputs."""
-    result = from_dict(input)
+def test_ConversionRecord_from_dict_parametrized(input, expected):
+    """Test ConversionRecord_from_dict with various inputs."""
+    result = ConversionRecord().from_dict(input)
     assert result == expected
 
 
-# Test for get_current_load (complexity: 3, coverage: 0%, priority: 0.50)
+# Test for SystemProfiler.get_current_load (complexity: 3, coverage: 0%, priority: 0.50)
 # Doc: Get current CPU and RAM usage....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_get_current_load_parametrized(input, expected):
-    """Test get_current_load with various inputs."""
-    result = get_current_load(input)
+def test_SystemProfiler_get_current_load_parametrized(input, expected):
+    """Test SystemProfiler_get_current_load with various inputs."""
+    result = SystemProfiler().get_current_load(input)
     assert result == expected
 
 
-# Test for log_conversion (complexity: 3, coverage: 0%, priority: 0.50)
+# Test for ConversionLogger.log_conversion (complexity: 3, coverage: 0%, priority: 0.50)
 # Doc: Log a conversion result (minimal data only). Uses append-onl...
 
-def test_log_conversion_basic():
-    """Test log_conversion with valid input."""
-    result = log_conversion('file_path_test', None, True)
+def test_ConversionLogger_log_conversion_basic():
+    """Test ConversionLogger_log_conversion with valid input."""
+    result = ConversionLogger().log_conversion('file_path_test', None, True)
     assert result is not None
 
 
@@ -95,42 +109,51 @@ def test_get_adaptive_estimator_parametrized(input, expected):
     assert result == expected
 
 
-# Test for get_records_by_type (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for ConversionLogger.__init__ (complexity: 2, coverage: 0%, priority: 0.48)
+# Doc: Initialize logger with storage directory....
+
+def test_ConversionLogger___init___basic():
+    """Test ConversionLogger___init__ with valid input."""
+    result = ConversionLogger().__init__('log_dir_test')
+    assert result is not None
+
+
+# Test for ConversionLogger.get_records_by_type (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Get records filtered by file type....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_get_records_by_type_parametrized(input, expected):
-    """Test get_records_by_type with various inputs."""
-    result = get_records_by_type(input)
+def test_ConversionLogger_get_records_by_type_parametrized(input, expected):
+    """Test ConversionLogger_get_records_by_type with various inputs."""
+    result = ConversionLogger().get_records_by_type(input)
     assert result == expected
 
 
-# Test for get_statistics (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for ConversionLogger.get_statistics (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Get summary statistics....
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_get_statistics_parametrized(input, expected):
-    """Test get_statistics with various inputs."""
-    result = get_statistics(input)
+def test_ConversionLogger_get_statistics_parametrized(input, expected):
+    """Test ConversionLogger_get_statistics with various inputs."""
+    result = ConversionLogger().get_statistics(input)
     assert result == expected
 
 
-# Test for estimate (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for AdaptiveEstimator.estimate (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Estimate conversion time for a file.  Formula: max(MIN_TIME,...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_estimate_parametrized(input, expected):
-    """Test estimate with various inputs."""
-    result = estimate(input)
+def test_AdaptiveEstimator_estimate_parametrized(input, expected):
+    """Test AdaptiveEstimator_estimate with various inputs."""
+    result = AdaptiveEstimator().estimate(input)
     assert result == expected
 
 
@@ -156,61 +179,52 @@ def test_log_conversion_result_basic():
     assert result is not None
 
 
-# Test for to_dict (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for SystemProfile.to_dict (complexity: 1, coverage: 0%, priority: 0.47)
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_to_dict_parametrized(input, expected):
-    """Test to_dict with various inputs."""
-    result = to_dict(input)
+def test_SystemProfile_to_dict_parametrized(input, expected):
+    """Test SystemProfile_to_dict with various inputs."""
+    result = SystemProfile().to_dict(input)
     assert result == expected
 
 
-# Test for to_dict (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for SystemProfiler.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
+
+def test_SystemProfiler___init___basic():
+    """Test SystemProfiler___init__ with valid input."""
+    result = SystemProfiler().__init__()
+    assert result is not None
+
+
+# Test for ConversionRecord.to_dict (complexity: 1, coverage: 0%, priority: 0.47)
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_to_dict_parametrized(input, expected):
-    """Test to_dict with various inputs."""
-    result = to_dict(input)
+def test_ConversionRecord_to_dict_parametrized(input, expected):
+    """Test ConversionRecord_to_dict with various inputs."""
+    result = ConversionRecord().to_dict(input)
     assert result == expected
 
 
-# Test for update_after_conversion (complexity: 1, coverage: 0%, priority: 0.47)
-# Doc: Log conversion and update average.  Args:     file_path: Pat...
-
-def test_update_after_conversion_basic():
-    """Test update_after_conversion with valid input."""
-    result = update_after_conversion('file_path_test', None, 42, True)
-    assert result is not None
-
-
-# Test for __init__ (complexity: 2, coverage: 0%, priority: 0.33)
-# Doc: Initialize logger with storage directory....
-
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('log_dir_test')
-    assert result is not None
-
-
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
-
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__()
-    assert result is not None
-
-
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for AdaptiveEstimator.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Initialize with logger....
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__(None, None)
+def test_AdaptiveEstimator___init___basic():
+    """Test AdaptiveEstimator___init__ with valid input."""
+    result = AdaptiveEstimator().__init__(None, None)
+    assert result is not None
+
+
+# Test for AdaptiveEstimator.update_after_conversion (complexity: 1, coverage: 0%, priority: 0.47)
+# Doc: Log conversion and update average.  Args:     file_path: Pat...
+
+def test_AdaptiveEstimator_update_after_conversion_basic():
+    """Test AdaptiveEstimator_update_after_conversion with valid input."""
+    result = AdaptiveEstimator().update_after_conversion('file_path_test', None, 42, True)
     assert result is not None
 

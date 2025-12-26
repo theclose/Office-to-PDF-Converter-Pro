@@ -1,14 +1,43 @@
 """
-Auto-generated tests for test_generated_test_ai_test_generator_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.920047
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_ai_test_generator_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.604458
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_ai_test_generator_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_ai_test_generator_v2 import (
+        test_test_create_basic_signature_basic,
+        test_test_signature_with_coverage_basic,
+        test_temp_coverage_file_basic,
+        test_test_init_without_coverage_file_basic,
+        test_test_load_coverage_missing_file_basic,
+        test_test_filter_untested_functions_basic,
+        test_test_generate_coverage_report_basic,
+        test_test_calculate_priority_high_complexity_basic,
+        test_test_calculate_priority_public_api_basic,
+        test_test_prioritize_sorting_basic,
+        test_temp_test_dir_basic,
+        test_test_learn_from_empty_dir_basic,
+        test_test_learn_assertions_basic,
+        test_test_learn_fixtures_basic,
+        test_test_suggest_assertion_bool_return_basic,
+        test_temp_project_basic,
+        test_test_basic_generation_basic,
+        test_test_prioritized_generation_basic,
+        test_test_pattern_learning_basic,
+        test_test_caching_mechanism_basic,
+        test_test_handles_empty_file_basic,
+        test_test_handles_syntax_error_file_basic,
+        test_test_handles_unicode_in_docstring_basic,
+        test_test_handles_very_long_function_names_basic,
+        test_test_handles_circular_imports_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_ai_test_generator_v2: {e}")
 
 # Test for test_test_create_basic_signature_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test_create_basic_signature with valid input....

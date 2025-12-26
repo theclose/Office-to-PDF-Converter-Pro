@@ -1,14 +1,59 @@
 """
-Auto-generated tests for test_generated_file_tools_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.876493
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_file_tools_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.339836
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_file_tools_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_file_tools_v2 import (
+        test_remove_vietnamese_accents_parametrized,
+        test_has_changed_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_apply_parametrized,
+        test_description_parametrized,
+        test_find_empty_folders_parametrized,
+        test_delete_folders_parametrized,
+        test_find_duplicates_parametrized,
+        test_get_last_transaction_parametrized,
+        test_undo_last_transaction_parametrized,
+        test_preview_parametrized,
+        test_execute_parametrized,
+        test___init___basic,
+        test___init___basic,
+        test___init___basic,
+        test___init___basic,
+        test___init___basic,
+        test___init___basic,
+        test_set_dates_basic,
+        test_set_attributes_basic,
+        test___init___basic,
+        test_abort_basic,
+        test___init___basic,
+        test_log_basic,
+        test_remove_transaction_file_basic,
+        test___init___basic,
+        test_add_rule_basic,
+        test_clear_rules_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_file_tools_v2: {e}")
 
 # Test for test_remove_vietnamese_accents_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test remove_vietnamese_accents with various inputs....

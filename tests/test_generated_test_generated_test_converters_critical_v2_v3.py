@@ -1,14 +1,46 @@
 """
-Auto-generated tests for test_generated_test_converters_critical_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.926148
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_converters_critical_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.684711
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_converters_critical_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_converters_critical_v2 import (
+        test_supports_file_parametrized,
+        test_test_ensure_com_initialized_creates_new_thread_basic,
+        test_test_ensure_com_handles_already_initialized_basic,
+        test_test_release_com_uninitializes_basic,
+        test_test_get_converter_for_supported_files_basic,
+        test_test_get_converter_for_unsupported_files_basic,
+        test_test_get_converter_case_insensitive_basic,
+        test_test_get_best_converter_prefers_native_basic,
+        test_test_get_best_converter_fallback_to_libreoffice_basic,
+        test_mock_converter_basic,
+        test_test_converter_supports_file_check_basic,
+        test_test_converter_lifecycle_basic,
+        test_test_progress_callback_invoked_basic,
+        test_test_log_callback_invoked_basic,
+        test_sample_files_basic,
+        test_test_converter_handles_missing_input_file_basic,
+        test_test_converter_creates_output_directory_basic,
+        test_test_converter_thread_safety_basic,
+        test_test_get_converter_with_very_long_filename_basic,
+        test_test_get_converter_with_special_characters_basic,
+        test_test_converter_with_no_extension_basic,
+        test_test_converter_with_multiple_dots_basic,
+        test_progress_cb_basic,
+        test_log_cb_basic,
+        test_convert_in_thread_basic,
+        test_initialize_basic,
+        test_convert_basic,
+        test_cleanup_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_converters_critical_v2: {e}")
 
 # Test for test_supports_file_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test supports_file with various inputs....

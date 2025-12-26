@@ -1,14 +1,23 @@
 """
-Auto-generated tests for test_generated_virtual_list_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.999837
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_virtual_list_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.829894
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_virtual_list_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_virtual_list_v2 import (
+        test_default_file_renderer_parametrized,
+        test_get_selected_item_parametrized,
+        test___init___basic,
+        test_set_items_basic,
+        test_clear_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_virtual_list_v2: {e}")
 
 # Test for test_default_file_renderer_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test default_file_renderer with various inputs....

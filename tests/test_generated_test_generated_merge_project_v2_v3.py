@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_merge_project_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.895196
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_merge_project_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.472239
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_merge_project_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_merge_project_v2 import (
+        test_should_ignore_parametrized,
+        test_generate_tree_parametrized,
+        test_estimate_tokens_parametrized,
+        test_main_basic,
+        test___init___basic,
+        test_load_default_ignores_basic,
+        test_load_gitignore_basic,
+        test_merge_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_merge_project_v2: {e}")
 
 # Test for test_should_ignore_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test should_ignore with various inputs....

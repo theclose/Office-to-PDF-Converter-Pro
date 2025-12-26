@@ -1,14 +1,28 @@
 """
-Auto-generated tests for test_generated_test_bug_fixes_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.924148
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_bug_fixes_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.635666
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_bug_fixes_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_bug_fixes_v2 import (
+        test_test_parse_page_range_without_total_pages_basic,
+        test_test_parse_page_range_with_total_pages_basic,
+        test_test_parse_page_range_empty_string_basic,
+        test_test_parse_page_range_reversed_range_basic,
+        test_test_parse_page_range_single_page_basic,
+        test_test_utils_pdf_tools_imports_from_core_basic,
+        test_test_all_expected_functions_available_in_utils_basic,
+        test_test_main_window_imports_without_error_basic,
+        test_test_parse_page_range_handles_invalid_input_basic,
+        test_test_merge_pdfs_handles_missing_files_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_bug_fixes_v2: {e}")
 
 # Test for test_test_parse_page_range_without_total_pages_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test_parse_page_range_without_total_pages with valid in...

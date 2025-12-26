@@ -1,14 +1,29 @@
 """
-Auto-generated tests for test_generated_parallel_converter_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.900294
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_parallel_converter_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.490026
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_parallel_converter_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_parallel_converter_v2 import (
+        test_get_parallel_converter_parametrized,
+        test_to_dict_parametrized,
+        test_submit_parametrized,
+        test_get_results_parametrized,
+        test_get_pending_count_parametrized,
+        test_is_running_parametrized,
+        test_get_worker_status_parametrized,
+        test_shutdown_parallel_converter_basic,
+        test___init___basic,
+        test_start_basic,
+        test_stop_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_parallel_converter_v2: {e}")
 
 # Test for test_get_parallel_converter_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test get_parallel_converter with various inputs....

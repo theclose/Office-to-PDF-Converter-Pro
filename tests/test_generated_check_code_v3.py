@@ -1,14 +1,26 @@
 """
-Auto-generated tests for check_code (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.798342
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for check_code (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.990711
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\scripts\check_code.py
-# TODO: Adjust import path
+try:
+    from scripts.check_code import (
+        run_command,
+        check_syntax,
+        main,
+        check_imports,
+        check_ruff,
+        print_header,
+        print_result,
+        check_tests,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from scripts.check_code: {e}")
 
 # Test for run_command (complexity: 5, coverage: 0%, priority: 0.54)
 

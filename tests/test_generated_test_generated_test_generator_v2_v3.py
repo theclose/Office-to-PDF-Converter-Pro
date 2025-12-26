@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_test_generator_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.987456
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_generator_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.580206
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_generator_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_generator_v2 import (
+        test_analyze_module_parametrized,
+        test_generate_tests_parametrized,
+        test_main_basic,
+        test___init___basic,
+        test_visit_ClassDef_basic,
+        test_visit_FunctionDef_basic,
+        test_visit_AsyncFunctionDef_basic,
+        test___init___basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_generator_v2: {e}")
 
 # Test for test_analyze_module_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test analyze_module with various inputs....

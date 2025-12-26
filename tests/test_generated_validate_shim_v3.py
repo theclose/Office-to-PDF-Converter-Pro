@@ -1,14 +1,19 @@
 """
-Auto-generated tests for validate_shim (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.683961
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for validate_shim (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.725835
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\validate_shim.py
-# TODO: Adjust import path
+try:
+    from validate_shim import (
+        validate,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from validate_shim: {e}")
 
 # Test for validate (complexity: 11, coverage: 0%, priority: 0.64)
 # Doc: Run comprehensive shim layer validation....

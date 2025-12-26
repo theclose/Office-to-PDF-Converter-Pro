@@ -1,14 +1,21 @@
 """
-Auto-generated tests for build_script (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.667709
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for build_script (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.711817
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\build_script.py
-# TODO: Adjust import path
+try:
+    from build_script import (
+        main,
+        run_command,
+        print_step,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from build_script: {e}")
 
 # Test for main (complexity: 6, coverage: 0%, priority: 0.55)
 

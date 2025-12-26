@@ -1,14 +1,34 @@
 """
-Auto-generated tests for test_generated_test_generated_circuit_breaker_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.930348
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_generated_circuit_breaker_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.787743
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_generated_circuit_breaker_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_generated_circuit_breaker_v2 import (
+        test_test___init___basic_basic,
+        test_test___init___edge_cases_basic,
+        test_test_should_allow_attempt_basic_basic,
+        test_test_should_allow_attempt_edge_cases_basic,
+        test_test_record_failure_basic_basic,
+        test_test_record_failure_edge_cases_basic,
+        test_test_record_success_basic_basic,
+        test_test_record_success_edge_cases_basic,
+        test_test_get_circuit_state_basic_basic,
+        test_test_get_circuit_state_edge_cases_basic,
+        test_test_reset_circuit_basic_basic,
+        test_test_reset_circuit_edge_cases_basic,
+        test_test_get_stats_basic_basic,
+        test_test_get_stats_edge_cases_basic,
+        test_test_cleanup_old_circuits_basic_basic,
+        test_test_cleanup_old_circuits_edge_cases_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_generated_circuit_breaker_v2: {e}")
 
 # Test for test_test___init___basic_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test test___init___basic with valid input....

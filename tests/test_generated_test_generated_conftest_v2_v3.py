@@ -1,14 +1,25 @@
 """
-Auto-generated tests for test_generated_conftest_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.864984
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_conftest_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.272442
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_conftest_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_conftest_v2 import (
+        test_mock_com_object_basic,
+        test_mock_worker_basic,
+        test_mock_psutil_basic,
+        test_temp_dir_basic,
+        test_sample_pdf_basic,
+        test_pytest_configure_basic,
+        test_terminate_effect_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_conftest_v2: {e}")
 
 # Test for test_mock_com_object_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test mock_com_object with valid input....

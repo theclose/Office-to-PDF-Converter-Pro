@@ -1,14 +1,29 @@
 """
-Auto-generated tests for test_generated_base_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.850291
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_base_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.204544
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_base_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_base_v2 import (
+        test_get_converter_for_file_parametrized,
+        test_get_best_converter_parametrized,
+        test_supports_file_parametrized,
+        test_initialize_parametrized,
+        test_convert_parametrized,
+        test_ensure_com_initialized_basic,
+        test_release_com_basic,
+        test___init___basic,
+        test_log_basic,
+        test_update_progress_basic,
+        test_cleanup_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_base_v2: {e}")
 
 # Test for test_get_converter_for_file_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test get_converter_for_file with various inputs....

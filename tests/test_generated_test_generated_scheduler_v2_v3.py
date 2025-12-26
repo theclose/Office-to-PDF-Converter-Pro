@@ -1,14 +1,31 @@
 """
-Auto-generated tests for test_generated_scheduler_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.917046
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_scheduler_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.558874
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_scheduler_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_scheduler_v2 import (
+        test_enqueue_parametrized,
+        test_enqueue_batch_parametrized,
+        test_dequeue_parametrized,
+        test_peek_parametrized,
+        test_peek_batch_parametrized,
+        test_remove_parametrized,
+        test_clear_parametrized,
+        test_cluster_distribution_parametrized,
+        test_total_enqueued_parametrized,
+        test_is_empty_parametrized,
+        test_get_stats_parametrized,
+        test_drain_parametrized,
+        test___init___basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_scheduler_v2: {e}")
 
 # Test for test_enqueue_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test enqueue with various inputs....

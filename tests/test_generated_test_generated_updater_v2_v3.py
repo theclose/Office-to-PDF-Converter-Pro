@@ -1,14 +1,26 @@
 """
-Auto-generated tests for test_generated_updater_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.998038
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_updater_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:16.819308
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_updater_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_updater_v2 import (
+        test_check_parametrized,
+        test_show_update_dialog_basic,
+        test_check_for_updates_on_startup_basic,
+        test___init___basic,
+        test_check_async_basic,
+        test_open_download_basic,
+        test_on_result_basic,
+        test_download_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_updater_v2: {e}")
 
 # Test for test_check_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test check with various inputs....

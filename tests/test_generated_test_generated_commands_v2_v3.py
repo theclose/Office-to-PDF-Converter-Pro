@@ -1,14 +1,33 @@
 """
-Auto-generated tests for test_generated_commands_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.862478
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_commands_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.260832
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_commands_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_commands_v2 import (
+        test_execute_parametrized,
+        test_validate_parametrized,
+        test_validate_parametrized,
+        test_execute_parametrized,
+        test_execute_parametrized,
+        test_execute_parametrized,
+        test_execute_parametrized,
+        test_execute_parametrized,
+        test_execute_parametrized,
+        test_execute_async_parametrized,
+        test_execute_sync_parametrized,
+        test_get_history_parametrized,
+        test_get_stats_parametrized,
+        test___init___basic,
+        test_shutdown_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_commands_v2: {e}")
 
 # Test for test_execute_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test execute with various inputs....

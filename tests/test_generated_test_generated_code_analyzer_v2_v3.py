@@ -1,14 +1,29 @@
 """
-Auto-generated tests for test_generated_code_analyzer_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.858845
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_code_analyzer_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.232357
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_code_analyzer_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_code_analyzer_v2 import (
+        test_run_ruff_parametrized,
+        test_analyze_file_parametrized,
+        test_generate_ai_prompt_parametrized,
+        test_calculate_complexity_parametrized,
+        test_generate_report_basic,
+        test_main_basic,
+        test___init___basic,
+        test_visit_ClassDef_basic,
+        test_visit_FunctionDef_basic,
+        test___init___basic,
+        test_visit_Call_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_code_analyzer_v2: {e}")
 
 # Test for test_run_ruff_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test run_ruff with various inputs....

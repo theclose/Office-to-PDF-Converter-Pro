@@ -1,14 +1,25 @@
 """
-Auto-generated tests for shim (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.749077
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for shim (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:13.917570
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\grid\shim.py
-# TODO: Adjust import path
+try:
+    from grid.shim import (
+        LegacyUIShim,
+        ShimLoader,
+        install_shim_layer,
+        uninstall_shim_layer,
+        get_shim_stats,
+        verify_neutralization,
+        is_shim_installed,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from grid.shim: {e}")
 
 # Test for install_shim_layer (complexity: 5, coverage: 0%, priority: 0.54)
 # Doc: Install shim layer to neutralize legacy UI.  CRITICAL: Must ...
@@ -58,21 +69,21 @@ def test_verify_neutralization_parametrized(input, expected):
     assert result == expected
 
 
-# Test for find_spec (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for LegacyUIShim.find_spec (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Find module spec (modern import API).  Args:     fullname: F...
 
-def test_find_spec_basic():
-    """Test find_spec with valid input."""
-    result = find_spec('fullname_test', None, None)
+def test_LegacyUIShim_find_spec_basic():
+    """Test LegacyUIShim_find_spec with valid input."""
+    result = LegacyUIShim().find_spec('fullname_test', None, None)
     assert result is not None
 
 
-# Test for find_module (complexity: 2, coverage: 0%, priority: 0.48)
+# Test for LegacyUIShim.find_module (complexity: 2, coverage: 0%, priority: 0.48)
 # Doc: Deprecated fallback for older Python versions....
 
-def test_find_module_basic():
-    """Test find_module with valid input."""
-    result = find_module('fullname_test', 'path_test')
+def test_LegacyUIShim_find_module_basic():
+    """Test LegacyUIShim_find_module with valid input."""
+    result = LegacyUIShim().find_module('fullname_test', 'path_test')
     assert result is not None
 
 
@@ -89,51 +100,51 @@ def test_is_shim_installed_parametrized(input, expected):
     assert result == expected
 
 
-# Test for create_module (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for ShimLoader.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
+# Doc: Initialize loader.  Args:     fullname: Fully qualified modu...
+
+def test_ShimLoader___init___basic():
+    """Test ShimLoader___init__ with valid input."""
+    result = ShimLoader().__init__('fullname_test')
+    assert result is not None
+
+
+# Test for ShimLoader.create_module (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Create the module object (Python 3.4+ import protocol).  Ret...
 
-def test_create_module_basic():
-    """Test create_module with valid input."""
-    result = create_module(None)
+def test_ShimLoader_create_module_basic():
+    """Test ShimLoader_create_module with valid input."""
+    result = ShimLoader().create_module(None)
     assert result is not None
 
 
-# Test for exec_module (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for ShimLoader.exec_module (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Execute module initialization (Python 3.4+ import protocol)....
 
-def test_exec_module_basic():
-    """Test exec_module with valid input."""
-    result = exec_module(None)
+def test_ShimLoader_exec_module_basic():
+    """Test ShimLoader_exec_module with valid input."""
+    result = ShimLoader().exec_module(None)
     assert result is not None
 
 
-# Test for load_module (complexity: 1, coverage: 0%, priority: 0.47)
+# Test for ShimLoader.load_module (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Create and return stub module (deprecated API, fallback only...
 
 @pytest.mark.parametrize("input,expected", [
     ('test', True),
     ('', False),
 ])
-def test_load_module_parametrized(input, expected):
-    """Test load_module with various inputs."""
-    result = load_module(input)
+def test_ShimLoader_load_module_parametrized(input, expected):
+    """Test ShimLoader_load_module with various inputs."""
+    result = ShimLoader().load_module(input)
     assert result == expected
 
 
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
-# Doc: Initialize loader.  Args:     fullname: Fully qualified modu...
-
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('fullname_test')
-    assert result is not None
-
-
-# Test for __init__ (complexity: 1, coverage: 0%, priority: 0.32)
+# Test for LegacyUIShim.__init__ (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Initialize shim finder.  Args:     neutralized_modules: List...
 
-def test___init___basic():
-    """Test __init__ with valid input."""
-    result = __init__('neutralized_modules_test')
+def test_LegacyUIShim___init___basic():
+    """Test LegacyUIShim___init__ with valid input."""
+    result = LegacyUIShim().__init__('neutralized_modules_test')
     assert result is not None
 

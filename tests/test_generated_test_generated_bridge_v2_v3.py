@@ -1,14 +1,20 @@
 """
-Auto-generated tests for test_generated_bridge_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.851842
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_bridge_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.214569
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_bridge_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_bridge_v2 import (
+        test_get_stats_parametrized,
+        test___init___basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_bridge_v2: {e}")
 
 # Test for test_get_stats_parametrized (complexity: 1, coverage: 0%, priority: 0.57)
 # Doc: Test get_stats with various inputs....

@@ -1,14 +1,28 @@
 """
-Auto-generated tests for test_generated_test_file_tools_v2 (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.927149
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for test_generated_test_file_tools_v2 (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.709965
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\test_generated_test_file_tools_v2.py
-# TODO: Adjust import path
+try:
+    from tests.test_generated_test_file_tools_v2 import (
+        test_setUp_basic,
+        test_tearDown_basic,
+        test_create_file_basic,
+        test_test_rename_rules_basic,
+        test_test_sequence_rule_basic,
+        test_test_undo_system_basic,
+        test_test_duplicate_finder_basic,
+        test_test_empty_folder_cleaner_basic,
+        test_test_attribute_manager_basic,
+        test_on_error_basic,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.test_generated_test_file_tools_v2: {e}")
 
 # Test for test_setUp_basic (complexity: 1, coverage: 0%, priority: 0.47)
 # Doc: Test setUp with valid input....

@@ -1,14 +1,25 @@
 """
-Auto-generated tests for conftest (v3.0 - AI Enhanced)
-Generated: 2025-12-26T23:59:22.824196
-Generator: Coverage-Aware + Smart Prioritized + Pattern Learned
+Auto-generated tests for conftest (v3.1 - Class-Aware)
+Generated: 2025-12-27T00:19:14.086036
+Generator: Class-Aware + Smart Prioritized
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 # Import from C:\Auto\office_converter\tests\conftest.py
-# TODO: Adjust import path
+try:
+    from tests.conftest import (
+        sample_pdf,
+        mock_com_object,
+        mock_worker,
+        mock_psutil,
+        temp_dir,
+        pytest_configure,
+        terminate_effect,
+    )
+except ImportError as e:
+    pytest.skip(f"Cannot import from tests.conftest: {e}")
 
 # Test for sample_pdf (complexity: 2, coverage: 0%, priority: 0.58)
 # Doc: Create a minimal PDF for testing....

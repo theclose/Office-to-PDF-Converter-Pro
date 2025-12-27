@@ -581,6 +581,16 @@ class EnhancedTestGeneratorV3:
             # Store original name for proper calling
             original_name = func.name  # Keep Class.method format
             
+            # Compute func_call for template
+            sample_args = self.template_engine._generate_sample_args(func)
+            if '.' in original_name:
+                # Class method: Class().method(args)
+                class_name, method_name = original_name.split('.', 1)
+                func_call = f"{class_name}().{method_name}({sample_args})" if sample_args else f"{class_name}().{method_name}()"
+            else:
+                # Module function
+                func_call = f"{original_name}({sample_args})" if sample_args else f"{original_name}()"
+            
             # Create modified signature for template
             func_for_template = FunctionSignature(
                 name=safe_name,  # Use safe name for test function
@@ -598,13 +608,14 @@ class EnhancedTestGeneratorV3:
             )
             
             template_type = self.template_engine.infer_template_type(func_for_template)
-            test_code = self.template_engine.generate_from_template(func_for_template, template_type)
             
-            # Replace placeholder with actual call
-            if '.' in original_name:
-                class_name, method_name = original_name.split('.', 1)
-                # Find function call pattern and replace
-                test_code = test_code.replace(f'{safe_name}(', f'{class_name}().{method_name}(')
+            # Get template and manually format with func_call
+            template = self.template_engine.TEMPLATES.get(template_type, self.template_engine.TEMPLATES['simple_function'])
+            test_code = template.format(
+                func_name=safe_name,
+                func_call=func_call,  # ADD: Provide func_call
+                sample_args=sample_args
+            )
             
             # Use original name in comments
             docstring_safe = ""

@@ -94,21 +94,21 @@ class TestTemplateEngine:
     TEMPLATES = {
         'simple_function': '''
 def test_{func_name}_basic():
-    """Test {func_name} with valid input."""
+    """Test {func_name} with valid input."""  
     result = {func_call}
     # Type-aware assertion
-    assert result is not None or result == [] or result == {}, f"Expected result, got {result}"
+    assert result is not None or result == [] or result == {{}}, f"Expected result, got {{{{result}}}}"
 ''',
         'function_with_return': '''
 @pytest.mark.parametrize("test_input,expected_type", [
     ([], list),
-    ({}, dict),
+    ({{}}, dict),
     ("test", (str, type(None))),
 ])
 def test_{func_name}_parametrized(test_input, expected_type):
     """Test {func_name} with various inputs."""
     result = {func_call}
-    assert isinstance(result, expected_type) or result is None, f"Expected {expected_type}, got {type(result)}"
+    assert isinstance(result, expected_type) or result is None, f"Expected {{{{expected_type}}}}, got {{{{type(result)}}}}"
 ''',
         'async_function': '''
 @pytest.mark.asyncio

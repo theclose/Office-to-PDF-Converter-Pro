@@ -555,7 +555,7 @@ class FileToolsDialog(ctk.CTkToplevel):
         try:
             results = self.dup_finder.find_duplicates(self.files)
             self.after(0, lambda: self._show_dup_results(results))
-        except Exception as e:
+        except Exception:
              self.after(0, lambda: messagebox.showerror("Error", str(e)))
         finally:
              self.after(0, lambda: self.btn_scan.configure(state="normal", text="🔍 SCAN NOW"))

@@ -70,7 +70,7 @@ def split_excel(
     if not input_path.exists():
         raise FileNotFoundError(f"File not found: {input_path}")
     
-    if not input_path.suffix.lower() in ['.xlsx', '.xlsm']:
+    if input_path.suffix.lower() not in ['.xlsx', '.xlsm']:
         raise ValueError(f"Unsupported format: {input_path.suffix}. Only .xlsx/.xlsm supported.")
     
     # Determine output directory

@@ -242,7 +242,6 @@ class TestFileTypeDetectionProperties:
         
         Ensures consistent file type routing.
         """
-        from pathlib import Path
         
         # Add various extensions
         extensions = ['.docx', '.xlsx', '.pptx', '.doc', '.xls', '.ppt']
@@ -272,7 +271,6 @@ class TestFileTypeDetectionProperties:
         
         Handles user file naming variations.
         """
-        from pathlib import Path
         
         filename = f"{base_name}{extension}"
         path = Path(filename)

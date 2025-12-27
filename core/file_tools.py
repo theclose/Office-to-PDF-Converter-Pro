@@ -210,7 +210,6 @@ class ExtensionRule(RenameRule):
 
 import hashlib
 
-import hashlib
 import stat
 import ctypes
 from datetime import datetime

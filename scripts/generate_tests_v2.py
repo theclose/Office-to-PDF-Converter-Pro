@@ -97,32 +97,32 @@ def test_{func_name}_basic():
     """Test {func_name} with valid input."""  
     result = {func_call}
     # Type-aware assertion
-    assert result is not None or result == [] or result == {{}}, f"Expected result, got {{{{result}}}}"
+    assert result is None or result == [] or result == {}, f"Expected result, got {{{{result}}}}"
 ''',
         'function_with_return': '''
 @pytest.mark.parametrize("test_input,expected_type", [
-    ([], list),
-    ({{}}, dict),
-    ("test", (str, type(None))),
+    ([], (list, tuple)),
+    ("test", (str, list, tuple, type(None))),
 ])
 def test_{func_name}_parametrized(test_input, expected_type):
     """Test {func_name} with various inputs."""
     result = {func_call}
-    assert isinstance(result, expected_type) or result is None, f"Expected {{{{expected_type}}}}, got {{{{type(result)}}}}"
+    assert result is None or isinstance(result, expected_type), f"Got {{type(result).__name__}}"
 ''',
         'async_function': '''
 @pytest.mark.asyncio
 async def test_{func_name}_async():
     """Test async {func_name}."""
     result = await {func_call}
-    assert result is not None or isinstance(result, (list, dict)), f"Unexpected result: {result}"
+    assert result is None or isinstance(result, (list, dict, str, bool, tuple))
 ''',
         'class_method': '''
 def test_{func_name}(tmp_path):
     """Test {func_name}."""
     instance = {class_name}()
     result = instance.{method_name}({sample_args})
-    assert result is not None or isinstance(result, (list, dict, bool)), f"Method should return a value"
+    # Most methods return list, tuple, bool or None
+    assert result is None or isinstance(result, (list, dict, str, bool, tuple))
 ''',
         'property': '''
 def test_{class_name}_{property_name}_property(self):

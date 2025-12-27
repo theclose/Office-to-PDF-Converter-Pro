@@ -189,7 +189,19 @@ Output JSON format:
 """
     
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.environ.get("OPENAI_API_KEY") or os.environ.get("GEMINI_API_KEY")
+        # Support both OpenAI and Gemini
+        self.openai_key = api_key or os.environ.get("OPENAI_API_KEY")
+        self.gemini_key = os.environ.get("GEMINI_API_KEY")
+        
+        if self.openai_key:
+            self.api_type = "openai"
+            self.api_key = self.openai_key
+        elif self.gemini_key:
+            self.api_type = "gemini"
+            self.api_key = self.gemini_key
+        else:
+            self.api_type = None
+            self.api_key = None or os.environ.get("GEMINI_API_KEY")
         
     def load_source_code(self, file_path: str, line: int, context: int = 5) -> str:
         """Load source code around the error line."""
@@ -251,6 +263,13 @@ Provide a fix in JSON format.
         return None
         
     def _call_api(self, prompt: str) -> dict:
+        """Call AI API (OpenAI or Gemini)."""
+        if self.api_type == "gemini":
+            return self._call_gemini_api(prompt)
+        else:
+            return self._call_openai_api(prompt)
+    
+    def _call_openai_api(self, prompt: str) -> dict:
         """Call OpenAI API."""
         url = "https://api.openai.com/v1/chat/completions"
         headers = {
@@ -274,7 +293,42 @@ Provide a fix in JSON format.
                 content = result["choices"][0]["message"]["content"]
                 return json.loads(content)
         except Exception as e:
-            print(f"API Error: {e}")
+            print(f"OpenAI API Error: {e}")
+            return {}
+    
+    def _call_gemini_api(self, prompt: str) -> dict:
+        """Call Gemini API."""
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={self.api_key}"
+        headers = {"Content-Type": "application/json"}
+        
+        full_prompt = self.SYSTEM_PROMPT + "\n\nAnalyze and respond in JSON format:\n\n" + prompt
+        
+        data = {
+            "contents": [{
+                "parts": [{"text": full_prompt}]
+            }]
+        }
+        
+        try:
+            req = urllib.request.Request(url, data=json.dumps(data).encode(), headers=headers)
+            with urllib.request.urlopen(req, timeout=60) as response:
+                result = json.loads(response.read().decode())
+                text = result["candidates"][0]["content"]["parts"][0]["text"]
+                # Clean JSON response
+                text = text.strip()
+                if text.startswith("```json"):
+                    text = text[7:]
+                if text.startswith("```"):
+                    text = text[3:]
+                if text.endswith("```"):
+                    text = text[:-3]
+                return json.loads(text.strip())
+        except json.JSONDecodeError as e:
+            print(f"Gemini JSON Parse Error: {e}")
+            print(f"Raw response: {text[:200] if 'text' in dir() else 'N/A'}")
+            return {}
+        except Exception as e:
+            print(f"Gemini API Error: {e}")
             return {}
             
     def _generate_mock_fix(self, failure: TestFailure) -> dict:

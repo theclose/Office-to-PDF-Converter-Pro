@@ -1,6 +1,6 @@
 """
 Auto-generated tests for pdf_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T07:58:49.334038
+Generated: 2025-12-27T08:11:37.391350
 Generator: Class-Aware + Smart Prioritized
 """
 
@@ -40,7 +40,7 @@ except ImportError as e:
 ])
 def test_parse_page_range_parametrized(test_input, expected_type):
     """Test parse_page_range with various inputs."""
-    result = parse_page_range('page_range_str_test', 42)
+    result = parse_page_range('test_value', None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -54,7 +54,7 @@ def test_parse_page_range_parametrized(test_input, expected_type):
 ])
 def test_rasterize_pdf_parametrized(test_input, expected_type):
     """Test rasterize_pdf with various inputs."""
-    result = rasterize_pdf('pdf_path_test', 'output_path_test', 42, True)
+    result = rasterize_pdf(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 42, True)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -68,7 +68,7 @@ def test_rasterize_pdf_parametrized(test_input, expected_type):
 ])
 def test_post_process_pdf_parametrized(test_input, expected_type):
     """Test post_process_pdf with various inputs."""
-    result = post_process_pdf('pdf_path_test', 'password_test', 'author_test', 'title_test')
+    result = post_process_pdf(str(tmp_path / 'test.txt'), 'test_value', 'test_value', 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -82,7 +82,7 @@ def test_post_process_pdf_parametrized(test_input, expected_type):
 ])
 def test_compress_pdf_parametrized(test_input, expected_type):
     """Test compress_pdf with various inputs."""
-    result = compress_pdf('input_path_test', 'output_path_test', 'quality_test')
+    result = compress_pdf(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -96,7 +96,7 @@ def test_compress_pdf_parametrized(test_input, expected_type):
 ])
 def test_extract_pdf_pages_parametrized(test_input, expected_type):
     """Test extract_pdf_pages with various inputs."""
-    result = extract_pdf_pages('pdf_path_test', 42)
+    result = extract_pdf_pages(str(tmp_path / 'test.txt'), [])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -110,7 +110,7 @@ def test_extract_pdf_pages_parametrized(test_input, expected_type):
 ])
 def test_merge_pdfs_parametrized(test_input, expected_type):
     """Test merge_pdfs with various inputs."""
-    result = merge_pdfs('pdf_paths_test', 'output_path_test')
+    result = merge_pdfs(['pdf_paths_test.txt'], str(tmp_path / 'test.txt'))
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -124,7 +124,7 @@ def test_merge_pdfs_parametrized(test_input, expected_type):
 ])
 def test_images_to_pdf_parametrized(test_input, expected_type):
     """Test images_to_pdf with various inputs."""
-    result = images_to_pdf('image_paths_test', 'output_path_test')
+    result = images_to_pdf(['image_paths_test.txt'], str(tmp_path / 'test.txt'))
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -138,7 +138,7 @@ def test_images_to_pdf_parametrized(test_input, expected_type):
 ])
 def test_rotate_pages_parametrized(test_input, expected_type):
     """Test rotate_pages with various inputs."""
-    result = rotate_pages('input_path_test', 'output_path_test', 42, 42)
+    result = rotate_pages(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 42, [])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -152,7 +152,7 @@ def test_rotate_pages_parametrized(test_input, expected_type):
 ])
 def test_reorder_pages_parametrized(test_input, expected_type):
     """Test reorder_pages with various inputs."""
-    result = reorder_pages('input_path_test', 'output_path_test', 42)
+    result = reorder_pages(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), [])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -166,7 +166,7 @@ def test_reorder_pages_parametrized(test_input, expected_type):
 ])
 def test_protect_pdf_parametrized(test_input, expected_type):
     """Test protect_pdf with various inputs."""
-    result = protect_pdf('input_path_test', 'output_path_test', 'password_test', 'owner_password_test')
+    result = protect_pdf(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 'test_value', 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -180,7 +180,7 @@ def test_protect_pdf_parametrized(test_input, expected_type):
 ])
 def test_add_watermark_parametrized(test_input, expected_type):
     """Test add_watermark with various inputs."""
-    result = add_watermark('input_path_test', 'output_path_test', 'text_test', None, 42, None, 42)
+    result = add_watermark(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 'test_value', 3.14, 42, ('test', 'data'), 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -194,7 +194,7 @@ def test_add_watermark_parametrized(test_input, expected_type):
 ])
 def test_pdf_to_images_parametrized(test_input, expected_type):
     """Test pdf_to_images with various inputs."""
-    result = pdf_to_images('input_path_test', 'output_folder_test', 42, 'image_format_test')
+    result = pdf_to_images(str(tmp_path / 'test.txt'), 'test_value', 42, 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -208,7 +208,7 @@ def test_pdf_to_images_parametrized(test_input, expected_type):
 ])
 def test_extract_pages_parametrized(test_input, expected_type):
     """Test extract_pages with various inputs."""
-    result = extract_pages('input_path_test', 'output_path_test', 'page_range_test')
+    result = extract_pages(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -222,7 +222,7 @@ def test_extract_pages_parametrized(test_input, expected_type):
 ])
 def test_delete_pages_parametrized(test_input, expected_type):
     """Test delete_pages with various inputs."""
-    result = delete_pages('input_path_test', 'output_path_test', 'page_range_test')
+    result = delete_pages(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'), 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -236,7 +236,7 @@ def test_delete_pages_parametrized(test_input, expected_type):
 ])
 def test_split_pdf_parametrized(test_input, expected_type):
     """Test split_pdf with various inputs."""
-    result = split_pdf('input_path_test', 'output_folder_test')
+    result = split_pdf(str(tmp_path / 'test.txt'), 'test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -250,6 +250,6 @@ def test_split_pdf_parametrized(test_input, expected_type):
 ])
 def test_reverse_pages_parametrized(test_input, expected_type):
     """Test reverse_pages with various inputs."""
-    result = reverse_pages('input_path_test', 'output_path_test')
+    result = reverse_pages(str(tmp_path / 'test.txt'), str(tmp_path / 'test.txt'))
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 

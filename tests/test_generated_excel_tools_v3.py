@@ -1,6 +1,6 @@
 """
 Auto-generated tests for excel_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T07:58:49.248278
+Generated: 2025-12-27T08:11:37.391350
 Generator: Class-Aware + Smart Prioritized
 """
 
@@ -33,7 +33,7 @@ except ImportError as e:
 ])
 def test_rename_sheets_parametrized(test_input, expected_type):
     """Test rename_sheets with various inputs."""
-    result = rename_sheets('input_path_test', 'output_path_test', {}, 'prefix_test', 'suffix_test', 'replace_from_test', 'replace_to_test', 'on_progress_test')
+    result = rename_sheets(str(tmp_path / 'test.txt'), 'test', None, 'test_value', 'test_value', 'test_value', 'test_value', None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -47,7 +47,7 @@ def test_rename_sheets_parametrized(test_input, expected_type):
 ])
 def test_csv_to_excel_parametrized(test_input, expected_type):
     """Test csv_to_excel with various inputs."""
-    result = csv_to_excel('input_files_test', 'output_path_test', 'encoding_test', 'delimiter_test', 'on_progress_test')
+    result = csv_to_excel(['input_files_test.txt'], str(tmp_path / 'test.txt'), 'test_value', 'test_value', None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -61,7 +61,7 @@ def test_csv_to_excel_parametrized(test_input, expected_type):
 ])
 def test_split_excel_parametrized(test_input, expected_type):
     """Test split_excel with various inputs."""
-    result = split_excel('input_path_test', 'output_dir_test', 'sheets_test', 'on_progress_test')
+    result = split_excel(str(tmp_path / 'test.txt'), 'test', ['sheets_test.txt'], None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -75,7 +75,7 @@ def test_split_excel_parametrized(test_input, expected_type):
 ])
 def test_excel_to_csv_parametrized(test_input, expected_type):
     """Test excel_to_csv with various inputs."""
-    result = excel_to_csv('input_path_test', 'output_dir_test', 'sheets_test', 'encoding_test', 'delimiter_test', 'on_progress_test')
+    result = excel_to_csv(str(tmp_path / 'test.txt'), 'test', ['sheets_test.txt'], 'test_value', 'test_value', None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -89,7 +89,7 @@ def test_excel_to_csv_parametrized(test_input, expected_type):
 ])
 def test_protect_sheets_parametrized(test_input, expected_type):
     """Test protect_sheets with various inputs."""
-    result = protect_sheets('input_path_test', 'output_path_test', 'password_test', 'sheets_test', 'on_progress_test')
+    result = protect_sheets(str(tmp_path / 'test.txt'), 'test', 'test_value', ['sheets_test.txt'], None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -103,7 +103,7 @@ def test_protect_sheets_parametrized(test_input, expected_type):
 ])
 def test_unprotect_sheets_parametrized(test_input, expected_type):
     """Test unprotect_sheets with various inputs."""
-    result = unprotect_sheets('input_path_test', 'output_path_test', 'password_test', 'sheets_test', 'on_progress_test')
+    result = unprotect_sheets(str(tmp_path / 'test.txt'), 'test', 'test_value', ['sheets_test.txt'], None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -117,7 +117,7 @@ def test_unprotect_sheets_parametrized(test_input, expected_type):
 ])
 def test_merge_excel_parametrized(test_input, expected_type):
     """Test merge_excel with various inputs."""
-    result = merge_excel('input_files_test', 'output_path_test', 'mode_test', True, 'on_progress_test')
+    result = merge_excel(['input_files_test.txt'], str(tmp_path / 'test.txt'), 'test_value', True, None)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -131,7 +131,7 @@ def test_merge_excel_parametrized(test_input, expected_type):
 ])
 def test_get_sheet_info_parametrized(test_input, expected_type):
     """Test get_sheet_info with various inputs."""
-    result = get_sheet_info('file_path_test')
+    result = get_sheet_info(str(tmp_path / 'test.txt'))
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -145,6 +145,6 @@ def test_get_sheet_info_parametrized(test_input, expected_type):
 ])
 def test_get_sheet_names_parametrized(test_input, expected_type):
     """Test get_sheet_names with various inputs."""
-    result = get_sheet_names('file_path_test')
+    result = get_sheet_names(str(tmp_path / 'test.txt'))
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 

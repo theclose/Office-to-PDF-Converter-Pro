@@ -1,6 +1,6 @@
 """
 Auto-generated tests for file_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T07:58:49.313075
+Generated: 2025-12-27T08:11:37.333036
 Generator: Class-Aware + Smart Prioritized
 """
 
@@ -39,7 +39,7 @@ except ImportError as e:
 ])
 def test_DuplicateFinder_find_duplicates_parametrized(test_input, expected_type):
     """Test DuplicateFinder_find_duplicates with various inputs."""
-    result = DuplicateFinder().find_duplicates('paths_test', True)
+    result = DuplicateFinder().find_duplicates(['paths_test.txt'], True)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -48,7 +48,7 @@ def test_DuplicateFinder_find_duplicates_parametrized(test_input, expected_type)
 
 def test_AttributeManager_set_attributes_basic():
     """Test AttributeManager_set_attributes with valid input."""  
-    result = AttributeManager().set_attributes('path_test', True, True)
+    result = AttributeManager().set_attributes(str(tmp_path / 'test.txt'), True, True)
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -63,7 +63,7 @@ def test_AttributeManager_set_attributes_basic():
 ])
 def test_FileToolsEngine_preview_parametrized(test_input, expected_type):
     """Test FileToolsEngine_preview with various inputs."""
-    result = FileToolsEngine().preview('files_test', [])
+    result = FileToolsEngine().preview(['files_test.txt'], [])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -77,7 +77,7 @@ def test_FileToolsEngine_preview_parametrized(test_input, expected_type):
 ])
 def test_EmptyFolderCleaner_find_empty_folders_parametrized(test_input, expected_type):
     """Test EmptyFolderCleaner_find_empty_folders with various inputs."""
-    result = EmptyFolderCleaner().find_empty_folders('root_paths_test')
+    result = EmptyFolderCleaner().find_empty_folders(['root_paths_test.txt'])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -91,7 +91,7 @@ def test_EmptyFolderCleaner_find_empty_folders_parametrized(test_input, expected
 ])
 def test_FileToolsEngine_execute_parametrized(test_input, expected_type):
     """Test FileToolsEngine_execute with various inputs."""
-    result = FileToolsEngine().execute('files_test')
+    result = FileToolsEngine().execute(['files_test.txt'])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -118,7 +118,7 @@ def test_RenamePreview_has_changed_parametrized(test_input, expected_type):
 ])
 def test_RenameRule_apply_parametrized(test_input, expected_type):
     """Test RenameRule_apply with various inputs."""
-    result = RenameRule().apply('name_test', 'extension_test', 42)
+    result = RenameRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -232,7 +232,7 @@ def test_ExtensionRule_description_parametrized(test_input, expected_type):
 
 def test_AttributeManager_set_dates_basic():
     """Test AttributeManager_set_dates with valid input."""  
-    result = AttributeManager().set_dates('path_test', None, None, None)
+    result = AttributeManager().set_dates(str(tmp_path / 'test.txt'), 3.14, 3.14, 3.14)
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -242,7 +242,7 @@ def test_AttributeManager_set_dates_basic():
 
 def test_TransactionLog_log_basic():
     """Test TransactionLog_log with valid input."""  
-    result = TransactionLog().log('operation_type_test', 'old_paths_test', 'new_paths_test')
+    result = TransactionLog().log('test_value', ['old_paths_test.txt'], ['new_paths_test.txt'])
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -270,7 +270,7 @@ def test_FileToolsEngine_undo_last_transaction_parametrized(test_input, expected
 ])
 def test_CaseRule_apply_parametrized(test_input, expected_type):
     """Test CaseRule_apply with various inputs."""
-    result = CaseRule().apply('name_test', 'extension_test', 42)
+    result = CaseRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -283,7 +283,7 @@ def test_CaseRule_apply_parametrized(test_input, expected_type):
 ])
 def test_EmptyFolderCleaner_delete_folders_parametrized(test_input, expected_type):
     """Test EmptyFolderCleaner_delete_folders with various inputs."""
-    result = EmptyFolderCleaner().delete_folders('folders_test')
+    result = EmptyFolderCleaner().delete_folders(['folders_test.txt'])
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -296,7 +296,7 @@ def test_EmptyFolderCleaner_delete_folders_parametrized(test_input, expected_typ
 ])
 def test_ExtensionRule_apply_parametrized(test_input, expected_type):
     """Test ExtensionRule_apply with various inputs."""
-    result = ExtensionRule().apply('name_test', 'extension_test', 42)
+    result = ExtensionRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -309,7 +309,7 @@ def test_ExtensionRule_apply_parametrized(test_input, expected_type):
 ])
 def test_ReplaceRule_apply_parametrized(test_input, expected_type):
     """Test ReplaceRule_apply with various inputs."""
-    result = ReplaceRule().apply('name_test', 'extension_test', 42)
+    result = ReplaceRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -337,7 +337,7 @@ def test_TransactionLog_get_last_transaction_parametrized(test_input, expected_t
 ])
 def test_remove_vietnamese_accents_parametrized(test_input, expected_type):
     """Test remove_vietnamese_accents with various inputs."""
-    result = remove_vietnamese_accents('text_test')
+    result = remove_vietnamese_accents('test_value')
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -350,7 +350,7 @@ def test_remove_vietnamese_accents_parametrized(test_input, expected_type):
 ])
 def test_RemoveAccentsRule_apply_parametrized(test_input, expected_type):
     """Test RemoveAccentsRule_apply with various inputs."""
-    result = RemoveAccentsRule().apply('name_test', 'extension_test', 42)
+    result = RemoveAccentsRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -363,7 +363,7 @@ def test_RemoveAccentsRule_apply_parametrized(test_input, expected_type):
 ])
 def test_AddStringRule_apply_parametrized(test_input, expected_type):
     """Test AddStringRule_apply with various inputs."""
-    result = AddStringRule().apply('name_test', 'extension_test', 42)
+    result = AddStringRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -376,7 +376,7 @@ def test_AddStringRule_apply_parametrized(test_input, expected_type):
 ])
 def test_SequenceRule_apply_parametrized(test_input, expected_type):
     """Test SequenceRule_apply with various inputs."""
-    result = SequenceRule().apply('name_test', 'extension_test', 42)
+    result = SequenceRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -385,7 +385,7 @@ def test_SequenceRule_apply_parametrized(test_input, expected_type):
 
 def test_TransactionLog_remove_transaction_file_basic():
     """Test TransactionLog_remove_transaction_file with valid input."""  
-    result = TransactionLog().remove_transaction_file(None)
+    result = TransactionLog().remove_transaction_file(3.14)
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -394,7 +394,7 @@ def test_TransactionLog_remove_transaction_file_basic():
 
 def test_CaseRule___init___basic():
     """Test CaseRule___init__ with valid input."""  
-    result = CaseRule().__init__('mode_test')
+    result = CaseRule().__init__('test_value')
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -403,7 +403,7 @@ def test_CaseRule___init___basic():
 
 def test_ReplaceRule___init___basic():
     """Test ReplaceRule___init__ with valid input."""  
-    result = ReplaceRule().__init__('old_test', 'new_test', True)
+    result = ReplaceRule().__init__('test_value', 'test_value', True)
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -426,7 +426,7 @@ def test_RemoveAccentsRule___init___basic():
 ])
 def test_TrimRule_apply_parametrized(test_input, expected_type):
     """Test TrimRule_apply with various inputs."""
-    result = TrimRule().apply('name_test', 'extension_test', 42)
+    result = TrimRule().apply('name_example', 'test_value', 42)
     assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
@@ -434,7 +434,7 @@ def test_TrimRule_apply_parametrized(test_input, expected_type):
 
 def test_AddStringRule___init___basic():
     """Test AddStringRule___init__ with valid input."""  
-    result = AddStringRule().__init__('text_test', True)
+    result = AddStringRule().__init__('test_value', True)
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -443,7 +443,7 @@ def test_AddStringRule___init___basic():
 
 def test_SequenceRule___init___basic():
     """Test SequenceRule___init__ with valid input."""  
-    result = SequenceRule().__init__(42, 42, 42, 'separator_test', True)
+    result = SequenceRule().__init__(42, 42, 42, 'test_value', True)
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -452,7 +452,7 @@ def test_SequenceRule___init___basic():
 
 def test_ExtensionRule___init___basic():
     """Test ExtensionRule___init__ with valid input."""  
-    result = ExtensionRule().__init__('mode_test', 'new_ext_test')
+    result = ExtensionRule().__init__('test_value', 'test_value')
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 
@@ -479,7 +479,7 @@ def test_DuplicateFinder_abort_basic():
 
 def test_TransactionLog___init___basic():
     """Test TransactionLog___init__ with valid input."""  
-    result = TransactionLog().__init__('log_dir_test')
+    result = TransactionLog().__init__('test_value')
     # Type-aware assertion
     assert result is not None or result == [] or result == {}, f"Expected result, got {{result}}"
 

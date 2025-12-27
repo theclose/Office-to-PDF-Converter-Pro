@@ -118,10 +118,9 @@ async def test_{func_name}_async():
     assert result is not None or isinstance(result, (list, dict)), f"Unexpected result: {result}"
 ''',
         'class_method': '''
-def test_{class_name}_{method_name}(tmp_path):
-    """Test {class_name}.{method_name}."""
+def test_{func_name}(tmp_path):
+    """Test {func_name}."""
     instance = {class_name}()
-    # Use tmp_path for file operations
     result = instance.{method_name}({sample_args})
     assert result is not None or isinstance(result, (list, dict, bool)), f"Method should return a value"
 ''',
@@ -152,25 +151,70 @@ def test_{class_name}_{property_name}_property(self):
         )
         
     def _generate_sample_args(self, func_sig: FunctionSignature) -> str:
-        """Generate sample arguments based on type hints."""
+        """Generate smart, type-aware sample arguments based on type hints."""
         args = []
         for arg_name, arg_type in func_sig.args:
-            if arg_type:
-                # Type-aware sample generation
-                if 'str' in arg_type.lower():
-                    args.append(f"'{arg_name}_test'")
-                elif 'int' in arg_type.lower():
-                    args.append("42")
-                elif 'bool' in arg_type.lower():
-                    args.append("True")
-                elif 'list' in arg_type.lower():
-                    args.append("[]")
-                elif 'dict' in arg_type.lower():
-                    args.append("{}")
+            if not arg_type:
+                # No type hint - use safe default
+                args.append("None")
+                continue
+            
+            arg_type_lower = arg_type.lower()
+            
+            # Handle List types
+            if 'list[str]' in arg_type_lower or 'list[path]' in arg_type_lower:
+                args.append(f"['{arg_name}_test.txt']")
+            elif 'list[' in arg_type_lower:
+                args.append("[]")
+            
+            # Handle Dict types  
+            elif 'dict[' in arg_type_lower or arg_type_lower == 'dict':
+                args.append("{}")
+            
+            # Handle Path types
+            elif 'path' in arg_type_lower:
+                args.append("tmp_path / 'test_file.txt'")
+            
+            # Handle Optional types
+            elif 'optional[str]' in arg_type_lower:
+                args.append("'test'")
+            elif 'optional[' in arg_type_lower:
+                args.append("None")
+            
+            # Handle Tuple
+            elif 'tuple' in arg_type_lower:
+                args.append("('test', 'data')")
+            
+            # Handle Set
+            elif 'set' in arg_type_lower:
+                args.append("{'test'}")
+            
+            # Basic types
+            elif arg_type_lower in ['str', 'string']:
+                # Use realistic string based on arg name
+                if 'path' in arg_name.lower() or 'file' in arg_name.lower():
+                    args.append("str(tmp_path / 'test.txt')")
+                elif 'name' in arg_name.lower():
+                    args.append(f"'{arg_name}_example'")
                 else:
-                    args.append("None")
+                    args.append("'test_value'")
+            
+            elif arg_type_lower in ['int', 'integer']:
+                args.append("42")
+            
+            elif arg_type_lower in ['float', 'double']:
+                args.append("3.14")
+            
+            elif arg_type_lower in ['bool', 'boolean']:
+                args.append("True")
+            
+            # Complex object types
+            elif any(x in arg_type_lower for x in ['callable', 'function']):
+                args.append("lambda: None")
+            
+            # Default fallback
             else:
-                args.append("None")  # No type hint
+                args.append("None")
                 
         return ', '.join(args)
     

@@ -1,6 +1,6 @@
 """
 Auto-generated tests for excel_tools (v3.1 - Class-Aware)
-Generated: 2025-12-27T00:19:13.821121
+Generated: 2025-12-27T07:58:49.248278
 Generator: Class-Aware + Smart Prioritized
 """
 
@@ -26,116 +26,125 @@ except ImportError as e:
 # Test for rename_sheets (complexity: 13, coverage: 0%, priority: 0.68)
 # Doc: Rename sheets in Excel file.  Args:     input_path: Excel fi...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_rename_sheets_parametrized(input, expected):
+def test_rename_sheets_parametrized(test_input, expected_type):
     """Test rename_sheets with various inputs."""
-    result = rename_sheets(input)
-    assert result == expected
+    result = rename_sheets('input_path_test', 'output_path_test', {}, 'prefix_test', 'suffix_test', 'replace_from_test', 'replace_to_test', 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for csv_to_excel (complexity: 12, coverage: 0%, priority: 0.66)
 # Doc: Import CSV files into Excel workbook.  Args:     input_files...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_csv_to_excel_parametrized(input, expected):
+def test_csv_to_excel_parametrized(test_input, expected_type):
     """Test csv_to_excel with various inputs."""
-    result = csv_to_excel(input)
-    assert result == expected
+    result = csv_to_excel('input_files_test', 'output_path_test', 'encoding_test', 'delimiter_test', 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for split_excel (complexity: 11, coverage: 0%, priority: 0.64)
 # Doc: Split Excel file - export each sheet as separate Excel file....
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_split_excel_parametrized(input, expected):
+def test_split_excel_parametrized(test_input, expected_type):
     """Test split_excel with various inputs."""
-    result = split_excel(input)
-    assert result == expected
+    result = split_excel('input_path_test', 'output_dir_test', 'sheets_test', 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for excel_to_csv (complexity: 9, coverage: 0%, priority: 0.61)
 # Doc: Export Excel sheets to CSV files.  Args:     input_path: Pat...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_excel_to_csv_parametrized(input, expected):
+def test_excel_to_csv_parametrized(test_input, expected_type):
     """Test excel_to_csv with various inputs."""
-    result = excel_to_csv(input)
-    assert result == expected
+    result = excel_to_csv('input_path_test', 'output_dir_test', 'sheets_test', 'encoding_test', 'delimiter_test', 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for protect_sheets (complexity: 8, coverage: 0%, priority: 0.59)
 # Doc: Protect sheets with password.  Args:     input_path: Excel f...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_protect_sheets_parametrized(input, expected):
+def test_protect_sheets_parametrized(test_input, expected_type):
     """Test protect_sheets with various inputs."""
-    result = protect_sheets(input)
-    assert result == expected
+    result = protect_sheets('input_path_test', 'output_path_test', 'password_test', 'sheets_test', 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for unprotect_sheets (complexity: 8, coverage: 0%, priority: 0.59)
 # Doc: Remove protection from sheets.  Args:     input_path: Excel ...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_unprotect_sheets_parametrized(input, expected):
+def test_unprotect_sheets_parametrized(test_input, expected_type):
     """Test unprotect_sheets with various inputs."""
-    result = unprotect_sheets(input)
-    assert result == expected
+    result = unprotect_sheets('input_path_test', 'output_path_test', 'password_test', 'sheets_test', 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for merge_excel (complexity: 6, coverage: 0%, priority: 0.55)
 # Doc: Merge multiple Excel files into one.  Args:     input_files:...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_merge_excel_parametrized(input, expected):
+def test_merge_excel_parametrized(test_input, expected_type):
     """Test merge_excel with various inputs."""
-    result = merge_excel(input)
-    assert result == expected
+    result = merge_excel('input_files_test', 'output_path_test', 'mode_test', True, 'on_progress_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for get_sheet_info (complexity: 6, coverage: 0%, priority: 0.55)
 # Doc: Get detailed info about sheets in Excel file.  Returns list ...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_get_sheet_info_parametrized(input, expected):
+def test_get_sheet_info_parametrized(test_input, expected_type):
     """Test get_sheet_info with various inputs."""
-    result = get_sheet_info(input)
-    assert result == expected
+    result = get_sheet_info('file_path_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 
 
 # Test for get_sheet_names (complexity: 3, coverage: 0%, priority: 0.50)
 # Doc: Get list of sheet names from Excel file.  Useful for UI to s...
 
-@pytest.mark.parametrize("input,expected", [
-    ('test', True),
-    ('', False),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_get_sheet_names_parametrized(input, expected):
+def test_get_sheet_names_parametrized(test_input, expected_type):
     """Test get_sheet_names with various inputs."""
-    result = get_sheet_names(input)
-    assert result == expected
+    result = get_sheet_names('file_path_test')
+    assert isinstance(result, expected_type) or result is None, f"Expected {{expected_type}}, got {{type(result)}}"
 

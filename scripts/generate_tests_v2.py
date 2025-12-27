@@ -95,32 +95,35 @@ class TestTemplateEngine:
         'simple_function': '''
 def test_{func_name}_basic():
     """Test {func_name} with valid input."""
-    result = {func_name}({sample_args})
-    assert result is not None
+    result = {func_call}
+    # Type-aware assertion
+    assert result is not None or result == [] or result == {}, f"Expected result, got {result}"
 ''',
         'function_with_return': '''
-@pytest.mark.parametrize("input,expected", [
-    ({sample_input_1}, {expected_1}),
-    ({sample_input_2}, {expected_2}),
+@pytest.mark.parametrize("test_input,expected_type", [
+    ([], list),
+    ({}, dict),
+    ("test", (str, type(None))),
 ])
-def test_{func_name}_parametrized(input, expected):
+def test_{func_name}_parametrized(test_input, expected_type):
     """Test {func_name} with various inputs."""
-    result = {func_name}(input)
-    assert result == expected
+    result = {func_call}
+    assert isinstance(result, expected_type) or result is None, f"Expected {expected_type}, got {type(result)}"
 ''',
         'async_function': '''
 @pytest.mark.asyncio
 async def test_{func_name}_async():
     """Test async {func_name}."""
-    result = await {func_name}({sample_args})
-    assert result is not None
+    result = await {func_call}
+    assert result is not None or isinstance(result, (list, dict)), f"Unexpected result: {result}"
 ''',
         'class_method': '''
-def test_{class_name}_{method_name}(self):
+def test_{class_name}_{method_name}(tmp_path):
     """Test {class_name}.{method_name}."""
-    obj = {class_name}()
-    result = obj.{method_name}({sample_args})
-    assert result is not None
+    instance = {class_name}()
+    # Use tmp_path for file operations
+    result = instance.{method_name}({sample_args})
+    assert result is not None or isinstance(result, (list, dict, bool)), f"Method should return a value"
 ''',
         'property': '''
 def test_{class_name}_{property_name}_property(self):

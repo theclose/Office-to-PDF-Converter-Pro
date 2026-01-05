@@ -860,17 +860,25 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         try:
             if op == "compress":
                 orig_size = os.path.getsize(input_path)
+                
+                # Progress callback for real-time updates
+                def on_progress(current, total, percent):
+                    self.after(0, lambda c=current, t=total, p=percent: self._log(
+                        f"   📄 Page {c}/{t} ({p*100:.0f}%)"
+                    ))
+                
                 # Use advanced compression with image optimization
                 result, reduction, stats = pdf_tools.compress_pdf_advanced(
                     input_path, output_path, 
-                    quality=self.var_quality.get()
+                    quality=self.var_quality.get(),
+                    progress_callback=on_progress
                 )
                 if result and os.path.exists(output_path):
                     new_size = os.path.getsize(output_path)
                     self.compression_results[input_path] = (orig_size, new_size)
                     # Log detailed stats
                     self.after(0, lambda s=stats: self._log(
-                        f"   📷 Images: {s.get('images_optimized', 0)}/{s.get('images_found', 0)} optimized"
+                        f"   ✅ {s.get('images_optimized', 0)} pages | {s.get('reduction_percent', 0):.1f}% smaller"
                     ))
                     self.after(0, self._refresh_file_list)
                 return result

@@ -542,6 +542,8 @@ def compress_pdf_advanced(
     jpeg_quality: int = None,
     grayscale: bool = False,
     remove_images: bool = False,
+    progress_callback: callable = None,  # NEW: progress_callback(current, total, percent)
+    cancel_check: callable = None,       # NEW: cancel_check() -> bool
 ) -> Tuple[bool, float, Dict[str, Any]]:
     """
     Advanced PDF compression with image optimization.
@@ -676,8 +678,16 @@ def compress_pdf_advanced(
                 try:
                     # Create a new document with rasterized pages
                     new_doc = fitz.open()
+                    total_pages = doc.page_count
                     
-                    for page_num in range(doc.page_count):
+                    for page_num in range(total_pages):
+                        # Check for cancellation
+                        if cancel_check and cancel_check():
+                            logger.info("Compression cancelled by user")
+                            new_doc.close()
+                            doc.close()
+                            return False, 0.0, {"error": "Cancelled", "cancelled": True}
+                        
                         page = doc[page_num]
                         page_rect = page.rect
                         
@@ -686,12 +696,20 @@ def compress_pdf_advanced(
                         scale = target_dpi / 72.0
                         mat = fitz.Matrix(scale, scale)
                         
-                        # Render page to pixmap
-                        pix = page.get_pixmap(matrix=mat, alpha=False)
+                        # FIX: Apply grayscale colorspace if requested
+                        if grayscale:
+                            colorspace = fitz.csGRAY
+                        else:
+                            colorspace = fitz.csRGB
+                        
+                        # Render page to pixmap with correct colorspace
+                        pix = page.get_pixmap(matrix=mat, alpha=False, colorspace=colorspace)
                         
                         # Convert pixmap to JPEG bytes using correct API
-                        # Note: jpg_quality is the correct parameter name!
                         img_data = pix.tobytes(output="jpg", jpg_quality=jpeg_quality)
+                        
+                        # Memory cleanup - release pixmap immediately
+                        pix = None
                         
                         # Create new page with original dimensions
                         new_page = new_doc.new_page(
@@ -706,11 +724,18 @@ def compress_pdf_advanced(
                             keep_proportion=True
                         )
                         
+                        # Memory cleanup
+                        img_data = None
+                        
                         stats["images_optimized"] += 1
                         
+                        # Progress callback
+                        if progress_callback:
+                            progress_callback(page_num + 1, total_pages, (page_num + 1) / total_pages)
+                        
                         # Log progress every 10 pages
-                        if (page_num + 1) % 10 == 0:
-                            logger.info(f"   Processed {page_num + 1}/{doc.page_count} pages")
+                        if (page_num + 1) % 10 == 0 or page_num == 0:
+                            logger.info(f"   Processed {page_num + 1}/{total_pages} pages")
                     
                     # Replace original doc with compressed version
                     doc.close()

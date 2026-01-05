@@ -758,7 +758,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.2.90"
+    VERSION = "4.2.91"
 
     def __init__(self):
         super().__init__()
@@ -1331,18 +1331,17 @@ class ConverterProApp(TkDnDWrapper):
 
             ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
             ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
-                              value=0, command=self._on_quality_change).pack(side="left", padx=5)
+                              value=0, command=self._on_quality_change, width=60).pack(side="left", padx=2)
             ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
-                              value=1, command=self._on_quality_change).pack(side="left")
-            ctk.CTkRadioButton(quality_frame, text="Tùy chọn", variable=self.var_quality,
-                              value=2, command=self._on_quality_change).pack(side="left", padx=5)
+                              value=1, command=self._on_quality_change, width=60).pack(side="left", padx=2)
+            ctk.CTkRadioButton(quality_frame, text="DPI:", variable=self.var_quality,
+                              value=2, command=self._on_quality_change, width=55).pack(side="left", padx=2)
 
             self.dpi_frame = ctk.CTkFrame(quality_frame, fg_color="transparent")
             self.dpi_frame.pack(side="left")
 
-            self.dpi_entry = ctk.CTkEntry(self.dpi_frame, width=50, textvariable=self.var_dpi)
+            self.dpi_entry = ctk.CTkEntry(self.dpi_frame, width=45, textvariable=self.var_dpi)
             self.dpi_entry.pack(side="left")
-            ctk.CTkLabel(self.dpi_frame, text="DPI", font=ctk.CTkFont(size=11)).pack(side="left", padx=2)
             
             # Initial state
             self._on_quality_change()

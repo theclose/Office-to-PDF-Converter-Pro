@@ -758,7 +758,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.2.88"
+    VERSION = "4.2.89"
 
     def __init__(self):
         super().__init__()
@@ -1371,18 +1371,18 @@ class ConverterProApp(TkDnDWrapper):
             sheet_entry = ctk.CTkEntry(sheet_frame, textvariable=self.var_sheet_index,
                         width=80, placeholder_text="all")
             sheet_entry.pack(side="left", padx=5)
-            ctk.CTkLabel(sheet_frame, text="(VD: 1-3, 5 hoặc để trống = tất cả)", 
+            ctk.CTkLabel(sheet_frame, text="VD: 1-3, 5 hoặc để trống = tất cả", 
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
 
-            # PDF page range  
+            # Excel page range (renamed from PDF)
             page_frame = ctk.CTkFrame(options, fg_color="transparent")
             page_frame.pack(fill="x", pady=5)
 
-            ctk.CTkLabel(page_frame, text="📄 Trang PDF:").pack(side="left")
+            ctk.CTkLabel(page_frame, text="📄 Trang Excel:").pack(side="left")
             page_entry = ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
                         width=80, placeholder_text="all")
             page_entry.pack(side="left", padx=5)
-            ctk.CTkLabel(page_frame, text="(Chỉ xuất các trang chỉ định)", 
+            ctk.CTkLabel(page_frame, text="Chỉ xuất các trang chỉ định", 
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
             # Save page range on focus out
             page_entry.bind("<FocusOut>", lambda e: self._save_page_range())

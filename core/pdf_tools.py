@@ -943,6 +943,142 @@ def pdf_to_images(
         return []
 
 
+def pdf_to_single_image(
+    input_path: str,
+    output_path: str,
+    dpi: int = 150,
+    image_format: str = "png",
+    page_gap: int = 10,
+    background_color: tuple = (255, 255, 255),
+    progress_callback: callable = None
+) -> Tuple[bool, Dict[str, Any]]:
+    """
+    Convert all PDF pages to a single combined image (vertically stacked).
+    
+    Args:
+        input_path: Path to input PDF
+        output_path: Path for output image
+        dpi: Resolution (default 150)
+        image_format: "png" or "jpg"
+        page_gap: Gap between pages in pixels (default 10)
+        background_color: RGB tuple for gap color (default white)
+        progress_callback: Optional callback(current, total, percent)
+        
+    Returns:
+        Tuple of (success, stats_dict)
+    """
+    if not HAS_PYMUPDF or not HAS_PIL:
+        logger.error("PyMuPDF or PIL not available")
+        return False, {"error": "Missing dependencies"}
+    
+    if not os.path.exists(input_path):
+        return False, {"error": "File not found"}
+    
+    stats = {
+        "pages": 0,
+        "width": 0,
+        "height": 0,
+        "file_size": 0
+    }
+    
+    try:
+        doc = fitz.open(input_path)
+        page_count = doc.page_count
+        stats["pages"] = page_count
+        
+        if page_count == 0:
+            doc.close()
+            return False, {"error": "PDF has no pages"}
+        
+        # Warn for very large PDFs
+        if page_count > 100:
+            logger.warning(f"Large PDF with {page_count} pages - may use significant memory")
+        
+        zoom = dpi / 72
+        matrix = fitz.Matrix(zoom, zoom)
+        
+        # Phase 1: Calculate dimensions
+        logger.info(f"Phase 1: Calculating dimensions for {page_count} pages...")
+        page_images = []
+        max_width = 0
+        total_height = 0
+        
+        for i, page in enumerate(doc):
+            pix = page.get_pixmap(matrix=matrix)
+            
+            # Convert to PIL Image
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            page_images.append(img)
+            
+            max_width = max(max_width, pix.width)
+            total_height += pix.height
+            
+            # Memory cleanup
+            pix = None
+            
+            if progress_callback:
+                progress_callback(i + 1, page_count * 2, (i + 1) / (page_count * 2))
+        
+        # Add gaps
+        total_height += (page_count - 1) * page_gap
+        
+        logger.info(f"Combined image size: {max_width}x{total_height} pixels")
+        stats["width"] = max_width
+        stats["height"] = total_height
+        
+        # Phase 2: Create combined image
+        logger.info("Phase 2: Creating combined image...")
+        
+        # Create canvas with background color
+        combined = Image.new("RGB", (max_width, total_height), background_color)
+        
+        # Paste each page
+        y_offset = 0
+        for i, img in enumerate(page_images):
+            # Center horizontally if narrower than max
+            x_offset = (max_width - img.width) // 2
+            combined.paste(img, (x_offset, y_offset))
+            
+            y_offset += img.height + page_gap
+            
+            # Memory cleanup
+            page_images[i] = None
+            
+            if progress_callback:
+                progress_callback(page_count + i + 1, page_count * 2, 
+                                (page_count + i + 1) / (page_count * 2))
+        
+        # Clear list
+        page_images = None
+        
+        # Phase 3: Save
+        logger.info(f"Phase 3: Saving to {output_path}...")
+        
+        # Ensure output directory exists
+        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+        
+        if image_format.lower() == "jpg" or image_format.lower() == "jpeg":
+            combined.save(output_path, "JPEG", quality=90, optimize=True)
+        else:
+            combined.save(output_path, "PNG", optimize=True)
+        
+        # Get file size
+        if os.path.exists(output_path):
+            stats["file_size"] = os.path.getsize(output_path)
+        
+        doc.close()
+        
+        logger.info(f"✅ Combined {page_count} pages into single image: {stats['file_size'] // 1024} KB")
+        
+        return True, stats
+        
+    except Exception as e:
+        logger.error(f"PDF to single image error: {e}")
+        import traceback
+        traceback.print_exc()
+        return False, {"error": str(e)}
+
+
 # =============================================================================
 # IMAGES TO PDF
 # =============================================================================

@@ -98,6 +98,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.var_dpi = ctk.IntVar(value=150)
         self.var_simulate_scan = ctk.BooleanVar(value=False)
         self.var_image_format = ctk.StringVar(value="png")
+        self.var_combine_pages = ctk.BooleanVar(value=False)  # NEW: Combine all pages into single image
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
 
@@ -524,6 +525,19 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     self.options_content, text=fmt.upper(),
                     variable=self.var_image_format, value=fmt
                 ).pack(anchor="w", padx=10)
+            
+            # NEW: Combine pages option
+            ctk.CTkCheckBox(
+                self.options_content,
+                text="📄 Gộp tất cả trang thành 1 ảnh",
+                variable=self.var_combine_pages
+            ).pack(anchor="w", pady=(10, 0))
+            ctk.CTkLabel(
+                self.options_content,
+                text="(Xếp dọc các trang, phù hợp tài liệu dài)",
+                text_color="gray",
+                font=ctk.CTkFont(size=10)
+            ).pack(anchor="w", padx=25)
 
         elif op == "rasterize":
             ctk.CTkLabel(self.options_content, text="Chất lượng (DPI):").pack(anchor="w")
@@ -898,8 +912,24 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             elif op == "watermark":
                 return pdf_tools.add_watermark(input_path, output_path, self.var_watermark_text.get())
             elif op == "pdf_to_img":
-                imgs = pdf_tools.pdf_to_images(input_path, output_path, self.var_dpi.get(), self.var_image_format.get())
-                return len(imgs) > 0
+                if self.var_combine_pages.get():
+                    # Combine all pages into single image
+                    ext = self.var_image_format.get()
+                    single_output = output_path + f"_combined.{ext}"
+                    success, stats = pdf_tools.pdf_to_single_image(
+                        input_path, single_output,
+                        dpi=self.var_dpi.get(),
+                        image_format=self.var_image_format.get()
+                    )
+                    if success:
+                        self.after(0, lambda s=stats: self._log(
+                            f"   ✅ {s['pages']} pages → {s['width']}x{s['height']}px ({s['file_size']//1024} KB)"
+                        ))
+                    return success
+                else:
+                    # Original: separate images per page
+                    imgs = pdf_tools.pdf_to_images(input_path, output_path, self.var_dpi.get(), self.var_image_format.get())
+                    return len(imgs) > 0
             elif op == "split":
                 return pdf_tools.split_pdf(input_path, output_path)
             elif op == "img_to_pdf":

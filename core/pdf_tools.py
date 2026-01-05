@@ -724,8 +724,6 @@ def compress_pdf_advanced(
                     # Continue with original doc - don't fail completely
             else:
                 logger.info("Phase 3: No images found, using deflate only")
-        else:
-            logger.info("Phase 3: Lossless mode - skipping image compression")
         
         elif remove_images:
             # Remove all images

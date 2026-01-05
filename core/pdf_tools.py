@@ -501,29 +501,29 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
 # Quality presets for compression
 COMPRESSION_PRESETS = {
     "low": {
-        "dpi": 72,
-        "jpeg_quality": 50,
-        "description": "Maximum compression (may reduce image quality)",
-        "expected_reduction": "80-90%"
+        "dpi": 120,         # Increased from 72 - text needs higher DPI
+        "jpeg_quality": 60,  # Increased from 50
+        "description": "Strong compression (good for images, readable text)",
+        "expected_reduction": "70-85%"
     },
     "medium": {
         "dpi": 150,
         "jpeg_quality": 75,
         "description": "Balanced compression (recommended)",
-        "expected_reduction": "60-80%"
+        "expected_reduction": "50-70%"
     },
     "high": {
         "dpi": 200,
         "jpeg_quality": 85,
         "description": "Quality preserve (minimal visual loss)",
-        "expected_reduction": "40-60%"
+        "expected_reduction": "30-50%"
     },
     "extreme": {
-        "dpi": 72,
-        "jpeg_quality": 30,
+        "dpi": 96,           # Increased from 72 - minimum for readable text
+        "jpeg_quality": 45,  # Increased from 30
         "grayscale": True,
-        "description": "Extreme compression (significant quality loss)",
-        "expected_reduction": "90-95%"
+        "description": "Extreme compression (grayscale, some quality loss)",
+        "expected_reduction": "80-90%"
     },
     "lossless": {
         "dpi": None,  # No image resampling

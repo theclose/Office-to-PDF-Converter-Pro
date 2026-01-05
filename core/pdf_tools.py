@@ -815,6 +815,279 @@ def compress_pdf_advanced(
         return False, 0.0, {"error": str(e)}
 
 
+# =============================================================================
+# SMART PDF COMPRESSION - Selective Image Compression (Preserves Text!)
+# =============================================================================
+
+def analyze_pdf_content(input_path: str) -> Dict[str, Any]:
+    """
+    Analyze PDF content to determine best compression strategy.
+    
+    Returns:
+        Dict with page analysis: text_pages, image_pages, mixed_pages
+    """
+    if not HAS_PYMUPDF or not os.path.exists(input_path):
+        return {"error": "File not found or PyMuPDF not available"}
+    
+    try:
+        doc = fitz.open(input_path)
+        analysis = {
+            "total_pages": doc.page_count,
+            "text_pages": [],
+            "image_pages": [],
+            "mixed_pages": [],
+            "total_images": 0,
+            "total_image_bytes": 0,
+            "has_text": False
+        }
+        
+        for page_num in range(doc.page_count):
+            page = doc[page_num]
+            
+            # Get images
+            images = page.get_images(full=True)
+            image_count = len(images)
+            
+            # Get text
+            text = page.get_text("text").strip()
+            has_text = len(text) > 50  # More than 50 chars = has meaningful text
+            
+            # Calculate image area
+            image_area = 0
+            for img in images:
+                xref = img[0]
+                try:
+                    base_img = doc.extract_image(xref)
+                    analysis["total_image_bytes"] += len(base_img.get("image", b""))
+                except:
+                    pass
+            
+            analysis["total_images"] += image_count
+            
+            # Classify page
+            if image_count == 0 and has_text:
+                analysis["text_pages"].append(page_num)
+            elif image_count > 0 and not has_text:
+                analysis["image_pages"].append(page_num)
+            else:
+                analysis["mixed_pages"].append(page_num)
+            
+            if has_text:
+                analysis["has_text"] = True
+        
+        doc.close()
+        
+        # Recommendation
+        if len(analysis["image_pages"]) == analysis["total_pages"]:
+            analysis["recommendation"] = "rasterize"  # All image pages
+        elif len(analysis["text_pages"]) == analysis["total_pages"]:
+            analysis["recommendation"] = "lossless"   # All text pages
+        else:
+            analysis["recommendation"] = "smart"      # Mixed - use selective
+        
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"PDF analysis failed: {e}")
+        return {"error": str(e)}
+
+
+def compress_pdf_smart(
+    input_path: str,
+    output_path: str,
+    quality: str = "medium",
+    progress_callback: callable = None
+) -> Tuple[bool, float, Dict[str, Any]]:
+    """
+    Smart PDF compression - Selectively compresses images while preserving text layer.
+    
+    This is the OPTIMAL compression method that:
+    1. Analyzes PDF content (text vs images)
+    2. Only recompresses embedded images
+    3. Keeps text/vectors intact (searchable, selectable)
+    4. Applies standard optimizations (garbage, fonts, metadata)
+    
+    Args:
+        input_path: Path to input PDF
+        output_path: Path for output PDF
+        quality: 'low', 'medium', 'high' - controls JPEG quality for images
+        progress_callback: Optional callback(current, total, percent)
+        
+    Returns:
+        Tuple of (success, reduction_percent, stats_dict)
+    """
+    if not HAS_PYMUPDF or not HAS_PIL:
+        return False, 0.0, {"error": "PyMuPDF or PIL not available"}
+    
+    if not os.path.exists(input_path):
+        return False, 0.0, {"error": "File not found"}
+    
+    # Quality settings for image compression
+    QUALITY_SETTINGS = {
+        "low": {"jpeg_quality": 50, "max_dim": 1200},
+        "medium": {"jpeg_quality": 75, "max_dim": 1600},
+        "high": {"jpeg_quality": 90, "max_dim": 2400},
+    }
+    settings = QUALITY_SETTINGS.get(quality, QUALITY_SETTINGS["medium"])
+    
+    original_size = os.path.getsize(input_path)
+    stats = {
+        "original_size": original_size,
+        "images_found": 0,
+        "images_compressed": 0,
+        "images_skipped": 0,
+        "text_preserved": True,
+        "bytes_saved_images": 0,
+        "method": "smart_selective"
+    }
+    
+    try:
+        doc = fitz.open(input_path)
+        logger.info(f"Smart compression: {doc.page_count} pages, quality={quality}")
+        
+        # Phase 1: Metadata cleanup
+        logger.info("Phase 1: Metadata cleanup...")
+        try:
+            doc.scrub(redact_images=0, garbage=4)
+        except:
+            pass
+        
+        # Phase 2: Font subsetting
+        logger.info("Phase 2: Font subsetting...")
+        try:
+            doc.subset_fonts()
+        except:
+            pass
+        
+        # Phase 3: Selective image compression
+        logger.info("Phase 3: Selective image compression...")
+        processed_xrefs = set()  # Track processed images (same image can appear multiple times)
+        
+        total_images = 0
+        for page in doc:
+            total_images += len(page.get_images(full=True))
+        
+        current_image = 0
+        
+        for page_num, page in enumerate(doc):
+            images = page.get_images(full=True)
+            
+            for img_info in images:
+                xref = img_info[0]
+                
+                # Skip if already processed
+                if xref in processed_xrefs:
+                    continue
+                processed_xrefs.add(xref)
+                
+                stats["images_found"] += 1
+                current_image += 1
+                
+                if progress_callback:
+                    progress_callback(current_image, total_images, current_image / total_images)
+                
+                try:
+                    # Extract image
+                    base_image = doc.extract_image(xref)
+                    if not base_image:
+                        continue
+                    
+                    image_bytes = base_image["image"]
+                    original_img_size = len(image_bytes)
+                    
+                    # Skip small images (icons, logos) - less than 5KB
+                    if original_img_size < 5000:
+                        stats["images_skipped"] += 1
+                        continue
+                    
+                    # Load with PIL
+                    pil_img = Image.open(io.BytesIO(image_bytes))
+                    
+                    # Convert to RGB if necessary
+                    if pil_img.mode in ("RGBA", "P", "LA"):
+                        pil_img = pil_img.convert("RGB")
+                    elif pil_img.mode == "CMYK":
+                        pil_img = pil_img.convert("RGB")
+                    
+                    # Resize if too large
+                    max_dim = settings["max_dim"]
+                    if pil_img.width > max_dim or pil_img.height > max_dim:
+                        ratio = min(max_dim / pil_img.width, max_dim / pil_img.height)
+                        new_size = (int(pil_img.width * ratio), int(pil_img.height * ratio))
+                        pil_img = pil_img.resize(new_size, Image.LANCZOS)
+                    
+                    # Compress to JPEG
+                    buffer = io.BytesIO()
+                    pil_img.save(buffer, "JPEG", quality=settings["jpeg_quality"], optimize=True)
+                    compressed_bytes = buffer.getvalue()
+                    
+                    # Only replace if smaller
+                    if len(compressed_bytes) < original_img_size * 0.9:  # At least 10% smaller
+                        # Update the image stream in PDF
+                        doc.update_stream(xref, compressed_bytes)
+                        
+                        # Update image metadata
+                        doc.xref_set_key(xref, "Filter", "/DCTDecode")
+                        doc.xref_set_key(xref, "Width", str(pil_img.width))
+                        doc.xref_set_key(xref, "Height", str(pil_img.height))
+                        doc.xref_set_key(xref, "ColorSpace", "/DeviceRGB")
+                        doc.xref_set_key(xref, "BitsPerComponent", "8")
+                        
+                        stats["images_compressed"] += 1
+                        stats["bytes_saved_images"] += original_img_size - len(compressed_bytes)
+                        
+                        logger.debug(f"  Image {xref}: {original_img_size//1024}KB → {len(compressed_bytes)//1024}KB")
+                    else:
+                        stats["images_skipped"] += 1
+                        
+                except Exception as e:
+                    logger.warning(f"Could not process image {xref}: {e}")
+                    stats["images_skipped"] += 1
+        
+        # Phase 4: Save with compression
+        logger.info("Phase 4: Saving optimized PDF...")
+        doc.save(
+            output_path,
+            garbage=4,
+            deflate=True,
+            clean=True,
+            pretty=False,
+            no_new_id=True
+        )
+        doc.close()
+        
+        # Verify output
+        if not os.path.exists(output_path):
+            return False, 0.0, {"error": "Output file not created"}
+        
+        new_size = os.path.getsize(output_path)
+        stats["new_size"] = new_size
+        
+        # If larger, copy original
+        if new_size >= original_size:
+            import shutil
+            shutil.copy(input_path, output_path)
+            logger.info("Compression made file larger, keeping original")
+            return True, 0.0, stats
+        
+        reduction = ((original_size - new_size) / original_size) * 100
+        stats["reduction_percent"] = reduction
+        stats["saved_bytes"] = original_size - new_size
+        
+        logger.info(f"✅ Smart Success: {original_size//1024}KB → {new_size//1024}KB ({reduction:.1f}% smaller)")
+        logger.info(f"   Images: {stats['images_compressed']}/{stats['images_found']} compressed, {stats['images_skipped']} skipped")
+        logger.info(f"   Text layer: ✓ Preserved")
+        
+        return True, reduction, stats
+        
+    except Exception as e:
+        logger.error(f"Smart compression failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False, 0.0, {"error": str(e)}
+
+
+
 def estimate_compression(input_path: str, quality: str = "medium") -> Dict[str, Any]:
     """
     Estimate compression results without actually compressing.

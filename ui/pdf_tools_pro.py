@@ -48,6 +48,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         ],
         "optimize": [
             ("compress", "📦 Nén", "Giảm dung lượng file"),
+            ("smart_compress", "✨ Nén tối ưu", "Giữ text, chỉ nén ảnh"),
             ("protect", "🔒 Mật khẩu", "Bảo vệ bằng password"),
             ("watermark", "💧 Watermark", "Thêm watermark text"),
             ("rasterize", "🔐 Hóa ảnh (Secure)", "Flatten thành ảnh 1 lớp"),
@@ -57,7 +58,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
 
     # All operation keys for validation
     ALL_OPERATIONS = ["merge", "split", "extract", "delete", "rotate", "reverse",
-                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "protect", "watermark", "rasterize", "scanmode"]
+                      "pdf_to_img", "img_to_pdf", "ocr", "compress", "smart_compress", "protect", "watermark", "rasterize", "scanmode"]
 
     def __init__(self, parent, lang: str = "vi"):
         super().__init__(parent)
@@ -476,6 +477,25 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     variable=self.var_quality, value=val, width=200
                 ).pack(side="left")
                 ctk.CTkLabel(frame, text=desc, text_color="gray", font=("Segoe UI", 10)).pack(side="left", padx=5)
+
+        elif op == "smart_compress":
+            # Smart compression - preserves text layer
+            ctk.CTkLabel(self.options_content, text="✨ Nén PDF Tối Ưu", 
+                        font=("Segoe UI", 12, "bold")).pack(anchor="w")
+            ctk.CTkLabel(self.options_content, 
+                        text="✅ Giữ nguyên text (copy, search được)\n✅ Chỉ nén ảnh embedded\n✅ Giữ nguyên vector, font",
+                        text_color="#4da6ff", font=("Segoe UI", 10), justify="left").pack(anchor="w", pady=5)
+            
+            ctk.CTkLabel(self.options_content, text="Chất lượng ảnh:", font=("Segoe UI", 11)).pack(anchor="w", pady=(5,0))
+            for val, text in [
+                ("low", "🟠 Nén mạnh (50% JPEG)"),
+                ("medium", "🟡 Cân bằng (75% JPEG) - Khuyến nghị"),
+                ("high", "🟢 Chất lượng cao (90% JPEG)"),
+            ]:
+                ctk.CTkRadioButton(
+                    self.options_content, text=text,
+                    variable=self.var_quality, value=val
+                ).pack(anchor="w", padx=10, pady=1)
 
         elif op == "rotate":
             ctk.CTkLabel(self.options_content, text="Góc xoay:").pack(anchor="w")
@@ -896,6 +916,30 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     ))
                     self.after(0, self._refresh_file_list)
                 return result
+            
+            elif op == "smart_compress":
+                # Smart compression - preserves text layer!
+                orig_size = os.path.getsize(input_path)
+                
+                def on_progress(current, total, percent):
+                    self.after(0, lambda c=current, t=total, p=percent: self._log(
+                        f"   🖼️ Image {c}/{t} ({p*100:.0f}%)"
+                    ))
+                
+                result, reduction, stats = pdf_tools.compress_pdf_smart(
+                    input_path, output_path,
+                    quality=self.var_quality.get(),
+                    progress_callback=on_progress
+                )
+                if result and os.path.exists(output_path):
+                    new_size = os.path.getsize(output_path)
+                    self.compression_results[input_path] = (orig_size, new_size)
+                    self.after(0, lambda s=stats: self._log(
+                        f"   ✅ {s.get('reduction_percent', 0):.1f}% smaller | Images: {s.get('images_compressed', 0)}/{s.get('images_found', 0)} | Text: ✓ Preserved"
+                    ))
+                    self.after(0, self._refresh_file_list)
+                return result
+            
             elif op == "protect":
                 pwd = self.var_password.get()
                 return pdf_tools.protect_pdf(input_path, output_path, pwd) if pwd else False

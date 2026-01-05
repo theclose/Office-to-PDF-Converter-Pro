@@ -758,7 +758,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.2.89"
+    VERSION = "4.2.90"
 
     def __init__(self):
         super().__init__()
@@ -1371,7 +1371,7 @@ class ConverterProApp(TkDnDWrapper):
             sheet_entry = ctk.CTkEntry(sheet_frame, textvariable=self.var_sheet_index,
                         width=80, placeholder_text="all")
             sheet_entry.pack(side="left", padx=5)
-            ctk.CTkLabel(sheet_frame, text="VD: 1-3, 5 hoặc để trống = tất cả", 
+            ctk.CTkLabel(sheet_frame, text="1-3, 5 hoặc trống=tất cả", 
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
 
             # Excel page range (renamed from PDF)

@@ -657,13 +657,12 @@ def compress_pdf_advanced(
         # ========================================
         # PHASE 3: Image optimization (KEY!)
         # ========================================
-        # NOTE: Direct image replacement can corrupt PDFs.
-        # Using safer approach: Only count images, actual optimization
-        # is done via garbage collection and deflate compression.
-        # For aggressive image compression, we use the 'rewrite' approach.
+        # Using page rasterization approach for reliable image compression.
+        # This converts each page to an image, then recreates the PDF.
+        # Works for all quality levels that need image compression.
         
-        if HAS_PIL and target_dpi and jpeg_quality and not remove_images:
-            logger.info(f"Phase 3: Image analysis (DPI={target_dpi}, JPEG={jpeg_quality}%)")
+        if target_dpi and jpeg_quality and not remove_images and quality != "lossless":
+            logger.info(f"Phase 3: Image compression (DPI={target_dpi}, Quality={jpeg_quality}%)")
             
             # Count images for stats
             for page_num in range(doc.page_count):
@@ -671,44 +670,62 @@ def compress_pdf_advanced(
                 image_list = page.get_images(full=True)
                 stats["images_found"] += len(image_list)
             
-            # For lossy compression, we rebuild the PDF with recompressed images
-            # This is safer than directly modifying xref streams
-            if quality in ["low", "extreme"]:
-                logger.info("Phase 3: Rebuilding with image compression...")
+            # Only do aggressive compression if there are images
+            if stats["images_found"] > 0:
+                logger.info(f"Phase 3: Rasterizing {doc.page_count} pages for compression...")
                 try:
-                    # Create a new document by copying pages
+                    # Create a new document with rasterized pages
                     new_doc = fitz.open()
                     
                     for page_num in range(doc.page_count):
                         page = doc[page_num]
+                        page_rect = page.rect
                         
-                        # Get page as pixmap at target DPI
-                        mat = fitz.Matrix(target_dpi / 72.0, target_dpi / 72.0)
-                        pix = page.get_pixmap(matrix=mat)
+                        # Calculate scale factor based on target DPI
+                        # Standard PDF is 72 DPI, so we scale accordingly
+                        scale = target_dpi / 72.0
+                        mat = fitz.Matrix(scale, scale)
                         
-                        # Convert to JPEG bytes
-                        img_data = pix.tobytes("jpeg", jpeg_quality=jpeg_quality)
+                        # Render page to pixmap
+                        pix = page.get_pixmap(matrix=mat, alpha=False)
                         
-                        # Create new page from image
-                        img_rect = fitz.Rect(0, 0, page.rect.width, page.rect.height)
-                        new_page = new_doc.new_page(width=page.rect.width, height=page.rect.height)
-                        new_page.insert_image(img_rect, stream=img_data)
+                        # Convert pixmap to JPEG bytes using correct API
+                        # Note: jpg_quality is the correct parameter name!
+                        img_data = pix.tobytes(output="jpg", jpg_quality=jpeg_quality)
+                        
+                        # Create new page with original dimensions
+                        new_page = new_doc.new_page(
+                            width=page_rect.width, 
+                            height=page_rect.height
+                        )
+                        
+                        # Insert the compressed image
+                        new_page.insert_image(
+                            new_page.rect,
+                            stream=img_data,
+                            keep_proportion=True
+                        )
                         
                         stats["images_optimized"] += 1
+                        
+                        # Log progress every 10 pages
+                        if (page_num + 1) % 10 == 0:
+                            logger.info(f"   Processed {page_num + 1}/{doc.page_count} pages")
                     
-                    # Close original and use new
+                    # Replace original doc with compressed version
                     doc.close()
                     doc = new_doc
-                    logger.info(f"Phase 3 complete: Rebuilt {stats['images_optimized']} pages")
+                    logger.info(f"Phase 3 complete: {stats['images_optimized']} pages compressed")
                     
                 except Exception as e:
-                    logger.warning(f"Image rebuild failed, using original: {e}")
+                    logger.error(f"Image compression failed: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Continue with original doc - don't fail completely
             else:
-                # For medium/high quality, just let deflate handle it
-                logger.info("Phase 3: Using deflate compression for images")
-                stats["images_optimized"] = 0  # Not individually optimized
-            
-            logger.info(f"Phase 3 complete: {stats['images_found']} images found")
+                logger.info("Phase 3: No images found, using deflate only")
+        else:
+            logger.info("Phase 3: Lossless mode - skipping image compression")
         
         elif remove_images:
             # Remove all images

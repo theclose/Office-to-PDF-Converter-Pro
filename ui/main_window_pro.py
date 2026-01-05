@@ -758,7 +758,7 @@ class FileListPanel(ctk.CTkFrame):
 class ConverterProApp(TkDnDWrapper):
     """Professional-grade Office to PDF Converter with robust Unicode drag-and-drop support."""
 
-    VERSION = "4.2.87"
+    VERSION = "4.2.88"
 
     def __init__(self):
         super().__init__()
@@ -807,7 +807,7 @@ class ConverterProApp(TkDnDWrapper):
         self.var_output_same = ctk.BooleanVar(value=self.config.get("output_same", True))
         self.var_output_folder = ctk.StringVar(value=self.config.get("output_folder", ""))
         # Setup window
-        self.title(f"Office to PDF Converter Pro - v{self.VERSION}")
+        self.title(f"Office to PDF Converter Pro - v{self.VERSION} | Tung Do - 0914665866")
         self.geometry("1000x750")
         self.minsize(900, 700)
 
@@ -1272,6 +1272,9 @@ class ConverterProApp(TkDnDWrapper):
                         font=ctk.CTkFont(size=22, weight="bold")).pack(side="left")
             ctk.CTkLabel(title_frame, text=f"v{self.VERSION}",
                         text_color="gray").pack(side="left", padx=10)
+            # Author info
+            ctk.CTkLabel(title_frame, text="| Tung Do - 0914665866",
+                        text_color="#4da6ff", font=ctk.CTkFont(size=12)).pack(side="left", padx=5)
 
             # Controls
             controls = ctk.CTkFrame(header, fg_color="transparent")

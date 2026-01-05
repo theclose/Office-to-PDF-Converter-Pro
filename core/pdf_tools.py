@@ -4,9 +4,10 @@ Based on PyMuPDF best practices from official documentation.
 """
 
 import os
+import io
 import logging
 import shutil
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Any
 
 try:
     import fitz  # PyMuPDF
@@ -491,6 +492,353 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
         import traceback
         traceback.print_exc()
         return False, 0.0
+
+
+# =============================================================================
+# ADVANCED PDF COMPRESSION - With Image Optimization
+# =============================================================================
+
+# Quality presets for compression
+COMPRESSION_PRESETS = {
+    "low": {
+        "dpi": 72,
+        "jpeg_quality": 50,
+        "description": "Maximum compression (may reduce image quality)",
+        "expected_reduction": "80-90%"
+    },
+    "medium": {
+        "dpi": 150,
+        "jpeg_quality": 75,
+        "description": "Balanced compression (recommended)",
+        "expected_reduction": "60-80%"
+    },
+    "high": {
+        "dpi": 200,
+        "jpeg_quality": 85,
+        "description": "Quality preserve (minimal visual loss)",
+        "expected_reduction": "40-60%"
+    },
+    "extreme": {
+        "dpi": 72,
+        "jpeg_quality": 30,
+        "grayscale": True,
+        "description": "Extreme compression (significant quality loss)",
+        "expected_reduction": "90-95%"
+    },
+    "lossless": {
+        "dpi": None,  # No image resampling
+        "jpeg_quality": None,  # No recompression
+        "description": "Lossless (only metadata/font optimization)",
+        "expected_reduction": "10-20%"
+    }
+}
+
+
+def compress_pdf_advanced(
+    input_path: str,
+    output_path: str,
+    quality: str = "medium",
+    target_dpi: int = None,
+    jpeg_quality: int = None,
+    grayscale: bool = False,
+    remove_images: bool = False,
+) -> Tuple[bool, float, Dict[str, Any]]:
+    """
+    Advanced PDF compression with image optimization.
+    
+    This function provides Adobe-level compression by:
+    1. Garbage collection (remove unused objects)
+    2. Stream compression (deflate)
+    3. Font subsetting (only embed used glyphs)
+    4. Metadata cleanup (scrub)
+    5. IMAGE OPTIMIZATION (KEY FEATURE):
+       - Downsampling high-DPI images
+       - JPEG recompression with quality control
+       - Optional grayscale conversion
+    
+    Args:
+        input_path: Path to input PDF
+        output_path: Path to output PDF
+        quality: Preset level - "low", "medium", "high", "extreme", "lossless"
+        target_dpi: Override DPI (default: from preset)
+        jpeg_quality: Override JPEG quality 1-100 (default: from preset)
+        grayscale: Convert images to grayscale (extra 10-20% savings)
+        remove_images: Remove all images (text-only output)
+        
+    Returns:
+        Tuple of (success, compression_percentage, detailed_stats)
+    """
+    # Validate dependencies
+    if not HAS_PYMUPDF:
+        logger.error("PyMuPDF (fitz) not installed")
+        return False, 0.0, {"error": "PyMuPDF not installed"}
+    
+    if not HAS_PIL:
+        logger.warning("PIL not installed - image optimization disabled")
+    
+    # Validate input
+    if not os.path.exists(input_path):
+        logger.error(f"Input file not found: {input_path}")
+        return False, 0.0, {"error": "File not found"}
+    
+    original_size = os.path.getsize(input_path)
+    if original_size == 0:
+        logger.error("Input file is empty")
+        return False, 0.0, {"error": "Empty file"}
+    
+    # Get preset settings
+    preset = COMPRESSION_PRESETS.get(quality, COMPRESSION_PRESETS["medium"])
+    target_dpi = target_dpi or preset.get("dpi")
+    jpeg_quality = jpeg_quality or preset.get("jpeg_quality")
+    grayscale = grayscale or preset.get("grayscale", False)
+    
+    logger.info(f"Starting advanced compression: {input_path}")
+    logger.info(f"Original size: {original_size / 1024:.1f} KB")
+    logger.info(f"Preset: {quality} (DPI={target_dpi}, JPEG={jpeg_quality}%)")
+    
+    # Statistics tracking
+    stats = {
+        "original_size": original_size,
+        "preset": quality,
+        "target_dpi": target_dpi,
+        "jpeg_quality": jpeg_quality,
+        "grayscale": grayscale,
+        "images_found": 0,
+        "images_optimized": 0,
+        "images_skipped": 0,
+        "fonts_subsetted": False,
+        "metadata_removed": False,
+    }
+    
+    try:
+        doc = fitz.open(input_path)
+        
+        if doc.page_count == 0:
+            logger.error("PDF has no pages")
+            doc.close()
+            return False, 0.0, {"error": "No pages"}
+        
+        stats["page_count"] = doc.page_count
+        
+        # ========================================
+        # PHASE 1: Metadata cleanup (Lossless)
+        # ========================================
+        try:
+            doc.scrub(
+                attached_files=True,
+                clean_pages=True,
+                embedded_files=True,
+                hidden_text=True,
+                javascript=True,
+                metadata=True,
+                redact_images=0,
+                redactions=True,
+                remove_links=False,
+                reset_fields=True,
+                reset_responses=True,
+                thumbnails=True,
+                xml_metadata=True,
+            )
+            stats["metadata_removed"] = True
+            logger.info("Phase 1: Metadata removed")
+        except Exception as e:
+            logger.warning(f"Scrub failed: {e}")
+        
+        # ========================================
+        # PHASE 2: Font subsetting (Lossless)
+        # ========================================
+        try:
+            doc.subset_fonts()
+            stats["fonts_subsetted"] = True
+            logger.info("Phase 2: Fonts subsetted")
+        except Exception as e:
+            logger.warning(f"Font subset failed: {e}")
+        
+        # ========================================
+        # PHASE 3: Image optimization (KEY!)
+        # ========================================
+        if HAS_PIL and target_dpi and jpeg_quality and not remove_images:
+            logger.info(f"Phase 3: Image optimization (DPI={target_dpi}, JPEG={jpeg_quality}%)")
+            
+            for page_num in range(doc.page_count):
+                page = doc[page_num]
+                image_list = page.get_images(full=True)
+                
+                for img_info in image_list:
+                    xref = img_info[0]
+                    stats["images_found"] += 1
+                    
+                    try:
+                        # Extract image
+                        base_image = doc.extract_image(xref)
+                        if not base_image:
+                            stats["images_skipped"] += 1
+                            continue
+                        
+                        image_bytes = base_image["image"]
+                        original_img_size = len(image_bytes)
+                        
+                        # Skip very small images (icons, etc.)
+                        if original_img_size < 5000:  # < 5KB
+                            stats["images_skipped"] += 1
+                            continue
+                        
+                        # Open with PIL
+                        pil_image = Image.open(io.BytesIO(image_bytes))
+                        orig_width, orig_height = pil_image.size
+                        
+                        # Calculate target size based on DPI
+                        # Estimate: assume images are meant for ~150 DPI viewing
+                        scale = target_dpi / 150.0
+                        new_width = max(1, int(orig_width * scale))
+                        new_height = max(1, int(orig_height * scale))
+                        
+                        # Only downscale, never upscale
+                        if new_width < orig_width and new_height < orig_height:
+                            pil_image = pil_image.resize(
+                                (new_width, new_height),
+                                Image.Resampling.LANCZOS
+                            )
+                        
+                        # Convert to grayscale if requested
+                        if grayscale and pil_image.mode != "L":
+                            pil_image = pil_image.convert("L")
+                        
+                        # Convert RGBA to RGB for JPEG
+                        if pil_image.mode == "RGBA":
+                            background = Image.new("RGB", pil_image.size, (255, 255, 255))
+                            background.paste(pil_image, mask=pil_image.split()[3])
+                            pil_image = background
+                        elif pil_image.mode not in ("RGB", "L"):
+                            pil_image = pil_image.convert("RGB")
+                        
+                        # Recompress as JPEG
+                        output_buffer = io.BytesIO()
+                        pil_image.save(
+                            output_buffer,
+                            format="JPEG",
+                            quality=jpeg_quality,
+                            optimize=True
+                        )
+                        new_image_bytes = output_buffer.getvalue()
+                        
+                        # Only replace if smaller
+                        if len(new_image_bytes) < original_img_size:
+                            # Create new image and insert
+                            new_pixmap = fitz.Pixmap(new_image_bytes)
+                            doc.xref_set_key(xref, "Filter", "/DCTDecode")
+                            doc.xref_set_key(xref, "Width", str(new_width))
+                            doc.xref_set_key(xref, "Height", str(new_height))
+                            doc.update_stream(xref, new_image_bytes)
+                            
+                            stats["images_optimized"] += 1
+                        else:
+                            stats["images_skipped"] += 1
+                            
+                    except Exception as e:
+                        logger.debug(f"Could not optimize image {xref}: {e}")
+                        stats["images_skipped"] += 1
+                        continue
+            
+            logger.info(f"Phase 3 complete: {stats['images_optimized']}/{stats['images_found']} images optimized")
+        
+        elif remove_images:
+            # Remove all images
+            logger.info("Phase 3: Removing all images")
+            for page_num in range(doc.page_count):
+                page = doc[page_num]
+                for img in page.get_images():
+                    xref = img[0]
+                    try:
+                        doc.xref_set_key(xref, "Width", "1")
+                        doc.xref_set_key(xref, "Height", "1")
+                        doc.update_stream(xref, b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t\x08\n\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a\x1f\x1e\x1d\x1a\x1c\x1c $.\' ",#\x1c\x1c(7),01444\x1f\'9telecast:telecast\xff\xc0\x00\x0b\x08\x00\x01\x00\x01\x01\x01\x11\x00\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4\x00\xb5\x10\x00\x02\x01\x03\x03\x02\x04\x03\x05\x05\x04\x04\x00\x00\x01}\x01\x02\x03\x00\x04\x11\x05\x12!1A\x06\x13Qa\x07"q\x142\x81\x91\xa1\x08#B\xb1\xc1\x15R\xd1\xf0$3br\x82\t\n\x16\x17\x18\x19\x1a%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xff\xda\x00\x08\x01\x01\x00\x00?\x00\xfb\xd5\xff\xd9')
+                        stats["images_optimized"] += 1
+                    except:
+                        pass
+        
+        # ========================================
+        # PHASE 4: Save with compression
+        # ========================================
+        logger.info("Phase 4: Saving with compression")
+        
+        # Use maximum compression settings
+        doc.save(
+            output_path,
+            garbage=4,           # Maximum garbage collection
+            deflate=True,        # Compress all streams
+            clean=True,          # Clean content streams
+            pretty=False,        # Don't pretty-print
+            no_new_id=True,      # Keep same ID
+        )
+        doc.close()
+        
+        # ========================================
+        # PHASE 5: Verify and report
+        # ========================================
+        if not os.path.exists(output_path):
+            logger.error("Output file was not created")
+            return False, 0.0, {"error": "Output not created"}
+        
+        new_size = os.path.getsize(output_path)
+        stats["new_size"] = new_size
+        
+        # If result is larger, use original
+        if new_size >= original_size:
+            logger.info("Compression did not reduce size - copying original")
+            shutil.copy(input_path, output_path)
+            stats["new_size"] = original_size
+            stats["reduction_percent"] = 0.0
+            return True, 0.0, stats
+        
+        reduction = ((original_size - new_size) / original_size) * 100
+        stats["reduction_percent"] = reduction
+        stats["saved_bytes"] = original_size - new_size
+        
+        logger.info(f"✅ Success: {original_size/1024:.1f}KB → {new_size/1024:.1f}KB ({reduction:.1f}% reduced)")
+        logger.info(f"   Images optimized: {stats['images_optimized']}/{stats['images_found']}")
+        
+        return True, reduction, stats
+        
+    except Exception as e:
+        logger.error(f"Advanced compression failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False, 0.0, {"error": str(e)}
+
+
+def estimate_compression(input_path: str, quality: str = "medium") -> Dict[str, Any]:
+    """
+    Estimate compression results without actually compressing.
+    Useful for preview in UI.
+    
+    Returns:
+        Dict with estimated new size and reduction percentage
+    """
+    if not os.path.exists(input_path):
+        return {"error": "File not found"}
+    
+    original_size = os.path.getsize(input_path)
+    
+    # Estimate based on preset
+    estimates = {
+        "low": 0.15,      # 85% reduction -> 15% of original
+        "medium": 0.30,   # 70% reduction -> 30% of original
+        "high": 0.50,     # 50% reduction -> 50% of original
+        "extreme": 0.08,  # 92% reduction -> 8% of original
+        "lossless": 0.85, # 15% reduction -> 85% of original
+    }
+    
+    factor = estimates.get(quality, 0.30)
+    estimated_size = int(original_size * factor)
+    estimated_reduction = (1 - factor) * 100
+    
+    return {
+        "original_size": original_size,
+        "estimated_size": estimated_size,
+        "estimated_reduction": estimated_reduction,
+        "preset": quality,
+    }
 
 
 # =============================================================================

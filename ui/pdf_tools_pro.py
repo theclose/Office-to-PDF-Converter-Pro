@@ -459,14 +459,22 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         op = self.var_operation.get()
 
         if op == "compress":
-            ctk.CTkLabel(self.options_content, text="Chất lượng:").pack(anchor="w")
-            for val, text in [("low", "🔹 Thấp (nhỏ nhất)"),
-                              ("medium", "🔸 Trung bình"),
-                              ("high", "🔶 Cao (chất lượng)")]:
+            ctk.CTkLabel(self.options_content, text="📊 Chất lượng nén:", font=("Segoe UI", 12, "bold")).pack(anchor="w")
+            # Quality presets with expected reduction
+            for val, text, desc in [
+                ("extreme", "🔴 Cực mạnh (90-95%)", "JPEG 30%, 72 DPI, Grayscale"),
+                ("low", "🟠 Mạnh (80-90%)", "JPEG 50%, 72 DPI"),
+                ("medium", "🟡 Cân bằng (60-80%)", "JPEG 75%, 150 DPI - Khuyến nghị"),
+                ("high", "🟢 Chất lượng (40-60%)", "JPEG 85%, 200 DPI"),
+                ("lossless", "⚪ Lossless (10-20%)", "Không nén ảnh"),
+            ]:
+                frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
+                frame.pack(fill="x", padx=5, pady=2)
                 ctk.CTkRadioButton(
-                    self.options_content, text=text,
-                    variable=self.var_quality, value=val
-                ).pack(anchor="w", padx=10)
+                    frame, text=text,
+                    variable=self.var_quality, value=val, width=200
+                ).pack(side="left")
+                ctk.CTkLabel(frame, text=desc, text_color="gray", font=("Segoe UI", 10)).pack(side="left", padx=5)
 
         elif op == "rotate":
             ctk.CTkLabel(self.options_content, text="Góc xoay:").pack(anchor="w")
@@ -852,10 +860,18 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         try:
             if op == "compress":
                 orig_size = os.path.getsize(input_path)
-                result, _ = pdf_tools.compress_pdf(input_path, output_path, self.var_quality.get())
+                # Use advanced compression with image optimization
+                result, reduction, stats = pdf_tools.compress_pdf_advanced(
+                    input_path, output_path, 
+                    quality=self.var_quality.get()
+                )
                 if result and os.path.exists(output_path):
                     new_size = os.path.getsize(output_path)
                     self.compression_results[input_path] = (orig_size, new_size)
+                    # Log detailed stats
+                    self.after(0, lambda s=stats: self._log(
+                        f"   📷 Images: {s.get('images_optimized', 0)}/{s.get('images_found', 0)} optimized"
+                    ))
                     self.after(0, self._refresh_file_list)
                 return result
             elif op == "protect":

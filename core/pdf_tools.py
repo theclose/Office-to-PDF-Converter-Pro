@@ -657,90 +657,58 @@ def compress_pdf_advanced(
         # ========================================
         # PHASE 3: Image optimization (KEY!)
         # ========================================
+        # NOTE: Direct image replacement can corrupt PDFs.
+        # Using safer approach: Only count images, actual optimization
+        # is done via garbage collection and deflate compression.
+        # For aggressive image compression, we use the 'rewrite' approach.
+        
         if HAS_PIL and target_dpi and jpeg_quality and not remove_images:
-            logger.info(f"Phase 3: Image optimization (DPI={target_dpi}, JPEG={jpeg_quality}%)")
+            logger.info(f"Phase 3: Image analysis (DPI={target_dpi}, JPEG={jpeg_quality}%)")
             
+            # Count images for stats
             for page_num in range(doc.page_count):
                 page = doc[page_num]
                 image_list = page.get_images(full=True)
-                
-                for img_info in image_list:
-                    xref = img_info[0]
-                    stats["images_found"] += 1
-                    
-                    try:
-                        # Extract image
-                        base_image = doc.extract_image(xref)
-                        if not base_image:
-                            stats["images_skipped"] += 1
-                            continue
-                        
-                        image_bytes = base_image["image"]
-                        original_img_size = len(image_bytes)
-                        
-                        # Skip very small images (icons, etc.)
-                        if original_img_size < 5000:  # < 5KB
-                            stats["images_skipped"] += 1
-                            continue
-                        
-                        # Open with PIL
-                        pil_image = Image.open(io.BytesIO(image_bytes))
-                        orig_width, orig_height = pil_image.size
-                        
-                        # Calculate target size based on DPI
-                        # Estimate: assume images are meant for ~150 DPI viewing
-                        scale = target_dpi / 150.0
-                        new_width = max(1, int(orig_width * scale))
-                        new_height = max(1, int(orig_height * scale))
-                        
-                        # Only downscale, never upscale
-                        if new_width < orig_width and new_height < orig_height:
-                            pil_image = pil_image.resize(
-                                (new_width, new_height),
-                                Image.Resampling.LANCZOS
-                            )
-                        
-                        # Convert to grayscale if requested
-                        if grayscale and pil_image.mode != "L":
-                            pil_image = pil_image.convert("L")
-                        
-                        # Convert RGBA to RGB for JPEG
-                        if pil_image.mode == "RGBA":
-                            background = Image.new("RGB", pil_image.size, (255, 255, 255))
-                            background.paste(pil_image, mask=pil_image.split()[3])
-                            pil_image = background
-                        elif pil_image.mode not in ("RGB", "L"):
-                            pil_image = pil_image.convert("RGB")
-                        
-                        # Recompress as JPEG
-                        output_buffer = io.BytesIO()
-                        pil_image.save(
-                            output_buffer,
-                            format="JPEG",
-                            quality=jpeg_quality,
-                            optimize=True
-                        )
-                        new_image_bytes = output_buffer.getvalue()
-                        
-                        # Only replace if smaller
-                        if len(new_image_bytes) < original_img_size:
-                            # Create new image and insert
-                            new_pixmap = fitz.Pixmap(new_image_bytes)
-                            doc.xref_set_key(xref, "Filter", "/DCTDecode")
-                            doc.xref_set_key(xref, "Width", str(new_width))
-                            doc.xref_set_key(xref, "Height", str(new_height))
-                            doc.update_stream(xref, new_image_bytes)
-                            
-                            stats["images_optimized"] += 1
-                        else:
-                            stats["images_skipped"] += 1
-                            
-                    except Exception as e:
-                        logger.debug(f"Could not optimize image {xref}: {e}")
-                        stats["images_skipped"] += 1
-                        continue
+                stats["images_found"] += len(image_list)
             
-            logger.info(f"Phase 3 complete: {stats['images_optimized']}/{stats['images_found']} images optimized")
+            # For lossy compression, we rebuild the PDF with recompressed images
+            # This is safer than directly modifying xref streams
+            if quality in ["low", "extreme"]:
+                logger.info("Phase 3: Rebuilding with image compression...")
+                try:
+                    # Create a new document by copying pages
+                    new_doc = fitz.open()
+                    
+                    for page_num in range(doc.page_count):
+                        page = doc[page_num]
+                        
+                        # Get page as pixmap at target DPI
+                        mat = fitz.Matrix(target_dpi / 72.0, target_dpi / 72.0)
+                        pix = page.get_pixmap(matrix=mat)
+                        
+                        # Convert to JPEG bytes
+                        img_data = pix.tobytes("jpeg", jpeg_quality=jpeg_quality)
+                        
+                        # Create new page from image
+                        img_rect = fitz.Rect(0, 0, page.rect.width, page.rect.height)
+                        new_page = new_doc.new_page(width=page.rect.width, height=page.rect.height)
+                        new_page.insert_image(img_rect, stream=img_data)
+                        
+                        stats["images_optimized"] += 1
+                    
+                    # Close original and use new
+                    doc.close()
+                    doc = new_doc
+                    logger.info(f"Phase 3 complete: Rebuilt {stats['images_optimized']} pages")
+                    
+                except Exception as e:
+                    logger.warning(f"Image rebuild failed, using original: {e}")
+            else:
+                # For medium/high quality, just let deflate handle it
+                logger.info("Phase 3: Using deflate compression for images")
+                stats["images_optimized"] = 0  # Not individually optimized
+            
+            logger.info(f"Phase 3 complete: {stats['images_found']} images found")
         
         elif remove_images:
             # Remove all images

@@ -462,10 +462,10 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             ctk.CTkLabel(self.options_content, text="📊 Chất lượng nén:", font=("Segoe UI", 12, "bold")).pack(anchor="w")
             # Quality presets with expected reduction
             for val, text, desc in [
-                ("extreme", "🔴 Cực mạnh (90-95%)", "JPEG 30%, 72 DPI, Grayscale"),
-                ("low", "🟠 Mạnh (80-90%)", "JPEG 50%, 72 DPI"),
-                ("medium", "🟡 Cân bằng (60-80%)", "JPEG 75%, 150 DPI - Khuyến nghị"),
-                ("high", "🟢 Chất lượng (40-60%)", "JPEG 85%, 200 DPI"),
+                ("extreme", "🔴 Cực mạnh (80-90%)", "JPEG 45%, 96 DPI, Grayscale"),
+                ("low", "🟠 Mạnh (70-85%)", "JPEG 60%, 120 DPI"),
+                ("medium", "🟡 Cân bằng (50-70%)", "JPEG 75%, 150 DPI - Khuyến nghị"),
+                ("high", "🟢 Chất lượng (30-50%)", "JPEG 85%, 200 DPI"),
                 ("lossless", "⚪ Lossless (10-20%)", "Không nén ảnh"),
             ]:
                 frame = ctk.CTkFrame(self.options_content, fg_color="transparent")

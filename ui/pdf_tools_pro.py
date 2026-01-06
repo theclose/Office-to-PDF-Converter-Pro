@@ -478,7 +478,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 ctk.CTkRadioButton(
                     frame, text=text,
                     variable=self.var_quality, value=val, width=200,
-                    command=self._update_options_frame
+                    command=self._update_options_panel
                 ).pack(side="left")
                 ctk.CTkLabel(frame, text=desc, text_color="gray", font=("Segoe UI", 10)).pack(side="left", padx=5)
             

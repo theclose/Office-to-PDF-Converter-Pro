@@ -100,6 +100,8 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.var_simulate_scan = ctk.BooleanVar(value=False)
         self.var_image_format = ctk.StringVar(value="png")
         self.var_combine_pages = ctk.BooleanVar(value=False)  # NEW: Combine all pages into single image
+        self.var_custom_jpeg = ctk.IntVar(value=75)  # Custom JPEG quality
+        self.var_custom_dpi = ctk.IntVar(value=150)  # Custom DPI
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
 
@@ -469,14 +471,35 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 ("medium", "🟡 Cân bằng (50-70%)", "JPEG 75%, 150 DPI - Khuyến nghị"),
                 ("high", "🟢 Chất lượng (30-50%)", "JPEG 85%, 200 DPI"),
                 ("lossless", "⚪ Lossless (10-20%)", "Không nén ảnh"),
+                ("custom", "⚙️ Tùy chỉnh", "Tự chọn JPEG% và DPI"),
             ]:
                 frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
                 frame.pack(fill="x", padx=5, pady=2)
                 ctk.CTkRadioButton(
                     frame, text=text,
-                    variable=self.var_quality, value=val, width=200
+                    variable=self.var_quality, value=val, width=200,
+                    command=self._update_options_frame
                 ).pack(side="left")
                 ctk.CTkLabel(frame, text=desc, text_color="gray", font=("Segoe UI", 10)).pack(side="left", padx=5)
+            
+            # Custom options (show when custom is selected)
+            if self.var_quality.get() == "custom":
+                custom_frame = ctk.CTkFrame(self.options_content, fg_color="#2b2b2b", corner_radius=8)
+                custom_frame.pack(fill="x", padx=10, pady=5)
+                
+                # JPEG Quality
+                jpeg_row = ctk.CTkFrame(custom_frame, fg_color="transparent")
+                jpeg_row.pack(fill="x", padx=10, pady=5)
+                ctk.CTkLabel(jpeg_row, text="JPEG Quality:", width=100).pack(side="left")
+                ctk.CTkEntry(jpeg_row, textvariable=self.var_custom_jpeg, width=60).pack(side="left", padx=5)
+                ctk.CTkLabel(jpeg_row, text="% (1-100)", text_color="gray", font=("Segoe UI", 10)).pack(side="left")
+                
+                # DPI
+                dpi_row = ctk.CTkFrame(custom_frame, fg_color="transparent")
+                dpi_row.pack(fill="x", padx=10, pady=5)
+                ctk.CTkLabel(dpi_row, text="DPI:", width=100).pack(side="left")
+                ctk.CTkEntry(dpi_row, textvariable=self.var_custom_dpi, width=60).pack(side="left", padx=5)
+                ctk.CTkLabel(dpi_row, text="(72-300)", text_color="gray", font=("Segoe UI", 10)).pack(side="left")
 
         elif op == "smart_compress":
             # Smart compression - preserves text layer
@@ -894,6 +917,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         try:
             if op == "compress":
                 orig_size = os.path.getsize(input_path)
+                quality = self.var_quality.get()
                 
                 # Progress callback for real-time updates
                 def on_progress(current, total, percent):
@@ -901,12 +925,24 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                         f"   📄 Page {c}/{t} ({p*100:.0f}%)"
                     ))
                 
-                # Use advanced compression with image optimization
-                result, reduction, stats = pdf_tools.compress_pdf_advanced(
-                    input_path, output_path, 
-                    quality=self.var_quality.get(),
-                    progress_callback=on_progress
-                )
+                # Handle custom preset
+                if quality == "custom":
+                    custom_jpeg = max(1, min(100, self.var_custom_jpeg.get()))
+                    custom_dpi = max(72, min(300, self.var_custom_dpi.get()))
+                    result, reduction, stats = pdf_tools.compress_pdf_advanced(
+                        input_path, output_path,
+                        quality="medium",  # Base preset
+                        dpi=custom_dpi,
+                        jpeg_quality=custom_jpeg,
+                        progress_callback=on_progress
+                    )
+                else:
+                    # Use preset
+                    result, reduction, stats = pdf_tools.compress_pdf_advanced(
+                        input_path, output_path, 
+                        quality=quality,
+                        progress_callback=on_progress
+                    )
                 if result and os.path.exists(output_path):
                     new_size = os.path.getsize(output_path)
                     self.compression_results[input_path] = (orig_size, new_size)

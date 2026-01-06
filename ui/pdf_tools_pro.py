@@ -485,21 +485,17 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
             # Custom options (show when custom is selected)
             if self.var_quality.get() == "custom":
                 custom_frame = ctk.CTkFrame(self.options_content, fg_color="#2b2b2b", corner_radius=8)
-                custom_frame.pack(fill="x", padx=10, pady=5)
+                custom_frame.pack(fill="x", padx=10, pady=3)
                 
-                # JPEG Quality
-                jpeg_row = ctk.CTkFrame(custom_frame, fg_color="transparent")
-                jpeg_row.pack(fill="x", padx=10, pady=5)
-                ctk.CTkLabel(jpeg_row, text="JPEG Quality:", width=100).pack(side="left")
-                ctk.CTkEntry(jpeg_row, textvariable=self.var_custom_jpeg, width=60).pack(side="left", padx=5)
-                ctk.CTkLabel(jpeg_row, text="% (1-100)", text_color="gray", font=("Segoe UI", 10)).pack(side="left")
-                
-                # DPI
-                dpi_row = ctk.CTkFrame(custom_frame, fg_color="transparent")
-                dpi_row.pack(fill="x", padx=10, pady=5)
-                ctk.CTkLabel(dpi_row, text="DPI:", width=100).pack(side="left")
-                ctk.CTkEntry(dpi_row, textvariable=self.var_custom_dpi, width=60).pack(side="left", padx=5)
-                ctk.CTkLabel(dpi_row, text="(72-300)", text_color="gray", font=("Segoe UI", 10)).pack(side="left")
+                # Single row: JPEG + DPI
+                row = ctk.CTkFrame(custom_frame, fg_color="transparent")
+                row.pack(fill="x", padx=8, pady=6)
+                ctk.CTkLabel(row, text="JPEG:", width=40).pack(side="left")
+                ctk.CTkEntry(row, textvariable=self.var_custom_jpeg, width=45).pack(side="left")
+                ctk.CTkLabel(row, text="%", text_color="gray", font=("Segoe UI", 9)).pack(side="left", padx=(2,10))
+                ctk.CTkLabel(row, text="DPI:", width=30).pack(side="left")
+                ctk.CTkEntry(row, textvariable=self.var_custom_dpi, width=45).pack(side="left")
+                ctk.CTkLabel(row, text="(72-300)", text_color="gray", font=("Segoe UI", 9)).pack(side="left", padx=2)
 
         elif op == "smart_compress":
             # Smart compression - preserves text layer

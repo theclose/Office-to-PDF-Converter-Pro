@@ -75,7 +75,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
 
         # Window setup
         self.title("🛠️ PDF Tools Pro")
-        self.geometry("1000x750")
+        self.geometry("1000x820")
         self.minsize(900, 700)
 
         # Center on screen

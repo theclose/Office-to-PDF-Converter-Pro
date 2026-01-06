@@ -100,8 +100,8 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         self.var_simulate_scan = ctk.BooleanVar(value=False)
         self.var_image_format = ctk.StringVar(value="png")
         self.var_combine_pages = ctk.BooleanVar(value=False)  # NEW: Combine all pages into single image
-        self.var_custom_jpeg = ctk.IntVar(value=75)  # Custom JPEG quality
-        self.var_custom_dpi = ctk.IntVar(value=150)  # Custom DPI
+        self.var_custom_jpeg = ctk.StringVar(value="75")  # Custom JPEG quality (StringVar to avoid TclError)
+        self.var_custom_dpi = ctk.StringVar(value="150")  # Custom DPI (StringVar to avoid TclError)
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
 
@@ -923,8 +923,16 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 
                 # Handle custom preset
                 if quality == "custom":
-                    custom_jpeg = max(1, min(100, self.var_custom_jpeg.get()))
-                    custom_dpi = max(72, min(300, self.var_custom_dpi.get()))
+                    # Parse custom values with defaults
+                    try:
+                        custom_jpeg = max(1, min(100, int(self.var_custom_jpeg.get() or "75")))
+                    except ValueError:
+                        custom_jpeg = 75
+                    try:
+                        custom_dpi = max(72, min(300, int(self.var_custom_dpi.get() or "150")))
+                    except ValueError:
+                        custom_dpi = 150
+                    
                     result, reduction, stats = pdf_tools.compress_pdf_advanced(
                         input_path, output_path,
                         quality="medium",  # Base preset

@@ -936,7 +936,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                     result, reduction, stats = pdf_tools.compress_pdf_advanced(
                         input_path, output_path,
                         quality="medium",  # Base preset
-                        dpi=custom_dpi,
+                        target_dpi=custom_dpi,
                         jpeg_quality=custom_jpeg,
                         progress_callback=on_progress
                     )

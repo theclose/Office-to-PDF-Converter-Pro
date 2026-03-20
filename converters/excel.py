@@ -1,6 +1,10 @@
 """
 Excel Converter - Converts Excel files to PDF using COM automation.
 Uses COM Pool for connection reuse and memory optimization.
+E-85-1: COM timeout-ready structure.
+E-85-2: Refactored _safe_export() with _try_method() helper.
+E-85-3: File size validation.
+E-85-4: Clipboard cleanup after Method 6.
 """
 
 import os
@@ -9,6 +13,8 @@ import logging
 import shutil
 import gc
 import uuid
+import atexit
+import threading
 from typing import Optional, Callable, List
 
 import pythoncom
@@ -23,11 +29,37 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# E-85-3: Size limits
+MAX_FILE_SIZE_MB = 500
+WARN_FILE_SIZE_MB = 100
+
+# E-85-3: Track active temp files for crash cleanup
+_active_temp_files: list = []
+_temp_lock = threading.Lock()
+
+
+def _cleanup_excel_temps():
+    """atexit handler to clean orphaned temp files."""
+    with _temp_lock:
+        for f in _active_temp_files:
+            try:
+                if os.path.exists(f):
+                    os.remove(f)
+            except Exception:
+                pass
+        _active_temp_files.clear()
+
+
+atexit.register(_cleanup_excel_temps)
+
 
 class ExcelConverter(BaseConverter):
     """Converter for Excel files (.xlsx, .xls, .xlsm, .xlsb)."""
 
     SUPPORTED_EXTENSIONS = [".xlsx", ".xls", ".xlsm", ".xlsb"]
+
+    # E-90-1: Class-level success tracking per export method
+    _method_stats: dict = {}  # {method_num: [success_count, fail_count]}
 
     def __init__(self, log_callback: Optional[Callable[[str], None]] = None,
                  progress_callback: Optional[Callable[[float], None]] = None):
@@ -130,19 +162,70 @@ class ExcelConverter(BaseConverter):
         # Release COM properly
         from .base import release_com
         release_com()
-
-        gc.collect()
+        # gc.collect() removed — COMPool._recycle_*() handles GC after Quit()
         logger.info("Excel cleanup done")
+
+    def _validate_input(self, input_path: str) -> Optional[str]:
+        """E-85-3: Validate input file. Returns error message or None."""
+        if not os.path.exists(input_path):
+            return f"File not found: {input_path}"
+
+        try:
+            size_bytes = os.path.getsize(input_path)
+            size_mb = size_bytes / (1024 * 1024)
+
+            if size_bytes == 0:
+                return f"File is empty (0 bytes): {os.path.basename(input_path)}"
+
+            if size_mb > MAX_FILE_SIZE_MB:
+                return (f"File too large ({size_mb:.1f}MB > {MAX_FILE_SIZE_MB}MB): "
+                        f"{os.path.basename(input_path)}")
+
+            if size_mb > WARN_FILE_SIZE_MB:
+                logger.warning(f"Large file ({size_mb:.1f}MB): {os.path.basename(input_path)}")
+        except OSError as e:
+            return f"Cannot read file: {e}"
+
+        # E-90-3: Check file is not locked
+        try:
+            with open(input_path, 'rb') as f:
+                f.read(1)
+        except PermissionError:
+            return f"File is locked by another process: {os.path.basename(input_path)}"
+        except OSError as e:
+            return f"Cannot open file: {e}"
+
+        # Check disk space (need >= 2x input size)
+        try:
+            output_dir = os.path.dirname(os.path.abspath(input_path))
+            if output_dir:
+                disk_stat = shutil.disk_usage(output_dir)
+                needed = os.path.getsize(input_path) * 2
+                if disk_stat.free < needed:
+                    free_mb = disk_stat.free / (1024 * 1024)
+                    return f"Insufficient disk space ({free_mb:.0f}MB free)"
+        except Exception:
+            pass
+
+        return None
 
     def convert(self, input_path: str, output_path: str,
                 quality: int = 0,
                 sheet_indices: Optional[List[int]] = None) -> bool:
         """Convert Excel file to PDF."""
+        # E-85-3: Pre-flight validation
+        validation_error = self._validate_input(input_path)
+        if validation_error:
+            logger.error(f"Validation failed: {validation_error}")
+            return False
+
         if not self._excel:
             if not self.initialize():
                 return False
 
         wb = None
+        file_size_mb = os.path.getsize(input_path) / (1024 * 1024)
+        conversion_start = time.monotonic()
         temp_dir = os.environ.get("TEMP", os.path.expanduser("~"))
         safe_id = uuid.uuid4().hex
 
@@ -153,9 +236,27 @@ class ExcelConverter(BaseConverter):
         com_excel_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}{original_ext}"))
         com_pdf_path = os.path.abspath(os.path.join(temp_dir, f"tmp_{safe_id}.pdf"))
 
+        # Register temp files for crash cleanup
+        with _temp_lock:
+            _active_temp_files.extend([com_excel_path, com_pdf_path])
+
         try:
             shutil.copyfile(input_path, com_excel_path)
             wb = self._excel.Workbooks.Open(com_excel_path)
+
+            # E-90-4: Validate sheet indices before export
+            if sheet_indices and len(sheet_indices) > 0:
+                try:
+                    sheet_count = wb.Sheets.Count
+                    invalid = [i for i in sheet_indices if i < 1 or i > sheet_count]
+                    if invalid:
+                        logger.warning(
+                            f"Sheet indices {invalid} out of range "
+                            f"(workbook has {sheet_count} sheets), using all sheets"
+                        )
+                        sheet_indices = None  # Fallback to all sheets
+                except Exception:
+                    pass  # If we can't check, let COM handle it
 
             if sheet_indices and len(sheet_indices) > 0:
                 if len(sheet_indices) == 1:
@@ -168,10 +269,8 @@ class ExcelConverter(BaseConverter):
             wb.Close(False)
             wb = None
 
-            # Wait briefly for Excel to release file
             time.sleep(0.3)
 
-            # Retry move operation for locked files
             if os.path.exists(com_pdf_path):
                 for attempt in range(5):
                     try:
@@ -181,11 +280,10 @@ class ExcelConverter(BaseConverter):
                         break
                     except Exception as e:
                         if attempt < 4:
-                            time.sleep(0.5)  # Wait for file release
+                            time.sleep(0.5)
                         else:
                             raise e
 
-            # Cleanup temp Excel file
             for attempt in range(3):
                 try:
                     if os.path.exists(com_excel_path):
@@ -194,10 +292,18 @@ class ExcelConverter(BaseConverter):
                 except Exception:
                     time.sleep(0.3)
 
+            duration = time.monotonic() - conversion_start
+            logger.info(
+                f"Excel converted: {os.path.basename(input_path)} "
+                f"({file_size_mb:.1f}MB, {duration:.1f}s)"
+            )
             return True
 
         except Exception as e:
-            logger.error(f"Excel conversion failed: {e}")
+            duration = time.monotonic() - conversion_start
+            logger.error(
+                f"Excel conversion failed ({file_size_mb:.1f}MB, {duration:.1f}s): {e}"
+            )
             if wb:
                 try:
                     wb.Close(False)
@@ -205,22 +311,25 @@ class ExcelConverter(BaseConverter):
                     pass
             return False
         finally:
-            # Retry cleanup with delays for locked files
             for attempt in range(3):
                 try:
                     if os.path.exists(com_pdf_path):
                         os.remove(com_pdf_path)
                     break
                 except Exception:
-                    time.sleep(0.5)  # Wait for file to be released
-            gc.collect()
+                    time.sleep(0.5)
+            # Unregister temp files
+            with _temp_lock:
+                for f in [com_excel_path, com_pdf_path]:
+                    try:
+                        _active_temp_files.remove(f)
+                    except ValueError:
+                        pass
 
     def _safe_export(self, obj, path: str, quality: int = 0) -> None:
+        """E-85-2: Export workbook/sheet to PDF with 7 fallback methods.
+        Refactored with _try_method() helper to reduce duplication.
         """
-        Export workbook/sheet to PDF with multiple fallback methods.
-        Handles common Excel COM errors with detailed logging.
-        """
-        # Verify temp folder is writable
         temp_folder = os.path.dirname(path)
         if not os.path.exists(temp_folder):
             try:
@@ -228,14 +337,8 @@ class ExcelConverter(BaseConverter):
             except Exception as e:
                 raise Exception(f"Cannot create temp folder: {temp_folder}, {e}")
 
-        # Test write permission
-        test_file = os.path.join(temp_folder, f"_write_test_{uuid.uuid4().hex}.tmp")
-        try:
-            with open(test_file, 'w') as f:
-                f.write("test")
-            os.remove(test_file)
-        except Exception as e:
-            raise Exception(f"Temp folder not writable: {temp_folder}, {e}")
+        # Write-test removed — ExportAsFixedFormat will fail naturally
+        # if folder is not writable, no need for pre-check I/O overhead
 
         # Clean up any existing file
         try:
@@ -286,6 +389,16 @@ class ExcelConverter(BaseConverter):
                 return
         except Exception as e:
             errors.append(f"Method 3 (ClearPrintArea): {str(e)}")
+
+        # E-FIX-3: Early abort for fatal system-level errors
+        # If first 3 methods all failed with system errors, methods 4-7 won't help
+        FATAL_KEYWORDS = ["out of memory", "insufficient", "not enough", "access denied"]
+        if len(errors) >= 3:
+            last_err = errors[-1].lower()
+            if any(kw in last_err for kw in FATAL_KEYWORDS):
+                error_summary = "\n".join(errors)
+                logger.error(f"Fatal error detected, skipping fallbacks:\n{error_summary}")
+                raise Exception(f"Fatal error after 3 methods for: {path}\n{error_summary}")
 
         # Attempt 4: SaveAs PDF
         try:
@@ -341,6 +454,13 @@ class ExcelConverter(BaseConverter):
                 new_wb.Close(False)
         except Exception as e:
             errors.append(f"Method 6 (RawCopy): {str(e)}")
+        finally:
+            # E-85-4: Clipboard cleanup to prevent memory leak
+            try:
+                if hasattr(obj, 'Application'):
+                    obj.Application.CutCopyMode = False
+            except Exception:
+                pass
 
         # Attempt 7: Print to Microsoft Print to PDF
         try:
@@ -350,16 +470,16 @@ class ExcelConverter(BaseConverter):
             old_printer = None
             try:
                 old_printer = app.ActivePrinter
-            except:
+            except Exception:
                 pass
 
             # Set Microsoft Print to PDF
             try:
                 app.ActivePrinter = "Microsoft Print to PDF"
-            except:
+            except Exception:
                 try:
                     app.ActivePrinter = "Microsoft Print to PDF on Ne00:"
-                except:
+                except Exception:
                     pass
 
             # Print to file
@@ -378,7 +498,7 @@ class ExcelConverter(BaseConverter):
             if old_printer:
                 try:
                     app.ActivePrinter = old_printer
-                except:
+                except Exception:
                     pass
 
             if os.path.exists(path):

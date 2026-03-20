@@ -167,7 +167,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
                 self.tab_view.set("✏️ Chỉnh sửa")
             elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
                 self.tab_view.set("🔄 Chuyển đổi")
-            elif op in ["compress", "protect", "watermark", "rasterize", "scanmode"]:
+            elif op in ["compress", "smart_compress", "protect", "watermark", "rasterize", "scanmode"]:
                 self.tab_view.set("⚡ Tối ưu")
         except Exception:
             pass  # Tab may not exist yet
@@ -855,6 +855,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel):
         # Get suffix
         suffixes = {
             "compress": "_compressed",
+            "smart_compress": "_smart_compressed",
             "rotate": "_rotated",
             "extract": "_extracted",
             "delete": "_deleted",

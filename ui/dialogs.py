@@ -15,7 +15,7 @@ if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
 from office_converter.utils.config import Config
-from office_converter.utils.localization import get_text, LANGUAGES
+from office_converter.utils.localization import get_text, AVAILABLE_LANGUAGES
 
 
 class SettingsDialog:
@@ -65,8 +65,8 @@ class SettingsDialog:
         frame_lang = ttk.LabelFrame(tab_general, text="🌐 Language", padding=5)
         frame_lang.pack(fill="x", pady=5)
 
-        for code, data in LANGUAGES.items():
-            ttk.Radiobutton(frame_lang, text=data["name"],
+        for code, name in AVAILABLE_LANGUAGES.items():
+            ttk.Radiobutton(frame_lang, text=name,
                            variable=self.var_language, value=code).pack(anchor="w")
 
         # Theme

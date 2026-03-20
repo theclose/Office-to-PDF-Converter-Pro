@@ -1,4 +1,2 @@
 # UI Module
-from .main_window import ConverterApp, main
-
-__all__ = ["ConverterApp", "main"]
+# Main App is now ran via run_pro.py directly.

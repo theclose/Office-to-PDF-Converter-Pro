@@ -19,122 +19,8 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Try to import psutil for system info
-try:
-    import psutil
-    HAS_PSUTIL = True
-except ImportError:
-    HAS_PSUTIL = False
-    logger.warning("psutil not installed - using limited system detection")
-
-
-# ============================================================================
-# SYSTEM PROFILER
-# ============================================================================
-
-@dataclass
-class SystemProfile:
-    """System hardware profile."""
-    cpu_name: str = "Unknown"
-    cpu_cores: int = 4
-    cpu_threads: int = 4
-    ram_total_gb: float = 8.0
-    ram_available_gb: float = 4.0
-    disk_type: str = "Unknown"  # SSD or HDD
-    performance_score: float = 1.0  # Normalized score (1.0 = baseline)
-
-    def to_dict(self) -> dict:
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls, data: dict) -> 'SystemProfile':
-        return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
-
-
-class SystemProfiler:
-    """
-    Detects and records system hardware specifications.
-    Used to normalize conversion time predictions across different machines.
-    """
-
-    # Baseline system (used for normalization)
-    BASELINE_CORES = 4
-    BASELINE_RAM_GB = 8.0
-
-    def __init__(self):
-        self.profile = self._detect_system()
-        logger.info(f"SystemProfiler initialized: {self.profile.cpu_name}, "
-                   f"{self.profile.cpu_cores}C/{self.profile.cpu_threads}T, "
-                   f"{self.profile.ram_total_gb:.1f}GB RAM, "
-                   f"Score: {self.profile.performance_score:.2f}")
-
-    def _detect_system(self) -> SystemProfile:
-        """Detect current system specifications."""
-        profile = SystemProfile()
-
-        if HAS_PSUTIL:
-            try:
-                # CPU info
-                profile.cpu_cores = psutil.cpu_count(logical=False) or 4
-                profile.cpu_threads = psutil.cpu_count(logical=True) or 4
-
-                # Try to get CPU name
-                try:
-                    import platform
-                    profile.cpu_name = platform.processor() or "Unknown CPU"
-                except Exception:
-                    pass
-
-                # RAM info
-                mem = psutil.virtual_memory()
-                profile.ram_total_gb = mem.total / (1024 ** 3)
-                profile.ram_available_gb = mem.available / (1024 ** 3)
-
-                # Disk type detection (check system drive)
-                try:
-                    disk_info = psutil.disk_partitions()
-                    if disk_info:
-                        # Simple heuristic: SSDs typically have faster read speeds
-                        profile.disk_type = "SSD"  # Assume SSD for modern systems
-                except Exception:
-                    pass
-
-            except Exception as e:
-                logger.warning(f"Error detecting system: {e}")
-
-        # Calculate performance score
-        profile.performance_score = self._calculate_performance_score(profile)
-
-        return profile
-
-    def _calculate_performance_score(self, profile: SystemProfile) -> float:
-        """
-        Calculate normalized performance score.
-        Score < 1.0 = faster than baseline
-        Score > 1.0 = slower than baseline
-        """
-        # CPU factor (more cores = faster)
-        cpu_factor = min(2.0, max(0.3, self.BASELINE_CORES / profile.cpu_cores))
-
-        # RAM factor (more RAM = faster)
-        ram_factor = min(2.0, max(0.3, self.BASELINE_RAM_GB / profile.ram_total_gb))
-
-        # Combined score (CPU weighted more heavily)
-        score = (cpu_factor * 0.6 + ram_factor * 0.4)
-
-        return round(score, 3)
-
-    def get_current_load(self) -> Dict[str, float]:
-        """Get current CPU and RAM usage."""
-        if HAS_PSUTIL:
-            try:
-                return {
-                    'cpu_percent': psutil.cpu_percent(interval=0.1),
-                    'ram_percent': psutil.virtual_memory().percent
-                }
-            except Exception:
-                pass
-        return {'cpu_percent': 50.0, 'ram_percent': 50.0}
+# SystemProfiler removed for performance optimization.
+# System hardware profiling via psutil is no longer used to simplify the app.
 
 
 # ============================================================================
@@ -283,9 +169,7 @@ class ConversionLogger:
         except Exception as e:
             logger.warning(f"Error logging conversion: {e}")
 
-    def get_records_by_type(self, file_type: str) -> List[ConversionRecord]:
-        """Get records filtered by file type."""
-        return [r for r in self.records if r.file_type == file_type and r.success]
+    # B4: get_records_by_type() removed — referenced nonexistent r.file_type field
 
     def get_statistics(self) -> Dict[str, Any]:
         """Get summary statistics."""
@@ -317,36 +201,24 @@ class AdaptiveEstimator:
     DEFAULT_TIME_PER_MB = 10.0  # 10 seconds per MB as starting point
     MIN_TIME = 3.0  # Minimum 3 seconds for any file (startup overhead)
 
-    def __init__(self, conv_logger: ConversionLogger, profiler: SystemProfiler):
-        """Initialize with logger."""
+    def __init__(self, conv_logger: ConversionLogger):
+        """Initialize with logger. Pre-compute running totals for O(1) updates."""
         self.logger = conv_logger
-        self.profiler = profiler
-        self.avg_time_per_mb = self._calculate_avg_time_per_mb()
+        # T3: Running totals — avoids O(N) re-scan after every conversion
+        records = [r for r in self.logger.records if r.success]
+        self._total_time = sum(r.duration_seconds for r in records)
+        self._total_size = sum(r.file_size_mb for r in records)
+        self._record_count = len(records)
+        self.avg_time_per_mb = self._compute_avg()
 
         logger.info(f"AdaptiveEstimator: avg_time_per_mb = {self.avg_time_per_mb:.2f}s/MB "
-                   f"(from {len(self.logger.records)} records)")
+                   f"(from {self._record_count} records)")
 
-    def _calculate_avg_time_per_mb(self) -> float:
-        """
-        Calculate average time per MB from historical data.
-        
-        Returns:
-            Average seconds per MB, or default if no data
-        """
-        records = [r for r in self.logger.records if r.success]
-
-        if not records:
+    def _compute_avg(self) -> float:
+        """Compute average time per MB from running totals. O(1)."""
+        if self._total_size < 0.1:
             return self.DEFAULT_TIME_PER_MB
-
-        total_time = sum(r.duration_seconds for r in records)
-        total_size = sum(r.file_size_mb for r in records)
-
-        if total_size < 0.1:  # Avoid division by zero
-            return self.DEFAULT_TIME_PER_MB
-
-        avg = total_time / total_size
-
-        # Sanity check: at least 1s/MB, at most 60s/MB
+        avg = self._total_time / self._total_size
         return max(1.0, min(60.0, avg))
 
     def estimate(self, file_path: str, unit_count: int = 1) -> float:
@@ -395,12 +267,19 @@ class AdaptiveEstimator:
         self.logger.log_conversion(
             file_path=file_path,
             duration=actual_duration,
-            success=success,
-            system_score=self.profiler.profile.performance_score
+            success=success
         )
 
-        # Recalculate average with new data
-        self.avg_time_per_mb = self._calculate_avg_time_per_mb()
+        # T3: O(1) incremental update instead of O(N) re-scan
+        if success:
+            try:
+                file_size_mb = os.path.getsize(file_path) / (1024 * 1024)
+                self._total_time += actual_duration
+                self._total_size += file_size_mb
+                self._record_count += 1
+                self.avg_time_per_mb = self._compute_avg()
+            except Exception:
+                pass
 
         logger.debug(f"Updated avg_time_per_mb = {self.avg_time_per_mb:.2f}s/MB")
 
@@ -409,17 +288,8 @@ class AdaptiveEstimator:
 # GLOBAL INSTANCES
 # ============================================================================
 
-_profiler: Optional[SystemProfiler] = None
 _logger: Optional[ConversionLogger] = None
 _estimator: Optional[AdaptiveEstimator] = None
-
-
-def get_system_profiler() -> SystemProfiler:
-    """Get global system profiler instance."""
-    global _profiler
-    if _profiler is None:
-        _profiler = SystemProfiler()
-    return _profiler
 
 
 def get_conversion_logger() -> ConversionLogger:
@@ -434,7 +304,7 @@ def get_adaptive_estimator() -> AdaptiveEstimator:
     """Get global adaptive estimator instance."""
     global _estimator
     if _estimator is None:
-        _estimator = AdaptiveEstimator(get_conversion_logger(), get_system_profiler())
+        _estimator = AdaptiveEstimator(get_conversion_logger())
     return _estimator
 
 

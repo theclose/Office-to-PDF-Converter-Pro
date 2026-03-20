@@ -106,7 +106,7 @@ class RecentFilesDB:
 
     def log_conversion(self, input_path: str, output_path: str,
                        status: str, duration: float):
-        """Log conversion result."""
+        """Log conversion result (with commit — use for single operations)."""
         try:
             with self._lock:
                 conn = self._get_connection()
@@ -118,6 +118,44 @@ class RecentFilesDB:
                 conn.commit()
         except Exception as e:
             logger.error(f"Log conversion error: {e}")
+
+    def batch_log(self, input_path: str, output_path: str,
+                  status: str, duration: float):
+        """Log conversion WITHOUT commit — caller must call flush().
+        Reduces O(N) fsync to O(1) for batch of N files."""
+        try:
+            with self._lock:
+                conn = self._get_connection()
+                conn.execute("""
+                    INSERT INTO conversion_history
+                    (input_path, output_path, status, duration)
+                    VALUES (?, ?, ?, ?)
+                """, (input_path, output_path, status, duration))
+        except Exception as e:
+            logger.error(f"Batch log error: {e}")
+
+    def batch_add_recent(self, path: str):
+        """Add recent file WITHOUT commit — caller must call flush()."""
+        try:
+            with self._lock:
+                conn = self._get_connection()
+                conn.execute("""
+                    INSERT INTO recent_files (path, last_used, use_count)
+                    VALUES (?, CURRENT_TIMESTAMP, 1)
+                    ON CONFLICT(path) DO UPDATE SET
+                        last_used = CURRENT_TIMESTAMP,
+                        use_count = use_count + 1
+                """, (path,))
+        except Exception as e:
+            logger.error(f"Batch add recent error: {e}")
+
+    def flush(self):
+        """Commit all pending batch writes. O(1) fsync."""
+        try:
+            with self._lock:
+                self._get_connection().commit()
+        except Exception as e:
+            logger.error(f"Flush error: {e}")
 
     def get_stats(self) -> Dict[str, Any]:
         """Get conversion statistics."""

@@ -28,3 +28,9 @@ Nếu muốn tự động commit SAU MỖI thay đổi, chạy lệnh:
 ```
 python scripts/auto_commit.py "auto-update"
 ```
+
+## Auto-update CLAUDE.md
+
+**SAU MỖI COMMIT**, nếu có thay đổi file trong `converters/`, `core/`, `ui/`, `utils/`, hoặc `requirements.txt`:
+- Chạy `/update-claude-md` để cập nhật CLAUDE.md
+- Điều này đảm bảo AI agents luôn có context mới nhất

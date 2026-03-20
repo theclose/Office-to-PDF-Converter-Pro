@@ -1,32 +1,39 @@
 """
 Watchdog & Health Monitoring System
 =====================================
-Monitors application and worker health for 24/7 stability.
+Monitors application health during active conversions.
+Designed to be an idle service that only runs when needed.
 
 Features:
-- Worker health monitoring
-- Automatic worker restart on failure
-- Memory usage tracking
-- Conversion success rate monitoring
+- Memory usage tracking 
+- General CPU monitoring
+- Conversion success rate tracking
 """
 
 import os
 import time
 import logging
 import threading
-from typing import Optional, Dict, List, Any, Callable
+from typing import Optional, Dict, Any, Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import deque
 
 logger = logging.getLogger(__name__)
 
-# Try to import psutil for system monitoring
-try:
-    import psutil
-    HAS_PSUTIL = True
-except ImportError:
-    HAS_PSUTIL = False
+# Lazy-loaded psutil
+_psutil = None
+
+def _get_psutil():
+    """Lazy import psutil on first use if it exists."""
+    global _psutil
+    if _psutil is None:
+        try:
+            import psutil
+            _psutil = psutil
+        except ImportError:
+            _psutil = False
+    return _psutil if _psutil is not False else None
 
 
 # =============================================================================
@@ -40,22 +47,17 @@ class HealthMetrics:
     memory_mb: float = 0.0
     cpu_percent: float = 0.0
     conversion_success_rate: float = 1.0
-    active_workers: int = 0
-    pending_jobs: int = 0
     total_conversions: int = 0
     failed_conversions: int = 0
     
     def is_healthy(self) -> bool:
         """Check if metrics indicate healthy state."""
         # Unhealthy conditions:
-        # - Memory > 2GB
-        # - Success rate < 50%
-        # - No active workers when jobs pending
+        # - Memory > 2048 MB (2GB)
+        # - Success rate < 50% after a reasonable sample size
         if self.memory_mb > 2048:
             return False
         if self.conversion_success_rate < 0.5 and self.total_conversions > 10:
-            return False
-        if self.active_workers == 0 and self.pending_jobs > 0:
             return False
         return True
 
@@ -118,61 +120,43 @@ class ConversionTracker:
 
 class Watchdog:
     """
-    Monitors application health and triggers recovery actions.
-    
-    Usage:
-        watchdog = Watchdog()
-        watchdog.start()
-        
-        # Register health check callbacks
-        watchdog.on_unhealthy = lambda metrics: restart_workers()
-        
-        # Get current health
-        metrics = watchdog.get_metrics()
-        
-        watchdog.stop()
+    Monitors application health during active conversions.
+    Only active while start() is called and stopped when jobs finish.
     """
     
     CHECK_INTERVAL = 5.0  # seconds
     
-    def __init__(
-        self,
-        parallel_converter=None,
-        on_unhealthy: Optional[Callable[[HealthMetrics], None]] = None,
-        on_worker_died: Optional[Callable[[int], None]] = None
-    ):
+    def __init__(self, on_unhealthy: Optional[Callable[[HealthMetrics], None]] = None):
         """
         Args:
-            parallel_converter: ParallelConverter instance to monitor
             on_unhealthy: Callback when system becomes unhealthy
-            on_worker_died: Callback when a worker process dies
         """
-        self.parallel_converter = parallel_converter
         self.on_unhealthy = on_unhealthy
-        self.on_worker_died = on_worker_died
-        
         self.tracker = ConversionTracker()
         self._thread: Optional[threading.Thread] = None
         self._stop_event = threading.Event()
         self._last_metrics: Optional[HealthMetrics] = None
-        self._known_dead_workers: set = set()
+        self._lock = threading.Lock()
     
     def start(self):
         """Start the watchdog monitoring thread."""
-        if self._thread is not None and self._thread.is_alive():
-            return
-        
-        self._stop_event.clear()
-        self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
-        self._thread.start()
-        logger.info("Watchdog started")
+        with self._lock:
+            if self._thread is not None and self._thread.is_alive():
+                return
+            
+            self._stop_event.clear()
+            self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
+            self._thread.start()
+            logger.info("Watchdog started for active conversions")
     
     def stop(self):
         """Stop the watchdog."""
         self._stop_event.set()
-        if self._thread is not None:
-            self._thread.join(timeout=2.0)
-        logger.info("Watchdog stopped")
+        with self._lock:
+            if self._thread is not None:
+                self._thread.join(timeout=2.0)
+                self._thread = None
+            logger.info("Watchdog stopped (system idle)")
     
     def record_conversion(self, success: bool, duration: float = 0.0):
         """Record a conversion for tracking."""
@@ -184,7 +168,8 @@ class Watchdog:
         metrics.timestamp = datetime.now()
         
         # System metrics
-        if HAS_PSUTIL:
+        psutil = _get_psutil()
+        if psutil:
             try:
                 process = psutil.Process()
                 metrics.memory_mb = process.memory_info().rss / (1024 * 1024)
@@ -196,15 +181,6 @@ class Watchdog:
         metrics.conversion_success_rate = self.tracker.get_success_rate()
         metrics.total_conversions = self.tracker.get_total()
         metrics.failed_conversions = self.tracker.get_failed()
-        
-        # Worker metrics
-        if self.parallel_converter is not None:
-            try:
-                status = self.parallel_converter.get_worker_status()
-                metrics.active_workers = sum(1 for w in status if w["alive"])
-                metrics.pending_jobs = self.parallel_converter.get_pending_count()
-            except Exception:
-                pass
         
         self._last_metrics = metrics
         return metrics
@@ -224,51 +200,14 @@ class Watchdog:
                         except Exception as e:
                             logger.error(f"Unhealthy callback error: {e}")
                 
-                # Check for dead workers
-                if self.parallel_converter is not None:
-                    self._check_workers()
-                
             except Exception as e:
                 logger.error(f"Watchdog error: {e}")
             
             # Wait for next check
             self._stop_event.wait(self.CHECK_INTERVAL)
-    
-    def _check_workers(self):
-        """Check for dead workers and trigger callbacks."""
-        try:
-            status = self.parallel_converter.get_worker_status()
-            
-            for worker in status:
-                worker_id = worker["id"]
-                is_alive = worker["alive"]
-                
-                if not is_alive and worker_id not in self._known_dead_workers:
-                    # New dead worker
-                    self._known_dead_workers.add(worker_id)
-                    logger.warning(f"Worker {worker_id} died")
-                    
-                    if self.on_worker_died:
-                        try:
-                            self.on_worker_died(worker_id)
-                        except Exception as e:
-                            logger.error(f"Worker died callback error: {e}")
-                
-                elif is_alive and worker_id in self._known_dead_workers:
-                    # Worker was restarted
-                    self._known_dead_workers.remove(worker_id)
-                    logger.info(f"Worker {worker_id} recovered")
-                    
-        except Exception as e:
-            logger.error(f"Worker check error: {e}")
 
-
-# =============================================================================
-# GLOBAL INSTANCE
-# =============================================================================
-
+# Global instances for tracking if needed
 _watchdog: Optional[Watchdog] = None
-
 
 def get_watchdog() -> Watchdog:
     """Get or create global watchdog instance."""
@@ -277,18 +216,19 @@ def get_watchdog() -> Watchdog:
         _watchdog = Watchdog()
     return _watchdog
 
-
-def start_watchdog(parallel_converter=None):
+def start_watchdog():
     """Start the global watchdog."""
     watchdog = get_watchdog()
-    watchdog.parallel_converter = parallel_converter
     watchdog.start()
     return watchdog
-
 
 def stop_watchdog():
     """Stop the global watchdog."""
     global _watchdog
     if _watchdog is not None:
         _watchdog.stop()
-        _watchdog = None
+
+def record_watchdog_conversion(success: bool, duration: float = 0.0):
+    """Convenience method to record against global watchdog if it exists."""
+    if _watchdog is not None:
+        _watchdog.record_conversion(success, duration)

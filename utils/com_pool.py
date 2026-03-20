@@ -4,6 +4,7 @@ Implements Singleton pattern for each Office application.
 """
 
 import logging
+import time
 import threading
 import pythoncom
 import win32com.client
@@ -21,7 +22,11 @@ class COMPool:
     """
 
     _instance = None
-    _lock = threading.Lock()
+    _lock = threading.RLock()  # Must be RLock: __new__ holds lock + calls _reset_idle_timer which also acquires it
+
+    # Idle timeout (5 minutes)
+    IDLE_TIMEOUT = 300
+    _idle_timer: Optional[threading.Timer] = None
 
     # Pool storage
     _excel: Optional[Any] = None
@@ -37,12 +42,34 @@ class COMPool:
     RECYCLE_THRESHOLD = 50
     MAX_RETRY = 3
 
+    # B1: Skip health-check if last successful use was within this interval
+    HEALTH_CHECK_INTERVAL = 30  # seconds
+    _excel_last_ok: float = 0.0
+    _word_last_ok: float = 0.0
+    _ppt_last_ok: float = 0.0
+
     def __new__(cls):
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
                     cls._instance = super().__new__(cls)
+                    # Start idle timer when pool is first created
+                    cls._instance._reset_idle_timer()
         return cls._instance
+
+    def _reset_idle_timer(self):
+        """Reset the idle timeout timer."""
+        with self._lock:
+            if self._idle_timer:
+                self._idle_timer.cancel()
+            self._idle_timer = threading.Timer(self.IDLE_TIMEOUT, self._on_idle_timeout)
+            self._idle_timer.daemon = True
+            self._idle_timer.start()
+
+    def _on_idle_timeout(self):
+        """Called when pool has been idle for IDLE_TIMEOUT seconds."""
+        logger.info("COM Pool idle timeout reached. Releasing all COM instances to free memory.")
+        self.release_all()
 
     def _is_excel_alive(self) -> bool:
         """Check if Excel instance is still alive and responsive."""
@@ -88,9 +115,11 @@ class COMPool:
             return None
 
         with self._lock:
-            # Health check existing instance
-            if self._excel is not None and not self._is_excel_alive():
-                self._excel = None
+            # B1: Only health-check if last successful use was >30s ago
+            if self._excel is not None:
+                if time.time() - self._excel_last_ok > self.HEALTH_CHECK_INTERVAL:
+                    if not self._is_excel_alive():
+                        self._excel = None
             
             if self._excel is None:
                 try:
@@ -104,6 +133,8 @@ class COMPool:
                     return None
 
             self._excel_count += 1
+            self._excel_last_ok = time.time()
+            self._reset_idle_timer()
 
             if self._excel_count >= self.RECYCLE_THRESHOLD:
                 self._recycle_excel()
@@ -118,9 +149,11 @@ class COMPool:
             return None
 
         with self._lock:
-            # Health check existing instance
-            if self._word is not None and not self._is_word_alive():
-                self._word = None
+            # B1: Only health-check if last successful use was >30s ago
+            if self._word is not None:
+                if time.time() - self._word_last_ok > self.HEALTH_CHECK_INTERVAL:
+                    if not self._is_word_alive():
+                        self._word = None
             
             if self._word is None:
                 try:
@@ -134,6 +167,8 @@ class COMPool:
                     return None
 
             self._word_count += 1
+            self._word_last_ok = time.time()
+            self._reset_idle_timer()
 
             if self._word_count >= self.RECYCLE_THRESHOLD:
                 self._recycle_word()
@@ -148,9 +183,11 @@ class COMPool:
             return None
 
         with self._lock:
-            # Health check existing instance
-            if self._ppt is not None and not self._is_ppt_alive():
-                self._ppt = None
+            # B1: Only health-check if last successful use was >30s ago
+            if self._ppt is not None:
+                if time.time() - self._ppt_last_ok > self.HEALTH_CHECK_INTERVAL:
+                    if not self._is_ppt_alive():
+                        self._ppt = None
             
             if self._ppt is None:
                 try:
@@ -164,6 +201,8 @@ class COMPool:
                     return None
 
             self._ppt_count += 1
+            self._ppt_last_ok = time.time()
+            self._reset_idle_timer()
 
             if self._ppt_count >= self.RECYCLE_THRESHOLD:
                 self._recycle_ppt()
@@ -235,11 +274,14 @@ class COMPool:
             logger.info("PowerPoint COM recycled")
 
     def release_all(self):
-        """Release all COM instances. Call on app exit."""
+        """Release all COM instances."""
         with self._lock:
             self._recycle_excel()
             self._recycle_word()
             self._recycle_ppt()
+            if self._idle_timer:
+                self._idle_timer.cancel()
+                self._idle_timer = None
             logger.info("All COM instances released")
 
     def get_stats(self) -> Dict[str, int]:

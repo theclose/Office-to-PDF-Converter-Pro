@@ -8,111 +8,6 @@
 ## Functions cần test
 
 
-### clean()
-**File**: `build_exe.py:27`
-**Docstring**: Clean build artifacts.
-```python
-def clean():
-    """Clean build artifacts."""
-    print("🧹 Cleaning build artifacts...")
-    
-    for folder in [DIST_DIR, BUILD_DIR]:
-        if folder.exists():
-            shutil.rmtree(folder)
-            print(f"  Removed: {folder}")
-```
-
-
-### create_version_info()
-**File**: `build_exe.py:45`
-**Docstring**: Create version info file for Windows.
-```python
-def create_version_info():
-    """Create version info file for Windows."""
-    version_parts = VERSION.split(".")
-    major = version_parts[0] if len(version_parts) > 0 else "1"
-    minor = version_parts[1] if len(version_parts) > 1 else "0"
-    patch = version_parts[2] if len(version_parts) > 2 else "0"
-    
-    version_info = f'''
-```
-
-
-### get_hidden_imports()
-**File**: `build_exe.py:92`
-**Docstring**: Get list of hidden imports - comprehensive for all features.
-```python
-def get_hidden_imports():
-    """Get list of hidden imports - comprehensive for all features."""
-    return [
-        # Core modules
-        "office_converter",
-        "office_converter.converters",
-        "office_converter.converters.excel",
-        "office_converter.converters.word",
-```
-
-
-### get_excludes()
-**File**: `build_exe.py:193`
-**Docstring**: Get modules to exclude for smaller size.
-```python
-def get_excludes():
-    """Get modules to exclude for smaller size."""
-    return [
-        # Large packages we don't need
-        "torch", "scipy", "numpy", "pandas", "matplotlib",
-        "sklearn", "scikit-learn", "tensorflow", "keras",
-        "cv2", "opencv", "opencv-python",
-        "IPython", "ipython", "notebook", "jupyter", "jupyterlab",
-```
-
-
-### get_data_files()
-**File**: `build_exe.py:213`
-**Docstring**: Get data files to include.
-```python
-def get_data_files():
-    """Get data files to include."""
-    data_files = []
-    
-    # CustomTkinter
-    try:
-        import customtkinter
-        ctk_path = Path(customtkinter.__file__).parent
-```
-
-
-### build()
-**File**: `build_exe.py:238`
-**Docstring**: Build the executable.
-```python
-def build():
-    """Build the executable."""
-    print(f"🔨 Building {APP_NAME} v{VERSION}...")
-    print()
-    
-    # Ensure main script exists
-    main_script_path = PROJECT_ROOT / MAIN_SCRIPT
-    if not main_script_path.exists():
-```
-
-
-### main()
-**File**: `build_exe.py:341`
-**Docstring**: Main entry point.
-```python
-def main():
-    """Main entry point."""
-    if "--clean" in sys.argv:
-        clean()
-    elif "--help" in sys.argv:
-        print(__doc__)
-    else:
-        sys.exit(build())
-```
-
-
 ### print_step(msg)
 **File**: `build_script.py:12`
 **Docstring**: Print step with formatting.
@@ -155,6 +50,111 @@ def main():
     
     if not run_command("pyinstaller --version", "Check PyInstaller"):
         print("Installing PyInstaller...")
+```
+
+
+### run_cmd(cmd, description, safe)
+**File**: `deploy_automation.py:11`
+**Docstring**: Run command with error handling.
+```python
+def run_cmd(cmd, description, safe=True):
+    """Run command with error handling."""
+    print(f"\n{'='*60}")
+    print(f"⚙️  {description}")
+    print(f"Command: {cmd}")
+    print(f"{'='*60}")
+    
+    if not safe:
+```
+
+
+### main()
+**File**: `deploy_automation.py:36`
+**Docstring**: No docstring
+```python
+def main():
+    print("""
+╔══════════════════════════════════════════════════════════╗
+║   Office Converter Pro v4.1.6 - Automated Deployment    ║
+╚══════════════════════════════════════════════════════════╝
+""")
+    
+    # Step 1: Pre-Deployment Verification
+```
+
+
+### test_modules()
+**File**: `main.py:21`
+**Docstring**: Test that all modules load correctly.
+```python
+def test_modules():
+    """Test that all modules load correctly."""
+    logger = get_logger("test")
+    
+    print("=" * 50)
+    print("Office Converter - Module Test")
+    print("=" * 50)
+    
+```
+
+
+### main()
+**File**: `run_grid.py:57`
+**Docstring**: Main entry point for Autonomous Conversion Grid.
+```python
+def main():
+    """Main entry point for Autonomous Conversion Grid."""
+    logger.info("="*60)
+    logger.info("Autonomous Conversion Grid - Starting")
+    logger.info("="*60)
+    
+    try:
+        # Create grid
+```
+
+
+### run_tests()
+**File**: `test_all.py:13`
+**Docstring**: No docstring
+```python
+def run_tests():
+    print('=== COMPREHENSIVE TEST ===')
+    print()
+    errors = []
+    
+    # Test 1: Config
+    print('[1] Config...')
+    try:
+```
+
+
+### test_basic_functionality()
+**File**: `validate_core.py:19`
+**Docstring**: Quick smoke test for core components.
+```python
+def test_basic_functionality():
+    """Quick smoke test for core components."""
+    print("=" * 60)
+    print("VALIDATION: Core Data Structures")
+    print("=" * 60)
+    
+    # Create test file
+    import tempfile
+```
+
+
+### validate()
+**File**: `validate_shim.py:19`
+**Docstring**: Run comprehensive shim layer validation.
+```python
+def validate():
+    """Run comprehensive shim layer validation."""
+    print("=" * 60)
+    print("SHIM LAYER VALIDATION")
+    print("=" * 60)
+    print()
+    
+    # Step 1: Verify legacy files exist on disk
 ```
 
 

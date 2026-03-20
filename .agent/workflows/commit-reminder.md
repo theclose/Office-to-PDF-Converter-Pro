@@ -13,6 +13,8 @@ description: Quy trình commit code sau mỗi thay đổi
    ```
    python scripts/auto_commit.py "mô tả thay đổi"
    ```
+3. **Nếu thay đổi liên quan đến `converters/`, `core/`, `ui/`, `utils/`, hoặc `requirements.txt`:**
+   → Tự động chạy `/update-claude-md` sau commit để cập nhật CLAUDE.md
 
 ## Loại thay đổi và bump type
 

@@ -298,5 +298,10 @@
     "pt_q_target_desc": "压缩到指定文件大小",
     "pt_target_kb_label": "最大大小:",
     "pt_target_current": "当前文件: {size} KB",
-    "pt_target_hint": "二分搜索自动查找最优质量"
+    "pt_target_hint": "二分搜索自动查找最优质量",
+    "pt_split_each": "每页 → 1个文件",
+    "pt_split_parts": "分成N个文件",
+    "pt_split_pages": "每个文件N页",
+    "pt_split_num_parts": "文件数:",
+    "pt_split_num_pages": "每文件页数:"
 }

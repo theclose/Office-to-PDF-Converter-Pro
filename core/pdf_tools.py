@@ -12,7 +12,7 @@ from office_converter.core.pdf.conversion import (
     pdf_to_images, pdf_to_single_image, images_to_pdf
 )
 from office_converter.core.pdf.merge_split import (
-    merge_pdfs, split_pdf
+    merge_pdfs, split_pdf, split_pdf_by_parts, split_pdf_by_pages_per_file,
 )
 from office_converter.core.pdf.pages import (
     rotate_pages, parse_page_range, extract_pages, delete_pages, reorder_pages, reverse_pages, extract_pdf_pages

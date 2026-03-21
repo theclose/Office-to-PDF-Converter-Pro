@@ -235,7 +235,23 @@ class PDFToolsOpsMixin:
                     imgs = pdf_tools.pdf_to_images(input_path, output_path, self.var_dpi.get(), self.var_image_format.get())
                     return len(imgs) > 0
             elif op == "split":
-                return pdf_tools.split_pdf(input_path, output_path)
+                split_mode = self.var_split_mode.get()
+                if split_mode == "by_parts":
+                    try:
+                        num_parts = max(2, int(self.var_split_num.get() or "3"))
+                    except ValueError:
+                        num_parts = 3
+                    self.after(0, lambda n=num_parts: self._log(f"   📦 Tách thành {n} file"))
+                    return pdf_tools.split_pdf_by_parts(input_path, output_path, num_parts)
+                elif split_mode == "by_pages":
+                    try:
+                        pages_per = max(1, int(self.var_split_num.get() or "5"))
+                    except ValueError:
+                        pages_per = 5
+                    self.after(0, lambda n=pages_per: self._log(f"   📑 Mỗi file {n} trang"))
+                    return pdf_tools.split_pdf_by_pages_per_file(input_path, output_path, pages_per)
+                else:
+                    return pdf_tools.split_pdf(input_path, output_path)
             elif op == "img_to_pdf":
                 return pdf_tools.images_to_pdf([input_path], output_path)
             elif op == "ocr":

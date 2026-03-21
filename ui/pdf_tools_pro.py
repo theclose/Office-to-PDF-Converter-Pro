@@ -105,6 +105,8 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         self.var_custom_jpeg = ctk.StringVar(value="75")  # Custom JPEG quality (StringVar to avoid TclError)
         self.var_custom_dpi = ctk.StringVar(value="150")  # Custom DPI (StringVar to avoid TclError)
         self.var_target_kb = ctk.StringVar(value="1000")  # Target size in KB
+        self.var_split_mode = ctk.StringVar(value="each_page")  # Split mode: each_page / by_parts / by_pages
+        self.var_split_num = ctk.StringVar(value="3")  # Number for split modes
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
 
@@ -561,6 +563,65 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                     self.options_content, text=text,
                     variable=self.var_quality, value=val
                 ).pack(anchor="w", padx=10, pady=1)
+
+        elif op == "split":
+            ctk.CTkLabel(self.options_content, text="✂️ Chế độ tách:",
+                        font=("Segoe UI", 12, "bold")).pack(anchor="w")
+            
+            for val, text in [
+                ("each_page", get_text("pt_split_each", "📄 Mỗi trang → 1 file")),
+                ("by_parts", get_text("pt_split_parts", "📦 Tách thành N file")),
+                ("by_pages", get_text("pt_split_pages", "📑 Mỗi file N trang")),
+            ]:
+                ctk.CTkRadioButton(
+                    self.options_content, text=text,
+                    variable=self.var_split_mode, value=val,
+                    command=self._update_options_panel,
+                ).pack(anchor="w", padx=10, pady=2)
+            
+            mode = self.var_split_mode.get()
+            if mode in ("by_parts", "by_pages"):
+                input_frame = ctk.CTkFrame(self.options_content, fg_color="#1a2a3a", corner_radius=8)
+                input_frame.pack(fill="x", padx=10, pady=5)
+                
+                row = ctk.CTkFrame(input_frame, fg_color="transparent")
+                row.pack(fill="x", padx=8, pady=4)
+                
+                if mode == "by_parts":
+                    label = get_text("pt_split_num_parts", "Số file cần tách:")
+                else:
+                    label = get_text("pt_split_num_pages", "Số trang mỗi file:")
+                
+                ctk.CTkLabel(row, text=label, font=("Segoe UI", 11)).pack(side="left")
+                ctk.CTkEntry(row, textvariable=self.var_split_num, width=50).pack(side="left", padx=5)
+                
+                # Page count hint
+                if self.files:
+                    try:
+                        import fitz as fitz_mod
+                        doc = fitz_mod.open(self.files[0])
+                        pc = len(doc)
+                        doc.close()
+                        if mode == "by_parts":
+                            try:
+                                n = max(1, int(self.var_split_num.get()))
+                                import math
+                                ppf = math.ceil(pc / n)
+                                hint = f"{pc} trang ÷ {n} file ≈ {ppf} trang/file"
+                            except ValueError:
+                                hint = f"{pc} trang"
+                        else:
+                            try:
+                                n = max(1, int(self.var_split_num.get()))
+                                import math
+                                parts = math.ceil(pc / n)
+                                hint = f"{pc} trang ÷ {n} = {parts} file"
+                            except ValueError:
+                                hint = f"{pc} trang"
+                        ctk.CTkLabel(row, text=hint, text_color="#4ade80",
+                                    font=("Segoe UI", 9)).pack(side="left", padx=8)
+                    except Exception:
+                        pass
 
         elif op == "rotate":
             ctk.CTkLabel(self.options_content, text=get_text("rotation_angle")).pack(anchor="w")

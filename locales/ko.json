@@ -298,5 +298,10 @@
     "pt_q_target_desc": "지정된 파일 크기로 압축",
     "pt_target_kb_label": "최대 크기:",
     "pt_target_current": "현재 파일: {size} KB",
-    "pt_target_hint": "이진 검색으로 최적 품질 자동 검색"
+    "pt_target_hint": "이진 검색으로 최적 품질 자동 검색",
+    "pt_split_each": "각 페이지 → 1개 파일",
+    "pt_split_parts": "N개 파일로 분할",
+    "pt_split_pages": "파일당 N페이지",
+    "pt_split_num_parts": "파일 수:",
+    "pt_split_num_pages": "파일당 페이지:"
 }

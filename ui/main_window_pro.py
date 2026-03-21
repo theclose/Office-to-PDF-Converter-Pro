@@ -76,6 +76,7 @@ from office_converter.ui.dialogs_mixin import DialogsMixin
 # FILE LIST COMPONENT — extracted to file_panel.py (R1 refactoring)
 # ============================================================================
 from office_converter.ui.file_panel import FileListPanel
+from office_converter.ui.collapsible_section import CollapsibleSection
 
 
 # ============================================================================
@@ -369,23 +370,134 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             # Enforce width — don't let content shrink the frame
             right_frame.pack_propagate(False)
 
-            # Options panel - takes full height of right column
-            self._create_options_panel(right_frame)
+            # ── P3: STICKY CONVERT BUTTON (top of right panel, always visible) ──
+            convert_section = ctk.CTkFrame(right_frame, fg_color="transparent")
+            convert_section.pack(fill="x", padx=10, pady=(10, 5))
 
-            # === CONVERT BUTTON ===
             self.btn_convert = ctk.CTkButton(
-                self.main_content_frame,
+                convert_section,
                 text=get_text('btn_convert'),
                 command=self._start_conversion,
-                height=50,
-                font=ctk.CTkFont(size=18, weight="bold"),
+                height=48,
+                font=ctk.CTkFont(size=16, weight="bold"),
                 fg_color="#16A34A",
                 hover_color="#15803D",
+                corner_radius=10,
                 state="disabled"
             )
-            self.btn_convert.pack(fill="x", pady=(10, 0))
+            self.btn_convert.pack(fill="x")
 
-            # === PROGRESS PANEL (initially hidden) ===
+            self.btn_stop = ctk.CTkButton(
+                convert_section,
+                text=get_text('btn_stop_convert'),
+                command=self._stop_conversion,
+                font=ctk.CTkFont(size=14, weight="bold"),
+                fg_color="#DC2626",
+                hover_color="#B91C1C",
+                height=40,
+                corner_radius=8
+            )
+            # btn_stop initially hidden — shown during conversion
+
+            # ── P3: COMPACT INLINE PROGRESS (right panel) ──
+            self.compact_progress_frame = ctk.CTkFrame(
+                right_frame, fg_color="#1F2937", corner_radius=10
+            )
+            # Initially hidden — shown during conversion
+
+            # Percentage + file count
+            compact_top = ctk.CTkFrame(self.compact_progress_frame, fg_color="transparent")
+            compact_top.pack(fill="x", padx=10, pady=(8, 2))
+
+            self.compact_percent = ctk.CTkLabel(
+                compact_top, text="0%",
+                font=ctk.CTkFont(size=28, weight="bold"),
+                text_color="#22C55E"
+            )
+            self.compact_percent.pack(side="left")
+
+            self.compact_file_count = ctk.CTkLabel(
+                compact_top, text="0/0",
+                font=ctk.CTkFont(size=13),
+                text_color="#9CA3AF"
+            )
+            self.compact_file_count.pack(side="right")
+
+            # Compact progress bar
+            self.compact_progress_bar = ctk.CTkProgressBar(
+                self.compact_progress_frame,
+                height=8,
+                corner_radius=4,
+                progress_color="#22C55E",
+                fg_color="#374151"
+            )
+            self.compact_progress_bar.pack(fill="x", padx=10, pady=2)
+            self.compact_progress_bar.set(0)
+
+            # Time + current file row
+            compact_info = ctk.CTkFrame(self.compact_progress_frame, fg_color="transparent")
+            compact_info.pack(fill="x", padx=10, pady=(2, 4))
+
+            self.compact_time = ctk.CTkLabel(
+                compact_info, text="⏱ 00:00  ⏳ --:--",
+                font=ctk.CTkFont(size=10),
+                text_color="#9CA3AF"
+            )
+            self.compact_time.pack(side="left")
+
+            compact_file_info = ctk.CTkFrame(self.compact_progress_frame, fg_color="transparent")
+            compact_file_info.pack(fill="x", padx=10, pady=(0, 8))
+
+            ctk.CTkLabel(
+                compact_file_info, text="📄",
+                font=ctk.CTkFont(size=11)
+            ).pack(side="left")
+
+            self.compact_current_file = ctk.CTkLabel(
+                compact_file_info, text=get_text('waiting'),
+                font=ctk.CTkFont(size=10),
+                text_color="#D1D5DB",
+                anchor="w"
+            )
+            self.compact_current_file.pack(side="left", padx=5, fill="x", expand=True)
+
+            # ── OPTIONS (collapsible accordion) ──
+            self._create_options_panel(right_frame)
+
+            # ── TOOLS BUTTONS (bottom of right panel) ──
+            tools_frame = ctk.CTkFrame(right_frame, fg_color="transparent")
+            tools_frame.pack(fill="x", padx=10, pady=(5, 10), side="bottom")
+
+            self.btn_pdf = ctk.CTkButton(
+                tools_frame, text=get_text('btn_pdf_tools'), width=90,
+                command=self._open_pdf_tools,
+                fg_color="#3B82F6", hover_color="#2563EB",
+                height=30, font=ctk.CTkFont(size=11)
+            )
+            self.btn_pdf.pack(side="left", padx=2)
+            self.btn_excel = ctk.CTkButton(
+                tools_frame, text=get_text('btn_excel_tools'), width=95,
+                command=self._open_excel_tools,
+                fg_color="#10B981", hover_color="#059669",
+                height=30, font=ctk.CTkFont(size=11)
+            )
+            self.btn_excel.pack(side="left", padx=2)
+
+            ctk.CTkButton(
+                tools_frame, text=get_text('btn_file_tools'), width=90,
+                command=self._open_file_tools,
+                fg_color="transparent", border_width=1,
+                height=30, font=ctk.CTkFont(size=11)
+            ).pack(side="left", padx=2)
+
+            try:
+                from CTkToolTip import CTkToolTip
+                CTkToolTip(self.btn_pdf, message=get_text('tooltip_pdf'), delay=0.3)
+                CTkToolTip(self.btn_excel, message=get_text('tooltip_excel'), delay=0.3)
+            except ImportError:
+                pass
+
+            # === FULL PROGRESS PANEL (shown below file list during conversion) ===
             self.progress_frame = ctk.CTkFrame(
                 self.main_content_frame,
                 corner_radius=15,
@@ -558,19 +670,6 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             )
             self.current_file_label.pack(side="left", fill="x", expand=True)
 
-            # ─── STOP BUTTON ───
-            self.btn_stop = ctk.CTkButton(
-                self.progress_frame,
-                text=get_text('btn_stop_convert'),
-                command=self._stop_conversion,
-                font=ctk.CTkFont(size=14, weight="bold"),
-                fg_color="#DC2626",
-                hover_color="#B91C1C",
-                height=45,
-                corner_radius=8
-            )
-            self.btn_stop.pack(fill="x", padx=15, pady=(5, 15))
-
             # === LOG ===
             log_frame = ctk.CTkFrame(self, corner_radius=12)
             log_frame.pack(fill="x", padx=15, pady=(5, 15))
@@ -605,13 +704,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             self.lang_dropdown.set(current_lang_name)
             self.lang_dropdown.pack(side="left")
 
-            ctk.CTkButton(log_header, text=get_text('btn_pdf_tools'), width=100,
-                         command=self._open_pdf_tools).pack(side="right", padx=5)
-            
-            ctk.CTkButton(log_header, text=get_text('btn_file_tools'), width=100,
-                         command=self._open_file_tools).pack(side="right", padx=5)
-
-            self.log_textbox = ctk.CTkTextbox(log_frame, height=80,
+            self.log_textbox = ctk.CTkTextbox(log_frame, height=100,
                                               font=ctk.CTkFont(family="Consolas", size=11))
             self.log_textbox.pack(fill="x", padx=10, pady=(0, 10))
 
@@ -676,7 +769,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             logger.error(f"Create header error: {e}")
 
     def _create_options_panel(self, parent):
-        """Create options panel. U3: Wrapped in ScrollableFrame for small screens."""
+        """Create options panel with collapsible accordion sections."""
         try:
             # U3: Scrollable container for options
             scroll_container = ctk.CTkScrollableFrame(
@@ -685,16 +778,17 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             )
             scroll_container.pack(fill="both", expand=True, padx=5, pady=5)
 
-            options = ctk.CTkFrame(scroll_container, fg_color="transparent")
-            options.pack(fill="x", padx=5, pady=5)
+            # ══════════════════════════════════════════════════
+            # SECTION 1: Quality (expanded by default)
+            # ══════════════════════════════════════════════════
+            self.section_quality = CollapsibleSection(
+                scroll_container,
+                title=get_text('section_quality'),
+                expanded=True
+            )
+            self.section_quality.pack(fill="x", pady=2)
 
-            # ══════════════════════════════════════════════════
-            # SECTION 1: Chất lượng
-            # ══════════════════════════════════════════════════
-            section1_label = ctk.CTkLabel(options, text=get_text('section_quality'),
-                                          font=ctk.CTkFont(size=11, weight="bold"),
-                                          text_color="gray")
-            section1_label.pack(fill="x", pady=(5, 2))
+            options = self.section_quality.content
 
             # Output folder
             output_frame = ctk.CTkFrame(options, fg_color="transparent")
@@ -754,7 +848,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 options, text=self._quality_hints.get(self.var_quality.get(), ""),
                 text_color="gray", font=ctk.CTkFont(size=10, slant="italic")
             )
-            self.quality_hint.pack(fill="x", padx=15, pady=(0, 2))
+            self.quality_hint.pack(fill="x", padx=5, pady=(0, 2))
 
             # DPI entry row — shown only for Custom DPI
             self.dpi_frame = ctk.CTkFrame(options, fg_color="transparent")
@@ -798,14 +892,18 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                          command=self._save_scan_mode).pack(fill="x", pady=3)
 
             # ══════════════════════════════════════════════════
-            # SECTION 2: Bảo mật
+            # SECTION 2: Security (collapsed by default)
             # ══════════════════════════════════════════════════
-            section2_label = ctk.CTkLabel(options, text=get_text('section_security'),
-                                          font=ctk.CTkFont(size=11, weight="bold"),
-                                          text_color="gray")
-            section2_label.pack(fill="x", pady=(8, 2))
+            self.section_security = CollapsibleSection(
+                scroll_container,
+                title=get_text('section_security'),
+                expanded=False
+            )
+            self.section_security.pack(fill="x", pady=2)
 
-            pw_frame = ctk.CTkFrame(options, fg_color="transparent")
+            security_content = self.section_security.content
+
+            pw_frame = ctk.CTkFrame(security_content, fg_color="transparent")
             pw_frame.pack(fill="x", pady=3)
 
             ctk.CTkSwitch(pw_frame, text=get_text('password_pdf'),
@@ -817,14 +915,18 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             self.password_entry.pack(side="left", padx=5)
 
             # ══════════════════════════════════════════════════
-            # SECTION 3: Excel
+            # SECTION 3: Excel (collapsed by default)
             # ══════════════════════════════════════════════════
-            section3_label = ctk.CTkLabel(options, text=get_text('section_excel'),
-                                          font=ctk.CTkFont(size=11, weight="bold"),
-                                          text_color="gray")
-            section3_label.pack(fill="x", pady=(8, 2))
+            self.section_excel = CollapsibleSection(
+                scroll_container,
+                title=get_text('section_excel'),
+                expanded=False
+            )
+            self.section_excel.pack(fill="x", pady=2)
 
-            sheet_frame = ctk.CTkFrame(options, fg_color="transparent")
+            excel_content = self.section_excel.content
+
+            sheet_frame = ctk.CTkFrame(excel_content, fg_color="transparent")
             sheet_frame.pack(fill="x", pady=3)
 
             ctk.CTkLabel(sheet_frame, text=get_text('sheet_label'),
@@ -835,7 +937,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             ctk.CTkLabel(sheet_frame, text="VD: 1-3, 5", 
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
 
-            page_frame = ctk.CTkFrame(options, fg_color="transparent")
+            page_frame = ctk.CTkFrame(excel_content, fg_color="transparent")
             page_frame.pack(fill="x", pady=3)
 
             ctk.CTkLabel(page_frame, text=get_text('page_label'),

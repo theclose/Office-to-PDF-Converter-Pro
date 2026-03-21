@@ -127,9 +127,26 @@ class ConversionMixin:
             if self.current_file_label:
                 self.current_file_label.configure(text=get_text('waiting'))
 
-            # Show progress frame
-            if self.progress_frame and self.btn_convert:
-                self.progress_frame.pack(fill="x", pady=15, after=self.btn_convert)
+            # Show progress frame (below main content area)
+            if self.progress_frame:
+                self.progress_frame.pack(fill="x", pady=15)
+
+            # P3: Show compact progress + stop button in right panel
+            if hasattr(self, 'compact_progress_frame'):
+                self.compact_progress_frame.pack(
+                    fill="x", padx=10, pady=5,
+                    after=self.btn_convert.master  # after convert_section
+                )
+                self.compact_progress_bar.set(0)
+                self.compact_percent.configure(text="0%")
+                total = len(self.file_panel.files)
+                self.compact_file_count.configure(text=f"0/{total}")
+                self.compact_current_file.configure(text=get_text('waiting'))
+                self.compact_time.configure(text="\u23f1 00:00  \u23f3 --:--")
+            if hasattr(self, 'btn_stop') and self.btn_stop:
+                self.btn_stop.pack(fill="x", pady=(5, 0))
+            if hasattr(self, 'btn_convert') and self.btn_convert:
+                self.btn_convert.pack_forget()
 
             # Parse DPI
             try:
@@ -224,9 +241,16 @@ class ConversionMixin:
                 if hasattr(self, 'progress_frame') and self.progress_frame:
                     self.progress_frame.pack_forget()
 
+                # P3: Hide compact progress and stop, restore convert button
+                if hasattr(self, 'compact_progress_frame'):
+                    self.compact_progress_frame.pack_forget()
+                if hasattr(self, 'btn_stop') and self.btn_stop:
+                    self.btn_stop.pack_forget()
+
                 # Re-enable convert button and show main content
                 if hasattr(self, 'btn_convert') and self.btn_convert:
-                    self.btn_convert.configure(state="normal")
+                    self.btn_convert.pack(fill="x")
+                    self.btn_convert.configure(state="normal", text=get_text('btn_convert'))
                 if hasattr(self, 'main_content_frame') and self.main_content_frame:
                     self.main_content_frame.pack(fill="both", expand=True, padx=15, pady=10)
 
@@ -297,6 +321,28 @@ class ConversionMixin:
 
                 rem_mins, rem_secs = divmod(int(max(0, remaining)), 60)
                 self.remaining_label.configure(text=f"{rem_mins:02d}:{rem_secs:02d}")
+
+            # P3: Sync compact progress panel
+            if hasattr(self, 'compact_progress_bar'):
+                self.compact_progress_bar.set(progress)
+            if hasattr(self, 'compact_percent'):
+                self.compact_percent.configure(text=f"{percent}%")
+            if hasattr(self, 'compact_file_count'):
+                self.compact_file_count.configure(text=f"{current + 1}/{total}")
+            if hasattr(self, 'compact_current_file'):
+                display_name = filename if len(filename) <= 35 else filename[:32] + "..."
+                self.compact_current_file.configure(text=display_name)
+            if hasattr(self, 'compact_time') and hasattr(self, 'conversion_start_time'):
+                elapsed = time.time() - self.conversion_start_time
+                e_m, e_s = divmod(int(elapsed), 60)
+                if progress > 0.05:
+                    remaining = max(0, (elapsed / progress) - elapsed)
+                else:
+                    remaining = self.total_estimated_time - elapsed
+                r_m, r_s = divmod(int(max(0, remaining)), 60)
+                self.compact_time.configure(
+                    text=f"\u23f1 {e_m:02d}:{e_s:02d}  \u23f3 {r_m:02d}:{r_s:02d}"
+                )
 
         except Exception as e:
             logger.error(f"Update progress UI error: {e}")
@@ -437,6 +483,13 @@ class ConversionMixin:
         try:
             if self.progress_frame:
                 self.progress_frame.pack_forget()
+            # P3: Hide compact progress, restore convert button
+            if hasattr(self, 'compact_progress_frame'):
+                self.compact_progress_frame.pack_forget()
+            if hasattr(self, 'btn_stop') and self.btn_stop:
+                self.btn_stop.pack_forget()
+            if hasattr(self, 'btn_convert') and self.btn_convert:
+                self.btn_convert.pack(fill="x")
         except Exception:
             pass
 

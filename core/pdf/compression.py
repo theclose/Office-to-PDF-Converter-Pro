@@ -993,3 +993,479 @@ def estimate_compression(input_path: str, quality: str = "medium") -> Dict[str, 
     }
     
     return result
+
+
+# ============================================================
+# Feature 1: SSIM Perceptual Quality Metric
+# ============================================================
+
+def compute_ssim(original_path: str, compressed_path: str, page: int = 0, dpi: int = 72) -> Dict[str, Any]:
+    """Compute SSIM (Structural Similarity Index) between original and compressed PDF.
+    
+    SSIM measures perceptual quality, not just pixel difference.
+    Range: 0.0 (completely different) to 1.0 (identical).
+    - > 0.98: Visually perfect (human can't distinguish)
+    - > 0.95: Excellent (minor differences visible only at zoom)
+    - > 0.90: Good (acceptable for most documents)
+    - > 0.80: Fair (visible artifacts)
+    - < 0.80: Poor (significant quality loss)
+    
+    Uses simplified SSIM without scipy dependency.
+    
+    Args:
+        original_path: Path to original PDF
+        compressed_path: Path to compressed PDF
+        page: Page number to compare (0-indexed)
+        dpi: Render DPI for comparison (72 = fast, 150 = accurate)
+    
+    Returns:
+        Dict with ssim, quality_label, avg_pixel_diff, black_percent
+    """
+    fitz = get_fitz()
+    if not fitz or not HAS_PIL:
+        return {"error": "PyMuPDF or Pillow not available", "ssim": 0.0}
+    
+    try:
+        doc_orig = fitz.open(original_path)
+        doc_comp = fitz.open(compressed_path)
+        
+        if page >= doc_orig.page_count or page >= doc_comp.page_count:
+            return {"error": f"Page {page} out of range", "ssim": 0.0}
+        
+        # Render pages at specified DPI
+        mat = fitz.Matrix(dpi / 72.0, dpi / 72.0)
+        pix_orig = doc_orig[page].get_pixmap(matrix=mat)
+        pix_comp = doc_comp[page].get_pixmap(matrix=mat)
+        
+        doc_orig.close()
+        doc_comp.close()
+        
+        # Convert to PIL for analysis
+        img_orig = Image.frombytes("RGB", [pix_orig.width, pix_orig.height], pix_orig.samples)
+        img_comp = Image.frombytes("RGB", [pix_comp.width, pix_comp.height], pix_comp.samples)
+        
+        # Ensure same size
+        if img_orig.size != img_comp.size:
+            img_comp = img_comp.resize(img_orig.size, Image.LANCZOS)
+        
+        # Convert to grayscale for SSIM (standard practice)
+        gray_orig = img_orig.convert("L")
+        gray_comp = img_comp.convert("L")
+        
+        # Simplified SSIM computation (no scipy needed)
+        # SSIM = (2*μx*μy + C1)(2*σxy + C2) / (μx² + μy² + C1)(σx² + σy² + C2)
+        import array
+        
+        width, height = gray_orig.size
+        pixels_orig = list(gray_orig.getdata())
+        pixels_comp = list(gray_comp.getdata())
+        n = len(pixels_orig)
+        
+        if n == 0:
+            return {"error": "Empty image", "ssim": 0.0}
+        
+        # Block-based SSIM (8x8 blocks, like JPEG)
+        block_size = 8
+        C1 = (0.01 * 255) ** 2  # Stabilization constants
+        C2 = (0.03 * 255) ** 2
+        
+        ssim_sum = 0.0
+        block_count = 0
+        total_diff = 0
+        
+        for by in range(0, height - block_size + 1, block_size):
+            for bx in range(0, width - block_size + 1, block_size):
+                # Extract block
+                block_o = []
+                block_c = []
+                for y in range(by, by + block_size):
+                    for x in range(bx, bx + block_size):
+                        idx = y * width + x
+                        block_o.append(pixels_orig[idx])
+                        block_c.append(pixels_comp[idx])
+                
+                bs = len(block_o)
+                
+                # Means
+                mu_o = sum(block_o) / bs
+                mu_c = sum(block_c) / bs
+                
+                # Variances and covariance
+                var_o = sum((p - mu_o) ** 2 for p in block_o) / bs
+                var_c = sum((p - mu_c) ** 2 for p in block_c) / bs
+                cov = sum((block_o[i] - mu_o) * (block_c[i] - mu_c) for i in range(bs)) / bs
+                
+                # SSIM for this block
+                numerator = (2 * mu_o * mu_c + C1) * (2 * cov + C2)
+                denominator = (mu_o ** 2 + mu_c ** 2 + C1) * (var_o + var_c + C2)
+                
+                ssim_sum += numerator / denominator if denominator > 0 else 1.0
+                block_count += 1
+        
+        ssim_value = ssim_sum / block_count if block_count > 0 else 0.0
+        
+        # Also compute simple pixel diff
+        for i in range(n):
+            total_diff += abs(pixels_orig[i] - pixels_comp[i])
+        avg_diff = total_diff / n
+        
+        # Black percent check
+        black_pixels = sum(1 for p in pixels_comp if p < 10)
+        black_pct = black_pixels / n * 100
+        
+        # Quality label
+        if ssim_value >= 0.98:
+            quality_label = "perfect"
+        elif ssim_value >= 0.95:
+            quality_label = "excellent"
+        elif ssim_value >= 0.90:
+            quality_label = "good"
+        elif ssim_value >= 0.80:
+            quality_label = "fair"
+        else:
+            quality_label = "poor"
+        
+        return {
+            "ssim": round(ssim_value, 4),
+            "quality_label": quality_label,
+            "avg_pixel_diff": round(avg_diff, 2),
+            "black_percent": round(black_pct, 1),
+            "page": page,
+            "render_dpi": dpi,
+        }
+        
+    except Exception as e:
+        logger.error(f"SSIM computation failed: {e}")
+        return {"error": str(e), "ssim": 0.0}
+
+
+# ============================================================
+# Feature 2: Ghostscript-Integrated Compression
+# ============================================================
+
+def compress_pdf_hybrid(
+    input_path: str,
+    output_path: str,
+    quality: str = "medium",
+    cancel_check=None,
+    progress_callback=None,
+) -> Tuple[bool, float, Dict[str, Any]]:
+    """Compress PDF using hybrid Ghostscript + PyMuPDF pipeline.
+    
+    Pipeline:
+      1. Try Ghostscript hybrid (GS lossy images → PyMuPDF lossless structure)
+      2. If GS not available or fails → fallback to compress_pdf_smart()
+      3. Compare results, keep the smaller file
+    
+    Args:
+        input_path: Path to input PDF
+        output_path: Path to output PDF
+        quality: "extreme"/"low"/"medium"/"high"/"lossless"
+        cancel_check: Optional callable returning True to cancel
+        progress_callback: Optional callable(percent, message)
+    
+    Returns:
+        Tuple of (success, reduction_percent, stats_dict)
+    """
+    if not os.path.exists(input_path):
+        return False, 0.0, {"error": "File not found"}
+    
+    original_size = os.path.getsize(input_path)
+    if original_size == 0:
+        return False, 0.0, {"error": "Empty file"}
+    
+    # Quality → DPI mapping for Ghostscript
+    dpi_map = {
+        "extreme": 72,
+        "low": 96,
+        "medium": 150,
+        "high": 200,
+        "lossless": 300,
+    }
+    target_dpi = dpi_map.get(quality, 150)
+    
+    stats = {
+        "pipeline": "unknown",
+        "original_size": original_size,
+        "gs_available": False,
+        "gs_tried": False,
+        "gs_success": False,
+    }
+    
+    # Check if Ghostscript is available
+    has_gs, hybrid_fn = _get_gs_support()
+    stats["gs_available"] = has_gs
+    
+    if has_gs and hybrid_fn:
+        stats["gs_tried"] = True
+        
+        if progress_callback:
+            progress_callback(10, "Ghostscript hybrid compression...")
+        
+        logger.info(f"Hybrid compress: GS+PyMuPDF (quality={quality}, DPI={target_dpi})")
+        
+        # Create temp for GS output
+        import tempfile
+        fd, temp_gs = tempfile.mkstemp(suffix=".pdf")
+        os.close(fd)
+        
+        try:
+            gs_ok, gs_reduction, gs_pipeline = hybrid_fn(
+                input_path, temp_gs, dpi=target_dpi
+            )
+            
+            if gs_ok and gs_reduction > 0:
+                stats["gs_success"] = True
+                stats["gs_reduction"] = gs_reduction
+                
+                if progress_callback:
+                    progress_callback(50, "Comparing with smart compression...")
+                
+                # Also try smart compression for comparison
+                fd2, temp_smart = tempfile.mkstemp(suffix=".pdf")
+                os.close(fd2)
+                
+                try:
+                    smart_ok, smart_red, smart_stats = compress_pdf_smart(
+                        input_path, temp_smart, quality=quality
+                    )
+                    
+                    gs_size = os.path.getsize(temp_gs)
+                    smart_size = os.path.getsize(temp_smart) if smart_ok else original_size
+                    
+                    # Pick the smaller result
+                    if gs_size <= smart_size:
+                        shutil.copy2(temp_gs, output_path)
+                        stats["pipeline"] = f"ghostscript+pymupdf"
+                        stats["chosen"] = "ghostscript"
+                        stats["gs_size"] = gs_size
+                        stats["smart_size"] = smart_size
+                        final_size = gs_size
+                    else:
+                        shutil.copy2(temp_smart, output_path)
+                        stats["pipeline"] = smart_stats.get("pipeline", "pymupdf_smart")
+                        stats["chosen"] = "smart"
+                        stats["gs_size"] = gs_size
+                        stats["smart_size"] = smart_size
+                        stats.update(smart_stats)
+                        final_size = smart_size
+                        
+                finally:
+                    if os.path.exists(temp_smart):
+                        os.remove(temp_smart)
+                
+                reduction = ((original_size - final_size) / original_size) * 100
+                stats["reduction_percent"] = reduction
+                stats["final_size"] = final_size
+                
+                if progress_callback:
+                    progress_callback(100, f"Done: {reduction:.1f}% reduced ({stats['chosen']})")
+                
+                logger.info(f"Hybrid result: GS={gs_size//1024}KB, Smart={smart_size//1024}KB → chose {stats['chosen']}")
+                return True, reduction, stats
+            else:
+                logger.info("GS hybrid didn't help, falling back to smart compression")
+        finally:
+            if os.path.exists(temp_gs):
+                os.remove(temp_gs)
+    
+    # Fallback: Smart compression only
+    if progress_callback:
+        progress_callback(30, "Smart compression (no Ghostscript)...")
+    
+    stats["pipeline"] = "smart_fallback"
+    ok, reduction, smart_stats = compress_pdf_smart(
+        input_path, output_path, quality=quality,
+        progress_callback=progress_callback,
+    )
+    stats.update(smart_stats)
+    return ok, reduction, stats
+
+
+# ============================================================
+# Feature 3: Target Size Mode (Binary Search)
+# ============================================================
+
+def compress_to_target_size(
+    input_path: str,
+    output_path: str,
+    target_kb: int,
+    min_quality: int = 10,
+    max_quality: int = 95,
+    max_iterations: int = 7,
+    cancel_check=None,
+    progress_callback=None,
+) -> Tuple[bool, float, Dict[str, Any]]:
+    """Compress PDF to a target file size using binary search for optimal JPEG quality.
+    
+    Finds the HIGHEST quality setting that results in file size ≤ target_kb.
+    This gives the best visual quality for the given size constraint.
+    
+    Algorithm:
+      1. Binary search on JPEG quality (10-95)
+      2. Each iteration compresses, checks size, adjusts quality
+      3. After convergence, pick highest quality under target
+      4. If target not achievable even at min quality → return best effort with warning
+    
+    Args:
+        input_path: Path to input PDF
+        output_path: Path to output PDF
+        target_kb: Target file size in KB
+        min_quality: Minimum JPEG quality to try (default 10)
+        max_quality: Maximum JPEG quality to try (default 95)
+        max_iterations: Max binary search iterations (default 7 = ~1% precision)
+        cancel_check: Optional callable returning True to cancel
+        progress_callback: Optional callable(percent, message)
+    
+    Returns:
+        Tuple of (success, reduction_percent, stats_dict)
+    """
+    if not os.path.exists(input_path):
+        return False, 0.0, {"error": "File not found"}
+    
+    original_size = os.path.getsize(input_path)
+    original_kb = original_size / 1024
+    target_bytes = target_kb * 1024
+    
+    if original_size <= target_bytes:
+        # Already under target
+        shutil.copy(input_path, output_path)
+        return True, 0.0, {
+            "pipeline": "target_size",
+            "note": "Already under target size",
+            "original_kb": round(original_kb, 1),
+            "target_kb": target_kb,
+            "final_kb": round(original_kb, 1),
+            "quality_used": 95,
+        }
+    
+    import tempfile
+    
+    stats = {
+        "pipeline": "target_size",
+        "original_kb": round(original_kb, 1),
+        "target_kb": target_kb,
+        "iterations": 0,
+        "search_log": [],
+    }
+    
+    lo = min_quality
+    hi = max_quality
+    best_quality = None
+    best_size = None
+    best_temp = None
+    
+    logger.info(f"Target Size Mode: {original_kb:.1f}KB → ≤{target_kb}KB (binary search)")
+    
+    for iteration in range(max_iterations):
+        if cancel_check and cancel_check():
+            return False, 0.0, {"error": "Cancelled", "cancelled": True}
+        
+        quality = (lo + hi) // 2
+        stats["iterations"] += 1
+        
+        if progress_callback:
+            pct = int((iteration + 1) / max_iterations * 80)
+            progress_callback(pct, f"Testing quality={quality}% (iteration {iteration+1}/{max_iterations})")
+        
+        # Create temp output
+        fd, temp_path = tempfile.mkstemp(suffix=".pdf")
+        os.close(fd)
+        
+        try:
+            # Map quality integer to DPI+JPEG settings
+            if quality >= 70:
+                preset_dpi = 150
+            elif quality >= 40:
+                preset_dpi = 96
+            else:
+                preset_dpi = 72
+            
+            # Compress with these settings
+            ok, _, _ = compress_pdf_advanced(
+                input_path, temp_path, quality="custom",
+                target_dpi=preset_dpi, jpeg_quality=quality,
+                cancel_check=cancel_check,
+            )
+            
+            if not ok or not os.path.exists(temp_path):
+                # Compression failed at this quality, try lower
+                hi = quality - 1
+                stats["search_log"].append({"quality": quality, "result": "failed"})
+                continue
+            
+            result_size = os.path.getsize(temp_path)
+            result_kb = result_size / 1024
+            
+            stats["search_log"].append({
+                "quality": quality,
+                "size_kb": round(result_kb, 1),
+                "under_target": result_size <= target_bytes,
+            })
+            
+            logger.info(f"  Binary search [{iteration+1}]: quality={quality}% → {result_kb:.1f}KB {'✅' if result_size <= target_bytes else '❌'}")
+            
+            if result_size <= target_bytes:
+                # Under target — save as best, try higher quality
+                if best_temp and os.path.exists(best_temp):
+                    os.remove(best_temp)
+                best_quality = quality
+                best_size = result_size
+                best_temp = temp_path
+                lo = quality + 1
+            else:
+                # Over target — try lower quality
+                os.remove(temp_path)
+                hi = quality - 1
+                
+        except Exception as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            hi = quality - 1
+            stats["search_log"].append({"quality": quality, "result": f"error: {e}"})
+        
+        if lo > hi:
+            break
+    
+    # Use best result
+    if best_temp and os.path.exists(best_temp):
+        shutil.copy2(best_temp, output_path)
+        os.remove(best_temp)
+        
+        final_size = os.path.getsize(output_path)
+        reduction = ((original_size - final_size) / original_size) * 100
+        
+        stats["quality_used"] = best_quality
+        stats["final_kb"] = round(final_size / 1024, 1)
+        stats["reduction_percent"] = round(reduction, 1)
+        stats["target_achieved"] = True
+        
+        if progress_callback:
+            progress_callback(100, f"Target achieved: {final_size//1024}KB ≤ {target_kb}KB (quality={best_quality}%)")
+        
+        logger.info(f"✅ Target Size reached: {original_kb:.1f}KB → {final_size//1024}KB (quality={best_quality}%, {stats['iterations']} iterations)")
+        return True, reduction, stats
+    else:
+        # Could not reach target even at min quality
+        # Return the smallest compression we can do
+        logger.warning(f"Could not reach target {target_kb}KB even at quality={min_quality}%")
+        
+        # Do one final attempt at minimum quality
+        ok, reduction, final_stats = compress_pdf_advanced(
+            input_path, output_path, quality="custom",
+            target_dpi=72, jpeg_quality=min_quality,
+            cancel_check=cancel_check,
+        )
+        
+        final_size = os.path.getsize(output_path) if os.path.exists(output_path) else original_size
+        stats["quality_used"] = min_quality
+        stats["final_kb"] = round(final_size / 1024, 1)
+        stats["reduction_percent"] = round(reduction, 1) if ok else 0.0
+        stats["target_achieved"] = False
+        stats["note"] = f"Target {target_kb}KB not achievable. Best: {final_size//1024}KB at quality={min_quality}%"
+        
+        if progress_callback:
+            progress_callback(100, f"Best effort: {final_size//1024}KB (target {target_kb}KB not achievable)")
+        
+        return ok, reduction, stats
+

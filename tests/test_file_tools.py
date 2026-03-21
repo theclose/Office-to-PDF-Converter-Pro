@@ -56,17 +56,13 @@ class TestFileTools(unittest.TestCase):
         f2 = self.create_file("tài liệu.doc")
         
         # 1. Trim + Lowercase
-        self.engine.add_rule(TrimRule())
-        self.engine.add_rule(CaseRule("lower"))
-        
-        previews = self.engine.preview([f1])
+        rules1 = [TrimRule(), CaseRule("lower")]
+        previews = self.engine.preview([f1], rules1)
         self.assertEqual(previews[0].new_filename, "test file.txt")
         
-        self.engine.clear_rules()
-        
         # 2. Vietnamese Accents
-        self.engine.add_rule(RemoveAccentsRule())
-        previews = self.engine.preview([f2])
+        rules2 = [RemoveAccentsRule()]
+        previews = self.engine.preview([f2], rules2)
         self.assertEqual(previews[0].new_filename, "tai lieu.doc")
 
     def test_sequence_rule(self):
@@ -76,19 +72,8 @@ class TestFileTools(unittest.TestCase):
             self.create_file("c.txt")
         ]
         
-        # Rename to File_001.txt, File_002.txt ...
-        self.engine.add_rule(ReplaceRule("a", "File", ignore_case=False)) # Just to clear name mostly
-        # Actually better to use specific logic, but let's try Sequence
-        
-        # Let's clean names first strictly
-        # We can't clear functionality easily with current rules without "Set Name", 
-        # but we can Append/Prepend.
-        # Let's just test Sequence appending
-        
-        self.engine.clear_rules()
-        self.engine.add_rule(SequenceRule(start=1, padding=2, at_start=True))
-        
-        previews = self.engine.preview(files)
+        rules = [SequenceRule(start=1, padding=2, at_start=True)]
+        previews = self.engine.preview(files, rules)
         # 01_a.txt, 02_b.txt
         self.assertEqual(previews[0].new_filename, "01_a.txt")
         self.assertEqual(previews[1].new_filename, "02_b.txt")
@@ -96,7 +81,7 @@ class TestFileTools(unittest.TestCase):
     def test_undo_system(self):
         f1 = self.create_file("old_name.txt")
         
-        # Execute Rename
+        # Execute Rename — add_rule then execute uses internal rules
         self.engine.add_rule(ReplaceRule("old", "new"))
         self.engine.execute([f1])
         

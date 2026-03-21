@@ -45,6 +45,7 @@ class TestRealConversion:
         os.close(fd)
         try:
             converter = WordConverter()
+            assert converter.initialize(), "Failed to initialize Word"
             success = converter.convert(docx, out)
             assert success is True, "Word conversion failed"
             assert os.path.exists(out)
@@ -64,6 +65,7 @@ class TestRealConversion:
         os.close(fd)
         try:
             converter = ExcelConverter()
+            assert converter.initialize(), "Failed to initialize Excel"
             success = converter.convert(xlsx, out)
             assert success is True, "Excel conversion failed"
             assert os.path.exists(out)
@@ -83,6 +85,7 @@ class TestRealConversion:
         os.close(fd)
         try:
             converter = PPTConverter()
+            assert converter.initialize(), "Failed to initialize PPT"
             success = converter.convert(pptx, out)
             assert success is True, "PPT conversion failed"
             assert os.path.exists(out)
@@ -105,6 +108,7 @@ class TestRealConversion:
             f.write("placeholder")
         try:
             converter = WordConverter()
+            assert converter.initialize(), "Failed to initialize Word"
             success = converter.convert(docx, out)
             assert success is True, "Overwrite conversion failed"
             assert os.path.getsize(out) > 20  # Real PDF, not our placeholder
@@ -133,6 +137,7 @@ class TestRealConversion:
         out_path = os.path.join(tmp_dir, "báo_cáo_2026.pdf")
         try:
             converter = WordConverter()
+            assert converter.initialize(), "Failed to initialize Word"
             success = converter.convert(docx_path, out_path)
             assert success is True, "Unicode filename conversion failed"
             assert os.path.exists(out_path)

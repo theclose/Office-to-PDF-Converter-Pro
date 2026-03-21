@@ -602,7 +602,7 @@ class FileToolsEngine:
             curr_name = name
             curr_ext = ext
             
-            for rule in self.rules:
+            for rule in rules:
                 try:
                     curr_name, curr_ext = rule.apply(curr_name, curr_ext, index=i)
                 except Exception as e:
@@ -625,21 +625,21 @@ class FileToolsEngine:
             
             seen_names.add(new_filename)
             
-            results.append(RenamePreview(
+            previews.append(RenamePreview(
                 original_path=file_path,
                 new_filename=new_filename,
                 status=status,
                 error_msg=err
             ))
             
-        return results
+        return previews
 
     def execute(self, files: List[str]) -> List[Tuple[str, bool, str]]:
         """
         Execute rename.
         Returns list of (original, success, message)
         """
-        previews = self.preview(files)
+        previews = self.preview(files, self.rules)
         results = []
         successful_ops = [] # Tuples of (old_path, new_full_path) for logging
         
@@ -671,6 +671,8 @@ class FileToolsEngine:
         
         # Log transaction if any success
         if successful_ops:
-            self.transaction_log.log(successful_ops)
+            old_paths = [op[0] for op in successful_ops]
+            new_paths = [op[1] for op in successful_ops]
+            self.transaction_log.log("rename", old_paths, new_paths)
                 
         return results

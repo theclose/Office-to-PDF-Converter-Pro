@@ -148,6 +148,22 @@ class ExcelConverter(BaseConverter):
         except Exception as e:
             logger.debug(f"Excel configure warning: {e}")
 
+    def _is_excel_alive(self) -> bool:
+        """Check if Excel COM object is still connected.
+
+        A dead COM proxy is non-None but throws -2147220995
+        ('Object is not connected to server') on any property access.
+        """
+        if not self._excel:
+            return False
+        try:
+            _ = self._excel.Name  # Lightweight probe
+            return True
+        except Exception:
+            logger.warning("Excel COM instance is dead, will reconnect")
+            self._excel = None
+            return False
+
     def cleanup(self):
         """Release Excel resources (pool handles actual cleanup)."""
         if not self._use_pool and self._excel:
@@ -217,7 +233,9 @@ class ExcelConverter(BaseConverter):
             logger.error(f"Validation failed: {validation_error}")
             return False
 
-        if not self._excel:
+        # COM liveness check: dead proxy is non-None but disconnected
+        if not self._is_excel_alive():
+            logger.info("Excel COM not alive, (re)initializing...")
             if not self.initialize():
                 return False
 

@@ -21,9 +21,9 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | File | LOC | Purpose |
 |------|-----|---------|
 | base.py | 228 | BaseConverter ABC, Factory, _validate_pdf_output |
-| excel.py | 512 | ExcelConverter — 7 fallback, sheet validation |
-| word.py | 415 | WordConverter — 3 fallback, corrupt repair |
-| ppt.py | 352 | PPTConverter — 3 fallback, quality-mapped intent |
+| excel.py | 531 | ExcelConverter — 7 fallback, sheet validation |
+| word.py | 436 | WordConverter — 3 fallback, corrupt repair |
+| ppt.py | 370 | PPTConverter — 3 fallback, quality-mapped intent |
 | libreoffice.py | 215 | LibreOffice headless fallback |
 | parallel_converter.py | 365 | Multi-process batch conversion |
 

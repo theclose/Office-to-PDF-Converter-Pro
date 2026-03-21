@@ -91,6 +91,22 @@ class PPTConverter(BaseConverter):
         except Exception as e:
             logger.debug(f"PPT configure warning: {e}")
 
+    def _is_ppt_alive(self) -> bool:
+        """Check if PowerPoint COM object is still connected.
+
+        A dead COM proxy is non-None but throws -2147220995
+        ('Object is not connected to server') on any property access.
+        """
+        if not self._ppt:
+            return False
+        try:
+            _ = self._ppt.Name  # Lightweight probe
+            return True
+        except Exception:
+            logger.warning("PowerPoint COM instance is dead, will reconnect")
+            self._ppt = None
+            return False
+
     def cleanup(self):
         """Release PowerPoint resources."""
         if not self._use_pool and self._ppt:
@@ -157,7 +173,9 @@ class PPTConverter(BaseConverter):
             logger.error(f"Validation failed: {validation_error}")
             return False
 
-        if not self._ppt:
+        # COM liveness check: dead proxy is non-None but disconnected
+        if not self._is_ppt_alive():
+            logger.info("PowerPoint COM not alive, (re)initializing...")
             if not self.initialize():
                 return False
 

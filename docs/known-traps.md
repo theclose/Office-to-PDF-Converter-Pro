@@ -120,3 +120,9 @@
 - **Rule:** NEVER assume a subprocess releases file locks immediately. Use retry-with-delay for temp file cleanup.
 - **Lesson:** Windows holds file locks longer than Linux. Always use retry patterns for cross-process temp file cleanup.
 
+## 19. COM proxy non-None but dead ('Object is not connected to server')
+- **Bug:** `self._word.Documents.Open()` throws `-2147220995: Object is not connected to server` during batch conversion
+- **Cause:** Word.exe crashed or was killed externally. The Python COM proxy `self._word` is still non-None, so `if not self._word` passes. But the underlying COM server is gone.
+- **Fix:** Add `_is_word_alive()` / `_is_excel_alive()` / `_is_ppt_alive()` that probes `self._xxx.Name` (lightweight read). If it throws, set `self._xxx = None` and call `initialize()` to reconnect.
+- **Rule:** NEVER trust a non-None COM proxy. ALWAYS probe with a lightweight property read before use.
+- **Lesson:** COM proxies survive server crashes as zombie objects. The Python check `if obj:` returns True for dead proxies. Only a real property access reveals the truth.

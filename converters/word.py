@@ -117,6 +117,23 @@ class WordConverter(BaseConverter):
         except Exception as e:
             logger.debug(f"Word configure warning: {e}")
 
+    def _is_word_alive(self) -> bool:
+        """Check if Word COM object is still connected and responsive.
+
+        A dead COM proxy is non-None but throws -2147220995
+        ('Object is not connected to server') on any property access.
+        Probe with a lightweight read to detect this.
+        """
+        if not self._word:
+            return False
+        try:
+            _ = self._word.Name  # Lightweight probe — reads 'Microsoft Word'
+            return True
+        except Exception:
+            logger.warning("Word COM instance is dead, will reconnect")
+            self._word = None
+            return False
+
     def cleanup(self):
         """Release Word resources."""
         if not self._use_pool and self._word:
@@ -201,7 +218,10 @@ class WordConverter(BaseConverter):
             logger.error(f"Validation failed: {validation_error}")
             return False
 
-        if not self._word:
+        # COM liveness check: dead proxy is non-None but disconnected
+        # Error -2147220995: 'Object is not connected to server'
+        if not self._is_word_alive():
+            logger.info("Word COM not alive, (re)initializing...")
             if not self.initialize():
                 return False
 

@@ -31,6 +31,7 @@ ARCH_MD = ROOT / "docs" / "architecture.md"
 CONFIG_JSON = ROOT / "config.json"
 MAIN_WINDOW = ROOT / "ui" / "main_window_pro.py"
 KNOWN_TRAPS = ROOT / "docs" / "known-traps.md"
+AUDIT_MANIFEST = ROOT / "docs" / "audit_manifest.md"
 
 PASS = "✅ PASS"
 FAIL = "❌ FAIL"
@@ -662,6 +663,63 @@ def check_skill_files():
         results.append((FAIL, f"SKILL.md issues ({len(all_issues)}):\n" + "\n".join(all_issues)))
 
 
+def check_audit_manifest():
+    """Check 17: Verify audit_manifest.md exists, all listed files exist,
+    and report tier distribution for audit coverage awareness."""
+    if not AUDIT_MANIFEST.exists():
+        results.append((WARN, "No docs/audit_manifest.md found — create one for structured audits"))
+        return
+
+    content = AUDIT_MANIFEST.read_text(encoding="utf-8")
+    lines = content.splitlines()
+
+    # Parse all checklist items: - [ ] path — description  OR  - [x] path — description
+    tier_files = {1: [], 2: [], 3: []}
+    current_tier = 0
+    total_files = 0
+    checked_files = 0
+    missing_files = []
+
+    for line in lines:
+        # Detect tier headers
+        tier_match = re.search(r'audit_tier:\s*(\d)', line)
+        if tier_match:
+            current_tier = int(tier_match.group(1))
+            continue
+
+        # Parse checklist items: - [ ] path/file.py or - [x] path/file.py
+        item_match = re.match(r'^- \[([ x])\]\s+([\w/]+\.py)', line)
+        if item_match:
+            is_checked = item_match.group(1) == 'x'
+            file_path = item_match.group(2)
+            total_files += 1
+            if is_checked:
+                checked_files += 1
+
+            tier = current_tier if current_tier in (1, 2, 3) else 3
+            tier_files[tier].append((file_path, is_checked))
+
+            # Verify file actually exists in project
+            full_path = ROOT / file_path
+            if not full_path.exists():
+                missing_files.append(file_path)
+
+    if total_files == 0:
+        results.append((WARN, "audit_manifest.md has no parseable file entries"))
+        return
+
+    # Report
+    tier_summary = ", ".join(
+        f"T{t}: {len(files)}" for t, files in tier_files.items() if files
+    )
+    results.append((PASS, f"Audit manifest: {total_files} files tracked ({tier_summary})"))
+
+    if missing_files:
+        results.append((FAIL, f"Manifest references {len(missing_files)} non-existent files: {', '.join(missing_files[:5])}"))
+    else:
+        results.append((PASS, f"Audit manifest: all {total_files} listed files exist in project"))
+
+
 def main():
     auto_fix = "--fix" in sys.argv
 
@@ -723,6 +781,19 @@ def main():
     print()
     print("  --- Skill Checks (9) ---")
     check_skill_files()
+
+    for status, msg in results:
+        print(f"  {status} {msg}")
+    all_pass += sum(1 for s, _ in results if s == PASS)
+    all_fail += sum(1 for s, _ in results if s == FAIL)
+    all_warn += sum(1 for s, _ in results if s == WARN)
+    all_fix += sum(1 for s, _ in results if s == AUTO)
+    results.clear()
+
+    # --- Audit Manifest Check (17) ---
+    print()
+    print("  --- Audit Manifest Check (17) ---")
+    check_audit_manifest()
 
     for status, msg in results:
         print(f"  {status} {msg}")

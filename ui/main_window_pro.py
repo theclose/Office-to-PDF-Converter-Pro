@@ -1406,7 +1406,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             if lang_code:
                 # Save to config
-                self.config.set("language", lang_code)
+                self.config.set("language", lang_code, auto_save=False)
                 self.config.save()
                 set_language(lang_code)
 
@@ -1552,7 +1552,8 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 display = Path(folder).name
                 if self.output_label:
                     self.output_label.configure(text=display, text_color="#22C55E")
-                self.config.set("output_folder", folder)
+                self.config.set("output_folder", folder, auto_save=False)
+                self.config.save()
         except Exception as e:
             logger.error(f"Select output error: {e}")
 

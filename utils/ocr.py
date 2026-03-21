@@ -62,18 +62,19 @@ try:
 except ImportError:
     logger.warning("pdf2image not installed. PDF OCR will be disabled.")
 
-# Check PyMuPDF for PDF creation
-try:
-    import fitz
-    HAS_PYMUPDF = True
-except ImportError:
-    HAS_PYMUPDF = False
-    logger.warning("PyMuPDF not installed. OCR PDF creation will be limited.")
+# Lazy PyMuPDF check (see known-trap #2: never cache module availability in boolean)
+def _get_fitz():
+    """Lazy runtime check for PyMuPDF."""
+    try:
+        import fitz
+        return fitz
+    except ImportError:
+        return None
 
 
 def is_ocr_available() -> bool:
     """Check if OCR is available."""
-    return HAS_TESSERACT and (HAS_PDF2IMAGE or HAS_PYMUPDF)
+    return HAS_TESSERACT and (HAS_PDF2IMAGE or _get_fitz() is not None)
 
 
 def get_tesseract_languages() -> List[str]:
@@ -170,7 +171,8 @@ def ocr_pdf_to_searchable(
 
     try:
         # Method 1: Using PyMuPDF (faster, better quality)
-        if HAS_PYMUPDF:
+        fitz = _get_fitz()
+        if fitz is not None:
             return _ocr_with_pymupdf(input_pdf, output_pdf, lang, dpi, progress_callback)
 
         # Method 2: Using pdf2image + pytesseract PDF output
@@ -196,6 +198,9 @@ def _ocr_with_pymupdf(
     progress_callback
 ) -> bool:
     """OCR using PyMuPDF for image extraction and PDF creation."""
+    fitz = _get_fitz()
+    if not fitz:
+        return False
     try:
         doc = fitz.open(input_pdf)
         total_pages = len(doc)
@@ -290,7 +295,8 @@ def _ocr_with_pdf2image(
                 pdf_pages.append(pdf_path)
 
             # Merge all pages
-            if HAS_PYMUPDF:
+            fitz = _get_fitz()
+            if fitz is not None:
                 final_doc = fitz.open()
                 for pdf_path in pdf_pages:
                     page_doc = fitz.open(pdf_path)
@@ -325,7 +331,8 @@ def extract_text_from_pdf(pdf_path: str, lang: str = 'eng+vie') -> str:
     if not is_ocr_available():
         raise RuntimeError("OCR not available")
 
-    if not HAS_PYMUPDF:
+    fitz = _get_fitz()
+    if not fitz:
         raise RuntimeError("PyMuPDF required for PDF text extraction")
 
     try:
@@ -363,6 +370,6 @@ def get_ocr_status() -> dict:
         "tesseract_path": TESSERACT_PATH,
         "has_tesseract": HAS_TESSERACT,
         "has_pdf2image": HAS_PDF2IMAGE,
-        "has_pymupdf": HAS_PYMUPDF,
+        "has_pymupdf": _get_fitz() is not None,
         "languages": get_tesseract_languages() if HAS_TESSERACT else [],
     }

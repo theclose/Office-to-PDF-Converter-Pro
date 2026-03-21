@@ -67,7 +67,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | tkdnd_wrapper.py | 161 | TkinterDnD2 wrapper |
 | watchdog.py | 234 | Resource monitoring |
 | localization.py | 105 | i18n language support |
-| ocr.py | 368 | OCR via pytesseract |
+| ocr.py | 375 | OCR via pytesseract |
 | updater.py | 269 | App auto-update checker |
 | history.py | 134 | Conversion history tracking |
 | dnd_helpers.py | 71 | Drag-and-drop helper utilities |

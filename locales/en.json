@@ -299,9 +299,9 @@
     "pt_target_kb_label": "Maximum size:",
     "pt_target_current": "Current file: {size} KB",
     "pt_target_hint": "Auto-finds optimal quality via binary search",
-    "pt_split_each": "Each page → 1 file",
-    "pt_split_parts": "Split into N files",
-    "pt_split_pages": "N pages per file",
+    "pt_split_each": "📄 Each page → 1 file",
+    "pt_split_parts": "📦 Split into N files",
+    "pt_split_pages": "📑 N pages per file",
     "pt_split_num_parts": "Number of files:",
     "pt_split_num_pages": "Pages per file:"
 }

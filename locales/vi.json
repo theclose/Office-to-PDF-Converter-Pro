@@ -299,9 +299,9 @@
     "pt_target_kb_label": "Dung lượng tối đa:",
     "pt_target_current": "File hiện tại: {size} KB",
     "pt_target_hint": "💡 Tự động tìm chất lượng tối ưu bằng binary search",
-    "pt_split_each": "\u0001f4c4 Mỗi trang → 1 file",
-    "pt_split_parts": "\u0001f4e6 Tách thành N file",
-    "pt_split_pages": "\u0001f4d1 Mỗi file N trang",
+    "pt_split_each": "📄 Mỗi trang → 1 file",
+    "pt_split_parts": "📦 Tách thành N file",
+    "pt_split_pages": "📑 Mỗi file N trang",
     "pt_split_num_parts": "Số file cần tách:",
     "pt_split_num_pages": "Số trang mỗi file:"
 }

@@ -299,9 +299,9 @@
     "pt_target_kb_label": "最大サイズ:",
     "pt_target_current": "現在のファイル: {size} KB",
     "pt_target_hint": "バイナリサーチで最適品質を自動検索",
-    "pt_split_each": "各ページ → 1ファイル",
-    "pt_split_parts": "N個のファイルに分割",
-    "pt_split_pages": "ファイルごとNページ",
+    "pt_split_each": "📄 各ページ → 1ファイル",
+    "pt_split_parts": "📦 N個のファイルに分割",
+    "pt_split_pages": "📑 ファイルごとNページ",
     "pt_split_num_parts": "ファイル数:",
     "pt_split_num_pages": "ページ数/ファイル:"
 }

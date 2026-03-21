@@ -3,6 +3,7 @@ PDF to Images and Images to PDF conversion.
 """
 
 import os
+import gc
 from typing import List, Tuple, Dict, Any
 
 from .common import get_fitz, HAS_PIL, logger
@@ -23,6 +24,7 @@ def pdf_to_images(
     if not fitz or not os.path.exists(input_path):
         return []
 
+    doc = None
     try:
         os.makedirs(output_folder, exist_ok=True)
         doc = fitz.open(input_path)
@@ -43,13 +45,19 @@ def pdf_to_images(
                 pix.save(out_path)
 
             created_files.append(out_path)
+            del pix
 
-        doc.close()
         return created_files
 
     except Exception as e:
         logger.error(f"PDF to images error: {e}")
         return []
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def pdf_to_single_image(
@@ -79,6 +87,7 @@ def pdf_to_single_image(
         "file_size": 0
     }
     
+    doc = None
     try:
         doc = fitz.open(input_path)
         page_count = doc.page_count
@@ -86,6 +95,7 @@ def pdf_to_single_image(
         
         if page_count == 0:
             doc.close()
+            doc = None
             return False, {"error": "PDF has no pages"}
         
         if page_count > 100:
@@ -105,7 +115,10 @@ def pdf_to_single_image(
             page_images.append(img)
             max_width = max(max_width, pix.width)
             total_height += pix.height
-            pix = None
+            del pix
+            # Periodic GC to prevent OOM on large PDFs
+            if (i + 1) % 20 == 0:
+                gc.collect()
             if progress_callback:
                 progress_callback(i + 1, page_count * 2, (i + 1) / (page_count * 2))
         
@@ -123,12 +136,15 @@ def pdf_to_single_image(
             x_offset = (max_width - img.width) // 2
             combined.paste(img, (x_offset, y_offset))
             y_offset += img.height + page_gap
-            page_images[i] = None
+            page_images[i] = None  # Release reference early
+            if (i + 1) % 20 == 0:
+                gc.collect()
             if progress_callback:
                 progress_callback(page_count + i + 1, page_count * 2, 
                                 (page_count + i + 1) / (page_count * 2))
         
-        page_images = None
+        del page_images
+        gc.collect()
         
         logger.info(f"Phase 3: Saving to {output_path}...")
         os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
@@ -138,10 +154,11 @@ def pdf_to_single_image(
         else:
             combined.save(output_path, "PNG", optimize=True)
         
+        del combined
+        gc.collect()
+        
         if os.path.exists(output_path):
             stats["file_size"] = os.path.getsize(output_path)
-        
-        doc.close()
         
         logger.info(f"✅ Combined {page_count} pages into single image: {stats['file_size'] // 1024} KB")
         return True, stats
@@ -151,6 +168,12 @@ def pdf_to_single_image(
         import traceback
         traceback.print_exc()
         return False, {"error": str(e)}
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def images_to_pdf(image_paths: List[str], output_path: str) -> bool:
@@ -159,6 +182,7 @@ def images_to_pdf(image_paths: List[str], output_path: str) -> bool:
     if not fitz or not image_paths:
         return False
 
+    doc = None
     try:
         doc = fitz.open()
 
@@ -178,9 +202,14 @@ def images_to_pdf(image_paths: List[str], output_path: str) -> bool:
             return False
 
         doc.save(output_path)
-        doc.close()
         return True
 
     except Exception as e:
         logger.error(f"Images to PDF error: {e}")
         return False
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass

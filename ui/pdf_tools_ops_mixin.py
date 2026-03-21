@@ -302,7 +302,7 @@ class PDFToolsOpsMixin:
                 return
 
         import threading
-        self._log(f"📎 Gộp {len(self.files)} files...")
+        self._log(get_text("pt_merge_log").format(len(self.files)))
         self.btn_process.configure(state="disabled")
 
         def _merge_worker():
@@ -319,10 +319,10 @@ class PDFToolsOpsMixin:
             self._log(get_text("pt_merged_ok").format(os.path.basename(output)))
             output_folder = os.path.dirname(output)
             open_folder = messagebox.askyesno(
-                "✅ Thành công",
-                f"Đã gộp {len(self.files)} files!\n\n"
+                get_text("success"),
+                get_text("pt_merge_done").format(len(self.files)) + "\n\n"
                 f"File: {os.path.basename(output)}\n\n"
-                f"Mở thư mục chứa file?",
+                + get_text("pt_open_folder_q"),
                 parent=self
             )
             if open_folder:
@@ -332,15 +332,15 @@ class PDFToolsOpsMixin:
                     self._log(get_text("pt_open_folder_err").format(e))
         else:
             self._log(get_text("pt_merge_failed"))
-            messagebox.showerror("Lỗi", "Không thể gộp PDF!")
+            messagebox.showerror(get_text("error"), get_text("pt_merge_error"))
 
     def _on_done(self, success: int, total: int):
         """Processing complete."""
         self.is_processing = False
-        self.btn_process.configure(state="normal", text="🚀 THỰC HIỆN")
+        self.btn_process.configure(state="normal", text=get_text("pt_btn_execute"))
         self.btn_stop.configure(state="disabled")
         self.progress_bar.set(1.0)
-        self.lbl_status.configure(text=f"✅ Xong: {success}/{total}")
+        self.lbl_status.configure(text=f"✅ {get_text('complete')}: {success}/{total}")
         self._log(get_text("pt_batch_done").format(success=success, total=total))
 
         if success > 0:
@@ -354,9 +354,9 @@ class PDFToolsOpsMixin:
 
             if output_folder and os.path.exists(output_folder):
                 result = messagebox.askyesno(
-                    "✅ Hoàn thành",
-                    f"Đã xử lý thành công {success}/{total} files.\n\n"
-                    f"Mở thư mục chứa file đã xử lý?",
+                    get_text("complete"),
+                    get_text("pt_batch_result").format(success, total) + "\n\n"
+                    + get_text("pt_batch_open_q"),
                     parent=self
                 )
                 if result:
@@ -366,7 +366,7 @@ class PDFToolsOpsMixin:
                         self._log(get_text("pt_open_folder_err").format(e))
             else:
                 messagebox.showinfo(
-                    "✅ Hoàn thành",
-                    f"Đã xử lý thành công {success}/{total} files.",
+                    get_text("complete"),
+                    get_text("pt_batch_result").format(success, total),
                     parent=self
                 )

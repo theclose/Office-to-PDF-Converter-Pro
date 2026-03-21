@@ -321,8 +321,10 @@ class WordConverter(BaseConverter):
                     Item=0,
                     PrintToFile=True
                 )
-                # PrintOut is async — wait for file
-                for _ in range(10):
+                # PrintOut is async — wait for file (adaptive based on size)
+                # Small files: 5s, Medium: 10s, Large (>10MB): 15s
+                max_wait = 10 if file_size_mb < 5 else (20 if file_size_mb < 20 else 30)
+                for _ in range(max_wait):
                     if os.path.exists(com_pdf_path):
                         break
                     time.sleep(0.5)

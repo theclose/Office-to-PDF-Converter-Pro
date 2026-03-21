@@ -40,7 +40,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | pdf/security.py | 200 | Password protection |
 | pdf/watermark.py | 66 | Watermark overlay |
 | pdf/merge_split.py | 221 | PDF merge/split |
-| pdf/conversion.py | 186 | PDF conversion utilities |
+| pdf/conversion.py | 215 | PDF conversion utilities |
 
 ### ui/ — Presentation
 | File | LOC | Purpose |

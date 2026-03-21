@@ -36,25 +36,25 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
     # Operation categories
     OPERATIONS = {
         "edit": [
-            ("merge", "📎 Gộp PDF", "Gộp nhiều file thành 1"),
+            ("merge", get_text("op_merge"), get_text("pt_merge_desc")),
             ("split", get_text("op_split"), get_text("pt_split_desc")),
-            ("extract", "📑 Trích xuất", "Lấy các trang cụ thể"),
-            ("delete", "🗑️ Xóa trang", "Xóa các trang chỉ định"),
-            ("rotate", "🔄 Xoay", "Xoay trang 90°/180°/270°"),
-            ("reverse", "🔃 Đảo ngược", "Đảo thứ tự trang"),
+            ("extract", get_text("op_extract"), get_text("pt_extract_desc")),
+            ("delete", get_text("op_delete"), get_text("pt_delete_desc")),
+            ("rotate", get_text("op_rotate"), get_text("pt_rotate_desc")),
+            ("reverse", get_text("op_reverse"), get_text("pt_reverse_desc")),
         ],
         "convert": [
-            ("pdf_to_img", "🖼️ PDF → Ảnh", "Xuất mỗi trang thành ảnh"),
-            ("img_to_pdf", "📄 Ảnh → PDF", "Gộp ảnh thành PDF"),
-            ("ocr", "🔍 OCR", "Scan PDF thành text"),
+            ("pdf_to_img", get_text("op_pdf_to_img"), get_text("pt_pdf_img_desc")),
+            ("img_to_pdf", get_text("op_img_to_pdf"), get_text("pt_img_pdf_desc")),
+            ("ocr", get_text("op_ocr"), get_text("pt_ocr_desc")),
         ],
         "optimize": [
-            ("compress", "📦 Nén", "Giảm dung lượng file"),
+            ("compress", get_text("op_compress"), get_text("pt_compress_desc")),
             ("smart_compress", get_text("pt_smart_compress"), get_text("pt_smart_desc")),
-            ("protect", "🔒 Mật khẩu", "Bảo vệ bằng password"),
-            ("watermark", "💧 Watermark", "Thêm watermark text"),
-            ("rasterize", "🔐 Hóa ảnh (Secure)", "Flatten thành ảnh 1 lớp"),
-            ("scanmode", "📠 Scan Mode", "Giả lập scan vật lý"),
+            ("protect", get_text("op_protect"), get_text("pt_protect_desc")),
+            ("watermark", get_text("op_watermark"), get_text("pt_watermark_desc")),
+            ("rasterize", get_text("pt_rasterize"), get_text("pt_rasterize_desc")),
+            ("scanmode", get_text("pt_scanmode"), get_text("pt_scanmode_desc")),
         ],
     }
 
@@ -171,7 +171,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             if op in ["merge", "split", "extract", "delete", "rotate", "reverse"]:
                 self.tab_view.set(get_text("tab_edit"))
             elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
-                self.tab_view.set("🔄 Chuyển đổi")
+                self.tab_view.set(get_text("pt_tab_convert"))
             elif op in ["compress", "smart_compress", "protect", "watermark", "rasterize", "scanmode"]:
                 self.tab_view.set(get_text("tab_optimize"))
         except Exception:
@@ -205,7 +205,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         # Create tabs
         tab_edit = self.tab_view.add(get_text("tab_edit"))
-        tab_convert = self.tab_view.add("🔄 Chuyển đổi")
+        tab_convert = self.tab_view.add(get_text("pt_tab_convert"))
         tab_optimize = self.tab_view.add(get_text("tab_optimize"))
 
         # Populate tabs
@@ -234,7 +234,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         ctk.CTkLabel(
             output_frame,
-            text="📂 Thư mục Output",
+            text=get_text("pt_output_folder"),
             font=ctk.CTkFont(weight="bold")
         ).pack(anchor="w", padx=10, pady=(10, 5))
 
@@ -275,7 +275,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         self.btn_process = ctk.CTkButton(
             action_frame,
-            text="🚀 THỰC HIỆN",
+            text=get_text("pt_btn_execute"),
             font=ctk.CTkFont(size=16, weight="bold"),
             height=50,
             fg_color="#22C55E",
@@ -384,7 +384,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         ctk.CTkLabel(
             progress_header,
-            text="📊 Tiến trình",
+            text=get_text("pt_progress_label"),
             font=ctk.CTkFont(weight="bold")
         ).pack(side="left")
 
@@ -514,7 +514,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         op = self.var_operation.get()
 
         if op == "compress":
-            ctk.CTkLabel(self.options_content, text="📊 Chất lượng nén:", font=("Segoe UI", 12, "bold")).pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("pt_compress_quality"), font=("Segoe UI", 12, "bold")).pack(anchor="w")
             # Quality presets with expected reduction
             for val, text, desc in [
                 ("extreme", "🔴 Cực mạnh (80-90%)", get_text("pt_q_extreme_desc")),
@@ -594,7 +594,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 ).pack(anchor="w", padx=10, pady=1)
 
         elif op == "split":
-            ctk.CTkLabel(self.options_content, text="✂️ Chế độ tách:",
+            ctk.CTkLabel(self.options_content, text=get_text("pt_split_mode"),
                         font=("Segoe UI", 12, "bold")).pack(anchor="w")
             
             for val, text in [
@@ -742,7 +742,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             # Checkbox simulate scan
             ctk.CTkCheckBox(
                 self.options_content,
-                text="Hiệu ứng Scan thật (Grayscale + Noise)",
+                text=get_text("pt_scanmode_real"),
                 variable=self.var_simulate_scan,
                 font=ctk.CTkFont(size=12)
             ).pack(anchor="w", pady=5)
@@ -750,30 +750,30 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         elif op == "scanmode":
             ctk.CTkLabel(
                 self.options_content,
-                text="📠 Chuyển PDF thành dạng scan",
+                text=get_text("pt_scanmode_title"),
                 font=ctk.CTkFont(weight="bold")
             ).pack(anchor="w", pady=(0, 5))
             
             ctk.CTkLabel(
                 self.options_content,
-                text="✓ Grayscale + Noise + Blur + Xoay nhẹ",
+                text=get_text("pt_scanmode_features"),
                 text_color="#10B981",
                 font=ctk.CTkFont(size=11)
             ).pack(anchor="w")
             
             ctk.CTkLabel(
                 self.options_content,
-                text="⚠️ Không thể copy text sau khi convert",
+                text=get_text("pt_scanmode_warning"),
                 text_color="#F59E0B",
                 font=ctk.CTkFont(size=11)
             ).pack(anchor="w", pady=(0, 10))
             
-            ctk.CTkLabel(self.options_content, text="Chất lượng (DPI):").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("pt_dpi_quality")).pack(anchor="w")
             self.var_scan_dpi = ctk.IntVar(value=150)
             dpi_frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
             dpi_frame.pack(anchor="w", fill="x")
             
-            for dpi, label in [(100, "Nhanh"), (150, "Chuẩn"), (200, "Cao")]:
+            for dpi, label in [(100, get_text("pt_dpi_fast")), (150, get_text("pt_dpi_standard")), (200, get_text("pt_dpi_high"))]:
                 ctk.CTkRadioButton(
                     dpi_frame, text=f"{label} ({dpi})",
                     variable=self.var_scan_dpi, value=dpi
@@ -782,7 +782,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         else:
             ctk.CTkLabel(
                 self.options_content,
-                text="Không có tùy chọn",
+                text=get_text("pt_no_options"),
                 text_color="#6B7280"
             ).pack(anchor="w")
 
@@ -903,7 +903,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             
             if added > 0:
                 self._refresh_file_list()
-                self._log(f"📁 Thả thêm {added} file(s)")
+                self._log(get_text("pt_drop_added").format(added))
         except Exception as e:
             logger.error(f"Drop error: {e}")
 
@@ -946,7 +946,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
     def _start_processing(self):
         """Start batch processing."""
         if not self.files:
-            messagebox.showwarning("Cảnh báo", "Chưa chọn file nào!")
+            messagebox.showwarning(get_text("warning"), get_text("pt_no_files_warning"))
             return
 
         if self.is_processing:
@@ -961,7 +961,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         self.is_processing = True
         self.stop_requested = False
-        self.btn_process.configure(state="disabled", text="⏳ Đang xử lý...")
+        self.btn_process.configure(state="disabled", text=get_text("pt_btn_processing"))
         self.btn_stop.configure(state="normal")
         self.progress_bar.set(0)
         self.log_textbox.delete("1.0", "end")
@@ -972,7 +972,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
     def _stop_processing(self):
         """Stop processing."""
         self.stop_requested = True
-        self._log("⏹️ Đang dừng...")
+        self._log(get_text("pt_stopping"))
 
     # Processing methods (_process_files, _execute_operation, _do_merge, _on_done)
     # are inherited from PDFToolsOpsMixin

@@ -40,7 +40,12 @@ def add_watermark(
         for page in doc:
             rect = page.rect
             cx, cy = rect.width / 2, rect.height / 2
-            text_width = len(text) * font_size * 0.4
+            # Use fitz.get_text_length for accurate width with non-ASCII chars
+            try:
+                text_width = fitz.get_text_length(text, fontname="helv", fontsize=font_size)
+            except (AttributeError, Exception):
+                # Fallback for older PyMuPDF versions
+                text_width = len(text) * font_size * 0.4
 
             page.insert_text(
                 point=(cx - text_width / 2, cy),

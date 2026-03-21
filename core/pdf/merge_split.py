@@ -101,6 +101,10 @@ def split_pdf_by_parts(input_path: str, output_folder: str, num_parts: int) -> b
     if not os.path.exists(input_path):
         return False
     
+    if num_parts < 1:
+        logger.error(f"Invalid num_parts: {num_parts} (must be >= 1)")
+        return False
+    
     try:
         os.makedirs(output_folder, exist_ok=True)
         doc = fitz.open(input_path)

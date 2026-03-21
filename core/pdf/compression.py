@@ -1323,6 +1323,10 @@ def compress_to_target_size(
     if not os.path.exists(input_path):
         return False, 0.0, {"error": "File not found"}
     
+    # Input validation
+    if target_kb < 10:
+        return False, 0.0, {"error": f"Target too small ({target_kb}KB). Minimum is 10KB."}
+    
     original_size = os.path.getsize(input_path)
     original_kb = original_size / 1024
     target_bytes = target_kb * 1024

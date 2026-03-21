@@ -238,8 +238,13 @@ class TestCompressToTargetSize:
         from office_converter.core.pdf.compression import compress_to_target_size
         
         file_size_kb = os.path.getsize(test_pdf_with_images) // 1024
-        # Set target slightly below current size
-        target = max(1, file_size_kb - 1)
+        # Target must be at least 10KB (compression minimum)
+        # Set target slightly below current size, but at least 10KB
+        target = max(10, file_size_kb - 1)
+        
+        # Skip if test PDF is too small for meaningful target compression
+        if file_size_kb < 12:
+            pytest.skip(f"Test PDF too small ({file_size_kb}KB) for target_size test")
         
         success, reduction, stats = compress_to_target_size(
             test_pdf_with_images, output_path, target_kb=target

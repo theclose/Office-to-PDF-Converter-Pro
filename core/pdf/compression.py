@@ -292,6 +292,7 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
         # BUG1 FIX: PyMuPDF refuses non-incremental save to the same file.
         # Always save to a temp file first, then move to output_path.
         import tempfile as _tempfile
+        import gc as _gc
         tmp_fd, tmp_save_path = _tempfile.mkstemp(suffix=".pdf", dir=os.path.dirname(output_path) or ".")
         os.close(tmp_fd)
         try:
@@ -303,15 +304,24 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
                 pretty=False,          # Don't pretty-print (smaller)
                 no_new_id=True,        # Keep same ID
             )
+        finally:
             doc.close()
-            # Move temp → output (atomic on same filesystem)
-            shutil.move(tmp_save_path, output_path)
-        except Exception:
-            doc.close()
-            # Clean up temp on failure
-            if os.path.exists(tmp_save_path):
-                os.remove(tmp_save_path)
-            raise
+            # Force PyMuPDF C-level file handle release (Windows holds locks longer)
+            _gc.collect()
+
+        # Replace output atomically — retry on Windows where handle release is delayed
+        import time as _time
+        for attempt in range(3):
+            try:
+                os.replace(tmp_save_path, output_path)
+                break
+            except PermissionError:
+                if attempt < 2:
+                    _time.sleep(0.3)
+                else:
+                    # Last resort: copy + remove
+                    shutil.copy2(tmp_save_path, output_path)
+                    os.remove(tmp_save_path)
         logger.info("Step 4: Saved with compression")
 
         # ========================================
@@ -325,8 +335,10 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
 
         # If result is larger, use original
         if new_size >= original_size:
-            logger.info("Compression did not reduce size - copying original")
-            shutil.copy(input_path, output_path)
+            logger.info("Compression did not reduce size - using original")
+            # Only copy if paths differ; if same, original is already in place
+            if os.path.normpath(input_path) != os.path.normpath(output_path):
+                shutil.copy(input_path, output_path)
             return True, 0.0
 
         # Calculate reduction percentage

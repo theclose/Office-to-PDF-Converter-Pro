@@ -34,7 +34,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | excel_tools.py | 826 | Excel-specific utilities |
 | file_tools.py | 677 | File manipulation tools |
 | pdf/common.py | 34 | get_fitz(), HAS_PIL flag |
-| pdf/compression.py | 1486 | Image compression pipeline (hybrid GS+PyMuPDF, image type detection) |
+| pdf/compression.py | 1498 | Image compression pipeline (hybrid GS+PyMuPDF, image type detection) |
 | pdf/ghostscript.py | 374 | Ghostscript wrapper (auto-detect, hybrid pipeline, fallback) |
 | pdf/pages.py | 262 | Page extraction/reordering |
 | pdf/security.py | 200 | Password protection |

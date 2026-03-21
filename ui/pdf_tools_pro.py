@@ -12,6 +12,7 @@ from typing import List
 import logging
 
 from office_converter.utils.config import Config
+from office_converter.utils.localization import get_text
 from office_converter.ui.pdf_tools_ops_mixin import PDFToolsOpsMixin
 
 # Drag and drop support - TkinterDnD2 for robust Unicode handling
@@ -36,7 +37,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
     OPERATIONS = {
         "edit": [
             ("merge", "📎 Gộp PDF", "Gộp nhiều file thành 1"),
-            ("split", "✂️ Tách PDF", "Tách thành nhiều file"),
+            ("split", get_text("op_split"), get_text("pt_split_desc")),
             ("extract", "📑 Trích xuất", "Lấy các trang cụ thể"),
             ("delete", "🗑️ Xóa trang", "Xóa các trang chỉ định"),
             ("rotate", "🔄 Xoay", "Xoay trang 90°/180°/270°"),
@@ -49,7 +50,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         ],
         "optimize": [
             ("compress", "📦 Nén", "Giảm dung lượng file"),
-            ("smart_compress", "✨ Nén tối ưu", "Giữ text, chỉ nén ảnh"),
+            ("smart_compress", get_text("pt_smart_compress"), get_text("pt_smart_desc")),
             ("protect", "🔒 Mật khẩu", "Bảo vệ bằng password"),
             ("watermark", "💧 Watermark", "Thêm watermark text"),
             ("rasterize", "🔐 Hóa ảnh (Secure)", "Flatten thành ảnh 1 lớp"),
@@ -165,11 +166,11 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         """Switch to the tab containing the given operation."""
         try:
             if op in ["merge", "split", "extract", "delete", "rotate", "reverse"]:
-                self.tab_view.set("✏️ Chỉnh sửa")
+                self.tab_view.set(get_text("tab_edit"))
             elif op in ["pdf_to_img", "img_to_pdf", "ocr"]:
                 self.tab_view.set("🔄 Chuyển đổi")
             elif op in ["compress", "smart_compress", "protect", "watermark", "rasterize", "scanmode"]:
-                self.tab_view.set("⚡ Tối ưu")
+                self.tab_view.set(get_text("tab_optimize"))
         except Exception:
             pass  # Tab may not exist yet
 
@@ -200,9 +201,9 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         self.tab_view.pack(fill="x", padx=10, pady=(0, 10))
 
         # Create tabs
-        tab_edit = self.tab_view.add("✏️ Chỉnh sửa")
+        tab_edit = self.tab_view.add(get_text("tab_edit"))
         tab_convert = self.tab_view.add("🔄 Chuyển đổi")
-        tab_optimize = self.tab_view.add("⚡ Tối ưu")
+        tab_optimize = self.tab_view.add(get_text("tab_optimize"))
 
         # Populate tabs
         self._create_operation_buttons(tab_edit, self.OPERATIONS["edit"])
@@ -215,7 +216,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         ctk.CTkLabel(
             self.options_frame,
-            text="⚙️ Tùy chọn",
+            text=get_text("options_title"),
             font=ctk.CTkFont(weight="bold")
         ).pack(anchor="w", padx=10, pady=(10, 5))
 
@@ -236,7 +237,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         ctk.CTkRadioButton(
             output_frame,
-            text="Cùng folder với file gốc",
+            text=get_text("output_same"),
             variable=self.var_output_same,
             value=True
         ).pack(anchor="w", padx=15)
@@ -246,7 +247,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         ctk.CTkRadioButton(
             other_row,
-            text="Khác:",
+            text=get_text("output_custom"),
             variable=self.var_output_same,
             value=False,
             width=80
@@ -285,7 +286,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         self.btn_stop = ctk.CTkButton(
             btn_row,
-            text="⏹️ Dừng",
+            text=get_text("btn_stop"),
             fg_color="#DC2626",
             hover_color="#B91C1C",
             width=100,
@@ -296,7 +297,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         ctk.CTkButton(
             btn_row,
-            text="Đóng",
+            text=get_text("btn_close"),
             fg_color="#6B7280",
             hover_color="#4B5563",
             width=100,
@@ -331,7 +332,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         btn_frame.pack(side="right", padx=5)
 
         for text, cmd in [
-            ("➕ Files", self._add_files),
+            (get_text("btn_add_file"), self._add_files),
             ("📁 Folder", self._add_folder),
             ("🗑️ Xóa", self._remove_files),
             ("🗑️ Hết", self._clear_files),
@@ -386,7 +387,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         self.lbl_status = ctk.CTkLabel(
             progress_header,
-            text="Sẵn sàng",
+            text=get_text("status_ready"),
             text_color="#9CA3AF"
         )
         self.lbl_status.pack(side="right")
@@ -467,12 +468,12 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             ctk.CTkLabel(self.options_content, text="📊 Chất lượng nén:", font=("Segoe UI", 12, "bold")).pack(anchor="w")
             # Quality presets with expected reduction
             for val, text, desc in [
-                ("extreme", "🔴 Cực mạnh (80-90%)", "JPEG 45%, 96 DPI, Grayscale"),
-                ("low", "🟠 Mạnh (70-85%)", "JPEG 60%, 120 DPI"),
-                ("medium", "🟡 Cân bằng (50-70%)", "JPEG 75%, 150 DPI - Khuyến nghị"),
-                ("high", "🟢 Chất lượng (30-50%)", "JPEG 85%, 200 DPI"),
-                ("lossless", "⚪ Lossless (10-20%)", "Không nén ảnh"),
-                ("custom", "⚙️ Tùy chỉnh", "Tự chọn JPEG% và DPI"),
+                ("extreme", "🔴 Cực mạnh (80-90%)", get_text("pt_q_extreme_desc")),
+                ("low", "🟠 Mạnh (70-85%)", get_text("pt_q_low_desc")),
+                ("medium", "🟡 Cân bằng (50-70%)", get_text("pt_q_medium_desc")),
+                ("high", "🟢 Chất lượng (30-50%)", get_text("pt_q_high_desc")),
+                ("lossless", get_text("pt_q_lossless"), get_text("pt_q_lossless_desc")),
+                ("custom", get_text("pt_q_custom"), get_text("pt_q_custom_desc")),
             ]:
                 frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
                 frame.pack(fill="x", padx=5, pady=2)
@@ -500,17 +501,17 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         elif op == "smart_compress":
             # Smart compression - preserves text layer
-            ctk.CTkLabel(self.options_content, text="✨ Nén PDF Tối Ưu", 
+            ctk.CTkLabel(self.options_content, text=get_text("pt_smart_title"),
                         font=("Segoe UI", 12, "bold")).pack(anchor="w")
             ctk.CTkLabel(self.options_content, 
-                        text="✅ Giữ nguyên text (copy, search được)\n✅ Chỉ nén ảnh embedded\n✅ Giữ nguyên vector, font",
+                        text=get_text("pt_smart_features"),
                         text_color="#4da6ff", font=("Segoe UI", 10), justify="left").pack(anchor="w", pady=5)
             
-            ctk.CTkLabel(self.options_content, text="Chất lượng ảnh:", font=("Segoe UI", 11)).pack(anchor="w", pady=(5,0))
+            ctk.CTkLabel(self.options_content, text=get_text("pt_image_quality"), font=("Segoe UI", 11)).pack(anchor="w", pady=(5,0))
             for val, text in [
-                ("low", "🟠 Nén mạnh (50% JPEG)"),
-                ("medium", "🟡 Cân bằng (75% JPEG) - Khuyến nghị"),
-                ("high", "🟢 Chất lượng cao (90% JPEG)"),
+                ("low", get_text("pt_sq_low")),
+                ("medium", get_text("pt_sq_medium")),
+                ("high", get_text("pt_sq_high")),
             ]:
                 ctk.CTkRadioButton(
                     self.options_content, text=text,
@@ -518,7 +519,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 ).pack(anchor="w", padx=10, pady=1)
 
         elif op == "rotate":
-            ctk.CTkLabel(self.options_content, text="Góc xoay:").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("rotation_angle")).pack(anchor="w")
             for val in [90, 180, 270]:
                 ctk.CTkRadioButton(
                     self.options_content, text=f"{val}°",
@@ -526,7 +527,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 ).pack(anchor="w", padx=10)
 
         elif op in ["extract", "delete"]:
-            ctk.CTkLabel(self.options_content, text="Số trang (vd: 1-5, 8, 10-12):").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("page_range_hint")).pack(anchor="w")
             ctk.CTkEntry(
                 self.options_content,
                 textvariable=self.var_page_range,
@@ -534,7 +535,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             ).pack(anchor="w", pady=5)
 
         elif op == "watermark":
-            ctk.CTkLabel(self.options_content, text="Text watermark:").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("watermark_text")).pack(anchor="w")
             ctk.CTkEntry(
                 self.options_content,
                 textvariable=self.var_watermark_text,
@@ -542,7 +543,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             ).pack(anchor="w", pady=5)
 
         elif op == "protect":
-            ctk.CTkLabel(self.options_content, text="Mật khẩu:").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("password_label")).pack(anchor="w")
             ctk.CTkEntry(
                 self.options_content,
                 textvariable=self.var_password,
@@ -559,7 +560,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 width=180
             ).pack(anchor="w", pady=5)
 
-            ctk.CTkLabel(self.options_content, text="Định dạng:").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("format_label")).pack(anchor="w")
             for fmt in ["png", "jpg"]:
                 ctk.CTkRadioButton(
                     self.options_content, text=fmt.upper(),
@@ -569,21 +570,21 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             # NEW: Combine pages option
             ctk.CTkCheckBox(
                 self.options_content,
-                text="📄 Gộp tất cả trang thành 1 ảnh",
+                text=get_text("pt_combine_pages"),
                 variable=self.var_combine_pages
             ).pack(anchor="w", pady=(10, 0))
             ctk.CTkLabel(
                 self.options_content,
-                text="(Xếp dọc các trang, phù hợp tài liệu dài)",
+                text=get_text("pt_combine_hint"),
                 text_color="gray",
                 font=ctk.CTkFont(size=10)
             ).pack(anchor="w", padx=25)
 
         elif op == "rasterize":
-            ctk.CTkLabel(self.options_content, text="Chất lượng (DPI):").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("pt_rasterize_quality")).pack(anchor="w")
             ctk.CTkLabel(
                 self.options_content, 
-                text="⚠️ Sẽ biến PDF thành ảnh. Không thể copy text/ảnh.",
+                text=get_text("pt_rasterize_warn"),
                 text_color="#F59E0B",
                 font=ctk.CTkFont(size=11)
             ).pack(anchor="w", pady=(0, 5))

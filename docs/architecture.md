@@ -4,7 +4,7 @@
 - **Language:** Python 3.11+
 - **GUI:** CustomTkinter (CTk) + tkinterdnd2
 - **COM:** pywin32 (STA model)
-- **PDF:** PyMuPDF (fitz) + Pillow
+- **PDF:** PyMuPDF (fitz) + Pillow + Ghostscript (optional)
 - **Build:** PyInstaller
 
 ## 4-Layer Architecture
@@ -33,18 +33,19 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | engine.py | 473 | ConversionEngine — batch, force-stop, auto-compress |
 | excel_tools.py | 826 | Excel-specific utilities |
 | file_tools.py | 677 | File manipulation tools |
-| pdf/common.py | 29 | get_fitz(), HAS_PIL flag |
-| pdf/compression.py | 656 | Image compression pipeline |
-| pdf/pages.py | 204 | Page extraction/reordering |
-| pdf/security.py | 156 | Password protection |
-| pdf/watermark.py | 50 | Watermark overlay |
-| pdf/merge_split.py | 60 | PDF merge/split |
-| pdf/conversion.py | 164 | PDF conversion utilities |
+| pdf/common.py | 34 | get_fitz(), HAS_PIL flag |
+| pdf/compression.py | 995 | Image compression pipeline (hybrid GS+PyMuPDF, image type detection) |
+| pdf/ghostscript.py | 364 | Ghostscript wrapper (auto-detect, hybrid pipeline, fallback) |
+| pdf/pages.py | 262 | Page extraction/reordering |
+| pdf/security.py | 188 | Password protection |
+| pdf/watermark.py | 60 | Watermark overlay |
+| pdf/merge_split.py | 79 | PDF merge/split |
+| pdf/conversion.py | 186 | PDF conversion utilities |
 
 ### ui/ — Presentation
 | File | LOC | Purpose |
 |------|-----|---------|
-| main_window_pro.py | 1557 | ConverterProApp — layout, options, file panel |
+| main_window_pro.py | 1588 | ConverterProApp — layout, options, file panel |
 | conversion_mixin.py | 457 | ConversionMixin — start/stop, progress |
 | dialogs_mixin.py | 279 | DialogsMixin — log, stats, _on_closing |
 | pdf_tools_pro.py | 849 | PDF Tools dialog |
@@ -52,6 +53,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | excel_tools_ui.py | 601 | Excel Tools dialog |
 | excel_tools_ops_mixin.py | 297 | Excel Tools operations |
 | file_tools_ui_v2.py | 461 | File Tools dialog |
+| file_tools_ui.py | 795 | File Tools dialog (legacy) |
 | dialogs.py | 153 | Legacy settings dialog |
 
 ### utils/ — Infrastructure
@@ -68,6 +70,8 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | ocr.py | 368 | OCR via pytesseract |
 | updater.py | 269 | App auto-update checker |
 | history.py | 134 | Conversion history tracking |
+| dnd_helpers.py | 71 | Drag-and-drop helper utilities |
+| pdf_tools.py | 121 | PDF tools utility functions |
 
 ## Entry Point
 - `run_pro.py` — DPI awareness, exception hooks, launches ConverterProApp

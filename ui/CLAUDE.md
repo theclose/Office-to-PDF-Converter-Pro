@@ -15,10 +15,16 @@
 - Progress throttle: 100ms
 - Log buffer flush: 100ms batch
 
-## Mixin Architecture
-- `main_window_pro.py` (1308 LOC) — layout, options, file panel
-- `conversion_mixin.py` (379 LOC) — start/stop, progress, toggle_inputs
-- `dialogs_mixin.py` (213 LOC) — log, stats, settings, _on_closing
+## UI Modules
+- `main_window_pro.py` (1588 LOC) — layout, options, file panel
+- `conversion_mixin.py` (457 LOC) — start/stop, progress, toggle_inputs
+- `dialogs_mixin.py` (279 LOC) — log, stats, settings, _on_closing
+- `pdf_tools_pro.py` (849 LOC) — PDF Tools dialog (compress, merge, split, etc.)
+- `pdf_tools_ops_mixin.py` (311 LOC) — PDF Tools operations (threading, callbacks)
+- `excel_tools_ui.py` (601 LOC) — Excel Tools dialog
+- `excel_tools_ops_mixin.py` (297 LOC) — Excel Tools operations
+- `file_tools_ui.py` (795 LOC) — File Tools dialog (legacy)
+- `file_tools_ui_v2.py` (461 LOC) — File Tools dialog (v2)
 
 ## Verification
 - ALL UI changes → run `python run_pro.py` → verify VISUALLY

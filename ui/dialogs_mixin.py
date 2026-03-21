@@ -9,6 +9,7 @@ import logging
 import subprocess
 from datetime import datetime
 from tkinter import messagebox
+from office_converter.utils.localization import get_text
 
 import customtkinter as ctk
 
@@ -54,28 +55,28 @@ class DialogsMixin:
             stats = self.db.get_stats()
 
             dialog = ctk.CTkToplevel(self)
-            dialog.title("📊 Thống kê")
+            dialog.title(get_text('stats_title'))
             dialog.geometry("350x250")
             dialog.transient(self)
             dialog.grab_set()
 
             text = f"""
-📊 THỐNG KÊ TỔNG HỢP
+{get_text('stats_header')}
 
-Tổng files: {stats['total']}
-Thành công: {stats['success']}
-Thất bại: {stats['failed']}
-Tỷ lệ: {stats['success_rate']:.1f}%
-Thời gian TB: {stats['avg_duration']:.1f}s
+{get_text('stats_total')}: {stats['total']}
+{get_text('stats_success')}: {stats['success']}
+{get_text('stats_failed')}: {stats['failed']}
+{get_text('stats_rate')}: {stats['success_rate']:.1f}%
+{get_text('stats_avg_time')}: {stats['avg_duration']:.1f}s
             """
 
             ctk.CTkLabel(dialog, text=text, font=ctk.CTkFont(size=14),
                         justify="left").pack(expand=True, padx=20, pady=20)
 
-            ctk.CTkButton(dialog, text="Đóng", command=dialog.destroy).pack(pady=10)
+            ctk.CTkButton(dialog, text=get_text('btn_close'), command=dialog.destroy).pack(pady=10)
         except Exception as e:
             logger.error(f"Show stats error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể hiển thị thống kê: {e}")
+            messagebox.showerror(get_text('error'), get_text('stats_error').format(e))
 
     def _show_settings(self):
         """Show settings dialog."""
@@ -83,25 +84,25 @@ Thời gian TB: {stats['avg_duration']:.1f}s
             from office_converter.ui.dialogs import show_settings
             show_settings(self, self.config, "vi", lambda: None)
         except ImportError:
-            messagebox.showinfo("Cài đặt", "Mở config.json để chỉnh sửa cài đặt")
+            messagebox.showinfo(get_text('tooltip_settings'), get_text('settings_open_config'))
         except Exception as e:
             logger.error(f"Show settings error: {e}")
-            messagebox.showinfo("Cài đặt", "Mở config.json để chỉnh sửa cài đặt")
+            messagebox.showinfo(get_text('tooltip_settings'), get_text('settings_open_config'))
 
     def _show_shortcuts(self):
         """Show keyboard shortcuts."""
         try:
-            shortcuts = """
-⌨️ KEYBOARD SHORTCUTS
+            shortcuts = f"""
+{get_text('shortcuts_title')}
 
-Ctrl+O     Thêm files
-Ctrl+V     Paste files
-Delete     Xóa danh sách
-Enter      Bắt đầu chuyển đổi
-Escape     Dừng chuyển đổi
-F1         Xem shortcuts
+Ctrl+O     {get_text('shortcut_add')}
+Ctrl+V     {get_text('shortcut_paste')}
+Delete     {get_text('shortcut_clear')}
+Enter      {get_text('shortcut_start')}
+Escape     {get_text('shortcut_stop')}
+F1         {get_text('shortcut_help')}
             """
-            messagebox.showinfo("Phím tắt", shortcuts)
+            messagebox.showinfo(get_text('tooltip_shortcuts'), shortcuts)
         except Exception as e:
             logger.error(f"Show shortcuts error: {e}")
 
@@ -113,16 +114,16 @@ F1         Xem shortcuts
             recent = self.db.get_recent(10)
 
             if not recent:
-                messagebox.showinfo("Recent Files", "Chưa có files gần đây")
+                messagebox.showinfo(get_text('recent_title'), get_text('recent_empty'))
                 return
 
             dialog = ctk.CTkToplevel(self)
-            dialog.title("🕐 Recent Files")
+            dialog.title(get_text('recent_title'))
             dialog.geometry("500x400")
             dialog.transient(self)
             dialog.grab_set()
 
-            ctk.CTkLabel(dialog, text="📋 Files gần đây",
+            ctk.CTkLabel(dialog, text=get_text('recent_header'),
                         font=ctk.CTkFont(size=16, weight="bold")).pack(pady=15)
 
             listbox_frame = ctk.CTkFrame(dialog)
@@ -139,13 +140,13 @@ F1         Xem shortcuts
                 if self.file_panel:
                     self.file_panel.add_files(recent)
                 dialog.destroy()
-                self._log(f"➕ Đã thêm {len(recent)} file(s) từ recent")
+                self._log(get_text('recent_added').format(len(recent)))
 
-            ctk.CTkButton(dialog, text="➕ Thêm tất cả",
+            ctk.CTkButton(dialog, text=get_text('recent_add_all'),
                          command=add_all).pack(pady=15)
         except Exception as e:
             logger.error(f"Show recent error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể hiển thị recent files: {e}")
+            messagebox.showerror(get_text('error'), get_text('recent_error').format(e))
 
     # =========== WINDOW LIFECYCLE ===========
 

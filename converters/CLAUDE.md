@@ -17,6 +17,7 @@
 - Excel: 7 methods (ExportAsFixedFormat → SaveAs16 → ... → PrintOut)
 - Word: 3 methods (Export → SaveAs2 → PrintToPDF)
 - PPT: 3 methods (SaveAs → ExportAsFixedFormat → PrintOut)
+- `libreoffice.py` — LibreOffice headless fallback for all formats (208 LOC)
 
 ## Pre-flight Validation
 1. File exists + size (0B/500MB reject)

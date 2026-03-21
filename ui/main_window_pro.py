@@ -423,7 +423,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
     - ConverterProApp: UI layout, options, file actions, DnD
     """
 
-    VERSION = "4.2.101"
+    VERSION = "4.2.102"
 
     def __init__(self):
         super().__init__()
@@ -665,30 +665,32 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             file_btn_frame = ctk.CTkFrame(left_frame, fg_color="transparent")
             file_btn_frame.pack(fill="x", padx=10, pady=10)
 
-            ctk.CTkButton(file_btn_frame, text=get_text('btn_add_file'), width=80,
-                         command=self._add_files).pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text=get_text('btn_add_folder'), width=80,
+            self.btn_add_files = ctk.CTkButton(file_btn_frame, text=get_text('btn_add_file'), width=80,
+                         command=self._add_files)
+            self.btn_add_files.pack(side="left", padx=2)
+            self.btn_add_folder = ctk.CTkButton(file_btn_frame, text=get_text('btn_add_folder'), width=80,
                          command=self._add_folder,
-                         fg_color="transparent", border_width=2).pack(side="left", padx=2)
+                         fg_color="transparent", border_width=2)
+            self.btn_add_folder.pack(side="left", padx=2)
             # R2: Buttons with tooltips
-            btn_pdf = ctk.CTkButton(file_btn_frame, text=get_text('btn_pdf_tools'), width=90,
+            self.btn_pdf = ctk.CTkButton(file_btn_frame, text=get_text('btn_pdf_tools'), width=90,
                          command=self._open_pdf_tools,
                          fg_color="#3B82F6", hover_color="#2563EB")
-            btn_pdf.pack(side="left", padx=2)
-            btn_excel = ctk.CTkButton(file_btn_frame, text=get_text('btn_excel_tools'), width=95,
+            self.btn_pdf.pack(side="left", padx=2)
+            self.btn_excel = ctk.CTkButton(file_btn_frame, text=get_text('btn_excel_tools'), width=95,
                          command=self._open_excel_tools,
                          fg_color="#10B981", hover_color="#059669")
-            btn_excel.pack(side="left", padx=2)
-            btn_clear = ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
+            self.btn_excel.pack(side="left", padx=2)
+            self.btn_clear = ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
                          command=self._clear_files,
                          fg_color="transparent", border_width=2,
                          hover_color="#DC2626")
-            btn_clear.pack(side="right")
+            self.btn_clear.pack(side="right")
             try:
                 from CTkToolTip import CTkToolTip
-                CTkToolTip(btn_pdf, message=get_text('tooltip_pdf'), delay=0.3)
-                CTkToolTip(btn_excel, message=get_text('tooltip_excel'), delay=0.3)
-                CTkToolTip(btn_clear, message=get_text('tooltip_clear'), delay=0.3)
+                CTkToolTip(self.btn_pdf, message=get_text('tooltip_pdf'), delay=0.3)
+                CTkToolTip(self.btn_excel, message=get_text('tooltip_excel'), delay=0.3)
+                CTkToolTip(self.btn_clear, message=get_text('tooltip_clear'), delay=0.3)
             except ImportError:
                 pass
 
@@ -810,12 +812,13 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             elapsed_card = ctk.CTkFrame(time_cards, fg_color="#1F2937", corner_radius=8)
             elapsed_card.grid(row=0, column=0, padx=5, sticky="ew")
 
-            ctk.CTkLabel(
+            self.elapsed_title_label = ctk.CTkLabel(
                 elapsed_card,
                 text=get_text('time_elapsed'),
                 font=ctk.CTkFont(size=11),
                 text_color="#9CA3AF"
-            ).pack(pady=(8, 2))
+            )
+            self.elapsed_title_label.pack(pady=(8, 2))
 
             self.elapsed_label = ctk.CTkLabel(
                 elapsed_card,
@@ -829,12 +832,13 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             est_card = ctk.CTkFrame(time_cards, fg_color="#1F2937", corner_radius=8)
             est_card.grid(row=0, column=1, padx=5, sticky="ew")
 
-            ctk.CTkLabel(
+            self.est_title_label = ctk.CTkLabel(
                 est_card,
                 text=get_text('time_estimated'),
                 font=ctk.CTkFont(size=11),
                 text_color="#9CA3AF"
-            ).pack(pady=(8, 2))
+            )
+            self.est_title_label.pack(pady=(8, 2))
 
             self.estimated_label = ctk.CTkLabel(
                 est_card,
@@ -848,12 +852,13 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             remaining_card = ctk.CTkFrame(time_cards, fg_color="#1F2937", corner_radius=8)
             remaining_card.grid(row=0, column=2, padx=5, sticky="ew")
 
-            ctk.CTkLabel(
+            self.remaining_title_label = ctk.CTkLabel(
                 remaining_card,
                 text=get_text('time_remaining'),
                 font=ctk.CTkFont(size=11),
                 text_color="#9CA3AF"
-            ).pack(pady=(8, 2))
+            )
+            self.remaining_title_label.pack(pady=(8, 2))
 
             self.remaining_label = ctk.CTkLabel(
                 remaining_card,
@@ -888,7 +893,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             # ─── STOP BUTTON ───
             self.btn_stop = ctk.CTkButton(
                 self.progress_frame,
-                text="⏹️  DỪNG CHUYỂN ĐỔI",
+                text=get_text('btn_stop_convert'),
                 command=self._stop_conversion,
                 font=ctk.CTkFont(size=14, weight="bold"),
                 fg_color="#DC2626",
@@ -905,8 +910,9 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             log_header = ctk.CTkFrame(log_frame, fg_color="transparent")
             log_header.pack(fill="x", padx=10, pady=(10, 5))
 
-            ctk.CTkLabel(log_header, text=get_text('log_label'),
-                        font=ctk.CTkFont(weight="bold")).pack(side="left")
+            self.log_title_label = ctk.CTkLabel(log_header, text=get_text('log_label'),
+                        font=ctk.CTkFont(weight="bold"))
+            self.log_title_label.pack(side="left")
 
             # Language selector
             lang_frame = ctk.CTkFrame(log_header, fg_color="transparent")
@@ -1280,7 +1286,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             if files and self.file_panel:
                 added = self.file_panel.add_files(list(files))
                 if added:
-                    self._log(f"➕ Đã thêm {added} file(s)")
+                    self._log(get_text("drop_added").format(added))
         except Exception as e:
             logger.error(f"Add files error: {e}")
             messagebox.showerror("Lỗi", f"Không thể thêm files: {e}")
@@ -1317,9 +1323,9 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                             added = self.file_panel.add_files(files)
                             self._log(f"📁 Đã thêm {added} file(s) từ folder (recursive, max depth {max_depth})")
                         else:
-                            self._log(f"⚠️ Không tìm thấy Office files trong folder")
+                            self._log("⚠️ Không tìm thấy Office files trong folder")
                     self.after(0, _update_ui)
-                except Exception as e:
+                except Exception:
                     self.after(0, lambda: self._log(f"❌ Lỗi quét folder: {e}"))
 
             threading.Thread(target=_scan_folder, daemon=True).start()
@@ -1429,6 +1435,17 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             if self.btn_stop:
                 self.btn_stop.configure(text=get_text('btn_stop_convert'))
 
+            # File action buttons
+            for attr, key in [
+                ('btn_add_files', 'btn_add_file'),
+                ('btn_add_folder', 'btn_add_folder'),
+                ('btn_pdf', 'btn_pdf_tools'),
+                ('btn_excel', 'btn_excel_tools'),
+            ]:
+                widget = getattr(self, attr, None)
+                if widget:
+                    widget.configure(text=get_text(key))
+
             # Progress section (if visible)
             if self.progress_title:
                 self.progress_title.configure(text=get_text('progress_converting'))
@@ -1436,6 +1453,20 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 self.status_badge.configure(text=get_text('progress_status'))
             if self.current_file_label:
                 self.current_file_label.configure(text=get_text('waiting'))
+
+            # Time card title labels
+            for attr, key in [
+                ('elapsed_title_label', 'time_elapsed'),
+                ('est_title_label', 'time_estimated'),
+                ('remaining_title_label', 'time_remaining'),
+            ]:
+                widget = getattr(self, attr, None)
+                if widget:
+                    widget.configure(text=get_text(key))
+
+            # Log header
+            if hasattr(self, 'log_title_label') and self.log_title_label:
+                self.log_title_label.configure(text=get_text('log_label'))
 
             # Quality presets (reload)
             if hasattr(self, '_quality_presets') and hasattr(self, 'quality_dropdown'):

@@ -466,7 +466,7 @@ class ConversionEngine:
                             f"(-{ratio:.1f}%)"
                         )
                     elif success:
-                        logger.info(f"Auto-compress: file already optimal")
+                        logger.info("Auto-compress: file already optimal")
                 except Exception as e:
                     logger.warning(f"Auto-compress failed (continuing): {e}")
         except Exception as e:

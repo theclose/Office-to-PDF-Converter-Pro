@@ -21,6 +21,7 @@ from office_converter.core.excel_tools import (
     get_sheet_info, HAS_OPENPYXL
 )
 from office_converter.utils.config import Config
+from office_converter.utils.localization import get_text
 from office_converter.ui.excel_tools_ops_mixin import ExcelToolsOpsMixin
 
 # Drag and drop support
@@ -36,9 +37,9 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
     # Operations organized by category
     OPERATIONS = {
         "edit": [
-            ("split", "✂️ Tách Sheet", "Xuất mỗi sheet riêng"),
+            ("split", get_text("et_split"), get_text("et_split_desc")),
             ("merge", "📎 Gộp Files", "Gộp nhiều file Excel"),
-            ("rename", "✏️ Đổi tên Sheet", "Đổi tên hàng loạt"),
+            ("rename", get_text("et_rename"), get_text("et_rename_desc")),
         ],
         "convert": [
             ("to_csv", "📄 Excel → CSV", "Xuất sang CSV"),
@@ -83,8 +84,8 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         # Check openpyxl
         if not HAS_OPENPYXL:
             messagebox.showerror(
-                "Thiếu thư viện",
-                "Cần cài đặt openpyxl để sử dụng Excel Tools.\n\n"
+                get_text("et_missing_lib"),
+                get_text("et_install_openpyxl") + "\n\n"
                 "Chạy lệnh: pip install openpyxl"
             )
             self.destroy()
@@ -136,7 +137,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         self.tab_view.pack(fill="x", padx=10, pady=(0, 10))
         
         # Create tabs
-        tab_edit = self.tab_view.add("✏️ Chỉnh sửa")
+        tab_edit = self.tab_view.add(get_text("tab_edit"))
         tab_convert = self.tab_view.add("🔄 Chuyển đổi")
         tab_protect = self.tab_view.add("🔒 Bảo vệ")
         
@@ -186,7 +187,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         
         ctk.CTkRadioButton(
             output_frame,
-            text="Cùng folder với file gốc",
+            text=get_text("output_same"),
             variable=self.var_output_same,
             value=True
         ).pack(anchor="w", padx=15)
@@ -196,7 +197,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         
         ctk.CTkRadioButton(
             other_row,
-            text="Khác:",
+            text=get_text("output_custom"),
             variable=self.var_output_same,
             value=False,
             width=70
@@ -235,7 +236,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         
         self.btn_stop = ctk.CTkButton(
             btn_row,
-            text="⏹️ Dừng",
+            text=get_text("btn_stop"),
             fg_color="#DC2626",
             hover_color="#B91C1C",
             width=100,
@@ -246,7 +247,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         
         ctk.CTkButton(
             btn_row,
-            text="Đóng",
+            text=get_text("btn_close"),
             fg_color="#6B7280",
             hover_color="#4B5563",
             width=100,
@@ -281,7 +282,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         btn_frame.pack(side="right", padx=5)
         
         for text, cmd in [
-            ("➕ Files", self._add_files),
+            (get_text("btn_add_file"), self._add_files),
             ("📁 Folder", self._add_folder),
             ("🗑️ Xóa", self._remove_files),
             ("🗑️ Hết", self._clear_files),
@@ -329,7 +330,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         
         self.lbl_status = ctk.CTkLabel(
             progress_header,
-            text="Sẵn sàng",
+            text=get_text("status_ready"),
             text_color="#9CA3AF"
         )
         self.lbl_status.pack(side="right")
@@ -366,50 +367,50 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         if op == "split":
             ctk.CTkLabel(
                 self.options_content,
-                text="Xuất tất cả các sheet thành file riêng",
+                text=get_text("et_split_hint"),
                 text_color="#9CA3AF"
             ).pack(anchor="w")
             
         elif op == "merge":
-            ctk.CTkLabel(self.options_content, text="Chế độ gộp:").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("et_merge_mode")).pack(anchor="w")
             
             ctk.CTkRadioButton(
                 self.options_content,
-                text="Mỗi sheet → 1 sheet trong file kết quả",
+                text=get_text("et_merge_sheets"),
                 variable=self.var_merge_mode,
                 value="sheets"
             ).pack(anchor="w", padx=10)
             
             ctk.CTkRadioButton(
                 self.options_content,
-                text="Gộp tất cả dữ liệu thành 1 sheet",
+                text=get_text("et_merge_rows"),
                 variable=self.var_merge_mode,
                 value="rows"
             ).pack(anchor="w", padx=10)
             
             ctk.CTkCheckBox(
                 self.options_content,
-                text="Bỏ dòng tiêu đề (trừ file đầu)",
+                text=get_text("et_skip_header"),
                 variable=self.var_skip_header
             ).pack(anchor="w", padx=10, pady=(5, 0))
         
         elif op == "rename":
-            ctk.CTkLabel(self.options_content, text="Tiền tố (prefix):").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("et_prefix")).pack(anchor="w")
             self.var_prefix = ctk.StringVar()
             ctk.CTkEntry(self.options_content, textvariable=self.var_prefix, width=150).pack(anchor="w", pady=2)
             
-            ctk.CTkLabel(self.options_content, text="Hậu tố (suffix):").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("et_suffix")).pack(anchor="w")
             self.var_suffix = ctk.StringVar()
             ctk.CTkEntry(self.options_content, textvariable=self.var_suffix, width=150).pack(anchor="w", pady=2)
             
-            ctk.CTkLabel(self.options_content, text="Thay thế: Tìm →", fg_color="transparent").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("et_find_replace"), fg_color="transparent").pack(anchor="w")
             replace_row = ctk.CTkFrame(self.options_content, fg_color="transparent")
             replace_row.pack(anchor="w", fill="x")
             self.var_replace_from = ctk.StringVar()
             self.var_replace_to = ctk.StringVar()
-            ctk.CTkEntry(replace_row, textvariable=self.var_replace_from, width=70, placeholder_text="Tìm").pack(side="left")
+            ctk.CTkEntry(replace_row, textvariable=self.var_replace_from, width=70, placeholder_text=get_text("et_find")).pack(side="left")
             ctk.CTkLabel(replace_row, text="→").pack(side="left", padx=5)
-            ctk.CTkEntry(replace_row, textvariable=self.var_replace_to, width=70, placeholder_text="Thay").pack(side="left")
+            ctk.CTkEntry(replace_row, textvariable=self.var_replace_to, width=70, placeholder_text=get_text("et_replace")).pack(side="left")
         
         elif op == "to_csv":
             ctk.CTkLabel(self.options_content, text="Encoding:").pack(anchor="w")
@@ -430,21 +431,21 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
         elif op == "from_csv":
             ctk.CTkLabel(
                 self.options_content,
-                text="Mỗi file CSV → 1 sheet trong Excel",
+                text=get_text("et_csv_hint"),
                 text_color="#9CA3AF"
             ).pack(anchor="w")
             self.var_encoding = ctk.StringVar(value="utf-8-sig")
             self.var_delimiter = ctk.StringVar(value=",")
         
         elif op == "protect":
-            ctk.CTkLabel(self.options_content, text="Mật khẩu (để trống = không mật khẩu):").pack(anchor="w")
+            ctk.CTkLabel(self.options_content, text=get_text("et_password_hint")).pack(anchor="w")
             self.var_password = ctk.StringVar()
             ctk.CTkEntry(self.options_content, textvariable=self.var_password, show="•", width=150).pack(anchor="w", pady=2)
         
         elif op == "unprotect":
             ctk.CTkLabel(
                 self.options_content,
-                text="Bỏ bảo vệ tất cả sheets",
+                text=get_text("et_unprotect_hint"),
                 text_color="#9CA3AF"
             ).pack(anchor="w")
     
@@ -473,7 +474,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
             
             if added > 0:
                 self._refresh_file_list()
-                self._log(f"📁 Thêm {added} file(s)")
+                self._log(get_text("drop_added").format(added))
         except Exception as e:
             logger.error(f"Drop error: {e}")
     
@@ -572,7 +573,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
     def _start_processing(self):
         """Start processing."""
         if not self.files:
-            messagebox.showwarning("Cảnh báo", "Chưa chọn file nào!")
+            messagebox.showwarning(get_text("warning"), get_text("no_files_selected"))
             return
         
         if self.is_processing:
@@ -591,7 +592,7 @@ class ExcelToolsDialog(ctk.CTkToplevel, ExcelToolsOpsMixin):
     def _stop_processing(self):
         """Stop processing."""
         self.stop_requested = True
-        self._log("⏹️ Đang dừng...")
+        self._log(get_text("et_stopping"))
     
     # Processing methods (_process_files, _do_split, _do_merge, _do_to_csv,
     # _do_from_csv, _do_protect, _do_unprotect, _do_rename, _processing_complete)

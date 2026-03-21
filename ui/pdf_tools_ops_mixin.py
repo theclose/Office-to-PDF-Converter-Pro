@@ -8,6 +8,7 @@ This mixin reduces pdf_tools_pro.py from ~1136 LOC to ~840 LOC.
 
 import os
 import logging
+from office_converter.utils.localization import get_text
 from tkinter import filedialog, messagebox
 
 from office_converter.core import pdf_tools
@@ -162,7 +163,7 @@ class PDFToolsOpsMixin:
                     new_size = os.path.getsize(output_path)
                     self.compression_results[input_path] = (orig_size, new_size)
                     self.after(0, lambda s=stats: self._log(
-                        f"   ✅ {s.get('reduction_percent', 0):.1f}% smaller | Images: {s.get('images_compressed', 0)}/{s.get('images_found', 0)} | Text: ✓ Preserved"
+                        f"   ✅ {s.get('reduction_percent', 0):.1f}% smaller | Images: {s.get('images_optimized', 0)}/{s.get('images_found', 0)} | Text: ✓ Preserved"
                     ))
                     self.after(0, self._refresh_file_list)
                 return result
@@ -232,7 +233,7 @@ class PDFToolsOpsMixin:
     def _do_merge(self):
         """Merge PDFs."""
         if len(self.files) < 2:
-            messagebox.showwarning("Cảnh báo", "Cần ít nhất 2 file để gộp!")
+            messagebox.showwarning(get_text("warning"), get_text("need_2_files"))
             return
 
         if self.var_output_same.get():
@@ -254,7 +255,7 @@ class PDFToolsOpsMixin:
         result = pdf_tools.merge_pdfs(self.files, output)
 
         if result:
-            self._log(f"✅ Đã gộp thành: {os.path.basename(output)}")
+            self._log(get_text("pt_merged_ok").format(os.path.basename(output)))
             output_folder = os.path.dirname(output)
             open_folder = messagebox.askyesno(
                 "✅ Thành công",
@@ -267,9 +268,9 @@ class PDFToolsOpsMixin:
                 try:
                     os.startfile(output_folder)
                 except Exception as e:
-                    self._log(f"❌ Không thể mở folder: {e}")
+                    self._log(get_text("pt_open_folder_err").format(e))
         else:
-            self._log("❌ Gộp thất bại!")
+            self._log(get_text("pt_merge_failed"))
             messagebox.showerror("Lỗi", "Không thể gộp PDF!")
 
     def _on_done(self, success: int, total: int):
@@ -279,7 +280,7 @@ class PDFToolsOpsMixin:
         self.btn_stop.configure(state="disabled")
         self.progress_bar.set(1.0)
         self.lbl_status.configure(text=f"✅ Xong: {success}/{total}")
-        self._log(f"\n🎉 Hoàn thành: {success}/{total} files")
+        self._log(get_text("pt_batch_done").format(success=success, total=total))
 
         if success > 0:
             if self.var_output_same.get():
@@ -301,7 +302,7 @@ class PDFToolsOpsMixin:
                     try:
                         os.startfile(output_folder)
                     except Exception as e:
-                        self._log(f"❌ Không thể mở folder: {e}")
+                        self._log(get_text("pt_open_folder_err").format(e))
             else:
                 messagebox.showinfo(
                     "✅ Hoàn thành",

@@ -18,6 +18,7 @@ from office_converter.core.file_tools import (
 )
 
 import logging
+from office_converter.utils.localization import get_text
 logger = logging.getLogger(__name__)
 
 
@@ -94,10 +95,10 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         frame = ctk.CTkFrame(parent, fg_color="transparent")
         frame.pack(fill="x")
         
-        self.entry_path = ctk.CTkEntry(frame, placeholder_text="Chọn thư mục chứa file cần đổi tên...")
+        self.entry_path = ctk.CTkEntry(frame, placeholder_text=get_text("ft_folder_hint"))
         self.entry_path.pack(side="left", fill="x", expand=True, padx=(0, 10))
         
-        btn_browse = ctk.CTkButton(frame, text="Chọn đường dẫn", width=120, command=self._browse_folder)
+        btn_browse = ctk.CTkButton(frame, text=get_text("ft_choose_path"), width=120, command=self._browse_folder)
         btn_browse.pack(side="right")
         
     def _create_tabs(self, parent):
@@ -123,33 +124,33 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         # Row 1
         row1 = ctk.CTkFrame(options_frame, fg_color="transparent")
         row1.pack(fill="x", pady=2)
-        ctk.CTkRadioButton(row1, text="Viết Hoa Chữ Đầu", variable=self.var_basic_mode, value="title").pack(side="left", padx=10)
+        ctk.CTkRadioButton(row1, text=get_text("ft_mode_title"), variable=self.var_basic_mode, value="title").pack(side="left", padx=10)
         ctk.CTkRadioButton(row1, text="VIẾT HOA TOÀN BỘ", variable=self.var_basic_mode, value="upper").pack(side="left", padx=10)
         
         # Row 2
         row2 = ctk.CTkFrame(options_frame, fg_color="transparent")
         row2.pack(fill="x", pady=2)
-        ctk.CTkRadioButton(row2, text="viết thường toàn bộ", variable=self.var_basic_mode, value="lower").pack(side="left", padx=10)
-        ctk.CTkRadioButton(row2, text="Chỉ viết hoa chữ cái đầu tiên", variable=self.var_basic_mode, value="capitalize").pack(side="left", padx=10)
+        ctk.CTkRadioButton(row2, text=get_text("ft_mode_lower"), variable=self.var_basic_mode, value="lower").pack(side="left", padx=10)
+        ctk.CTkRadioButton(row2, text=get_text("ft_mode_capitalize"), variable=self.var_basic_mode, value="capitalize").pack(side="left", padx=10)
         
         # Row 3
         row3 = ctk.CTkFrame(options_frame, fg_color="transparent")
         row3.pack(fill="x", pady=2)
-        ctk.CTkRadioButton(row3, text="Loại Bỏ Khoảng Trắng", variable=self.var_basic_mode, value="remove_spaces").pack(side="left", padx=10)
-        ctk.CTkRadioButton(row3, text="Bỏ toàn bộ tên cũ thay bằng số", variable=self.var_basic_mode, value="number_only").pack(side="left", padx=10)
+        ctk.CTkRadioButton(row3, text=get_text("ft_mode_nospace"), variable=self.var_basic_mode, value="remove_spaces").pack(side="left", padx=10)
+        ctk.CTkRadioButton(row3, text=get_text("ft_mode_numonly"), variable=self.var_basic_mode, value="number_only").pack(side="left", padx=10)
         
         # Row 4
         row4 = ctk.CTkFrame(options_frame, fg_color="transparent")
         row4.pack(fill="x", pady=2)
-        ctk.CTkRadioButton(row4, text="Phục Hồi Khoảng Trắng", variable=self.var_basic_mode, value="restore_spaces").pack(side="left", padx=10)
+        ctk.CTkRadioButton(row4, text=get_text("ft_mode_restore_spaces"), variable=self.var_basic_mode, value="restore_spaces").pack(side="left", padx=10)
         
         # Checkbox
-        ctk.CTkCheckBox(options_frame, text="Bỏ khoảng trắng ở đầu và cuối", variable=self.var_trim_whitespace).pack(anchor="w", padx=10, pady=10)
+        ctk.CTkCheckBox(options_frame, text=get_text("ft_trim_whitespace"), variable=self.var_trim_whitespace).pack(anchor="w", padx=10, pady=10)
         
         # Extension change
         ext_frame = ctk.CTkFrame(options_frame, fg_color="transparent")
         ext_frame.pack(fill="x", pady=5, padx=10)
-        ctk.CTkLabel(ext_frame, text="Đổi đuôi thành:").pack(side="left")
+        ctk.CTkLabel(ext_frame, text=get_text("ft_change_ext")).pack(side="left")
         ctk.CTkEntry(ext_frame, textvariable=self.var_new_extension, width=80, placeholder_text=".txt").pack(side="left", padx=10)
         
     def _create_tab2_advanced(self, parent):
@@ -161,36 +162,36 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         replace_frame = ctk.CTkFrame(frame, fg_color="transparent")
         replace_frame.pack(fill="x", pady=5)
         
-        ctk.CTkLabel(replace_frame, text="Thay thế").pack(side="left", padx=5)
-        ctk.CTkEntry(replace_frame, textvariable=self.var_replace_find, width=100, placeholder_text="Tìm...").pack(side="left", padx=5)
-        ctk.CTkLabel(replace_frame, text="Bằng").pack(side="left", padx=5)
-        ctk.CTkEntry(replace_frame, textvariable=self.var_replace_with, width=100, placeholder_text="Thay bằng...").pack(side="left", padx=5)
+        ctk.CTkLabel(replace_frame, text=get_text("ft_replace")).pack(side="left", padx=5)
+        ctk.CTkEntry(replace_frame, textvariable=self.var_replace_find, width=100, placeholder_text=get_text("et_find")).pack(side="left", padx=5)
+        ctk.CTkLabel(replace_frame, text=get_text("ft_with")).pack(side="left", padx=5)
+        ctk.CTkEntry(replace_frame, textvariable=self.var_replace_with, width=100, placeholder_text=get_text("et_replace")).pack(side="left", padx=5)
         
         # Cut section
         cut_frame = ctk.CTkFrame(frame, fg_color="transparent")
         cut_frame.pack(fill="x", pady=10)
         
-        ctk.CTkLabel(cut_frame, text="Cắt từ").pack(side="left", padx=5)
-        ctk.CTkRadioButton(cut_frame, text="Đầu", variable=self.var_cut_pos, value="start").pack(side="left", padx=5)
-        ctk.CTkRadioButton(cut_frame, text="Cuối", variable=self.var_cut_pos, value="end").pack(side="left", padx=5)
-        ctk.CTkLabel(cut_frame, text="Lấy").pack(side="left", padx=5)
+        ctk.CTkLabel(cut_frame, text=get_text("ft_cut_from")).pack(side="left", padx=5)
+        ctk.CTkRadioButton(cut_frame, text=get_text("ft_start"), variable=self.var_cut_pos, value="start").pack(side="left", padx=5)
+        ctk.CTkRadioButton(cut_frame, text=get_text("ft_end"), variable=self.var_cut_pos, value="end").pack(side="left", padx=5)
+        ctk.CTkLabel(cut_frame, text=get_text("ft_take")).pack(side="left", padx=5)
         ctk.CTkEntry(cut_frame, textvariable=self.var_cut_count, width=50, placeholder_text="N").pack(side="left", padx=5)
-        ctk.CTkLabel(cut_frame, text="kí tự").pack(side="left")
+        ctk.CTkLabel(cut_frame, text=get_text("ft_chars")).pack(side="left")
         
         # Cut after delimiter
         cutafter_frame = ctk.CTkFrame(frame, fg_color="transparent")
         cutafter_frame.pack(fill="x", pady=5)
-        ctk.CTkLabel(cutafter_frame, text="Cắt bỏ phần sau bắt đầu bằng kí tự:").pack(side="left", padx=5)
+        ctk.CTkLabel(cutafter_frame, text=get_text("ft_cut_after")).pack(side="left", padx=5)
         ctk.CTkEntry(cutafter_frame, textvariable=self.var_cut_after, width=80).pack(side="left", padx=5)
         
         # Add text section
         add_frame = ctk.CTkFrame(frame, fg_color="transparent")
         add_frame.pack(fill="x", pady=10)
         
-        ctk.CTkLabel(add_frame, text="Thêm từ").pack(side="left", padx=5)
+        ctk.CTkLabel(add_frame, text=get_text("ft_add_text")).pack(side="left", padx=5)
         ctk.CTkEntry(add_frame, textvariable=self.var_add_text, width=120).pack(side="left", padx=5)
-        ctk.CTkRadioButton(add_frame, text="Vào đầu", variable=self.var_add_pos, value="start").pack(side="left", padx=10)
-        ctk.CTkRadioButton(add_frame, text="Vào cuối", variable=self.var_add_pos, value="end").pack(side="left", padx=10)
+        ctk.CTkRadioButton(add_frame, text=get_text("ft_at_start"), variable=self.var_add_pos, value="start").pack(side="left", padx=10)
+        ctk.CTkRadioButton(add_frame, text=get_text("ft_at_end"), variable=self.var_add_pos, value="end").pack(side="left", padx=10)
         
     def _create_tab3_other(self, parent):
         """Tab 3: Other functions."""
@@ -201,24 +202,24 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         btn_frame = ctk.CTkFrame(frame, fg_color="transparent")
         btn_frame.pack(side="left", fill="y", padx=10)
         
-        ctk.CTkButton(btn_frame, text="Xóa chi tiết", width=150, command=self._clear_details).pack(pady=3)
-        ctk.CTkButton(btn_frame, text="Copy tên file vào title", width=150).pack(pady=3)
-        ctk.CTkButton(btn_frame, text="Copy tên title sang tên file", width=150).pack(pady=3)
-        ctk.CTkButton(btn_frame, text="Check mã MD5 hàng loạt", width=150, command=self._check_md5).pack(pady=3)
-        ctk.CTkButton(btn_frame, text="So sánh 2 thư mục", width=150).pack(pady=3)
-        ctk.CTkButton(btn_frame, text="Tìm file trùng", width=150, command=self._find_duplicates).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_clear_details"), width=150, command=self._clear_details).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_copy_to_title"), width=150).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_copy_from_title"), width=150).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_check_md5"), width=150, command=self._check_md5).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_compare_folders"), width=150).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_find_dupes"), width=150, command=self._find_duplicates).pack(pady=3)
         
         # Right numbering options
         num_frame = ctk.CTkFrame(frame, fg_color="transparent")
         num_frame.pack(side="right", fill="both", expand=True, padx=10)
         
-        ctk.CTkLabel(num_frame, text="Đánh số thứ tự", font=ctk.CTkFont(weight="bold")).pack(anchor="w")
+        ctk.CTkLabel(num_frame, text=get_text("ft_numbering"), font=ctk.CTkFont(weight="bold")).pack(anchor="w")
         
-        ctk.CTkRadioButton(num_frame, text="Không", variable=self.var_numbering, value="none").pack(anchor="w", pady=2)
-        ctk.CTkRadioButton(num_frame, text="Ở đầu file", variable=self.var_numbering, value="prefix").pack(anchor="w", pady=2)
-        ctk.CTkRadioButton(num_frame, text="Ở cuối file", variable=self.var_numbering, value="suffix").pack(anchor="w", pady=2)
-        ctk.CTkRadioButton(num_frame, text="Bỏ toàn bộ stt ở đầu file", variable=self.var_numbering, value="remove_prefix").pack(anchor="w", pady=2)
-        ctk.CTkRadioButton(num_frame, text="Bỏ toàn bộ stt ở cuối file", variable=self.var_numbering, value="remove_suffix").pack(anchor="w", pady=2)
+        ctk.CTkRadioButton(num_frame, text=get_text("ft_num_none"), variable=self.var_numbering, value="none").pack(anchor="w", pady=2)
+        ctk.CTkRadioButton(num_frame, text=get_text("ft_num_prefix"), variable=self.var_numbering, value="prefix").pack(anchor="w", pady=2)
+        ctk.CTkRadioButton(num_frame, text=get_text("ft_num_suffix"), variable=self.var_numbering, value="suffix").pack(anchor="w", pady=2)
+        ctk.CTkRadioButton(num_frame, text=get_text("ft_remove_prefix_num"), variable=self.var_numbering, value="remove_prefix").pack(anchor="w", pady=2)
+        ctk.CTkRadioButton(num_frame, text=get_text("ft_remove_suffix_num"), variable=self.var_numbering, value="remove_suffix").pack(anchor="w", pady=2)
         
     def _create_file_lists(self, parent):
         """Create old name / new name file lists."""
@@ -226,9 +227,9 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         header = ctk.CTkFrame(parent, fg_color="transparent")
         header.pack(fill="x")
         
-        ctk.CTkLabel(header, text="Tên cũ", font=ctk.CTkFont(weight="bold")).pack(side="left", expand=True)
+        ctk.CTkLabel(header, text=get_text("ft_old_name"), font=ctk.CTkFont(weight="bold")).pack(side="left", expand=True)
         ctk.CTkButton(header, text="Refresh", width=60, command=self._refresh_files).pack(side="left", padx=5)
-        ctk.CTkLabel(header, text="Tên mới", font=ctk.CTkFont(weight="bold")).pack(side="right", expand=True)
+        ctk.CTkLabel(header, text=get_text("ft_new_name"), font=ctk.CTkFont(weight="bold")).pack(side="right", expand=True)
         
         # Lists container
         lists_frame = ctk.CTkFrame(parent, fg_color="transparent")
@@ -248,8 +249,8 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         cb_frame = ctk.CTkFrame(parent, fg_color="transparent")
         cb_frame.pack(fill="x", pady=5)
         
-        ctk.CTkCheckBox(cb_frame, text="Bao gồm thư mục con", variable=self.var_include_subdir).pack(side="left", padx=10)
-        ctk.CTkCheckBox(cb_frame, text="Loại bỏ dấu", variable=self.var_remove_accents).pack(side="left", padx=10)
+        ctk.CTkCheckBox(cb_frame, text=get_text("ft_include_subdir"), variable=self.var_include_subdir).pack(side="left", padx=10)
+        ctk.CTkCheckBox(cb_frame, text=get_text("ft_remove_accents"), variable=self.var_remove_accents).pack(side="left", padx=10)
         
         # Buttons row
         btn_frame = ctk.CTkFrame(parent, fg_color="transparent")
@@ -257,19 +258,19 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         
         ctk.CTkButton(btn_frame, text="Undo", width=80, fg_color="#6B7280", command=self._undo).pack(side="left", padx=5)
         ctk.CTkButton(btn_frame, text="Reset form", width=80, fg_color="#6B7280", command=self._reset_form).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Phóng to kết quả", width=120, fg_color="#3B82F6").pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Xuất kết quả ra txt", width=120, fg_color="#3B82F6").pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text=get_text("ft_enlarge_result"), width=120, fg_color="#3B82F6").pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, text=get_text("ft_export_txt"), width=120, fg_color="#3B82F6").pack(side="left", padx=5)
         
         # Right side
         ctk.CTkButton(btn_frame, text="Rename!", width=100, fg_color="#10B981", hover_color="#059669", command=self._execute_rename).pack(side="right", padx=5)
-        ctk.CTkButton(btn_frame, text="Xem thử trước", width=100, fg_color="#F59E0B", hover_color="#D97706", command=self._preview).pack(side="right", padx=5)
+        ctk.CTkButton(btn_frame, text=get_text("ft_preview"), width=100, fg_color="#F59E0B", hover_color="#D97706", command=self._preview).pack(side="right", padx=5)
         
         # Bottom checkboxes
         bottom_frame = ctk.CTkFrame(parent, fg_color="transparent")
         bottom_frame.pack(fill="x")
         
-        ctk.CTkCheckBox(bottom_frame, text="Mở thư mục khi kết thúc", variable=self.var_open_after).pack(side="left", padx=10)
-        ctk.CTkCheckBox(bottom_frame, text="Lưu lại log file", variable=self.var_save_log).pack(side="left", padx=10)
+        ctk.CTkCheckBox(bottom_frame, text=get_text("ft_open_after"), variable=self.var_open_after).pack(side="left", padx=10)
+        ctk.CTkCheckBox(bottom_frame, text=get_text("ft_save_log"), variable=self.var_save_log).pack(side="left", padx=10)
         
     # ===================== Actions =====================
     

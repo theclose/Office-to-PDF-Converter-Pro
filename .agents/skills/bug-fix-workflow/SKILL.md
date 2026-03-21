@@ -82,6 +82,9 @@ Add entry to `docs/known-traps.md`:
 - Use `get_fitz()` not `HAS_PYMUPDF` boolean
 - Check post-processing order in engine.py
 - Verify compression levels map correctly
+- NEVER use `doc.update_stream()` for image replacement (see known-trap #11)
+- Image replacement: always `delete_image()` + `insert_image()` (handles metadata)
+- Ghostscript pipeline: falls back gracefully when GS not installed
 
 ## Anti-Patterns (DON'T DO)
 1. ❌ Fix symptom without finding root cause

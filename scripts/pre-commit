@@ -1,0 +1,19 @@
+#!/bin/sh
+# Pre-commit hook: Verify CLAUDE.md docs before allowing commit
+# Auto-installed by: python scripts/install_hooks.py
+
+echo "🔍 Running CLAUDE.md verification..."
+python scripts/verify_claude_md.py
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ CLAUDE.md verification FAILED — commit blocked"
+    echo "   Fix issues above, then try again."
+    echo "   Auto-fix LOC: python scripts/verify_claude_md.py --fix"
+    echo "   Skip check:   git commit --no-verify"
+    echo ""
+    exit 1
+fi
+
+echo "✅ CLAUDE.md verification passed"
+exit 0

@@ -63,3 +63,10 @@
 - **Fix:** Added `_cancel_all_after_jobs()` helper that cancels all stored job IDs and sets `_closing=True` flag. Use `os._exit(0)` instead of `self.destroy()`
 - **Rule:** ALWAYS call `_cancel_all_after_jobs()` before any `self.destroy()` or `os._exit()` on the main window. Modal dialogs (pdf_tools, excel_tools) are safe — they have no recurring after() callbacks.
 - **Audit lesson:** Static analysis cannot detect Tkinter lifecycle bugs. MUST run app and test close/language change flows.
+
+## 11. update_stream corrupts PDF images (CRITICAL)
+- **Bug:** All compressed PDF pages rendered as completely black (quality = 0)
+- **Cause:** `doc.update_stream(xref, jpeg_bytes)` replaces raw stream data but does NOT update xref metadata (Filter, Width, Height, ColorSpace, BitsPerComponent). When original image used FlateDecode but new data is JPEG (DCTDecode), the metadata mismatch causes viewer to misinterpret the stream → black/garbled output
+- **Fix:** Use `page.delete_image(xref)` + `page.insert_image(rect, stream=compressed)` which correctly creates new xref with matching metadata. Use `replaced_xrefs` set to avoid processing same xref twice
+- **Rule:** NEVER use `doc.update_stream()` for image replacement unless you also update ALL xref dictionary keys (Filter, Width, Height, ColorSpace, BitsPerComponent, DecodeParms). The safe method is always delete_image + insert_image.
+- **Lesson:** "In-place" replacement sounds efficient but PDF xrefs have coupled metadata. Changing the stream without the metadata = silent corruption.

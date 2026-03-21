@@ -459,9 +459,26 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
     def _update_options_panel(self):
         """Update options panel based on selected operation."""
-        # Clear current options
+        # Safe clear: detach textvariables from CTkEntry before destroy
+        # to prevent trace callbacks on dead widgets (CustomTkinter bug)
         for widget in self.options_content.winfo_children():
-            widget.destroy()
+            try:
+                # Recursively find all CTkEntry and detach textvariable
+                for child in widget.winfo_children():
+                    if hasattr(child, '_textvariable') and child._textvariable:
+                        try:
+                            child.configure(textvariable="")
+                        except Exception:
+                            pass
+                    for grandchild in child.winfo_children():
+                        if hasattr(grandchild, '_textvariable') and grandchild._textvariable:
+                            try:
+                                grandchild.configure(textvariable="")
+                            except Exception:
+                                pass
+                widget.destroy()
+            except Exception:
+                pass
 
         op = self.var_operation.get()
 

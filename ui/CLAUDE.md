@@ -16,7 +16,8 @@
 - Log buffer flush: 100ms batch
 
 ## UI Modules
-- `main_window_pro.py` (1588 LOC) — layout, options, file panel
+- `main_window_pro.py` (1265 LOC) — layout, options, DnD
+- `file_panel.py` (340 LOC) — FileListPanel component (extracted from main_window)
 - `conversion_mixin.py` (457 LOC) — start/stop, progress, toggle_inputs
 - `dialogs_mixin.py` (279 LOC) — log, stats, settings, _on_closing
 - `pdf_tools_pro.py` (849 LOC) — PDF Tools dialog (compress, merge, split, etc.)

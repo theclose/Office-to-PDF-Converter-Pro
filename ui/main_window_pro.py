@@ -73,341 +73,9 @@ from office_converter.ui.dialogs_mixin import DialogsMixin
 
 
 # ============================================================================
-# FILE LIST COMPONENT
+# FILE LIST COMPONENT — extracted to file_panel.py (R1 refactoring)
 # ============================================================================
-
-class FileListPanel(ctk.CTkFrame):
-    """Enhanced file list with drag & drop, selection and type indicators."""
-
-    def __init__(self, parent, on_selection_change: Optional[Callable] = None, 
-                 app_instance=None, **kwargs):
-        super().__init__(parent, **kwargs)
-
-        self.files: List[ConversionFile] = []
-        self.selected_indices: set = set()  # Track selected file indices
-        self.anchor_index: int = -1  # For shift-selection
-        self.on_selection_change = on_selection_change
-        self.app_instance = app_instance  # Store reference to main app for logging
-
-        self._create_widgets()
-        self._setup_drag_drop()
-        self._setup_keyboard_bindings()
-
-    def _create_widgets(self):
-        """Create file list widgets."""
-        # Type indicator bar
-        self.type_bar = ctk.CTkFrame(self, height=6, corner_radius=3)
-        self.type_bar.pack(fill="x", padx=10, pady=(10, 5))
-
-        self.excel_bar = ctk.CTkFrame(self.type_bar, fg_color=FILE_TYPE_COLORS[FileType.EXCEL])
-        self.word_bar = ctk.CTkFrame(self.type_bar, fg_color=FILE_TYPE_COLORS[FileType.WORD])
-        self.ppt_bar = ctk.CTkFrame(self.type_bar, fg_color=FILE_TYPE_COLORS[FileType.POWERPOINT])
-
-        # Drop zone / File list
-        self.drop_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.drop_frame.pack(fill="both", expand=True, padx=10, pady=5)
-
-        self.drop_label = ctk.CTkLabel(
-            self.drop_frame,
-            text="📁 Kéo thả files vào đây\n\n💡 Ctrl+O: Thêm files\n⌫ Delete: Xóa files đã chọn\n🔲 Ctrl+A: Chọn tất cả",
-            font=ctk.CTkFont(size=14),
-            text_color="gray"
-        )
-        self.drop_label.pack(expand=True, pady=30)
-
-        # R1: CTkTextbox replaces tk.Listbox — theme-native, bo góc, smooth scroll
-        self.file_listbox = ctk.CTkTextbox(
-            self.drop_frame,
-            font=ctk.CTkFont(family="Segoe UI", size=11),
-            corner_radius=8,
-            state="disabled",  # Read-only by default
-            wrap="none",
-            activate_scrollbars=True
-        )
-        # Track selection state for compatibility
-        self._selected_lines: set = set()
-        self._is_ctk_textbox = True  # Flag for compatibility methods
-
-        # Stats row
-        stats_frame = ctk.CTkFrame(self, fg_color="transparent")
-        stats_frame.pack(fill="x", padx=10, pady=5)
-
-        self.count_label = ctk.CTkLabel(
-            stats_frame,
-            text="0 files",
-            font=ctk.CTkFont(weight="bold")
-        )
-        self.count_label.pack(side="left")
-
-        self.types_label = ctk.CTkLabel(
-            stats_frame,
-            text="",
-            text_color="gray"
-        )
-        self.types_label.pack(side="left", padx=10)
-
-    def _setup_drag_drop(self):
-        """Setup drag and drop support."""
-        try:
-            from tkinterdnd2 import DND_FILES
-
-            # Check if root supports DnD
-            root = self.winfo_toplevel()
-            if hasattr(root, 'drop_target_register'):
-                self.drop_frame.drop_target_register(DND_FILES)
-                self.drop_frame.dnd_bind('<<Drop>>', self._on_drop)
-                self.drop_label.configure(text="📁 Kéo thả files vào đây\n✅ Drag & Drop đã bật")
-        except ImportError:
-            logger.info("TkinterDnD2 not available, drag & drop disabled")
-        except Exception as e:
-            logger.warning(f"Could not setup drag & drop: {e}")
-
-    def _setup_keyboard_bindings(self):
-        """Setup keyboard shortcuts for file selection."""
-        # Ctrl+A to select all
-        self.file_listbox.bind('<Control-a>', self._select_all)
-        self.file_listbox.bind('<Control-A>', self._select_all)
-        
-        # Delete to remove selected
-        self.file_listbox.bind('<Delete>', self._delete_selected)
-        self.file_listbox.bind('<BackSpace>', self._delete_selected)
-        
-        # Click to select line
-        self.file_listbox.bind('<Button-1>', self._on_click_select)
-
-    def _select_all(self, event=None):
-        """Select all files."""
-        try:
-            if self.files:
-                self.selected_indices = set(range(len(self.files)))
-                self._highlight_selected()
-        except Exception as e:
-            logger.error(f"Select all error: {e}")
-        return "break"
-
-    def _on_click_select(self, event=None):
-        """Handle click to select a line in CTkTextbox."""
-        try:
-            if not self.files:
-                return
-            # Get clicked line number
-            index = self.file_listbox.index(f"@{event.x},{event.y}")
-            line_num = int(index.split('.')[0]) - 1  # 0-indexed
-            if 0 <= line_num < len(self.files):
-                # Toggle selection
-                if line_num in self.selected_indices:
-                    self.selected_indices.discard(line_num)
-                else:
-                    self.selected_indices.add(line_num)
-                self._highlight_selected()
-        except Exception:
-            pass
-
-    def _highlight_selected(self):
-        """Highlight selected lines in CTkTextbox."""
-        try:
-            self.file_listbox.configure(state="normal")
-            self.file_listbox.tag_remove("selected", "1.0", "end")
-            self.file_listbox.tag_config(
-                "selected",
-                background="#1f6aa5",
-                foreground="white"
-            )
-            for idx in self.selected_indices:
-                line = idx + 1
-                self.file_listbox.tag_add("selected", f"{line}.0", f"{line}.end")
-            self.file_listbox.configure(state="disabled")
-        except Exception:
-            pass
-
-    def _delete_selected(self, event=None):
-        """Delete selected files from list."""
-        try:
-            if not self.selected_indices:
-                return "break"
-            # Remove in reverse order to maintain indices
-            for idx in sorted(self.selected_indices, reverse=True):
-                if 0 <= idx < len(self.files):
-                    del self.files[idx]
-            self.selected_indices.clear()
-            self._refresh_display()
-        except Exception as e:
-            logger.error(f"Delete selected error: {e}")
-        return "break"
-
-    def get_selected_files(self) -> List[ConversionFile]:
-        """Get currently selected files (or all if none selected)."""
-        if self.selected_indices:
-            return [self.files[i] for i in sorted(self.selected_indices) if i < len(self.files)]
-        return self.files  # Return all if none selected
-
-
-    def _on_drop(self, event):
-        """Handle dropped files using production-grade Unicode parser."""
-        try:
-            # Use parse_dropped_paths for robust multi-file Unicode support
-            file_paths = parse_dropped_paths(self, event.data)
-            added = self.add_files(file_paths)
-            
-            # Success log message
-            if added > 0:
-                logger.info(f"Drag & drop: Added {added} file(s)")
-                # Log to UI using app instance
-                if self.app_instance and hasattr(self.app_instance, '_log'):
-                    self.app_instance._log(f"✅ Đã thêm {added} file(s) thành công")
-        except Exception as e:
-            logger.error(f"Drop error: {e}")
-
-    def add_files(self, paths: List[str]) -> int:
-        """Add files to the list with success logging."""
-        added = 0
-        skipped = 0
-        try:
-            for path in paths:
-                # Check extension
-                ext = Path(path).suffix.lower()
-                if ext not in ALL_EXTENSIONS:
-                    skipped += 1
-                    continue
-
-                # Check if already exists
-                if any(f.path == path for f in self.files):
-                    skipped += 1
-                    continue
-
-                self.files.append(ConversionFile(path=path))
-                added += 1
-
-            if added > 0:
-                self._refresh_display()
-                # Log success to console
-                logger.info(f"Added {added} file(s) successfully" + 
-                          (f" (skipped {skipped})" if skipped > 0 else ""))
-                
-        except Exception as e:
-            logger.error(f"Add files error: {e}")
-
-        return added
-
-    def clear(self):
-        """Clear all files."""
-        try:
-            self.files.clear()
-            self._refresh_display()
-        except Exception as e:
-            logger.error(f"Clear error: {e}")
-
-    def remove_completed(self):
-        """Remove completed files."""
-        try:
-            self.files = [f for f in self.files if f.status != "completed"]
-            self._refresh_display()
-        except Exception as e:
-            logger.error(f"Remove completed error: {e}")
-
-    def _refresh_display(self):
-        """Refresh the file list display with debouncing for large lists."""
-        try:
-            # Debounce: cancel previous scheduled refresh
-            if hasattr(self, '_refresh_job') and self._refresh_job:
-                self.after_cancel(self._refresh_job)
-            
-            # Schedule refresh after 50ms debounce
-            self._refresh_job = self.after(50, self._do_refresh_display)
-        except Exception as e:
-            logger.error(f"Refresh display error: {e}")
-
-    def _do_refresh_display(self):
-        """Actual refresh implementation."""
-        try:
-            count = len(self.files)
-
-            # Update type bar
-            self._update_type_bar()
-
-            # Update count
-            self.count_label.configure(text=f"{count} file{'s' if count != 1 else ''}")
-
-            # Update type breakdown
-            type_counts = {ft: 0 for ft in FileType}
-            for f in self.files:
-                type_counts[f.file_type] += 1
-
-            parts = []
-            if type_counts[FileType.EXCEL]: parts.append(f"📗{type_counts[FileType.EXCEL]}")
-            if type_counts[FileType.WORD]: parts.append(f"📘{type_counts[FileType.WORD]}")
-            if type_counts[FileType.POWERPOINT]: parts.append(f"📙{type_counts[FileType.POWERPOINT]}")
-            self.types_label.configure(text=" ".join(parts))
-
-            # Update list display (R1: CTkTextbox-compatible)
-            if count == 0:
-                self.file_listbox.pack_forget()
-                self.drop_label.pack(expand=True, pady=30)
-            else:
-                self.drop_label.pack_forget()
-                self.file_listbox.pack(fill="both", expand=True)
-
-                # Clear and repopulate CTkTextbox
-                self.file_listbox.configure(state="normal")
-                self.file_listbox.delete("1.0", "end")
-
-                # Progressive rendering: show only first 200 files for performance
-                MAX_DISPLAY = 200
-                display_files = self.files[:MAX_DISPLAY]
-                
-                lines = []
-                for i, f in enumerate(display_files, 1):
-                    status_icon = {
-                        "pending": f.icon,
-                        "converting": "⏳",
-                        "completed": "✅",
-                        "failed": "❌"
-                    }.get(f.status, f.icon)
-                    lines.append(f"{status_icon} {i:3d}. {f.filename}")
-                
-                # Add "more files" indicator if truncated
-                if count > MAX_DISPLAY:
-                    lines.append(f"... và {count - MAX_DISPLAY} files nữa")
-                
-                self.file_listbox.insert("1.0", "\n".join(lines))
-                self.file_listbox.configure(state="disabled")
-                
-                # Re-apply selection highlighting
-                self._highlight_selected()
-
-            # Callback
-            if self.on_selection_change:
-                self.on_selection_change(self.files)
-        except Exception as e:
-            logger.error(f"Refresh display error: {e}")
-
-    def _update_type_bar(self):
-        """Update the file type distribution bar."""
-        try:
-            if not self.files:
-                self.excel_bar.place_forget()
-                self.word_bar.place_forget()
-                self.ppt_bar.place_forget()
-                return
-
-            type_counts = {ft: 0 for ft in FileType}
-            for f in self.files:
-                type_counts[f.file_type] += 1
-
-            total = len(self.files)
-            x = 0
-
-            for ftype, bar in [(FileType.EXCEL, self.excel_bar),
-                               (FileType.WORD, self.word_bar),
-                               (FileType.POWERPOINT, self.ppt_bar)]:
-                if type_counts[ftype]:
-                    width = type_counts[ftype] / total
-                    bar.place(relx=x, rely=0, relwidth=width, relheight=1)
-                    x += width
-                else:
-                    bar.place_forget()
-        except Exception as e:
-            logger.error(f"Update type bar error: {e}")
+from office_converter.ui.file_panel import FileListPanel
 
 
 # ============================================================================
@@ -510,7 +178,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         else:
             self._log(get_text('pymupdf_no'))
         if HAS_TKDND:
-            self._log("📁 Drag & Drop: Kéo thả file hoạt động (TkinterDnD2)")
+            self._log(get_text('dnd_active_log'))
 
         # Cleanup old temp files from previous sessions
         self._cleanup_temp_files()
@@ -1099,6 +767,20 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             self.dpi_entry.pack(side="left", padx=5)
             ctk.CTkLabel(self.dpi_frame, text=get_text('dpi_range'),
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
+
+            # FATAL-3 fix: Validate DPI on focus-out (clamp to 72-600)
+            def _validate_dpi(event=None):
+                try:
+                    val = int(self.var_dpi.get())
+                    if val < 72:
+                        self.var_dpi.set("72")
+                    elif val > 600:
+                        self.var_dpi.set("600")
+                    self.dpi_entry.configure(border_color="")
+                except (ValueError, TypeError):
+                    self.var_dpi.set("300")
+                    self.dpi_entry.configure(border_color="#DC2626")
+            self.dpi_entry.bind("<FocusOut>", _validate_dpi)
             
             self._on_quality_change()
 
@@ -1289,7 +971,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                     self._log(get_text("drop_added").format(added))
         except Exception as e:
             logger.error(f"Add files error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể thêm files: {e}")
+            messagebox.showerror(get_text('error'), get_text('add_files_error').format(e))
 
     def _add_folder(self):
         """Add files from folder. R4: Threaded scan with progress indicator."""
@@ -1298,7 +980,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             if not folder or not self.file_panel:
                 return
 
-            self._log(f"🔍 Đang quét folder: {os.path.basename(folder)}...")
+            self._log(get_text('scanning_folder').format(os.path.basename(folder)))
 
             # R4: Run folder scan in thread to avoid blocking UI
             def _scan_folder():
@@ -1321,17 +1003,17 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                     def _update_ui():
                         if files:
                             added = self.file_panel.add_files(files)
-                            self._log(f"📁 Đã thêm {added} file(s) từ folder (recursive, max depth {max_depth})")
+                            self._log(get_text('folder_added').format(added))
                         else:
-                            self._log("⚠️ Không tìm thấy Office files trong folder")
+                            self._log(get_text('no_office_files'))
                     self.after(0, _update_ui)
-                except Exception:
-                    self.after(0, lambda: self._log(f"❌ Lỗi quét folder: {e}"))
+                except Exception as scan_err:
+                    self.after(0, lambda err=scan_err: self._log(get_text('folder_scan_error').format(err)))
 
             threading.Thread(target=_scan_folder, daemon=True).start()
         except Exception as e:
             logger.error(f"Add folder error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể thêm folder: {e}")
+            messagebox.showerror(get_text('error'), get_text('add_files_error').format(e))
 
     # _show_recent() → DialogsMixin
 
@@ -1347,7 +1029,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             shell32 = ctypes.windll.shell32
 
             if not user32.OpenClipboard(0):
-                self._log("ℹ️ Không thể truy cập clipboard. Dùng Ctrl+O hoặc kéo thả.")
+                self._log(get_text('clipboard_error'))
                 return
 
             try:
@@ -1366,9 +1048,9 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                             valid = [p for p in paths if os.path.isfile(p)]
                             if valid and self.file_panel:
                                 added = self.file_panel.add_files(valid)
-                                self._log(f"📋 Paste: thêm {added} file(s) từ clipboard")
+                                self._log(get_text('clipboard_paste_ok').format(added))
                                 return
-                    self._log("ℹ️ Clipboard không chứa files. Copy files trong Explorer rồi thử lại.")
+                    self._log(get_text('clipboard_empty'))
                     return
 
                 # Extract file paths from HDROP
@@ -1382,14 +1064,14 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
                 if paths and self.file_panel:
                     added = self.file_panel.add_files(paths)
-                    self._log(f"📋 Paste: thêm {added} file(s) từ clipboard")
+                    self._log(get_text('clipboard_paste_ok').format(added))
                 else:
-                    self._log("ℹ️ Clipboard không chứa files hỗ trợ.")
+                    self._log(get_text('clipboard_no_supported'))
             finally:
                 user32.CloseClipboard()
         except Exception as e:
             logger.error(f"Paste files error: {e}")
-            self._log("ℹ️ Paste từ clipboard thất bại. Dùng Ctrl+O hoặc kéo thả.")
+            self._log(get_text('clipboard_paste_failed'))
 
     def _change_language(self, selected_name: str):
         """Change application language with instant hot-reload."""
@@ -1508,7 +1190,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             PDFToolsDialogPro(self, "vi")
         except Exception as e:
             logger.error(f"Open PDF Tools error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể mở PDF Tools: {e}")
+            messagebox.showerror(get_text('error'), get_text('open_pdf_tools_error').format(e))
 
     def _open_excel_tools(self):
         """Open Excel Tools dialog."""
@@ -1518,13 +1200,12 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         except ImportError as e:
             logger.error(f"Excel Tools import error: {e}")
             messagebox.showerror(
-                "Thiếu thư viện",
-                "Cần cài đặt openpyxl để sử dụng Excel Tools.\n\n"
-                "Chạy lệnh: pip install openpyxl"
+                get_text('error'),
+                get_text('missing_openpyxl')
             )
         except Exception as e:
             logger.error(f"Open Excel Tools error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể mở Excel Tools: {e}")
+            messagebox.showerror(get_text('error'), get_text('open_excel_error').format(e))
 
     def _clear_files(self):
         """Clear file list. U6: Confirm before clearing >3 files."""
@@ -1534,12 +1215,12 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 # U6: Confirmation for large lists
                 if count > 3:
                     if not messagebox.askyesno(
-                        "Xác nhận xóa",
-                        f"Xóa {count} files khỏi danh sách?"
+                        get_text('confirm_clear_title'),
+                        get_text('confirm_clear_msg').format(count)
                     ):
                         return
                 self.file_panel.clear()
-                self._log(f"🗑️ Đã xóa {count} file(s) khỏi danh sách")
+                self._log(get_text('files_cleared').format(count))
         except Exception as e:
             logger.error(f"Clear files error: {e}")
 

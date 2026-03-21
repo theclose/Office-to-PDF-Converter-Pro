@@ -45,9 +45,10 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 ### ui/ — Presentation
 | File | LOC | Purpose |
 |------|-----|---------|
-| main_window_pro.py | 1588 | ConverterProApp — layout, options, file panel |
+| main_window_pro.py | 1270 | ConverterProApp — layout, options, DnD |
+| file_panel.py | 352 | FileListPanel — file list, drag&drop, selection |
 | conversion_mixin.py | 457 | ConversionMixin — start/stop, progress |
-| dialogs_mixin.py | 279 | DialogsMixin — log, stats, _on_closing |
+| dialogs_mixin.py | 290 | DialogsMixin — log, stats, _on_closing |
 | pdf_tools_pro.py | 983 | PDF Tools dialog |
 | pdf_tools_ops_mixin.py | 372 | PDF Tools operations |
 | excel_tools_ui.py | 601 | Excel Tools dialog |

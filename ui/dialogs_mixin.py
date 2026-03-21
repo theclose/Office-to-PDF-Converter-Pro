@@ -203,6 +203,11 @@ F1         {get_text('shortcut_help')}
 
     def _on_closing(self):
         """Cleanup on close with forced termination."""
+        # FATAL-2 fix: prevent double-close race condition
+        if getattr(self, '_closing_in_progress', False):
+            return
+        self._closing_in_progress = True
+
         try:
             import time as _time
             logger.info("Application closing - starting cleanup")
@@ -264,7 +269,7 @@ F1         {get_text('shortcut_help')}
             except Exception:
                 pass
 
-            logger.info("Cleanup complete - forcing exit")
+            logger.info("Cleanup complete - attempting graceful exit")
 
         except Exception as e:
             logger.error(f"Cleanup error: {e}")
@@ -277,4 +282,9 @@ F1         {get_text('shortcut_help')}
                     _handler.flush()
                 except Exception:
                     pass
+            # R4: Try graceful destroy first, os._exit as fallback
+            try:
+                self.destroy()
+            except Exception:
+                pass
             os._exit(0)

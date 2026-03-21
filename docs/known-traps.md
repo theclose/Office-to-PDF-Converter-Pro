@@ -77,3 +77,24 @@
 - **Fix:** Use `_safe_destroy_children()` → recursively find CTkEntry, call `tv.trace_remove('write', cb_name)` to remove the trace, set `_textvariable = None`, then destroy
 - **Rule:** NEVER use `configure(textvariable="")` to detach. ALWAYS use `trace_remove()` + set to `None`. NEVER destroy CTkEntry with active textvariable traces.
 - **Lesson:** CustomTkinter's trace callbacks survive widget destruction. Must explicitly remove traces from StringVars before destroying.
+
+## 13. _on_closing double-close race condition
+- **Bug:** Clicking window ❌ button twice quickly triggers `_on_closing` twice → double COM cleanup → race condition
+- **Cause:** No reentrance guard — `_on_closing` was not idempotent
+- **Fix:** Add `_closing_in_progress` flag checked at entry. Also try `self.destroy()` before `os._exit(0)` for graceful exit.
+- **Rule:** ALWAYS add reentrance guard to `_on_closing`. ALWAYS try graceful destroy before os._exit.
+- **Lesson:** Window close event can fire multiple times on rapid clicks.
+
+## 14. DPI entry accepts any string → COM crash
+- **Bug:** User can type "abc" or "99999" into DPI entry → COM method receives invalid DPI → unrecoverable COM error
+- **Cause:** CTkEntry had no validation — `int(var_dpi.get())` had try/except fallback to 300 but values like -100 or 99999 passed through
+- **Fix:** Add `FocusOut` validator that clamps value to range 72-600, resets to 300 on non-numeric input
+- **Rule:** ALWAYS validate numeric entries on FocusOut. NEVER send unvalidated user input to COM methods.
+- **Lesson:** try/except around int() is not enough — must also validate the range.
+
+## 15. Lambda closure captures wrong exception variable
+- **Bug:** `_add_folder` inner thread exception handler used `e` from outer try block instead of local exception
+- **Cause:** `except Exception:` without `as scan_err` → lambda captured `e` from enclosing scope (wrong exception)
+- **Fix:** Use `except Exception as scan_err:` and `lambda err=scan_err:` to capture the correct variable
+- **Rule:** ALWAYS name exception variables in nested try/except. ALWAYS use default argument in lambda to capture loop/scope variables.
+- **Lesson:** Python closures capture variables by reference, not by value. Use default arguments to freeze values.

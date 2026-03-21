@@ -148,9 +148,13 @@ class WordConverter(BaseConverter):
                 logger.debug(f"Word quit error: {e}")
             self._word = None
 
-        from .base import release_com
-        release_com()
-        logger.info("Word cleanup done")
+        # Only release COM apartment if NOT using pool
+        # Pool manages COM lifetime — CoUninitialize kills pooled instances
+        if not self._use_pool:
+            from .base import release_com
+            release_com()
+        self._word = None
+        logger.debug("Word cleanup done")
 
     def _validate_input(self, input_path: str) -> Optional[str]:
         """W-85-2 + W-85-4: Validate input file before conversion.

@@ -178,11 +178,12 @@ class ExcelConverter(BaseConverter):
                 logger.debug(f"Excel quit error: {e}")
             self._excel = None
 
-        # Release COM properly
-        from .base import release_com
-        release_com()
-        # gc.collect() removed — COMPool._recycle_*() handles GC after Quit()
-        logger.info("Excel cleanup done")
+        # Only release COM apartment if NOT using pool
+        if not self._use_pool:
+            from .base import release_com
+            release_com()
+        self._excel = None
+        logger.debug("Excel cleanup done")
 
     def _validate_input(self, input_path: str) -> Optional[str]:
         """E-85-3: Validate input file. Returns error message or None."""

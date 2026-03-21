@@ -126,3 +126,10 @@
 - **Fix:** Converter `_is_xxx_alive()` probes `.Name`, if dead → calls `pool.invalidate_xxx()` (sets `_xxx=None` + `_last_ok=0.0`) → then `initialize()` → pool creates fresh COM. Added `invalidate_word/excel/ppt()` to COMPool.
 - **Rule:** When detecting dead COM, ALWAYS invalidate BOTH the local cache AND the pool cache. Never assume pool will self-heal.
 - **Lesson:** Multi-layer caching (converter + pool) means dead objects propagate through ALL layers. Invalidation must cascade.
+
+## 20. converter.cleanup() calls CoUninitialize, killing pooled COM
+- **Bug:** Word COM dies between every conversion. `_is_word_alive()` always returns False on 2nd file.
+- **Cause:** `cleanup()` calls `release_com()` → `CoUninitialize()` unconditionally, even when using COM pool. This destroys the thread's COM apartment, killing all cached COM objects in the pool. Engine creates new converter per file → cleanup called after each → COM apartment destroyed → pool's Word/Excel/PPT instances become zombies.
+- **Fix:** Guard `release_com()` with `if not self._use_pool:` in all 3 converters. When pooled, cleanup only nulls local ref (`self._word = None`). Pool manages COM apartment lifetime.
+- **Rule:** NEVER call CoUninitialize when using COM pool. Pool owns the COM apartment.
+- **Lesson:** COM apartment is per-thread, not per-object. Uninitializing it kills ALL COM objects on that thread, not just the converter's.

@@ -121,9 +121,12 @@ class PPTConverter(BaseConverter):
                 logger.debug(f"PPT quit error: {e}")
             self._ppt = None
 
-        from .base import release_com
-        release_com()
-        logger.info("PowerPoint cleanup done")
+        # Only release COM apartment if NOT using pool
+        if not self._use_pool:
+            from .base import release_com
+            release_com()
+        self._ppt = None
+        logger.debug("PowerPoint cleanup done")
 
     def _validate_input(self, input_path: str) -> Optional[str]:
         """Validate input file. Returns error message or None."""

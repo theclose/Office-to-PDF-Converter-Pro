@@ -22,7 +22,7 @@ Phase 2: Worker Pool & Circuit Breaker (CURRENT)
 """
 
 __version__ = "2.0.0"
-__author__ = "VNTime JSC"
+__author__ = "TungDo"
 
 # Phase 1 exports
 from .models import FileType, ConversionFile, Priority, CircuitBreakerState

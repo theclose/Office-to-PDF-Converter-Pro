@@ -40,15 +40,15 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | pdf/security.py | 200 | Password protection |
 | pdf/watermark.py | 66 | Watermark overlay |
 | pdf/merge_split.py | 221 | PDF merge/split |
-| pdf/conversion.py | 215 | PDF conversion utilities |
+| pdf/conversion.py | 221 | PDF conversion utilities |
 
 ### ui/ — Presentation
 | File | LOC | Purpose |
 |------|-----|---------|
-| main_window_pro.py | 1398 | ConverterProApp — layout, options, DnD |
-| file_panel.py | 352 | FileListPanel — file list, drag&drop, selection |
+| main_window_pro.py | 1406 | ConverterProApp — layout, options, DnD |
+| file_panel.py | 363 | FileListPanel — file list, drag&drop, selection |
 | collapsible_section.py | 106 | CollapsibleSection — accordion widget for options |
-| conversion_mixin.py | 509 | ConversionMixin — start/stop, progress |
+| conversion_mixin.py | 517 | ConversionMixin — start/stop, progress |
 | dialogs_mixin.py | 290 | DialogsMixin — log, stats, _on_closing |
 | pdf_tools_pro.py | 983 | PDF Tools dialog |
 | pdf_tools_ops_mixin.py | 372 | PDF Tools operations |
@@ -62,7 +62,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | File | LOC | Purpose |
 |------|-----|---------|
 | com_pool.py | 313 | COMPool singleton — RLock, health-check, recycle |
-| config.py | 128 | Config singleton — JSON, thread-safe save() |
+| config.py | 144 | Config singleton — JSON, thread-safe save() |
 | recent_files.py | 211 | RecentFilesDB — SQLite WAL, batch_log() |
 | progress_estimator.py | 336 | AdaptiveEstimator — JSONL persistence |
 | logging_setup.py | 68 | Centralized logging → %LOCALAPPDATA% |

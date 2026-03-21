@@ -383,10 +383,18 @@ class ConversionMixin:
 
     def _on_file_complete(self, conv_file: ConversionFile):
         """File completion callback.
-        B3: Buffers log messages and flushes every 100ms."""
+        B3: Buffers log messages and flushes every 100ms.
+        F2: Tracks recently completed files in config."""
         try:
             if conv_file.status == "completed":
                 self._log_buffer.append(f"✅ {conv_file.filename}")
+                # F2: Add to recent files
+                try:
+                    from office_converter.utils.config import Config
+                    config = Config()
+                    config.add_recent_file(conv_file.path)
+                except Exception:
+                    pass
             else:
                 self._log_buffer.append(f"❌ {conv_file.filename}")
 

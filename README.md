@@ -146,4 +146,4 @@ office_converter/
 
 ## 📝 License
 
-MIT License - Copyright (c) 2024 VNTime JSC
+MIT License - Copyright (c) 2024 TungDo

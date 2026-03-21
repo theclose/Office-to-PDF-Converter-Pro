@@ -13,7 +13,7 @@ Components:
 """
 
 __version__ = "3.0.0"
-__author__ = "VNTime JSC"
+__author__ = "TungDo"
 
 from .commands import Command, CommandBus, CommandResult, ExecutionContext
 from .events import Event, EventBus

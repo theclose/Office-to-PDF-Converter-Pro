@@ -305,7 +305,18 @@ class FileListPanel(ctk.CTkFrame):
                         "completed": "✅",
                         "failed": "❌"
                     }.get(f.status, f.icon)
-                    lines.append(f"{status_icon} {i:3d}. {f.filename}")
+                    # F6: Show file size next to filename
+                    try:
+                        size_bytes = os.path.getsize(f.path)
+                        if size_bytes < 1024:
+                            size_str = f"{size_bytes}B"
+                        elif size_bytes < 1024 * 1024:
+                            size_str = f"{size_bytes / 1024:.0f}KB"
+                        else:
+                            size_str = f"{size_bytes / (1024 * 1024):.1f}MB"
+                    except OSError:
+                        size_str = "?"
+                    lines.append(f"{status_icon} {i:3d}. {f.filename}  ({size_str})")
                 
                 # Add "more files" indicator if truncated
                 if count > MAX_DISPLAY:

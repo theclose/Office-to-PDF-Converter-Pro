@@ -100,7 +100,7 @@ System Requirements:
 - Windows 10/11
 - Microsoft Office installed (for conversions)
 
-Support: vntime.jsc@gmail.com
+Support: TungDo
 """, encoding='utf-8')
     
     print(f"✅ Portable package created at: {portable_dir.absolute()}")

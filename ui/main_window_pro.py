@@ -163,6 +163,13 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         # Keyboard shortcuts
         self._setup_shortcuts()
 
+        # F1: Restore theme from config
+        saved_theme = self.config.theme
+        if saved_theme == "dark":
+            ctk.set_appearance_mode("dark")
+            if self.theme_switch:
+                self.theme_switch.select()  # Turn switch on for dark mode
+
         # Setup drag and drop
         self._setup_drag_drop()
 
@@ -722,7 +729,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             ctk.CTkLabel(title_frame, text=f"v{self.VERSION}",
                         text_color="gray").pack(side="left", padx=10)
             # U7: Author in subtitle only (no phone in title bar)
-            ctk.CTkLabel(title_frame, text="by VNTime JSC",
+            ctk.CTkLabel(title_frame, text="by TungDo",
                         text_color="#6B7280", font=ctk.CTkFont(size=11)).pack(side="left", padx=5)
 
             # Controls
@@ -1072,12 +1079,13 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             logger.error(f"Password toggle error: {e}")
 
     def _toggle_theme(self):
-        """Toggle dark/light theme. R1: CTkTextbox auto-follows theme."""
+        """Toggle dark/light theme. F1: Persist to config."""
         try:
             if self.theme_switch:
                 mode = "dark" if self.theme_switch.get() else "light"
                 ctk.set_appearance_mode(mode)
-                # R1: CTkTextbox auto-adapts to theme — no manual color update needed
+                # F1: Save theme preference to config
+                self.config.theme = mode
         except Exception as e:
             logger.error(f"Toggle theme error: {e}")
 

@@ -24,7 +24,8 @@ DEFAULT_CONFIG = {
         "title": "",
         "password_enabled": False
     },
-    "scan_mode": False
+    "scan_mode": False,
+    "recent_files": []
 }
 
 
@@ -126,3 +127,18 @@ class Config:
     @pdf_quality.setter
     def pdf_quality(self, value: int):
         self.set("pdf_quality", value)
+
+    @property
+    def recent_files(self) -> list:
+        """F2: Get recent files list."""
+        return self.get("recent_files", [])
+
+    def add_recent_file(self, path: str):
+        """F2: Add a file to recent files (max 10, most recent first)."""
+        recent = self.recent_files
+        # Remove if already exists
+        recent = [f for f in recent if f != path]
+        # Insert at front
+        recent.insert(0, path)
+        # Keep max 10
+        self.set("recent_files", recent[:10])

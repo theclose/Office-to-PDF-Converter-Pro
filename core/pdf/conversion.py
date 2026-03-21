@@ -104,21 +104,20 @@ def pdf_to_single_image(
         zoom = dpi / 72
         matrix = fitz.Matrix(zoom, zoom)
         
-        logger.info(f"Phase 1: Calculating dimensions for {page_count} pages...")
-        page_images = []
+        # === PASS 1: Calculate dimensions only (no pixel data stored) ===
+        logger.info(f"Pass 1: Calculating dimensions for {page_count} pages...")
+        page_heights = []
         max_width = 0
         total_height = 0
         
         for i, page in enumerate(doc):
-            pix = page.get_pixmap(matrix=matrix)
-            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            page_images.append(img)
-            max_width = max(max_width, pix.width)
-            total_height += pix.height
-            del pix
-            # Periodic GC to prevent OOM on large PDFs
-            if (i + 1) % 20 == 0:
-                gc.collect()
+            # Get dimensions without storing pixel data
+            rect = page.rect
+            w = int(rect.width * zoom)
+            h = int(rect.height * zoom)
+            page_heights.append(h)
+            max_width = max(max_width, w)
+            total_height += h
             if progress_callback:
                 progress_callback(i + 1, page_count * 2, (i + 1) / (page_count * 2))
         
@@ -128,22 +127,29 @@ def pdf_to_single_image(
         stats["width"] = max_width
         stats["height"] = total_height
         
-        logger.info("Phase 2: Creating combined image...")
+        # === PASS 2: Render each page directly into combined image ===
+        logger.info("Pass 2: Streaming pages into combined image...")
         combined = Image.new("RGB", (max_width, total_height), background_color)
         
         y_offset = 0
-        for i, img in enumerate(page_images):
+        for i, page in enumerate(doc):
+            # Render page to pixmap
+            pix = page.get_pixmap(matrix=matrix)
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            
+            # Paste directly — no accumulation
             x_offset = (max_width - img.width) // 2
             combined.paste(img, (x_offset, y_offset))
-            y_offset += img.height + page_gap
-            page_images[i] = None  # Release reference early
+            y_offset += pix.height + page_gap
+            
+            # Release immediately
+            del pix, img
             if (i + 1) % 20 == 0:
                 gc.collect()
             if progress_callback:
                 progress_callback(page_count + i + 1, page_count * 2, 
                                 (page_count + i + 1) / (page_count * 2))
         
-        del page_images
         gc.collect()
         
         logger.info(f"Phase 3: Saving to {output_path}...")

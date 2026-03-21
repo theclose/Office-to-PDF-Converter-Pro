@@ -113,6 +113,27 @@ class COMPool:
             self._ppt = None
             return False
 
+    @staticmethod
+    def _kill_zombie_office(process_name: str):
+        """Kill zombie Office processes that block new COM creation.
+        
+        When Office crashes, the process may linger as a zombie.
+        Dispatch() connects to the zombie instead of creating new.
+        """
+        import subprocess
+        try:
+            result = subprocess.run(
+                ["taskkill", "/F", "/IM", process_name],
+                capture_output=True, text=True, timeout=5
+            )
+            if result.returncode == 0:
+                logger.info(f"Killed zombie {process_name}")
+                time.sleep(1)  # Wait for process to fully exit
+            else:
+                logger.debug(f"No {process_name} to kill: {result.stderr.strip()}")
+        except Exception as e:
+            logger.debug(f"Zombie kill failed for {process_name}: {e}")
+
     def get_excel(self, _retry_count: int = 0) -> Optional[Any]:
         """Get or create Excel COM instance."""
         if _retry_count >= self.MAX_RETRY:
@@ -130,6 +151,14 @@ class COMPool:
                 try:
                     pythoncom.CoInitialize()
                     self._excel = win32com.client.Dispatch("Excel.Application")
+                    # Post-creation alive check — Dispatch may connect to zombie
+                    try:
+                        _ = self._excel.Version
+                    except Exception:
+                        logger.warning("New Excel COM is dead (zombie process), killing and retrying")
+                        self._excel = None
+                        self._kill_zombie_office("EXCEL.EXE")
+                        return self.get_excel(_retry_count + 1)
                     self._configure_excel(self._excel)
                     self._excel_count = 0
                     logger.info("Excel COM created (pooled)")
@@ -164,6 +193,14 @@ class COMPool:
                 try:
                     pythoncom.CoInitialize()
                     self._word = win32com.client.Dispatch("Word.Application")
+                    # Post-creation alive check — Dispatch may connect to zombie
+                    try:
+                        _ = self._word.Version
+                    except Exception:
+                        logger.warning("New Word COM is dead (zombie process), killing and retrying")
+                        self._word = None
+                        self._kill_zombie_office("WINWORD.EXE")
+                        return self.get_word(_retry_count + 1)
                     self._configure_word(self._word)
                     self._word_count = 0
                     logger.info("Word COM created (pooled)")
@@ -198,6 +235,14 @@ class COMPool:
                 try:
                     pythoncom.CoInitialize()
                     self._ppt = win32com.client.Dispatch("PowerPoint.Application")
+                    # Post-creation alive check — Dispatch may connect to zombie
+                    try:
+                        _ = self._ppt.Version
+                    except Exception:
+                        logger.warning("New PPT COM is dead (zombie process), killing and retrying")
+                        self._ppt = None
+                        self._kill_zombie_office("POWERPNT.EXE")
+                        return self.get_ppt(_retry_count + 1)
                     self._configure_ppt(self._ppt)
                     self._ppt_count = 0
                     logger.info("PowerPoint COM created (pooled)")

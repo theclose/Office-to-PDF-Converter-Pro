@@ -343,7 +343,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             self.btn_add_folder.pack(side="left", padx=2)
             # Paste from clipboard
             self.btn_paste = ctk.CTkButton(file_btn_frame, text="📋", width=40,
-                         command=self._paste_from_clipboard,
+                         command=self._paste_files,
                          fg_color="transparent", border_width=2)
             self.btn_paste.pack(side="left", padx=2)
             self.btn_clear = ctk.CTkButton(file_btn_frame, text="🗑️", width=40,

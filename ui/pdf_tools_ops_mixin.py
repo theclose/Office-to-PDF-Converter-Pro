@@ -281,7 +281,7 @@ class PDFToolsOpsMixin:
             return False
 
     def _do_merge(self):
-        """Merge PDFs."""
+        """Merge PDFs (runs in background thread to avoid UI freeze)."""
         if len(self.files) < 2:
             messagebox.showwarning(get_text("warning"), get_text("need_2_files"))
             return
@@ -301,9 +301,20 @@ class PDFToolsOpsMixin:
             if not output:
                 return
 
+        import threading
         self._log(f"📎 Gộp {len(self.files)} files...")
-        result = pdf_tools.merge_pdfs(self.files, output)
+        self.btn_process.configure(state="disabled")
 
+        def _merge_worker():
+            result = pdf_tools.merge_pdfs(self.files, output)
+            self.after(0, lambda: self._on_merge_done(result, output))
+
+        thread = threading.Thread(target=_merge_worker, daemon=True)
+        thread.start()
+
+    def _on_merge_done(self, result: bool, output: str):
+        """Handle merge completion on UI thread."""
+        self.btn_process.configure(state="normal")
         if result:
             self._log(get_text("pt_merged_ok").format(os.path.basename(output)))
             output_folder = os.path.dirname(output)

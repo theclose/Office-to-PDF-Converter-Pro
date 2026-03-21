@@ -170,40 +170,50 @@ def compress_with_gs(
     
     logger.info(f"GS compress: DPI={dpi}, color_convert={color_conversion}")
     
+    process = None
     try:
-        result = subprocess.run(
+        process = subprocess.Popen(
             cmd,
-            capture_output=True,
-            timeout=timeout,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            logger.error(f"GS timed out after {timeout}s — killing process")
+            process.kill()
+            process.communicate(timeout=10)  # Reap the process
+            # Clean up partial output
+            if os.path.exists(output_path):
+                try:
+                    os.remove(output_path)
+                except OSError:
+                    pass
+            return False, f"Ghostscript timed out ({timeout}s)"
         
-        if result.returncode != 0:
-            stderr = result.stderr.decode(errors="replace").strip()
-            logger.warning(f"GS returned code {result.returncode}: {stderr[:200]}")
+        if process.returncode != 0:
+            stderr_text = stderr.decode(errors="replace").strip()
+            logger.warning(f"GS returned code {process.returncode}: {stderr_text[:200]}")
             # GS may still produce output even with non-zero return code
             if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
-                return False, f"GS failed (code {result.returncode}): {stderr[:100]}"
+                return False, f"GS failed (code {process.returncode}): {stderr_text[:100]}"
         
         if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
             return True, "Ghostscript compression complete"
         else:
             return False, "GS produced no output"
             
-    except subprocess.TimeoutExpired:
-        logger.error(f"GS timed out after {timeout}s")
-        # Clean up partial output
-        if os.path.exists(output_path):
-            try:
-                os.remove(output_path)
-            except OSError:
-                pass
-        return False, f"Ghostscript timed out ({timeout}s)"
     except FileNotFoundError:
         logger.error("GS executable not found at runtime")
         return False, "Ghostscript executable not found"
     except Exception as e:
         logger.error(f"GS error: {e}")
+        if process and process.poll() is None:
+            try:
+                process.kill()
+            except Exception:
+                pass
         return False, str(e)
 
 

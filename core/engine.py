@@ -198,13 +198,16 @@ class ConversionEngine:
                         logger.warning(f"Could not remove: {e}")
             self._incomplete_files.clear()
             
-            # Clean up temp directory for any orphaned files
+            # Clean up temp directory for any orphaned app-created temp files only
+            # WARNING: Do NOT delete ~$* files — those are Office lock files for
+            # documents the user may have open in other instances.
             import tempfile
             temp_dir = tempfile.gettempdir()
             patterns = [
-                os.path.join(temp_dir, "~$*.doc*"),  # Word temp files
-                os.path.join(temp_dir, "~$*.xls*"),  # Excel temp files  
-                os.path.join(temp_dir, "~$*.ppt*"),  # PowerPoint temp files
+                os.path.join(temp_dir, "tmp_*.doc*"),  # App-created Word temp
+                os.path.join(temp_dir, "tmp_*.xls*"),  # App-created Excel temp
+                os.path.join(temp_dir, "tmp_*.ppt*"),  # App-created PPT temp
+                os.path.join(temp_dir, "tmp_*.pdf"),   # App-created PDF temp
             ]
             
             for pattern in patterns:

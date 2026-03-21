@@ -31,6 +31,7 @@ def protect_pdf(input_path: str, output_path: str, password: str,
         logger.error("Password cannot be empty")
         return False
 
+    doc = None
     try:
         doc = fitz.open(input_path)
 
@@ -47,7 +48,6 @@ def protect_pdf(input_path: str, output_path: str, password: str,
             user_pw=password,
             permissions=perm
         )
-        doc.close()
 
         logger.info(f"Protected PDF saved to {output_path}")
         return True
@@ -55,6 +55,12 @@ def protect_pdf(input_path: str, output_path: str, password: str,
     except Exception as e:
         logger.error(f"Protect PDF error: {e}")
         return False
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def post_process_pdf(pdf_path: str, password: str = None,
@@ -138,7 +144,7 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
                 "Consider splitting before rasterizing for better memory usage."
             )
 
-        for page in doc:
+        for page_idx, page in enumerate(doc):
             mat = fitz.Matrix(dpi / 72, dpi / 72)
             pix = page.get_pixmap(matrix=mat, alpha=False)
             
@@ -165,6 +171,12 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
                                   keep_proportion=False, overlay=True)
             
             del img_data
+            
+            # Periodic GC to prevent OOM on large PDFs
+            if (page_idx + 1) % 50 == 0:
+                import gc
+                gc.collect()
+                logger.debug(f"Rasterize: GC after page {page_idx + 1}/{page_count}")
 
         doc.close()
 

@@ -18,30 +18,36 @@ def merge_pdfs(pdf_paths: List[str], output_path: str) -> bool:
     if not pdf_paths:
         return False
 
+    merged_doc = None
     try:
         merged_doc = fitz.open()
 
         for pdf_path in pdf_paths:
             if os.path.exists(pdf_path):
                 doc = fitz.open(pdf_path)
-                merged_doc.insert_pdf(doc)
-                doc.close()
+                try:
+                    merged_doc.insert_pdf(doc)
+                finally:
+                    doc.close()
             else:
                 logger.warning(f"Merge: skipping missing file: {pdf_path}")
 
         if len(merged_doc) == 0:
-            merged_doc.close()
             return False
 
         merged_doc.save(output_path)
-        merged_doc.close()
-
         logger.info(f"Merged {len(pdf_paths)} PDFs into {output_path}")
         return True
 
     except Exception as e:
         logger.error(f"Merge error: {e}")
         return False
+    finally:
+        if merged_doc:
+            try:
+                merged_doc.close()
+            except Exception:
+                pass
 
 
 def split_pdf(input_path: str, output_folder: str) -> bool:
@@ -55,6 +61,7 @@ def split_pdf(input_path: str, output_folder: str) -> bool:
     if not os.path.exists(input_path):
         return False
 
+    doc = None
     try:
         os.makedirs(output_folder, exist_ok=True)
 
@@ -64,19 +71,25 @@ def split_pdf(input_path: str, output_folder: str) -> bool:
 
         for i in range(page_count):
             new_doc = fitz.open()
-            new_doc.insert_pdf(doc, from_page=i, to_page=i)
+            try:
+                new_doc.insert_pdf(doc, from_page=i, to_page=i)
+                output_path = os.path.join(output_folder, f"{base_name}_page_{i+1:03d}.pdf")
+                new_doc.save(output_path)
+            finally:
+                new_doc.close()
 
-            output_path = os.path.join(output_folder, f"{base_name}_page_{i+1:03d}.pdf")
-            new_doc.save(output_path)
-            new_doc.close()
-
-        doc.close()
         logger.info(f"Split PDF into {page_count} pages")
         return True
 
     except Exception as e:
         logger.error(f"Split error: {e}")
         return False
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def split_pdf_by_parts(input_path: str, output_folder: str, num_parts: int) -> bool:
@@ -105,6 +118,7 @@ def split_pdf_by_parts(input_path: str, output_folder: str, num_parts: int) -> b
         logger.error(f"Invalid num_parts: {num_parts} (must be >= 1)")
         return False
     
+    doc = None
     try:
         os.makedirs(output_folder, exist_ok=True)
         doc = fitz.open(input_path)
@@ -123,24 +137,30 @@ def split_pdf_by_parts(input_path: str, output_folder: str, num_parts: int) -> b
             end = min(start + pages_per_part - 1, page_count - 1)
             
             new_doc = fitz.open()
-            new_doc.insert_pdf(doc, from_page=start, to_page=end)
-            
-            output_path = os.path.join(
-                output_folder,
-                f"{base_name}_part_{part_num:02d}_p{start+1}-{end+1}.pdf"
-            )
-            new_doc.save(output_path)
-            new_doc.close()
+            try:
+                new_doc.insert_pdf(doc, from_page=start, to_page=end)
+                output_path = os.path.join(
+                    output_folder,
+                    f"{base_name}_part_{part_num:02d}_p{start+1}-{end+1}.pdf"
+                )
+                new_doc.save(output_path)
+            finally:
+                new_doc.close()
             
             logger.info(f"Split part {part_num}: pages {start+1}-{end+1}")
         
-        doc.close()
         logger.info(f"Split PDF into {part_num} parts ({page_count} pages)")
         return True
     
     except Exception as e:
         logger.error(f"Split by parts error: {e}")
         return False
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def split_pdf_by_pages_per_file(input_path: str, output_folder: str, pages_per_file: int) -> bool:
@@ -161,6 +181,7 @@ def split_pdf_by_pages_per_file(input_path: str, output_folder: str, pages_per_f
     if not os.path.exists(input_path):
         return False
     
+    doc = None
     try:
         os.makedirs(output_folder, exist_ok=True)
         doc = fitz.open(input_path)
@@ -175,20 +196,26 @@ def split_pdf_by_pages_per_file(input_path: str, output_folder: str, pages_per_f
             end = min(start + pages_per_file - 1, page_count - 1)
             
             new_doc = fitz.open()
-            new_doc.insert_pdf(doc, from_page=start, to_page=end)
-            
-            output_path = os.path.join(
-                output_folder,
-                f"{base_name}_part_{part_num:02d}_p{start+1}-{end+1}.pdf"
-            )
-            new_doc.save(output_path)
-            new_doc.close()
+            try:
+                new_doc.insert_pdf(doc, from_page=start, to_page=end)
+                output_path = os.path.join(
+                    output_folder,
+                    f"{base_name}_part_{part_num:02d}_p{start+1}-{end+1}.pdf"
+                )
+                new_doc.save(output_path)
+            finally:
+                new_doc.close()
         
-        doc.close()
         logger.info(f"Split PDF into {part_num} files ({pages_per_file} pages each)")
         return True
     
     except Exception as e:
         logger.error(f"Split by pages error: {e}")
         return False
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 

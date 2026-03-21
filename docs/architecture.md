@@ -35,11 +35,11 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | file_tools.py | 677 | File manipulation tools |
 | pdf/common.py | 34 | get_fitz(), HAS_PIL flag |
 | pdf/compression.py | 1471 | Image compression pipeline (hybrid GS+PyMuPDF, image type detection) |
-| pdf/ghostscript.py | 364 | Ghostscript wrapper (auto-detect, hybrid pipeline, fallback) |
+| pdf/ghostscript.py | 374 | Ghostscript wrapper (auto-detect, hybrid pipeline, fallback) |
 | pdf/pages.py | 262 | Page extraction/reordering |
-| pdf/security.py | 188 | Password protection |
-| pdf/watermark.py | 60 | Watermark overlay |
-| pdf/merge_split.py | 190 | PDF merge/split |
+| pdf/security.py | 200 | Password protection |
+| pdf/watermark.py | 66 | Watermark overlay |
+| pdf/merge_split.py | 221 | PDF merge/split |
 | pdf/conversion.py | 186 | PDF conversion utilities |
 
 ### ui/ — Presentation
@@ -49,7 +49,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | conversion_mixin.py | 457 | ConversionMixin — start/stop, progress |
 | dialogs_mixin.py | 279 | DialogsMixin — log, stats, _on_closing |
 | pdf_tools_pro.py | 983 | PDF Tools dialog |
-| pdf_tools_ops_mixin.py | 361 | PDF Tools operations |
+| pdf_tools_ops_mixin.py | 372 | PDF Tools operations |
 | excel_tools_ui.py | 601 | Excel Tools dialog |
 | excel_tools_ops_mixin.py | 297 | Excel Tools operations |
 | file_tools_ui_v2.py | 461 | File Tools dialog |
@@ -60,7 +60,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | File | LOC | Purpose |
 |------|-----|---------|
 | com_pool.py | 313 | COMPool singleton — RLock, health-check, recycle |
-| config.py | 119 | Config singleton — JSON, thread-safe save() |
+| config.py | 128 | Config singleton — JSON, thread-safe save() |
 | recent_files.py | 211 | RecentFilesDB — SQLite WAL, batch_log() |
 | progress_estimator.py | 336 | AdaptiveEstimator — JSONL persistence |
 | logging_setup.py | 68 | Centralized logging → %LOCALAPPDATA% |

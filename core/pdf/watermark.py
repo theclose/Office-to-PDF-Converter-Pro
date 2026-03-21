@@ -33,6 +33,7 @@ def add_watermark(
     if rotation not in [0, 90, 180, 270]:
         rotation = 0
 
+    doc = None
     try:
         doc = fitz.open(input_path)
 
@@ -52,9 +53,14 @@ def add_watermark(
             )
 
         doc.save(output_path)
-        doc.close()
         return True
 
     except Exception as e:
         logger.error(f"Watermark error: {e}")
         return False
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass

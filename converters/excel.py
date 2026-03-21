@@ -258,11 +258,11 @@ class ExcelConverter(BaseConverter):
 
             if sheet_indices and len(sheet_indices) > 0:
                 if len(sheet_indices) == 1:
-                    self._safe_export(wb.Worksheets(sheet_indices[0]), com_pdf_path, quality)
+                    com_pdf_path = self._safe_export(wb.Worksheets(sheet_indices[0]), com_pdf_path, quality)
                 else:
-                    self._safe_export(wb, com_pdf_path, quality)
+                    com_pdf_path = self._safe_export(wb, com_pdf_path, quality)
             else:
-                self._safe_export(wb, com_pdf_path, quality)
+                com_pdf_path = self._safe_export(wb, com_pdf_path, quality)
 
             wb.Close(False)
             wb = None
@@ -324,9 +324,12 @@ class ExcelConverter(BaseConverter):
                     except ValueError:
                         pass
 
-    def _safe_export(self, obj, path: str, quality: int = 0) -> None:
+    def _safe_export(self, obj, path: str, quality: int = 0) -> str:
         """E-85-2: Export workbook/sheet to PDF with 7 fallback methods.
         Refactored with _try_method() helper to reduce duplication.
+        
+        Returns:
+            str: The actual output path used (may differ from input if file was locked).
         """
         temp_folder = os.path.dirname(path)
         if not os.path.exists(temp_folder):
@@ -357,7 +360,7 @@ class ExcelConverter(BaseConverter):
                                     IgnorePrintAreas=False,
                                     OpenAfterPublish=False)
             if os.path.exists(path):
-                return
+                return path
         except Exception as e:
             errors.append(f"Method 1 (Standard): {str(e)}")
 
@@ -368,7 +371,7 @@ class ExcelConverter(BaseConverter):
                                     IgnorePrintAreas=True,
                                     OpenAfterPublish=False)
             if os.path.exists(path):
-                return
+                return path
         except Exception as e:
             errors.append(f"Method 2 (IgnorePrintAreas): {str(e)}")
 
@@ -384,7 +387,7 @@ class ExcelConverter(BaseConverter):
                                     IgnorePrintAreas=False,
                                     OpenAfterPublish=False)
             if os.path.exists(path):
-                return
+                return path
         except Exception as e:
             errors.append(f"Method 3 (ClearPrintArea): {str(e)}")
 
@@ -402,7 +405,7 @@ class ExcelConverter(BaseConverter):
         try:
             obj.SaveAs(Filename=path, FileFormat=57)
             if os.path.exists(path):
-                return
+                return path
         except Exception as e:
             errors.append(f"Method 4 (SaveAs): {str(e)}")
 
@@ -422,7 +425,7 @@ class ExcelConverter(BaseConverter):
                                            OpenAfterPublish=False)
                 if os.path.exists(path):
                     new_wb.Close(False)
-                    return
+                    return path
                 new_wb.Close(False)
             except Exception as e:
                 new_wb.Close(False)
@@ -448,7 +451,7 @@ class ExcelConverter(BaseConverter):
                                            OpenAfterPublish=False)
                 if os.path.exists(path):
                     new_wb.Close(False)
-                    return
+                    return path
                 new_wb.Close(False)
         except Exception as e:
             errors.append(f"Method 6 (RawCopy): {str(e)}")
@@ -500,7 +503,7 @@ class ExcelConverter(BaseConverter):
                     pass
 
             if os.path.exists(path):
-                return
+                return path
         except Exception as e:
             errors.append(f"Method 7 (PrintToPDF): {str(e)}")
 

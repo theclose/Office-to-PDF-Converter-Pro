@@ -73,15 +73,24 @@ class Config:
         return False
 
     def save(self) -> bool:
-        """Save config to file (thread-safe)."""
+        """Save config to file (thread-safe, atomic write)."""
         try:
             with self._save_lock:
-                with open(self._config_path, "w", encoding="utf-8") as f:
+                tmp_path = self._config_path + ".tmp"
+                with open(tmp_path, "w", encoding="utf-8") as f:
                     json.dump(self._data, f, indent=2, ensure_ascii=False)
+                os.replace(tmp_path, self._config_path)
             logger.info(f"Config saved to {self._config_path}")
             return True
         except Exception as e:
             logger.error(f"Failed to save config: {e}")
+            # Clean up temp file on failure
+            try:
+                tmp_path = self._config_path + ".tmp"
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except OSError:
+                pass
             return False
 
     def get(self, key: str, default: Any = None) -> Any:

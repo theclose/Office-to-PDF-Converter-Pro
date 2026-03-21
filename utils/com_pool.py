@@ -19,6 +19,11 @@ class COMPool:
     Pool for managing COM application instances.
     Reuses instances instead of creating new ones for each conversion.
     Thread-safe with locking.
+    
+    IMPORTANT: Callers MUST call pythoncom.CoInitialize() on their own thread
+    before requesting COM instances from this pool. The pool's CoInitialize
+    only covers the thread that first created the instance, NOT subsequent
+    threads that retrieve it.
     """
 
     _instance = None

@@ -372,10 +372,10 @@ class WordConverter(BaseConverter):
                     pass
             return False
         finally:
-            # Cleanup temp files
+            # Cleanup temp files (skip com_pdf_path if already moved by _finalize)
             for temp_file in [com_pdf_path, com_input_path]:
                 try:
-                    if os.path.exists(temp_file):
+                    if temp_file and os.path.exists(temp_file):
                         os.remove(temp_file)
                     _unregister_temp(temp_file)
                 except Exception:

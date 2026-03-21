@@ -1236,7 +1236,7 @@ def compress_pdf_hybrid(
                     # Pick the smaller result
                     if gs_size <= smart_size:
                         shutil.copy2(temp_gs, output_path)
-                        stats["pipeline"] = f"ghostscript+pymupdf"
+                        stats["pipeline"] = "ghostscript+pymupdf"
                         stats["chosen"] = "ghostscript"
                         stats["gs_size"] = gs_size
                         stats["smart_size"] = smart_size

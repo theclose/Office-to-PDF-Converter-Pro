@@ -122,7 +122,11 @@ class BaseConverter(ABC):
                 logger.warning(f"PDF validation: file too small ({os.path.getsize(pdf_path)} bytes)")
                 return False
             
-            import fitz  # PyMuPDF
+            from office_converter.core.pdf.common import get_fitz
+            fitz = get_fitz()
+            if not fitz:
+                logger.debug("PDF validation skipped (PyMuPDF not available)")
+                return True
             doc = fitz.open(pdf_path)
             page_count = len(doc)
             doc.close()

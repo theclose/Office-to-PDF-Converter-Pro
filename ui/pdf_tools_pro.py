@@ -459,28 +459,57 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
 
         self._update_options_panel()
 
-    def _update_options_panel(self):
-        """Update options panel based on selected operation."""
-        # Safe clear: detach textvariables from CTkEntry before destroy
-        # to prevent trace callbacks on dead widgets (CustomTkinter bug)
-        for widget in self.options_content.winfo_children():
+    def _safe_destroy_children(self, parent):
+        """Safely destroy all children, removing CTkEntry textvariable traces first.
+        
+        CustomTkinter bug: destroying CTkEntry with an active textvariable
+        write-trace causes the trace callback to fire on the dead widget.
+        Fix: remove the trace from the StringVar BEFORE destroying.
+        """
+        for widget in list(parent.winfo_children()):
+            self._detach_entry_traces(widget)
             try:
-                # Recursively find all CTkEntry and detach textvariable
-                for child in widget.winfo_children():
-                    if hasattr(child, '_textvariable') and child._textvariable:
-                        try:
-                            child.configure(textvariable="")
-                        except Exception:
-                            pass
-                    for grandchild in child.winfo_children():
-                        if hasattr(grandchild, '_textvariable') and grandchild._textvariable:
-                            try:
-                                grandchild.configure(textvariable="")
-                            except Exception:
-                                pass
                 widget.destroy()
             except Exception:
                 pass
+
+    def _detach_entry_traces(self, widget):
+        """Recursively remove textvariable traces from all CTkEntry descendants."""
+        try:
+            for child in widget.winfo_children():
+                self._detach_entry_traces(child)
+        except Exception:
+            pass
+        
+        # Only process CTkEntry widgets that have a textvariable
+        if not isinstance(widget, ctk.CTkEntry):
+            return
+        
+        try:
+            tv = getattr(widget, '_textvariable', None)
+            if tv is None or isinstance(tv, str):
+                return
+            
+            # Remove the write trace callback registered by CTkEntry
+            cb_name = getattr(widget, '_textvariable_callback_name', None)
+            if cb_name:
+                try:
+                    tv.trace_remove('write', cb_name)
+                except Exception:
+                    pass
+            
+            # Null out internal reference to prevent stale callbacks
+            widget._textvariable = None
+        except Exception:
+            pass
+
+    def _update_options_panel(self):
+        """Update options panel based on selected operation."""
+        # Safe clear: remove textvariable traces before destroying CTkEntry widgets.
+        # CustomTkinter bug: destroying CTkEntry with active textvariable trace causes
+        # the trace callback to fire on the dead widget → TclError.
+        # Fix: remove the trace callback from the StringVar BEFORE destroying.
+        self._safe_destroy_children(self.options_content)
 
         op = self.var_operation.get()
 

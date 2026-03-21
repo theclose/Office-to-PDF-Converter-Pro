@@ -70,3 +70,10 @@
 - **Fix:** Use `page.delete_image(xref)` + `page.insert_image(rect, stream=compressed)` which correctly creates new xref with matching metadata. Use `replaced_xrefs` set to avoid processing same xref twice
 - **Rule:** NEVER use `doc.update_stream()` for image replacement unless you also update ALL xref dictionary keys (Filter, Width, Height, ColorSpace, BitsPerComponent, DecodeParms). The safe method is always delete_image + insert_image.
 - **Lesson:** "In-place" replacement sounds efficient but PDF xrefs have coupled metadata. Changing the stream without the metadata = silent corruption.
+
+## 12. CTkEntry textvariable + dynamic destroy → TclError/AttributeError
+- **Bug:** Switching options in PDF Tools causes `TclError: invalid command name` or `AttributeError: 'str' object has no attribute 'get'`
+- **Cause:** `_update_options_panel()` destroys widgets including CTkEntry with active textvariable write-trace. The trace callback fires on the dead widget → TclError. First fix attempt `configure(textvariable="")` corrupted `_textvariable` to string → AttributeError
+- **Fix:** Use `_safe_destroy_children()` → recursively find CTkEntry, call `tv.trace_remove('write', cb_name)` to remove the trace, set `_textvariable = None`, then destroy
+- **Rule:** NEVER use `configure(textvariable="")` to detach. ALWAYS use `trace_remove()` + set to `None`. NEVER destroy CTkEntry with active textvariable traces.
+- **Lesson:** CustomTkinter's trace callbacks survive widget destruction. Must explicitly remove traces from StringVars before destroying.

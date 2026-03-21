@@ -98,3 +98,25 @@
 - **Fix:** Use `except Exception as scan_err:` and `lambda err=scan_err:` to capture the correct variable
 - **Rule:** ALWAYS name exception variables in nested try/except. ALWAYS use default argument in lambda to capture loop/scope variables.
 - **Lesson:** Python closures capture variables by reference, not by value. Use default arguments to freeze values.
+
+## 16. PyMuPDF save-to-original file fails
+- **Bug:** `doc.save(output_path)` throws `ValueError: save to original must be incremental` when output_path == input_path
+- **Cause:** PyMuPDF holds a file lock on the opened PDF. `doc.save()` to the SAME path requires `incremental=True`, but incremental mode doesn't support garbage collection or deflate
+- **Fix:** Always save to `tempfile.mkstemp()` in same directory, then `shutil.move()` to final path after `doc.close()`
+- **Rule:** NEVER `doc.save()` to the same path the doc was opened from. ALWAYS use temp-file-then-move.
+- **Lesson:** Libraries that open files for reading keep locks. Save-to-original is a fundamental anti-pattern.
+
+## 17. CTkEntry textvariable trace fires on destroyed widget
+- **Bug:** Closing PDF Tools dialog triggers `AttributeError: 'str' object has no attribute 'get'` and `TclError: invalid command name`
+- **Cause:** CTkEntry registers a `write` trace on its `StringVar`. When dialog is destroyed, the underlying Tcl widget is gone but the trace callback still references it. Any write to the StringVar fires the dead callback.
+- **Fix:** Call `_detach_entry_traces(self)` recursively on the ENTIRE dialog tree BEFORE `self.destroy()` in `_on_close()`
+- **Rule:** ALWAYS remove textvariable traces from CTkEntry widgets before destroying their parent dialog. Use recursive `_detach_entry_traces()`.
+- **Lesson:** CustomTkinter doesn't auto-cleanup textvariable traces on destroy. This is a framework bug we must work around.
+
+## 18. OCR temp file locked by subprocess
+- **Bug:** `os.remove(tmp_path)` throws `PermissionError: Permission denied` on temp PNG created for OCR
+- **Cause:** `pytesseract.image_to_pdf_or_hocr()` spawns a Tesseract subprocess that may still hold the file handle when `os.remove()` runs immediately after
+- **Fix:** Retry `os.remove()` up to 3 times with 0.5s delay. If still locked, log warning and move on (OS temp cleanup handles it)
+- **Rule:** NEVER assume a subprocess releases file locks immediately. Use retry-with-delay for temp file cleanup.
+- **Lesson:** Windows holds file locks longer than Linux. Always use retry patterns for cross-process temp file cleanup.
+

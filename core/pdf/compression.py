@@ -289,18 +289,29 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
         settings = quality_settings.get(quality, quality_settings["medium"])
         logger.info(f"Step 3: Using {quality} quality settings (garbage={settings['garbage']})")
 
-        # ========================================
-        # STEP 4: Save with compression
-        # ========================================
-        doc.save(
-            output_path,
-            garbage=settings["garbage"],
-            deflate=settings["deflate"],
-            clean=settings["clean"],
-            pretty=False,          # Don't pretty-print (smaller)
-            no_new_id=True,        # Keep same ID
-        )
-        doc.close()
+        # BUG1 FIX: PyMuPDF refuses non-incremental save to the same file.
+        # Always save to a temp file first, then move to output_path.
+        import tempfile as _tempfile
+        tmp_fd, tmp_save_path = _tempfile.mkstemp(suffix=".pdf", dir=os.path.dirname(output_path) or ".")
+        os.close(tmp_fd)
+        try:
+            doc.save(
+                tmp_save_path,
+                garbage=settings["garbage"],
+                deflate=settings["deflate"],
+                clean=settings["clean"],
+                pretty=False,          # Don't pretty-print (smaller)
+                no_new_id=True,        # Keep same ID
+            )
+            doc.close()
+            # Move temp → output (atomic on same filesystem)
+            shutil.move(tmp_save_path, output_path)
+        except Exception:
+            doc.close()
+            # Clean up temp on failure
+            if os.path.exists(tmp_save_path):
+                os.remove(tmp_save_path)
+            raise
         logger.info("Step 4: Saved with compression")
 
         # ========================================

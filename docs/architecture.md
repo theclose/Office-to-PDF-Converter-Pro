@@ -34,7 +34,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | excel_tools.py | 826 | Excel-specific utilities |
 | file_tools.py | 677 | File manipulation tools |
 | pdf/common.py | 34 | get_fitz(), HAS_PIL flag |
-| pdf/compression.py | 1471 | Image compression pipeline (hybrid GS+PyMuPDF, image type detection) |
+| pdf/compression.py | 1486 | Image compression pipeline (hybrid GS+PyMuPDF, image type detection) |
 | pdf/ghostscript.py | 374 | Ghostscript wrapper (auto-detect, hybrid pipeline, fallback) |
 | pdf/pages.py | 262 | Page extraction/reordering |
 | pdf/security.py | 200 | Password protection |
@@ -69,7 +69,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | tkdnd_wrapper.py | 161 | TkinterDnD2 wrapper |
 | watchdog.py | 234 | Resource monitoring |
 | localization.py | 105 | i18n language support |
-| ocr.py | 397 | OCR via pytesseract |
+| ocr.py | 407 | OCR via pytesseract |
 | updater.py | 269 | App auto-update checker |
 | history.py | 134 | Conversion history tracking |
 | dnd_helpers.py | 71 | Drag-and-drop helper utilities |

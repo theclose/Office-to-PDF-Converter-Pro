@@ -157,6 +157,9 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
             logger.error(f"Config save error: {e}")
         finally:
             self.grab_release()
+            # BUG2 FIX: Detach ALL CTkEntry textvariable traces before destroy
+            # to prevent stale callbacks on dead widgets
+            self._detach_entry_traces(self)
             self.destroy()
             try:
                 if self.parent:

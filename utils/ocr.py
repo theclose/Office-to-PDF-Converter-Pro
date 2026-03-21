@@ -240,9 +240,19 @@ def _ocr_with_pymupdf(
                 ocr_doc.close()
 
             finally:
-                # Clean up temp file
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
+                # BUG3 FIX: Temp file may be locked by pytesseract subprocess.
+                # Retry with delay, then give up gracefully.
+                import time as _time
+                for attempt in range(3):
+                    try:
+                        if os.path.exists(tmp_path):
+                            os.remove(tmp_path)
+                        break
+                    except PermissionError:
+                        if attempt < 2:
+                            _time.sleep(0.5)
+                        else:
+                            logger.warning(f"Could not remove temp file (locked): {tmp_path}")
 
         # Save result
         new_doc.save(output_pdf, garbage=4, deflate=True)

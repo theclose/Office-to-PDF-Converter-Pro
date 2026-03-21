@@ -478,7 +478,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 ("target_size", get_text("pt_q_target_size", "🎯 Dung lượng mục tiêu"), get_text("pt_q_target_desc", "Nén đến kích thước chỉ định")),
             ]:
                 frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
-                frame.pack(fill="x", padx=5, pady=2)
+                frame.pack(fill="x", padx=5, pady=1)
                 ctk.CTkRadioButton(
                     frame, text=text,
                     variable=self.var_quality, value=val, width=200,
@@ -507,27 +507,24 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 target_frame.pack(fill="x", padx=10, pady=3)
                 
                 row = ctk.CTkFrame(target_frame, fg_color="transparent")
-                row.pack(fill="x", padx=8, pady=6)
+                row.pack(fill="x", padx=8, pady=4)
                 ctk.CTkLabel(row, text=get_text("pt_target_kb_label", "Dung lượng tối đa:"),
                             font=("Segoe UI", 11)).pack(side="left")
-                ctk.CTkEntry(row, textvariable=self.var_target_kb, width=70,
-                            placeholder_text="1000").pack(side="left", padx=5)
+                ctk.CTkEntry(row, textvariable=self.var_target_kb, width=70).pack(side="left", padx=5)
                 ctk.CTkLabel(row, text="KB", text_color="#4da6ff",
                             font=("Segoe UI", 11, "bold")).pack(side="left")
                 
-                # Show current file size hint
+                # File size hint + auto-search note on same line
+                hint_parts = []
                 if self.files:
                     try:
                         first_size = os.path.getsize(self.files[0]) / 1024
-                        hint_text = get_text("pt_target_current", "File hiện tại: {size} KB").format(size=f"{first_size:.0f}")
-                        ctk.CTkLabel(target_frame, text=hint_text,
-                                    text_color="#6b7280", font=("Segoe UI", 9)).pack(padx=8, pady=(0,4))
+                        hint_parts.append(f"File: {first_size:.0f}KB")
                     except Exception:
                         pass
-                
-                ctk.CTkLabel(target_frame, 
-                            text=get_text("pt_target_hint", "💡 Tự động tìm chất lượng tối ưu bằng binary search"),
-                            text_color="#4ade80", font=("Segoe UI", 9)).pack(padx=8, pady=(0,4))
+                hint_parts.append(get_text("pt_target_hint", "Auto binary search"))
+                ctk.CTkLabel(row, text=" · ".join(hint_parts),
+                            text_color="#4ade80", font=("Segoe UI", 9)).pack(side="left", padx=(10, 0))
 
         elif op == "smart_compress":
             # Smart compression - preserves text layer

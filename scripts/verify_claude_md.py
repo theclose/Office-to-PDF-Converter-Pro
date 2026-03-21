@@ -412,6 +412,163 @@ def check_known_traps():
     results.extend(checks)
 
 
+def check_trap_rules_in_code():
+    """Check 10: Cross-reference known-trap rules against actual code.
+    
+    Maps each trap's Rule to concrete code patterns and scans source files
+    for violations. Reports FAIL for critical violations, WARN for suspicious patterns.
+    """
+    
+    # ─── Trap Rule Definitions ───
+    # Each entry: (trap_id, description, violation_pattern, file_scope, severity, exclude_patterns)
+    #   violation_pattern: regex to detect BAD code
+    #   file_scope: glob patterns for which files to scan
+    #   severity: FAIL or WARN
+    #   exclude_patterns: list of regex patterns to exclude (known-safe usage)
+    
+    TRAP_RULES = [
+        # Trap #1: pack_propagate(True) on fixed-width frames
+        {
+            "id": 1,
+            "name": "pack_propagate(True) on fixed-width frames",
+            "pattern": r"pack_propagate\s*\(\s*True\s*\)",
+            "scope": ["ui/*.py"],
+            "severity": FAIL,
+            "exclude": [],
+        },
+        # Trap #2: Stale HAS_PYMUPDF boolean (should use get_fitz())
+        {
+            "id": 2,
+            "name": "Stale HAS_PYMUPDF boolean used as guard",
+            "pattern": r"\bif\s+(?:not\s+)?HAS_PYMUPDF\b",
+            "scope": ["core/**/*.py", "ui/*.py"],
+            "severity": WARN,
+            "exclude": [r"common\.py"],  # common.py defines it, OK there
+        },
+        # Trap #6: Config.set() without auto_save=False (multiple calls)
+        # Detect: 2+ config.set() calls in same function without auto_save=False
+        {
+            "id": 6,
+            "name": "Config.set() without auto_save=False",
+            "pattern": r"config\.set\s*\([^)]*\)\s*$",  # set() without auto_save arg
+            "scope": ["ui/*.py"],
+            "severity": WARN,
+            "exclude": [r"auto_save\s*=\s*False"],  # If same line has auto_save=False, OK
+        },
+        # Trap #11: doc.update_stream() for image replacement
+        {
+            "id": 11,
+            "name": "doc.update_stream() for image replacement",
+            "pattern": r"\.update_stream\s*\(",
+            "scope": ["core/**/*.py"],
+            "severity": FAIL,
+            "exclude": [],
+        },
+        # Trap #12: configure(textvariable="") — broken detach
+        {
+            "id": 12,
+            "name": "configure(textvariable='') broken detach",
+            "pattern": r"""configure\s*\(\s*textvariable\s*=\s*["']["']\s*\)""",
+            "scope": ["ui/*.py"],
+            "severity": FAIL,
+            "exclude": [],
+        },
+    ]
+    
+    # ─── Scan Source Files ───
+    violations = []
+    scanned_files = 0
+    rules_checked = len(TRAP_RULES)
+    
+    for rule in TRAP_RULES:
+        pattern = re.compile(rule["pattern"], re.MULTILINE)
+        exclude_patterns = [re.compile(ep) for ep in rule.get("exclude", [])]
+        
+        # Collect files matching scope
+        target_files = []
+        for scope_glob in rule["scope"]:
+            for src_dir in SOURCE_DIRS:
+                search_dir = ROOT / src_dir
+                if search_dir.exists():
+                    # Handle ** glob manually
+                    if "**" in scope_glob:
+                        # e.g., "core/**/*.py" → search all .py recursively
+                        ext = scope_glob.split("*.")[-1] if "*." in scope_glob else "py"
+                        target_files.extend(search_dir.rglob(f"*.{ext}"))
+                    else:
+                        # e.g., "ui/*.py" → only top-level
+                        basename_glob = scope_glob.split("/")[-1]
+                        target_files.extend(search_dir.glob(basename_glob))
+        
+        # Deduplicate
+        target_files = list(set(target_files))
+        
+        for filepath in target_files:
+            try:
+                content = filepath.read_text(encoding="utf-8", errors="replace")
+                lines = content.splitlines()
+                
+                for line_num, line in enumerate(lines, 1):
+                    if pattern.search(line):
+                        # Check exclusions
+                        excluded = False
+                        
+                        # File-level exclusion
+                        for ep in exclude_patterns:
+                            if ep.search(str(filepath.name)) or ep.search(line):
+                                excluded = True
+                                break
+                        
+                        # Skip comments
+                        stripped = line.strip()
+                        if stripped.startswith("#") or stripped.startswith('"""') or stripped.startswith("'''"):
+                            excluded = True
+                        
+                        if not excluded:
+                            rel_path = filepath.relative_to(ROOT)
+                            violations.append({
+                                "rule": rule,
+                                "file": str(rel_path),
+                                "line": line_num,
+                                "code": stripped[:80],
+                            })
+                
+                scanned_files += 1
+            except Exception:
+                pass
+    
+    # ─── Report Results ───
+    if not violations:
+        results.append((PASS, f"Trap rules code scan: {rules_checked} rules checked across {scanned_files} files, 0 violations"))
+    else:
+        # Group by severity
+        fails = [v for v in violations if v["rule"]["severity"] == FAIL]
+        warns = [v for v in violations if v["rule"]["severity"] == WARN]
+        
+        if fails:
+            detail_lines = []
+            for v in fails:
+                detail_lines.append(f"    ❌ Trap #{v['rule']['id']}: {v['file']}:{v['line']} → {v['code']}")
+            detail = "\n".join(detail_lines[:10])  # Cap at 10
+            results.append((FAIL, f"Trap rule violations ({len(fails)} critical):\n{detail}"))
+        
+        if warns:
+            detail_lines = []
+            for v in warns:
+                detail_lines.append(f"    ⚠️ Trap #{v['rule']['id']}: {v['file']}:{v['line']} → {v['code']}")
+            detail = "\n".join(detail_lines[:10])
+            results.append((WARN, f"Trap rule warnings ({len(warns)} suspicious):\n{detail}"))
+        
+        if not fails and not warns:
+            results.append((PASS, f"Trap rules code scan: {rules_checked} rules, 0 violations"))
+    
+    # Non-scannable traps note (for documentation completeness)
+    # Traps #3(PPT quality), #4(pytest vs GUI), #5(COM thread), #7(self-reporting),
+    # #8(bare callbacks), #9(thread locks), #10(after callbacks) require runtime/manual check
+    nonscannable = [3, 4, 5, 7, 8, 9, 10]
+    results.append((PASS, f"Trap rules: {rules_checked} auto-scanned, {len(nonscannable)} manual-only (#{','.join(map(str, nonscannable))})"))
+
+
 def check_skill_files():
     """Check 9: SKILL.md cross-reference validation."""
     skills_dir = ROOT / ".agents" / "skills"
@@ -540,6 +697,19 @@ def main():
     check_undocumented_files()
     check_subdir_claude_accuracy()
     check_known_traps()
+
+    for status, msg in results:
+        print(f"  {status} {msg}")
+    all_pass += sum(1 for s, _ in results if s == PASS)
+    all_fail += sum(1 for s, _ in results if s == FAIL)
+    all_warn += sum(1 for s, _ in results if s == WARN)
+    all_fix += sum(1 for s, _ in results if s == AUTO)
+    results.clear()
+
+    # --- Trap Rules Code Scan (10) ---
+    print()
+    print("  --- Trap Rules Code Scan (10) ---")
+    check_trap_rules_in_code()
 
     for status, msg in results:
         print(f"  {status} {msg}")

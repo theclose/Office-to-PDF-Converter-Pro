@@ -23,8 +23,8 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | base.py | 228 | BaseConverter ABC, Factory, _validate_pdf_output |
 | excel.py | 512 | ExcelConverter — 7 fallback, sheet validation |
 | word.py | 415 | WordConverter — 3 fallback, corrupt repair |
-| ppt.py | 345 | PPTConverter — 3 fallback, quality-mapped intent |
-| libreoffice.py | 208 | LibreOffice headless fallback |
+| ppt.py | 352 | PPTConverter — 3 fallback, quality-mapped intent |
+| libreoffice.py | 215 | LibreOffice headless fallback |
 | parallel_converter.py | 365 | Multi-process batch conversion |
 
 ### core/ — Business Logic
@@ -67,7 +67,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | tkdnd_wrapper.py | 161 | TkinterDnD2 wrapper |
 | watchdog.py | 234 | Resource monitoring |
 | localization.py | 105 | i18n language support |
-| ocr.py | 375 | OCR via pytesseract |
+| ocr.py | 397 | OCR via pytesseract |
 | updater.py | 269 | App auto-update checker |
 | history.py | 134 | Conversion history tracking |
 | dnd_helpers.py | 71 | Drag-and-drop helper utilities |

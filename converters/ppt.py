@@ -299,12 +299,20 @@ class PPTConverter(BaseConverter):
                     pass
             return False
         finally:
-            for temp_file in [com_pdf_path, com_input_path]:
+            # Only remove temp files that still exist
+            # Note: com_pdf_path may have been moved by _finalize already
+            for temp_file in [com_input_path]:
                 try:
                     if os.path.exists(temp_file):
                         os.remove(temp_file)
                 except Exception:
                     pass
+            # com_pdf_path: only remove if _finalize didn't move it
+            try:
+                if os.path.exists(com_pdf_path):
+                    os.remove(com_pdf_path)
+            except Exception:
+                pass
             with _temp_lock:
                 for f in [com_input_path, com_pdf_path]:
                     try:

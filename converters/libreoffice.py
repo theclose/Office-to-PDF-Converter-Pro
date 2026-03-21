@@ -137,17 +137,24 @@ class LibreOfficeConverter(BaseConverter):
 
             logger.info(f"LibreOffice converting: {os.path.basename(input_path)}")
 
-            # Run conversion
-            result = subprocess.run(
+            # Use Popen to allow explicit kill on timeout (same pattern as ghostscript.py)
+            process = subprocess.Popen(
                 cmd,
-                capture_output=True,
-                text=True,
-                timeout=300,  # 5 minute timeout
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
             )
 
-            if result.returncode != 0:
-                logger.error(f"LibreOffice error: {result.stderr}")
+            try:
+                stdout, stderr = process.communicate(timeout=300)  # 5 minute timeout
+            except subprocess.TimeoutExpired:
+                logger.error("LibreOffice conversion timed out — killing process")
+                process.kill()
+                process.wait(timeout=5)
+                return False
+
+            if process.returncode != 0:
+                logger.error(f"LibreOffice error: {stderr.decode('utf-8', errors='replace')}")
                 return False
 
             # LibreOffice outputs to same name with .pdf extension

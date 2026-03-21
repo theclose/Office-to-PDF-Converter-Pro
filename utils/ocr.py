@@ -201,6 +201,8 @@ def _ocr_with_pymupdf(
     fitz = _get_fitz()
     if not fitz:
         return False
+    doc = None
+    new_doc = None
     try:
         doc = fitz.open(input_pdf)
         total_pages = len(doc)
@@ -244,8 +246,6 @@ def _ocr_with_pymupdf(
 
         # Save result
         new_doc.save(output_pdf, garbage=4, deflate=True)
-        new_doc.close()
-        doc.close()
 
         logger.info(f"OCR complete: {total_pages} pages processed")
         return True
@@ -253,6 +253,18 @@ def _ocr_with_pymupdf(
     except Exception as e:
         logger.error(f"PyMuPDF OCR error: {e}")
         return False
+    finally:
+        # Ensure documents are always closed to prevent file handle leaks
+        if new_doc:
+            try:
+                new_doc.close()
+            except Exception:
+                pass
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def _ocr_with_pdf2image(
@@ -298,12 +310,16 @@ def _ocr_with_pdf2image(
             fitz = _get_fitz()
             if fitz is not None:
                 final_doc = fitz.open()
-                for pdf_path in pdf_pages:
-                    page_doc = fitz.open(pdf_path)
-                    final_doc.insert_pdf(page_doc)
-                    page_doc.close()
-                final_doc.save(output_pdf, garbage=4, deflate=True)
-                final_doc.close()
+                try:
+                    for pdf_path in pdf_pages:
+                        page_doc = fitz.open(pdf_path)
+                        try:
+                            final_doc.insert_pdf(page_doc)
+                        finally:
+                            page_doc.close()
+                    final_doc.save(output_pdf, garbage=4, deflate=True)
+                finally:
+                    final_doc.close()
             else:
                 # Fallback: just copy first page (limited)
                 if pdf_pages:
@@ -335,6 +351,7 @@ def extract_text_from_pdf(pdf_path: str, lang: str = 'eng+vie') -> str:
     if not fitz:
         raise RuntimeError("PyMuPDF required for PDF text extraction")
 
+    doc = None
     try:
         doc = fitz.open(pdf_path)
         all_text = []
@@ -354,12 +371,17 @@ def extract_text_from_pdf(pdf_path: str, lang: str = 'eng+vie') -> str:
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)
 
-        doc.close()
         return "\n\n".join(all_text)
 
     except Exception as e:
         logger.error(f"PDF text extraction error: {e}")
         raise
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 # Status info

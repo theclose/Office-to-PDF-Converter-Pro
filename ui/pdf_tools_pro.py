@@ -104,6 +104,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
         self.var_combine_pages = ctk.BooleanVar(value=False)  # NEW: Combine all pages into single image
         self.var_custom_jpeg = ctk.StringVar(value="75")  # Custom JPEG quality (StringVar to avoid TclError)
         self.var_custom_dpi = ctk.StringVar(value="150")  # Custom DPI (StringVar to avoid TclError)
+        self.var_target_kb = ctk.StringVar(value="1000")  # Target size in KB
         self.var_output_same = ctk.BooleanVar(value=True)
         self.var_output_folder = ctk.StringVar()
 
@@ -474,6 +475,7 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 ("high", "🟢 Chất lượng (30-50%)", get_text("pt_q_high_desc")),
                 ("lossless", get_text("pt_q_lossless"), get_text("pt_q_lossless_desc")),
                 ("custom", get_text("pt_q_custom"), get_text("pt_q_custom_desc")),
+                ("target_size", get_text("pt_q_target_size", "🎯 Dung lượng mục tiêu"), get_text("pt_q_target_desc", "Nén đến kích thước chỉ định")),
             ]:
                 frame = ctk.CTkFrame(self.options_content, fg_color="transparent")
                 frame.pack(fill="x", padx=5, pady=2)
@@ -498,6 +500,34 @@ class PDFToolsDialogPro(ctk.CTkToplevel, PDFToolsOpsMixin):
                 ctk.CTkLabel(row, text="DPI:", width=30).pack(side="left")
                 ctk.CTkEntry(row, textvariable=self.var_custom_dpi, width=45).pack(side="left")
                 ctk.CTkLabel(row, text="(72-300)", text_color="gray", font=("Segoe UI", 9)).pack(side="left", padx=2)
+
+            # Target Size Mode input (show when target_size is selected)
+            if self.var_quality.get() == "target_size":
+                target_frame = ctk.CTkFrame(self.options_content, fg_color="#1a3a2a", corner_radius=8)
+                target_frame.pack(fill="x", padx=10, pady=3)
+                
+                row = ctk.CTkFrame(target_frame, fg_color="transparent")
+                row.pack(fill="x", padx=8, pady=6)
+                ctk.CTkLabel(row, text=get_text("pt_target_kb_label", "Dung lượng tối đa:"),
+                            font=("Segoe UI", 11)).pack(side="left")
+                ctk.CTkEntry(row, textvariable=self.var_target_kb, width=70,
+                            placeholder_text="1000").pack(side="left", padx=5)
+                ctk.CTkLabel(row, text="KB", text_color="#4da6ff",
+                            font=("Segoe UI", 11, "bold")).pack(side="left")
+                
+                # Show current file size hint
+                if self.files:
+                    try:
+                        first_size = os.path.getsize(self.files[0]) / 1024
+                        hint_text = get_text("pt_target_current", "File hiện tại: {size} KB").format(size=f"{first_size:.0f}")
+                        ctk.CTkLabel(target_frame, text=hint_text,
+                                    text_color="#6b7280", font=("Segoe UI", 9)).pack(padx=8, pady=(0,4))
+                    except Exception:
+                        pass
+                
+                ctk.CTkLabel(target_frame, 
+                            text=get_text("pt_target_hint", "💡 Tự động tìm chất lượng tối ưu bằng binary search"),
+                            text_color="#4ade80", font=("Segoe UI", 9)).pack(padx=8, pady=(0,4))
 
         elif op == "smart_compress":
             # Smart compression - preserves text layer

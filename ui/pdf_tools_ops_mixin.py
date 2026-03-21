@@ -131,6 +131,40 @@ class PDFToolsOpsMixin:
                         jpeg_quality=custom_jpeg,
                         progress_callback=on_progress
                     )
+                elif quality == "target_size":
+                    try:
+                        target_kb = max(50, int(self.var_target_kb.get() or "1000"))
+                    except ValueError:
+                        target_kb = 1000
+                    
+                    self.after(0, lambda: self._log(f"   🎯 Target: ≤{target_kb} KB"))
+                    
+                    result, reduction, stats = pdf_tools.compress_to_target_size(
+                        input_path, output_path,
+                        target_kb=target_kb,
+                        cancel_check=lambda: self.stop_requested,
+                    )
+                    
+                    # SSIM quality check
+                    if result and os.path.exists(output_path):
+                        try:
+                            ssim_result = pdf_tools.compute_ssim(input_path, output_path)
+                            ssim_val = ssim_result.get("ssim", 0)
+                            ssim_label = ssim_result.get("quality_label", "unknown")
+                            self.after(0, lambda s=ssim_val, l=ssim_label: self._log(
+                                f"   📊 SSIM: {s:.4f} ({l})"
+                            ))
+                        except Exception:
+                            pass
+                    
+                    if stats.get("target_achieved"):
+                        self.after(0, lambda s=stats: self._log(
+                            f"   ✅ Đạt mục tiêu: {s.get('final_kb', 0):.0f}KB ≤ {target_kb}KB (quality={s.get('quality_used', '?')}%, {s.get('iterations', 0)} iterations)"
+                        ))
+                    else:
+                        self.after(0, lambda s=stats: self._log(
+                            f"   ⚠️ Best effort: {s.get('final_kb', 0):.0f}KB (target {target_kb}KB không đạt được)"
+                        ))
                 else:
                     result, reduction, stats = pdf_tools.compress_pdf_advanced(
                         input_path, output_path,

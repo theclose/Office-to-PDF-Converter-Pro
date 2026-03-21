@@ -293,5 +293,10 @@
     "ft_export_txt": "Xuất ra txt",
     "ft_preview": "Xem thử trước",
     "ft_open_after": "Mở folder khi xong",
-    "ft_save_log": "Lưu log file"
-}
+    "ft_save_log": "Lưu log file",
+    "pt_q_target_size": "🎯 Dung lượng mục tiêu",
+    "pt_q_target_desc": "Nén đến kích thước chỉ định",
+    "pt_target_kb_label": "Dung lượng tối đa:",
+    "pt_target_current": "File hiện tại: {size} KB",
+    "pt_target_hint": "💡 Tự động tìm chất lượng tối ưu bằng binary search"
+}

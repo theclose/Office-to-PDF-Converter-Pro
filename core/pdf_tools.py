@@ -5,7 +5,8 @@ Re-exports functionalities from the core.pdf sub-package.
 
 from office_converter.core.pdf.common import get_fitz, HAS_PYMUPDF, HAS_PIL
 from office_converter.core.pdf.compression import (
-    compress_pdf, compress_pdf_advanced, analyze_pdf_content, compress_pdf_smart, estimate_compression
+    compress_pdf, compress_pdf_advanced, analyze_pdf_content, compress_pdf_smart, estimate_compression,
+    compress_to_target_size, compute_ssim, compress_pdf_hybrid,
 )
 from office_converter.core.pdf.conversion import (
     pdf_to_images, pdf_to_single_image, images_to_pdf

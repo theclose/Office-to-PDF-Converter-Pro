@@ -203,6 +203,14 @@ class AdaptiveEstimator:
     DEFAULT_TIME_PER_MB = 10.0  # 10 seconds per MB as starting point
     MIN_TIME = 3.0  # Minimum 3 seconds for any file (startup overhead)
 
+    # F3: Per-extension default estimates (seconds) for first-run accuracy
+    # Excel has COM overhead + multiple sheets, PPT has slide rendering
+    EXTENSION_DEFAULTS = {
+        '.xlsx': 8.0, '.xls': 7.0, '.xlsm': 8.0, '.xlsb': 7.0, '.csv': 3.0,
+        '.docx': 5.0, '.doc': 5.0, '.docm': 5.0, '.rtf': 4.0, '.odt': 6.0,
+        '.pptx': 6.0, '.ppt': 6.0, '.pptm': 6.0, '.odp': 7.0,
+    }
+
     def __init__(self, conv_logger: ConversionLogger):
         """Initialize with logger. Pre-compute running totals for O(1) updates."""
         self.logger = conv_logger
@@ -239,8 +247,16 @@ class AdaptiveEstimator:
         try:
             file_size_mb = os.path.getsize(file_path) / (1024 * 1024)
 
-            # Simple formula: size × avg_time_per_mb
-            estimate = file_size_mb * self.avg_time_per_mb
+            if self._record_count >= 5:
+                # Enough data: use learned avg_time_per_mb
+                estimate = file_size_mb * self.avg_time_per_mb
+            else:
+                # F3: Use per-extension default for cold-start accuracy
+                ext = os.path.splitext(file_path)[1].lower()
+                base_time = self.EXTENSION_DEFAULTS.get(ext, 5.0)
+                # Scale by file size: files over 5MB take proportionally longer
+                size_factor = max(1.0, file_size_mb / 2.0)
+                estimate = base_time * size_factor
 
             # Minimum time for startup overhead
             estimate = max(self.MIN_TIME, estimate)

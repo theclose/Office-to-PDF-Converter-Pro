@@ -812,6 +812,22 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                          command=self._select_output,
                          fg_color="transparent", border_width=1).pack(side="right")
 
+            # F4: Quick-pick output folder buttons
+            quick_pick_frame = ctk.CTkFrame(options, fg_color="transparent")
+            quick_pick_frame.pack(fill="x", pady=(0, 3))
+            for label, folder_name in [("🖥️ Desktop", "Desktop"),
+                                        ("📁 Documents", "Documents"),
+                                        ("⬇️ Downloads", "Downloads")]:
+                path = os.path.join(os.path.expanduser("~"), folder_name)
+                if os.path.exists(path):
+                    ctk.CTkButton(
+                        quick_pick_frame, text=label, width=90, height=22,
+                        font=ctk.CTkFont(size=10),
+                        fg_color="transparent", border_width=1,
+                        hover_color=("gray85", "gray30"),
+                        command=lambda p=path: self._set_output_quick(p)
+                    ).pack(side="left", padx=2)
+
             # Quality — 5-preset dropdown
             quality_frame = ctk.CTkFrame(options, fg_color="transparent")
             quality_frame.pack(fill="x", pady=3)
@@ -1373,6 +1389,20 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 self.config.save()
         except Exception as e:
             logger.error(f"Select output error: {e}")
+
+    def _set_output_quick(self, folder: str):
+        """F4: Quick-set output folder from Desktop/Documents/Downloads buttons."""
+        try:
+            if os.path.exists(folder):
+                self.output_folder = folder
+                display = Path(folder).name
+                if self.output_label:
+                    self.output_label.configure(text=display, text_color="#22C55E")
+                self.config.set("output_folder", folder, auto_save=False)
+                self.config.save()
+                self._log(f"📁 Output → {display}")
+        except Exception as e:
+            logger.error(f"Set output quick error: {e}")
 
     # =========== CONVERSION ===========
     # _start_conversion, _calculate_estimated_time, _run_conversion,

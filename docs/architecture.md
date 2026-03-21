@@ -45,7 +45,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 ### ui/ — Presentation
 | File | LOC | Purpose |
 |------|-----|---------|
-| main_window_pro.py | 1406 | ConverterProApp — layout, options, DnD |
+| main_window_pro.py | 1436 | ConverterProApp — layout, options, DnD |
 | file_panel.py | 363 | FileListPanel — file list, drag&drop, selection |
 | collapsible_section.py | 106 | CollapsibleSection — accordion widget for options |
 | conversion_mixin.py | 517 | ConversionMixin — start/stop, progress |
@@ -64,7 +64,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 | com_pool.py | 313 | COMPool singleton — RLock, health-check, recycle |
 | config.py | 144 | Config singleton — JSON, thread-safe save() |
 | recent_files.py | 211 | RecentFilesDB — SQLite WAL, batch_log() |
-| progress_estimator.py | 336 | AdaptiveEstimator — JSONL persistence |
+| progress_estimator.py | 354 | AdaptiveEstimator — JSONL persistence |
 | logging_setup.py | 68 | Centralized logging → %LOCALAPPDATA% |
 | tkdnd_wrapper.py | 161 | TkinterDnD2 wrapper |
 | watchdog.py | 234 | Resource monitoring |
@@ -106,6 +106,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
   "page_range": "",         // page range filter
   "default_author": "",     // default PDF author metadata
   "pdf_tools_last_operation": "",
+  "recent_files": [],          // F2: last 10 converted files
   "metadata": {             // PDF metadata settings
     "author": "",
     "title": "",

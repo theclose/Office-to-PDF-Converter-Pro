@@ -94,8 +94,8 @@ class ConversionMixin:
             self.is_converting = True
             self.conversion_start_time = time.time()
 
-            # Default estimate (5s per file)
-            self.total_estimated_time = len(self.file_panel.files) * 5.0
+            # F3: Use adaptive estimator (per-extension + historical data)
+            self.total_estimated_time = self._calculate_estimated_time()
 
             # UI updates
             if self.btn_convert:

@@ -61,7 +61,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging)
 ### utils/ — Infrastructure
 | File | LOC | Purpose |
 |------|-----|---------|
-| com_pool.py | 313 | COMPool singleton — RLock, health-check, recycle |
+| com_pool.py | 339 | COMPool singleton — RLock, health-check, recycle |
 | config.py | 144 | Config singleton — JSON, thread-safe save() |
 | recent_files.py | 211 | RecentFilesDB — SQLite WAL, batch_log() |
 | progress_estimator.py | 354 | AdaptiveEstimator — JSONL persistence |

@@ -132,6 +132,11 @@ class WordConverter(BaseConverter):
         except Exception:
             logger.warning("Word COM instance is dead, will reconnect")
             self._word = None
+            # Invalidate pool cache so get_word() creates fresh instance
+            try:
+                get_pool().invalidate_word()
+            except Exception:
+                pass
             return False
 
     def cleanup(self):

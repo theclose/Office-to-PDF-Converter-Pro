@@ -278,6 +278,27 @@ class COMPool:
             gc.collect()
             logger.info("PowerPoint COM recycled")
 
+    def invalidate_word(self):
+        """Force-invalidate cached Word COM (called when converter detects dead proxy)."""
+        with self._lock:
+            self._word = None
+            self._word_last_ok = 0.0
+            logger.info("Word COM invalidated by converter")
+
+    def invalidate_excel(self):
+        """Force-invalidate cached Excel COM."""
+        with self._lock:
+            self._excel = None
+            self._excel_last_ok = 0.0
+            logger.info("Excel COM invalidated by converter")
+
+    def invalidate_ppt(self):
+        """Force-invalidate cached PowerPoint COM."""
+        with self._lock:
+            self._ppt = None
+            self._ppt_last_ok = 0.0
+            logger.info("PowerPoint COM invalidated by converter")
+
     def release_all(self):
         """Release all COM instances."""
         with self._lock:

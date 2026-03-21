@@ -105,6 +105,11 @@ class PPTConverter(BaseConverter):
         except Exception:
             logger.warning("PowerPoint COM instance is dead, will reconnect")
             self._ppt = None
+            # Invalidate pool cache so get_ppt() creates fresh instance
+            try:
+                get_pool().invalidate_ppt()
+            except Exception:
+                pass
             return False
 
     def cleanup(self):

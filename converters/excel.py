@@ -162,6 +162,11 @@ class ExcelConverter(BaseConverter):
         except Exception:
             logger.warning("Excel COM instance is dead, will reconnect")
             self._excel = None
+            # Invalidate pool cache so get_excel() creates fresh instance
+            try:
+                get_pool().invalidate_excel()
+            except Exception:
+                pass
             return False
 
     def cleanup(self):

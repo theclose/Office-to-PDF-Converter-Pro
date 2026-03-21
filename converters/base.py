@@ -107,6 +107,40 @@ class BaseConverter(ABC):
         """
         pass
 
+    @staticmethod
+    def _validate_pdf_output(pdf_path: str) -> bool:
+        """Validate that a generated PDF is not corrupt.
+        
+        Uses PyMuPDF (fitz) quick open to check page count.
+        Returns True if valid, False if corrupt or missing.
+        """
+        try:
+            if not os.path.exists(pdf_path):
+                logger.warning(f"PDF validation: file not found: {pdf_path}")
+                return False
+            if os.path.getsize(pdf_path) < 100:
+                logger.warning(f"PDF validation: file too small ({os.path.getsize(pdf_path)} bytes)")
+                return False
+            
+            import fitz  # PyMuPDF
+            doc = fitz.open(pdf_path)
+            page_count = len(doc)
+            doc.close()
+            
+            if page_count < 1:
+                logger.warning(f"PDF validation: 0 pages in {os.path.basename(pdf_path)}")
+                return False
+            
+            logger.debug(f"PDF validation OK: {os.path.basename(pdf_path)} ({page_count} pages)")
+            return True
+        except ImportError:
+            # PyMuPDF not installed — skip validation silently
+            logger.debug("PDF validation skipped (PyMuPDF not installed)")
+            return True
+        except Exception as e:
+            logger.warning(f"PDF validation failed for {pdf_path}: {e}")
+            return False
+
     @abstractmethod
     def cleanup(self):
         """Release COM resources."""

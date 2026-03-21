@@ -10,6 +10,7 @@ import threading
 from pathlib import Path
 from datetime import datetime
 from tkinter import messagebox
+from office_converter.utils.localization import get_text
 
 from office_converter.utils.logging_setup import get_logger
 from office_converter.core.engine import (
@@ -98,7 +99,7 @@ class ConversionMixin:
 
             # UI updates
             if self.btn_convert:
-                self.btn_convert.configure(state="disabled", text="⏳ Đang chuyển đổi...")
+                self.btn_convert.configure(state="disabled", text=get_text('converting_progress'))
 
             # Phase 4: Lock all inputs to prevent user error
             self._toggle_inputs(True)
@@ -110,11 +111,11 @@ class ConversionMixin:
                 self.progress_percent.configure(text="0%", text_color="#22C55E")
             if self.progress_label:
                 total = len(self.file_panel.files)
-                self.progress_label.configure(text=f"Đang xử lý 0/{total} files")
+                self.progress_label.configure(text=get_text('progress_files').format(0, total))
             if self.progress_title:
-                self.progress_title.configure(text="Đang chuyển đổi...")
+                self.progress_title.configure(text=get_text('progress_converting'))
             if self.status_badge:
-                self.status_badge.configure(text="ĐANG XỬ LÝ", fg_color="#3B82F6")
+                self.status_badge.configure(text=get_text('progress_status'), fg_color="#3B82F6")
             if self.elapsed_label:
                 self.elapsed_label.configure(text="00:00")
             if self.remaining_label:
@@ -124,7 +125,7 @@ class ConversionMixin:
                 est_mins, est_secs = divmod(int(self.total_estimated_time), 60)
                 self.estimated_label.configure(text=f"{est_mins:02d}:{est_secs:02d}")
             if self.current_file_label:
-                self.current_file_label.configure(text="Đang chờ...")
+                self.current_file_label.configure(text=get_text('waiting'))
 
             # Show progress frame
             if self.progress_frame and self.btn_convert:
@@ -140,6 +141,7 @@ class ConversionMixin:
             options = ConversionOptions(
                 quality=self.var_quality.get(),
                 quality_dpi=dpi,
+                auto_compress=self.var_auto_compress.get(),
                 scan_mode=self.var_scan_mode.get(),
                 password=self.var_password.get() if self.var_password_enabled.get() else None,
                 page_range=self.var_page_range.get() or None,
@@ -173,7 +175,7 @@ class ConversionMixin:
         except Exception as e:
             self.is_converting = False
             logger.error(f"Start conversion error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể bắt đầu chuyển đổi: {e}")
+            messagebox.showerror(get_text('error'), get_text('cannot_start').format(e))
 
     def _calculate_estimated_time(self) -> float:
         """Calculate total estimated conversion time."""
@@ -210,7 +212,7 @@ class ConversionMixin:
         """Stop conversion immediately (force stop)."""
         try:
             if self.engine:
-                self._log("⏹️ Đang dừng ngay lập tức...")
+                self._log(get_text('stopping'))
 
                 # Force stop - kills Office processes if needed
                 self.engine.stop(force=True)
@@ -228,7 +230,7 @@ class ConversionMixin:
                 if hasattr(self, 'main_content_frame') and self.main_content_frame:
                     self.main_content_frame.pack(fill="both", expand=True, padx=15, pady=10)
 
-                self._log("⏹️ Đã dừng chuyển đổi!")
+                self._log(get_text('stopped'))
 
                 # Phase 4: Unlock inputs
                 self._toggle_inputs(False)
@@ -279,7 +281,7 @@ class ConversionMixin:
                 self.progress_percent.configure(text=f"{percent}%", text_color=color)
 
             if self.progress_label:
-                self.progress_label.configure(text=f"Đang xử lý {current + 1}/{total} files")
+                self.progress_label.configure(text=get_text('progress_files').format(current + 1, total))
 
             if self.current_file_label:
                 display_name = filename if len(filename) <= 50 else filename[:47] + "..."
@@ -398,21 +400,21 @@ class ConversionMixin:
             if self.progress_percent:
                 self.progress_percent.configure(text="100%", text_color="#22C55E")
             if self.progress_label:
-                self.progress_label.configure(text=f"Hoàn thành {completed}/{total} files")
+                self.progress_label.configure(text=get_text('completed_files').format(completed, total))
             if self.progress_title:
-                self.progress_title.configure(text="Chuyển đổi hoàn tất!")
+                self.progress_title.configure(text=get_text('conversion_complete'))
             if self.status_badge:
-                self.status_badge.configure(text="XONG", fg_color="#22C55E")
+                self.status_badge.configure(text=get_text('status_done_text'), fg_color="#22C55E")
             if self.elapsed_label:
                 self.elapsed_label.configure(text=f"{mins:02d}:{secs:02d}")
             if self.remaining_label:
                 self.remaining_label.configure(text="00:00")
             if self.current_file_label:
-                self.current_file_label.configure(text="Tất cả files đã hoàn thành!")
+                self.current_file_label.configure(text=get_text('all_files_done'))
 
             # Reset convert button
             if self.btn_convert:
-                self.btn_convert.configure(state="normal", text="🚀 CHUYỂN ĐỔI SANG PDF")
+                self.btn_convert.configure(state="normal", text=get_text('btn_convert'))
 
             # Phase 4: Unlock inputs after completion
             self._toggle_inputs(False)
@@ -420,14 +422,12 @@ class ConversionMixin:
             # Hide progress frame after delay
             self.after(5000, self._hide_progress_frame)
 
-            self._log(f"🎉 Hoàn thành {completed}/{total} trong {time_str}")
+            self._log(get_text('conversion_done_log').format(completed, total, time_str))
 
             if completed > 0 and self.file_panel and self.file_panel.files:
                 folder = self.output_folder or str(Path(self.file_panel.files[0].path).parent)
-                if messagebox.askyesno("✅ Hoàn thành",
-                                       f"Đã chuyển đổi {completed}/{total} files\n"
-                                       f"Thời gian: {time_str}\n\n"
-                                       f"Mở folder?"):
+                if messagebox.askyesno(get_text('conversion_done_title'),
+                                       get_text('conversion_done_msg').format(completed, total, time_str)):
                     os.startfile(folder)
         except Exception as e:
             logger.error(f"On conversion done error: {e}")

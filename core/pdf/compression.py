@@ -8,7 +8,7 @@ import io
 import shutil
 from typing import Tuple, Dict, Any
 
-from .common import get_fitz, HAS_PYMUPDF, HAS_PIL, logger
+from .common import get_fitz, HAS_PIL, logger
 
 try:
     from PIL import Image
@@ -36,7 +36,7 @@ def compress_pdf(input_path: str, output_path: str, quality: str = "medium") -> 
         Tuple of (success, compression_percentage)
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         logger.error("PyMuPDF (fitz) not installed")
         return False, 0.0
 
@@ -206,7 +206,7 @@ def compress_pdf_advanced(
     cancel_check: callable = None,       # NEW: cancel_check() -> bool
 ) -> Tuple[bool, float, Dict[str, Any]]:
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         logger.error("PyMuPDF (fitz) not installed")
         return False, 0.0, {"error": "PyMuPDF not installed"}
     
@@ -385,7 +385,7 @@ def compress_pdf_advanced(
                         doc.xref_set_key(xref, "Height", "1")
                         doc.update_stream(xref, b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t\x08\n\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a\x1f\x1e\x1d\x1a\x1c\x1c $.\' ",#\x1c\x1c(7),01444\x1f\'9telecast:telecast\xff\xc0\x00\x0b\x08\x00\x01\x00\x01\x01\x01\x11\x00\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xc4\x00\xb5\x10\x00\x02\x01\x03\x03\x02\x04\x03\x05\x05\x04\x04\x00\x00\x01}\x01\x02\x03\x00\x04\x11\x05\x12!1A\x06\x13Qa\x07"q\x142\x81\x91\xa1\x08#B\xb1\xc1\x15R\xd1\xf0$3br\x82\t\n\x16\x17\x18\x19\x1a%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz\x83\x84\x85\x86\x87\x88\x89\x8a\x92\x93\x94\x95\x96\x97\x98\x99\x9a\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xff\xda\x00\x08\x01\x01\x00\x00?\x00\xfb\xd5\xff\xd9')
                         stats["images_optimized"] += 1
-                    except:
+                    except Exception:
                         pass
         
         logger.info("Phase 4: Saving optimized PDF...")
@@ -406,7 +406,6 @@ def compress_pdf_advanced(
         stats["new_size"] = new_size
         
         if new_size >= original_size:
-            import shutil
             shutil.copy(input_path, output_path)
             logger.info("Compression made file larger, keeping original")
             stats["new_size"] = original_size
@@ -431,7 +430,7 @@ def compress_pdf_advanced(
 
 def analyze_pdf_content(input_path: str) -> Dict[str, Any]:
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF or not os.path.exists(input_path):
+    if not fitz or not os.path.exists(input_path):
         return {"error": "File not found or PyMuPDF not available"}
     
     try:
@@ -458,7 +457,7 @@ def analyze_pdf_content(input_path: str) -> Dict[str, Any]:
                 try:
                     base_img = doc.extract_image(xref)
                     analysis["total_image_bytes"] += len(base_img.get("image", b""))
-                except:
+                except Exception:
                     pass
             
             analysis["total_images"] += image_count
@@ -496,7 +495,7 @@ def compress_pdf_smart(
     progress_callback: callable = None
 ) -> Tuple[bool, float, Dict[str, Any]]:
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF or not HAS_PIL:
+    if not fitz or not HAS_PIL:
         return False, 0.0, {"error": "PyMuPDF or PIL not available"}
     
     if not os.path.exists(input_path):
@@ -526,13 +525,13 @@ def compress_pdf_smart(
         logger.info("Phase 1: Metadata cleanup...")
         try:
             doc.scrub(redact_images=0, garbage=4)
-        except:
+        except Exception:
             pass
         
         logger.info("Phase 2: Font subsetting...")
         try:
             doc.subset_fonts()
-        except:
+        except Exception:
             pass
         
         logger.info("Phase 3: Selective image compression...")
@@ -644,7 +643,6 @@ def compress_pdf_smart(
         stats["new_size"] = new_size
         
         if new_size >= original_size:
-            import shutil
             shutil.copy(input_path, output_path)
             logger.info("Compression made file larger, keeping original")
             return True, 0.0, stats

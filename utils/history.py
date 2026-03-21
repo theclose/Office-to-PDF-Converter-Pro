@@ -4,6 +4,7 @@ Conversion History - Track and display conversion history.
 
 import os
 import json
+import threading
 from datetime import datetime
 from typing import List, Dict, Optional
 from dataclasses import dataclass, asdict
@@ -32,7 +33,7 @@ class ConversionRecord:
 
 
 class ConversionHistory:
-    """Manages conversion history with file persistence."""
+    """Manages conversion history with file persistence. Thread-safe."""
 
     MAX_RECORDS = 500  # Keep last 500 conversions
 
@@ -41,6 +42,7 @@ class ConversionHistory:
             package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             history_file = os.path.join(package_dir, "conversion_history.json")
 
+        self._lock = threading.Lock()
         self.history_file = history_file
         self.records: List[ConversionRecord] = []
         self._load()
@@ -71,18 +73,19 @@ class ConversionHistory:
 
     def add(self, input_file: str, output_file: str, file_type: str,
             success: bool, duration: float, error: Optional[str] = None):
-        """Add a conversion record."""
-        record = ConversionRecord(
-            timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            input_file=input_file,
-            output_file=output_file,
-            file_type=file_type,
-            success=success,
-            duration=round(duration, 2),
-            error=error[:100] if error else None
-        )
-        self.records.append(record)
-        self._save()
+        """Add a conversion record. Thread-safe."""
+        with self._lock:
+            record = ConversionRecord(
+                timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                input_file=input_file,
+                output_file=output_file,
+                file_type=file_type,
+                success=success,
+                duration=round(duration, 2),
+                error=error[:100] if error else None
+            )
+            self.records.append(record)
+            self._save()
 
     def get_recent(self, count: int = 50) -> List[ConversionRecord]:
         """Get most recent records."""

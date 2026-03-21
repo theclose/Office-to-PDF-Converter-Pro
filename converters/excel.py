@@ -11,13 +11,11 @@ import os
 import time
 import logging
 import shutil
-import gc
 import uuid
 import atexit
 import threading
 from typing import Optional, Callable, List
 
-import pythoncom
 
 from .base import BaseConverter
 

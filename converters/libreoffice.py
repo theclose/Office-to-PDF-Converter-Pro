@@ -94,17 +94,25 @@ class LibreOfficeConverter(BaseConverter):
     def convert(self, input_path: str, output_path: str, quality: int = 100, **options) -> bool:
         """
         Convert document to PDF using LibreOffice.
-        
-        Args:
-            input_path: Path to input document
-            output_path: Path to output PDF
-            quality: PDF quality (not directly used, LibreOffice uses its own settings)
-            
-        Returns:
-            True if conversion successful
         """
         if not self._soffice_path:
             logger.error("LibreOffice not available")
+            return False
+
+        # M2: Input validation
+        if not os.path.exists(input_path):
+            logger.error(f"File not found: {input_path}")
+            return False
+        try:
+            size = os.path.getsize(input_path)
+            if size == 0:
+                logger.error(f"File is empty: {os.path.basename(input_path)}")
+                return False
+            if size > 500 * 1024 * 1024:
+                logger.error(f"File too large ({size / 1024 / 1024:.1f}MB): {os.path.basename(input_path)}")
+                return False
+        except OSError as e:
+            logger.error(f"Cannot read file: {e}")
             return False
 
         input_path = os.path.abspath(input_path)

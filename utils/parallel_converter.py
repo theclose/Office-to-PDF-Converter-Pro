@@ -7,8 +7,6 @@ Each worker process has its own COM instance to avoid threading issues.
 Uses multiprocessing Queue for job distribution and result collection.
 """
 
-import os
-import sys
 import time
 import logging
 import multiprocessing as mp

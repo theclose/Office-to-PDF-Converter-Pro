@@ -18,7 +18,6 @@ import atexit
 import threading
 from typing import Optional, Callable
 
-import pythoncom
 
 from .base import BaseConverter
 from ..utils.com_pool import get_pool
@@ -188,6 +187,9 @@ class PPTConverter(BaseConverter):
 
             errors = []
 
+            # Map quality to PPT export intent
+            # quality 0 = high (print intent), 1+ = compact (screen intent)
+            ppt_intent = 1 if quality == 0 else 2  # 1=ppFixedFormatIntentPrint, 2=ppFixedFormatIntentScreen
             # Method 1: Standard SaveAs PDF
             method_start = time.monotonic()
             try:
@@ -210,7 +212,7 @@ class PPTConverter(BaseConverter):
                 presentation.ExportAsFixedFormat(
                     Path=com_pdf_path,
                     FixedFormatType=ppFixedFormatTypePDF,
-                    Intent=1,  # ppFixedFormatIntentPrint
+                    Intent=ppt_intent,  # Use quality-mapped intent
                     FrameSlides=False,
                     RangeType=1  # ppPrintAll
                 )

@@ -20,7 +20,6 @@ import atexit
 import threading
 from typing import Optional, Callable
 
-import pythoncom
 
 from .base import BaseConverter
 from ..utils.com_pool import get_pool
@@ -398,7 +397,7 @@ class WordConverter(BaseConverter):
                     os.remove(output_path)
                 shutil.move(com_pdf_path, output_path)
                 break
-            except (PermissionError, OSError) as e:
+            except (PermissionError, OSError):
                 if attempt < 4:
                     time.sleep(0.5)
                 else:

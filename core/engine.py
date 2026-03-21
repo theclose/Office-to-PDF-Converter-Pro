@@ -13,8 +13,9 @@ from enum import Enum, auto
 
 from office_converter.utils.logging_setup import get_logger
 from office_converter.utils.pdf_tools import (
-    post_process_pdf, rasterize_pdf, parse_page_range, extract_pdf_pages, HAS_PYMUPDF
+    post_process_pdf, rasterize_pdf, parse_page_range, extract_pdf_pages
 )
+from office_converter.core.pdf.common import get_fitz
 from office_converter.converters import get_converter_for_file
 from office_converter.utils.recent_files import RecentFilesDB
 from office_converter.utils.watchdog import start_watchdog, stop_watchdog, record_watchdog_conversion
@@ -87,9 +88,18 @@ class ConversionFile:
 
 @dataclass
 class ConversionOptions:
-    """Conversion settings."""
-    quality: int = 0  # 0=high, 1=compact, 2=custom
-    quality_dpi: int = 300  # only used if quality=2
+    """Conversion settings.
+    
+    Quality presets:
+        0 = Tối đa (Maximum) — COM high quality, no compression
+        1 = Cao (High) — COM high quality, light compression
+        2 = Cân bằng (Balanced) — COM high quality, medium compression  
+        3 = Nhỏ gọn (Compact) — COM low quality, heavy compression
+        4 = Custom — user-specified DPI
+    """
+    quality: int = 0  # 0=max, 1=high, 2=balanced, 3=compact, 4=custom
+    quality_dpi: int = 300  # only used if quality=4
+    auto_compress: bool = False  # auto-compress PDF after conversion
     scan_mode: bool = False
     password: Optional[str] = None
     page_range: Optional[str] = None
@@ -97,6 +107,23 @@ class ConversionOptions:
     author: Optional[str] = None
     title: Optional[str] = None
 
+    @property
+    def com_quality(self) -> int:
+        """Map quality preset to COM Quality param (0=high, 1=low)."""
+        if self.quality >= 3:  # Compact or Custom with low DPI
+            return 1  # Screen quality (96dpi)
+        return 0  # Print quality (300dpi)
+
+    @property
+    def compress_level(self) -> Optional[str]:
+        """Map quality preset to compression level."""
+        return {
+            0: None,       # Tối đa: no compression
+            1: "high",     # Cao: light compression
+            2: "medium",   # Cân bằng: balanced compression
+            3: "low",      # Nhỏ gọn: heavy compression
+            4: None,       # Custom: no auto-compress
+        }.get(self.quality)
 
 # ============================================================================
 # CONVERSION ENGINE
@@ -353,21 +380,31 @@ class ConversionEngine:
                 logger.error(f"Failed to initialize converter for: {conv_file.path}")
                 return False
 
-            # Excel with sheet indices (check by name to avoid eager import)
-            # Note: Excel only accepts quality 0 (high) or 1 (low)
-            # If DPI >= 250 AND scan_mode enabled, use 0 for best quality
+            # Use com_quality property for correct COM param mapping
+            excel_quality = options.com_quality
+            
+            # Override: scan_mode with high DPI forces quality=0 for best source
             if options.scan_mode and options.quality_dpi >= 250:
                 excel_quality = 0
-            else:
-                excel_quality = min(options.quality, 1)  # Ensure valid Excel value (0 or 1)
             
-            if converter.__class__.__name__ == "ExcelConverter" and options.sheet_indices:
-                success = converter.convert(
-                    conv_file.path,
-                    conv_file.output_path,
-                    excel_quality,
-                    options.sheet_indices
-                )
+            # M4: Check by capability, not class name — robust to renames
+            success = False
+            if options.sheet_indices:
+                import inspect
+                sig = inspect.signature(converter.convert)
+                if 'sheet_indices' in sig.parameters:
+                    success = converter.convert(
+                        conv_file.path,
+                        conv_file.output_path,
+                        excel_quality,
+                        options.sheet_indices
+                    )
+                else:
+                    success = converter.convert(
+                        conv_file.path,
+                        conv_file.output_path,
+                        excel_quality
+                    )
             else:
                 success = converter.convert(
                     conv_file.path,
@@ -396,7 +433,7 @@ class ConversionEngine:
 
     def _apply_post_processing(self, pdf_path: str, options: ConversionOptions):
         """Apply post-processing to PDF."""
-        if not HAS_PYMUPDF:
+        if not get_fitz():
             return
 
         try:
@@ -413,5 +450,24 @@ class ConversionEngine:
             # Scan mode (rasterize) - use quality_dpi from options
             if options.scan_mode:
                 rasterize_pdf(pdf_path, dpi=options.quality_dpi)
+
+            # Auto-compress based on quality preset
+            compress_level = options.compress_level
+            if options.auto_compress and compress_level:
+                try:
+                    from office_converter.core.pdf.compression import compress_pdf
+                    original_size = os.path.getsize(pdf_path)
+                    success, ratio = compress_pdf(pdf_path, pdf_path, quality=compress_level)
+                    if success and ratio > 1.0:
+                        new_size = os.path.getsize(pdf_path)
+                        logger.info(
+                            f"Auto-compressed ({compress_level}): "
+                            f"{original_size/1024:.0f}KB → {new_size/1024:.0f}KB "
+                            f"(-{ratio:.1f}%)"
+                        )
+                    elif success:
+                        logger.info(f"Auto-compress: file already optimal")
+                except Exception as e:
+                    logger.warning(f"Auto-compress failed (continuing): {e}")
         except Exception as e:
             logger.error(f"Post-processing error: {e}")

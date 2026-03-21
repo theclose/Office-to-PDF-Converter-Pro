@@ -18,7 +18,6 @@ Usage:
     output_path = merge_excel(["file1.xlsx", "file2.xlsx"], "merged.xlsx")
 """
 
-import os
 import logging
 from pathlib import Path
 from typing import List, Optional, Callable, Tuple

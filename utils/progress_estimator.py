@@ -12,6 +12,7 @@ Components:
 import os
 import json
 import logging
+import threading
 from datetime import datetime
 from typing import Optional, Dict, List, Any
 from dataclasses import dataclass, asdict
@@ -50,7 +51,7 @@ class ConversionRecord:
 class ConversionLogger:
     """
     Logs conversion history for machine learning.
-    Stores data in JSON format for easy analysis.
+    Stores data in JSON format for easy analysis. Thread-safe.
     """
 
     def __init__(self, log_dir: Optional[str] = None):
@@ -59,6 +60,7 @@ class ConversionLogger:
             # Default to user's app data directory
             log_dir = os.path.join(os.path.expanduser("~"), ".office_converter")
 
+        self._lock = threading.Lock()
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
 

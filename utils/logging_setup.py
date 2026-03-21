@@ -21,8 +21,11 @@ def setup_logging(log_dir: Optional[str] = None,
         Root logger configured for the application
     """
     if log_dir is None:
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        log_dir = os.path.join(base_dir, "logs")
+        # C4: Use %LOCALAPPDATA% — persistent across sessions.
+        # In packaged EXE, __file__ resolves to temp extraction dir (_MEIxxxxxx)
+        # which is deleted on exit, losing all logs.
+        app_data = os.environ.get("LOCALAPPDATA", os.path.expanduser("~"))
+        log_dir = os.path.join(app_data, "OfficeToPDF_Pro", "logs")
 
     os.makedirs(log_dir, exist_ok=True)
 

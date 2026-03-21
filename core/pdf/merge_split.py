@@ -5,14 +5,14 @@ PDF Merging and Splitting operations.
 import os
 from typing import List
 
-from .common import get_fitz, HAS_PYMUPDF, logger
+from .common import get_fitz, logger
 
 def merge_pdfs(pdf_paths: List[str], output_path: str) -> bool:
     """
     Merge multiple PDF files into one.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     if not pdf_paths:
@@ -26,6 +26,8 @@ def merge_pdfs(pdf_paths: List[str], output_path: str) -> bool:
                 doc = fitz.open(pdf_path)
                 merged_doc.insert_pdf(doc)
                 doc.close()
+            else:
+                logger.warning(f"Merge: skipping missing file: {pdf_path}")
 
         if len(merged_doc) == 0:
             merged_doc.close()
@@ -47,7 +49,7 @@ def split_pdf(input_path: str, output_folder: str) -> bool:
     Split a PDF into individual pages.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     if not os.path.exists(input_path):

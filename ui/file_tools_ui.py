@@ -6,15 +6,13 @@ from tkinter import ttk, filedialog, messagebox
 import customtkinter as ctk
 import os
 import threading
-from typing import List, Optional
+from typing import List
 
 from office_converter.core.file_tools import (
     FileToolsEngine, CaseRule, ReplaceRule, RemoveAccentsRule,
     TrimRule, AddStringRule, SequenceRule, ExtensionRule, RenameRule,
     DuplicateFinder, DuplicateGroup, EmptyFolderCleaner, AttributeManager
 )
-from office_converter.utils.tkdnd_wrapper import TkDnDWrapper
-from datetime import datetime
 import time
 
 class DuplicateResultWidget(ctk.CTkFrame):

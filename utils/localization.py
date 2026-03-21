@@ -8,7 +8,6 @@ import os
 import sys
 import json
 import logging
-from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 

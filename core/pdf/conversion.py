@@ -5,7 +5,7 @@ PDF to Images and Images to PDF conversion.
 import os
 from typing import List, Tuple, Dict, Any
 
-from .common import get_fitz, HAS_PYMUPDF, HAS_PIL, logger
+from .common import get_fitz, HAS_PIL, logger
 
 try:
     from PIL import Image
@@ -20,7 +20,7 @@ def pdf_to_images(
 ) -> List[str]:
     """Convert PDF pages to images."""
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF or not os.path.exists(input_path):
+    if not fitz or not os.path.exists(input_path):
         return []
 
     try:
@@ -65,7 +65,7 @@ def pdf_to_single_image(
     Convert all PDF pages to a single combined image (vertically stacked).
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF or not HAS_PIL:
+    if not fitz or not HAS_PIL:
         logger.error("PyMuPDF or PIL not available")
         return False, {"error": "Missing dependencies"}
     
@@ -156,7 +156,7 @@ def pdf_to_single_image(
 def images_to_pdf(image_paths: List[str], output_path: str) -> bool:
     """Combine multiple images into a single PDF."""
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF or not image_paths:
+    if not fitz or not image_paths:
         return False
 
     try:

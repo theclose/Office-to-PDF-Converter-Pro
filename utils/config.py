@@ -6,6 +6,7 @@ import os
 import json
 import copy
 import logging
+import threading
 from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ DEFAULT_CONFIG = {
     "language": "vi",
     "theme": "light",
     "pdf_quality": 0,
+    "auto_compress": False,
     "last_folder": "",
     "output_folder": "",
     "metadata": {
@@ -33,6 +35,7 @@ class Config:
     _config_path = None
     _data: Dict[str, Any] = {}
     _initialized = False
+    _save_lock = threading.Lock()  # M3: Prevent concurrent config.json corruption
 
     def __new__(cls, config_path: Optional[str] = None):
         """Singleton pattern - only one config instance."""
@@ -70,10 +73,11 @@ class Config:
         return False
 
     def save(self) -> bool:
-        """Save config to file."""
+        """Save config to file (thread-safe)."""
         try:
-            with open(self._config_path, "w", encoding="utf-8") as f:
-                json.dump(self._data, f, indent=2, ensure_ascii=False)
+            with self._save_lock:
+                with open(self._config_path, "w", encoding="utf-8") as f:
+                    json.dump(self._data, f, indent=2, ensure_ascii=False)
             logger.info(f"Config saved to {self._config_path}")
             return True
         except Exception as e:

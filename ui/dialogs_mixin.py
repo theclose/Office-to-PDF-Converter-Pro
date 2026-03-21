@@ -5,6 +5,7 @@ All methods use `self.*` and resolve via MRO to ConverterProApp's attributes.
 """
 
 import os
+import logging
 import subprocess
 from datetime import datetime
 from tkinter import messagebox
@@ -12,7 +13,6 @@ from tkinter import messagebox
 import customtkinter as ctk
 
 from office_converter.utils.logging_setup import get_logger
-from office_converter.utils.com_pool import release_pool
 
 logger = get_logger("DialogsMixin")
 
@@ -179,11 +179,35 @@ F1         Xem shortcuts
             logger.error(f"Error opening File Tools: {e}")
             messagebox.showerror("Error", f"Failed to open File Tools: {e}")
 
+    def _cancel_all_after_jobs(self):
+        """Cancel all pending after() callbacks to prevent TclError on destroy.
+        
+        Must be called before self.destroy() or os._exit() to prevent
+        'application has been destroyed' errors from orphaned timer callbacks.
+        """
+        self._closing = True  # Flag to prevent new after() scheduling
+
+        # Cancel stored after() job IDs
+        for attr in ('_refresh_job', '_log_flush_job'):
+            job_id = getattr(self, attr, None)
+            if job_id is not None:
+                try:
+                    self.after_cancel(job_id)
+                except Exception:
+                    pass
+                setattr(self, attr, None)
+
+        # Stop recurring timers
+        self.is_converting = False  # Stops _update_time_display recursion
+
     def _on_closing(self):
         """Cleanup on close with forced termination."""
         try:
             import time as _time
             logger.info("Application closing - starting cleanup")
+
+            # 0. Cancel all pending after() callbacks first
+            self._cancel_all_after_jobs()
 
             # 1. Stop conversion engine if running
             if self.engine and self.is_converting:
@@ -244,4 +268,12 @@ F1         Xem shortcuts
         except Exception as e:
             logger.error(f"Cleanup error: {e}")
         finally:
+            # C6: Flush all log handlers before forced exit.
+            # os._exit() bypasses Python cleanup — log buffers would be lost.
+            for _handler in (logging.root.handlers
+                           + logging.getLogger("office_converter").handlers):
+                try:
+                    _handler.flush()
+                except Exception:
+                    pass
             os._exit(0)

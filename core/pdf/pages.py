@@ -7,14 +7,14 @@ import os
 import shutil
 from typing import List, Optional, Tuple
 
-from .common import get_fitz, HAS_PYMUPDF, logger
+from .common import get_fitz, logger
 
 def rotate_pages(input_path: str, output_path: str, rotation: int, page_indices: Optional[List[int]] = None) -> bool:
     """
     Rotate pages in a PDF.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     if rotation not in [90, 180, 270]:
@@ -88,7 +88,7 @@ def extract_pages(input_path: str, output_path: str, page_range: str) -> Tuple[b
     Extract specific pages from PDF to a new file.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False, 0
 
     if not os.path.exists(input_path):
@@ -124,7 +124,7 @@ def delete_pages(input_path: str, output_path: str, page_range: str) -> Tuple[bo
     Delete specific pages from PDF.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False, 0
 
     if not os.path.exists(input_path):
@@ -136,6 +136,11 @@ def delete_pages(input_path: str, output_path: str, page_range: str) -> Tuple[bo
 
         if not page_indices:
             logger.error("No valid pages to delete")
+            doc.close()
+            return False, 0
+
+        if len(page_indices) >= len(doc):
+            logger.error("Cannot delete all pages — would create empty PDF")
             doc.close()
             return False, 0
 
@@ -158,7 +163,7 @@ def reorder_pages(input_path: str, output_path: str, new_order: List[int]) -> bo
     Reorder pages in a PDF.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     if not os.path.exists(input_path):
@@ -199,7 +204,7 @@ def reverse_pages(input_path: str, output_path: str) -> bool:
     Reverse page order in a PDF.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     if not os.path.exists(input_path):
@@ -222,7 +227,7 @@ def extract_pdf_pages(pdf_path: str, page_indices: List[int]) -> bool:
     Extract specific pages from PDF and overwrite the original.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF or not page_indices:
+    if not fitz or not page_indices:
         return False
 
     try:

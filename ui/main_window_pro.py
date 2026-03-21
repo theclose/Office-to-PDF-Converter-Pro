@@ -14,18 +14,13 @@ HOTFIX CHANGES:
 import os
 import sys
 import time
-import sqlite3
 import threading
 from pathlib import Path
-from datetime import datetime
-from typing import List, Optional, Set, Dict, Any, Callable
-from dataclasses import dataclass, field
-from enum import Enum, auto
+from typing import List, Optional, Callable
 
 import customtkinter as ctk
-import tkinter as tk
 from tkinter import filedialog, messagebox
-from PIL import Image, ImageTk
+from office_converter.utils.localization import get_text
 
 # Add parent directories to path for imports
 ui_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,16 +31,11 @@ if root_dir not in sys.path:
 
 from office_converter.utils.logging_setup import setup_logging
 from office_converter.utils.config import Config
-from office_converter.utils.com_pool import release_pool
 # Lazy: pdf_tools and converters are loaded on-demand
 # from office_converter.utils.pdf_tools import ... -> Moved to functions
 # from office_converter.converters import ExcelConverter -> Moved to _convert_single
 
 # PDF tools - loaded at module level for preview panel
-from office_converter.utils.pdf_tools import (
-    post_process_pdf, rasterize_pdf, parse_page_range, extract_pdf_pages, HAS_PYMUPDF
-)
-from office_converter.converters import get_converter_for_file  # Lightweight lookup only
 
 # Setup logging
 logger = setup_logging()
@@ -62,22 +52,16 @@ else:
 # UI Components
 # FileToolsDialog - lazy loaded in _open_file_tools()
 
-# Import fitz (PyMuPDF) at module level with proper fallback
-fitz = None
-if HAS_PYMUPDF:
-    try:
-        import fitz as _fitz
-        fitz = _fitz
-    except ImportError:
-        pass
+# R3+U10: Use get_fitz() for live PyMuPDF availability check
+from office_converter.core.pdf.common import get_fitz as _get_fitz_fn
+fitz = _get_fitz_fn()
 
 # ============================================================================
 # CONSTANTS & CONFIGURATION
 # ============================================================================
 
 from office_converter.core.engine import (
-    FileType, FILE_EXTENSIONS, ALL_EXTENSIONS, FILE_TYPE_COLORS, FILE_TYPE_ICONS,
-    ConversionFile, ConversionOptions, ConversionEngine
+    FileType, FILE_EXTENSIONS, ALL_EXTENSIONS, FILE_TYPE_COLORS, ConversionFile, ConversionEngine
 )
 from office_converter.utils.recent_files import RecentFilesDB
 
@@ -131,19 +115,18 @@ class FileListPanel(ctk.CTkFrame):
         )
         self.drop_label.pack(expand=True, pady=30)
 
-        # Use Listbox for proper selection support
-        self.file_listbox = tk.Listbox(
+        # R1: CTkTextbox replaces tk.Listbox — theme-native, bo góc, smooth scroll
+        self.file_listbox = ctk.CTkTextbox(
             self.drop_frame,
-            font=("Consolas", 11),
-            selectmode=tk.EXTENDED,  # Allow multiple selection
-            bg="#2b2b2b",
-            fg="#dcdcdc",
-            selectbackground="#1f6aa5",
-            selectforeground="white",
-            highlightthickness=0,
-            borderwidth=0,
-            activestyle="none"
+            font=ctk.CTkFont(family="Segoe UI", size=11),
+            corner_radius=8,
+            state="disabled",  # Read-only by default
+            wrap="none",
+            activate_scrollbars=True
         )
+        # Track selection state for compatibility
+        self._selected_lines: set = set()
+        self._is_ctk_textbox = True  # Flag for compatibility methods
 
         # Stats row
         stats_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -189,35 +172,68 @@ class FileListPanel(ctk.CTkFrame):
         self.file_listbox.bind('<Delete>', self._delete_selected)
         self.file_listbox.bind('<BackSpace>', self._delete_selected)
         
-        # Update selected_indices when selection changes
-        self.file_listbox.bind('<<ListboxSelect>>', self._on_listbox_select)
+        # Click to select line
+        self.file_listbox.bind('<Button-1>', self._on_click_select)
 
     def _select_all(self, event=None):
         """Select all files."""
-        if self.files:
-            self.file_listbox.select_set(0, tk.END)
-            self.selected_indices = set(range(len(self.files)))
-        return "break"  # Prevent default behavior
+        try:
+            if self.files:
+                self.selected_indices = set(range(len(self.files)))
+                self._highlight_selected()
+        except Exception as e:
+            logger.error(f"Select all error: {e}")
+        return "break"
+
+    def _on_click_select(self, event=None):
+        """Handle click to select a line in CTkTextbox."""
+        try:
+            if not self.files:
+                return
+            # Get clicked line number
+            index = self.file_listbox.index(f"@{event.x},{event.y}")
+            line_num = int(index.split('.')[0]) - 1  # 0-indexed
+            if 0 <= line_num < len(self.files):
+                # Toggle selection
+                if line_num in self.selected_indices:
+                    self.selected_indices.discard(line_num)
+                else:
+                    self.selected_indices.add(line_num)
+                self._highlight_selected()
+        except Exception:
+            pass
+
+    def _highlight_selected(self):
+        """Highlight selected lines in CTkTextbox."""
+        try:
+            self.file_listbox.configure(state="normal")
+            self.file_listbox.tag_remove("selected", "1.0", "end")
+            self.file_listbox.tag_config(
+                "selected",
+                background="#1f6aa5",
+                foreground="white"
+            )
+            for idx in self.selected_indices:
+                line = idx + 1
+                self.file_listbox.tag_add("selected", f"{line}.0", f"{line}.end")
+            self.file_listbox.configure(state="disabled")
+        except Exception:
+            pass
 
     def _delete_selected(self, event=None):
         """Delete selected files from list."""
-        selection = self.file_listbox.curselection()
-        if not selection:
-            return
-        
-        # Remove in reverse order to maintain indices
-        for idx in sorted(selection, reverse=True):
-            if 0 <= idx < len(self.files):
-                del self.files[idx]
-        
-        self.selected_indices.clear()
-        self._refresh_display()
+        try:
+            if not self.selected_indices:
+                return "break"
+            # Remove in reverse order to maintain indices
+            for idx in sorted(self.selected_indices, reverse=True):
+                if 0 <= idx < len(self.files):
+                    del self.files[idx]
+            self.selected_indices.clear()
+            self._refresh_display()
+        except Exception as e:
+            logger.error(f"Delete selected error: {e}")
         return "break"
-
-    def _on_listbox_select(self, event=None):
-        """Handle listbox selection change."""
-        selection = self.file_listbox.curselection()
-        self.selected_indices = set(selection)
 
     def get_selected_files(self) -> List[ConversionFile]:
         """Get currently selected files (or all if none selected)."""
@@ -323,7 +339,7 @@ class FileListPanel(ctk.CTkFrame):
             if type_counts[FileType.POWERPOINT]: parts.append(f"📙{type_counts[FileType.POWERPOINT]}")
             self.types_label.configure(text=" ".join(parts))
 
-            # Update list display
+            # Update list display (R1: CTkTextbox-compatible)
             if count == 0:
                 self.file_listbox.pack_forget()
                 self.drop_label.pack(expand=True, pady=30)
@@ -331,13 +347,15 @@ class FileListPanel(ctk.CTkFrame):
                 self.drop_label.pack_forget()
                 self.file_listbox.pack(fill="both", expand=True)
 
-                # Clear and repopulate listbox
-                self.file_listbox.delete(0, tk.END)
+                # Clear and repopulate CTkTextbox
+                self.file_listbox.configure(state="normal")
+                self.file_listbox.delete("1.0", "end")
 
                 # Progressive rendering: show only first 200 files for performance
                 MAX_DISPLAY = 200
                 display_files = self.files[:MAX_DISPLAY]
                 
+                lines = []
                 for i, f in enumerate(display_files, 1):
                     status_icon = {
                         "pending": f.icon,
@@ -345,11 +363,17 @@ class FileListPanel(ctk.CTkFrame):
                         "completed": "✅",
                         "failed": "❌"
                     }.get(f.status, f.icon)
-                    self.file_listbox.insert(tk.END, f"{status_icon} {i:3d}. {f.filename}")
+                    lines.append(f"{status_icon} {i:3d}. {f.filename}")
                 
                 # Add "more files" indicator if truncated
                 if count > MAX_DISPLAY:
-                    self.file_listbox.insert(tk.END, f"... và {count - MAX_DISPLAY} files nữa")
+                    lines.append(f"... và {count - MAX_DISPLAY} files nữa")
+                
+                self.file_listbox.insert("1.0", "\n".join(lines))
+                self.file_listbox.configure(state="disabled")
+                
+                # Re-apply selection highlighting
+                self._highlight_selected()
 
             # Callback
             if self.on_selection_change:
@@ -399,7 +423,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
     - ConverterProApp: UI layout, options, file actions, DnD
     """
 
-    VERSION = "4.2.100"
+    VERSION = "4.2.101"
 
     def __init__(self):
         super().__init__()
@@ -446,6 +470,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         # Variables - Load from config
         self.var_quality = ctk.IntVar(value=self.config.get("pdf_quality", 0))
         self.var_dpi = ctk.StringVar(value=str(self.config.get("pdf_dpi", "300")))
+        self.var_auto_compress = ctk.BooleanVar(value=self.config.get("auto_compress", False))
         self.var_scan_mode = ctk.BooleanVar(value=self.config.get("scan_mode", False))
         self.var_password = ctk.StringVar()
         self.var_password_enabled = ctk.BooleanVar(value=False)
@@ -455,9 +480,10 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         self.var_output_same = ctk.BooleanVar(value=self.config.get("output_same", True))
         self.var_output_folder = ctk.StringVar(value=self.config.get("output_folder", ""))
         # Setup window
-        self.title(f"Office to PDF Converter Pro - v{self.VERSION} | Tung Do - 0914665866")
-        self.geometry("1000x750")
-        self.minsize(900, 700)
+        # U7: Professional title bar (no phone number)
+        self.title(f"{get_text('app_title')} - v{self.VERSION}")
+        self.geometry("1100x750")
+        self.minsize(1000, 700)
 
         # Center window
         self._center_window()
@@ -478,11 +504,11 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
         # Initial log
-        self._log(f"🚀 Office to PDF Converter Pro v{self.VERSION}")
+        self._log(f"🚀 {get_text('app_title')} v{self.VERSION}")
         if fitz:
-            self._log("📄 PyMuPDF: Hỗ trợ xử lý trang PDF")
+            self._log(get_text('pymupdf_yes'))
         else:
-            self._log("⚠️ PyMuPDF không có: Không hỗ trợ chọn trang")
+            self._log(get_text('pymupdf_no'))
         if HAS_TKDND:
             self._log("📁 Drag & Drop: Kéo thả file hoạt động (TkinterDnD2)")
 
@@ -530,7 +556,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         """Center window on screen."""
         try:
             self.update_idletasks()
-            w, h = 1000, 750
+            w, h = 1100, 750
             x = (self.winfo_screenwidth() - w) // 2
             y = (self.winfo_screenheight() - h) // 2
             self.geometry(f"{w}x{h}+{x}+{y}")
@@ -598,7 +624,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                     else:
                         # Unsupported extension
                         basename = os.path.basename(file_path)
-                        self._log(f"⚠️ File không hỗ trợ: {basename}")
+                        self._log(f"⚠️ {get_text('file_unsupported').format(basename)}")
                 except Exception as file_err:
                     logger.warning(f"Skip file due to error: {file_err}")
                     continue
@@ -607,12 +633,12 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 # Refresh display
                 if self.file_panel:
                     self.file_panel._refresh_display()
-                self._log(f"📁 Thả thêm {added_count} file(s)")
+                self._log(f"📁 {get_text('drop_added').format(added_count)}")
                 self._on_files_changed(self.file_panel.files if self.file_panel else [])
                 
         except Exception as e:
             logger.error(f"Handle drop error: {e}")
-            self._log(f"❌ Lỗi kéo thả: {e}")
+            self._log(f"❌ {get_text('drop_error').format(e)}")
 
     def _create_layout(self):
         """Create the main layout."""
@@ -639,25 +665,38 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             file_btn_frame = ctk.CTkFrame(left_frame, fg_color="transparent")
             file_btn_frame.pack(fill="x", padx=10, pady=10)
 
-            ctk.CTkButton(file_btn_frame, text="➕ Files", width=80,
+            ctk.CTkButton(file_btn_frame, text=get_text('btn_add_file'), width=80,
                          command=self._add_files).pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text="📁 Folder", width=80,
+            ctk.CTkButton(file_btn_frame, text=get_text('btn_add_folder'), width=80,
                          command=self._add_folder,
                          fg_color="transparent", border_width=2).pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text="🔧 PDF Tools", width=90,
+            # R2: Buttons with tooltips
+            btn_pdf = ctk.CTkButton(file_btn_frame, text=get_text('btn_pdf_tools'), width=90,
                          command=self._open_pdf_tools,
-                         fg_color="#3B82F6", hover_color="#2563EB").pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text="📊 Excel Tools", width=95,
+                         fg_color="#3B82F6", hover_color="#2563EB")
+            btn_pdf.pack(side="left", padx=2)
+            btn_excel = ctk.CTkButton(file_btn_frame, text=get_text('btn_excel_tools'), width=95,
                          command=self._open_excel_tools,
-                         fg_color="#10B981", hover_color="#059669").pack(side="left", padx=2)
-            ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
+                         fg_color="#10B981", hover_color="#059669")
+            btn_excel.pack(side="left", padx=2)
+            btn_clear = ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
                          command=self._clear_files,
                          fg_color="transparent", border_width=2,
-                         hover_color="#DC2626").pack(side="right")
+                         hover_color="#DC2626")
+            btn_clear.pack(side="right")
+            try:
+                from CTkToolTip import CTkToolTip
+                CTkToolTip(btn_pdf, message=get_text('tooltip_pdf'), delay=0.3)
+                CTkToolTip(btn_excel, message=get_text('tooltip_excel'), delay=0.3)
+                CTkToolTip(btn_clear, message=get_text('tooltip_clear'), delay=0.3)
+            except ImportError:
+                pass
 
-            # Right column: Options
-            right_frame = ctk.CTkFrame(self.main_content_frame, width=320, corner_radius=12)
+            # R6: Right column — fixed 468px width (+30% from original 360px)
+            right_frame = ctk.CTkFrame(self.main_content_frame, corner_radius=12)
             right_frame.pack(side="right", fill="y", padx=(5, 0))
+            right_frame.configure(width=468)
+            # Enforce width — don't let content shrink the frame
             right_frame.pack_propagate(False)
 
             # Options panel - takes full height of right column
@@ -666,7 +705,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             # === CONVERT BUTTON ===
             self.btn_convert = ctk.CTkButton(
                 self.main_content_frame,
-                text="🚀 CHUYỂN ĐỔI SANG PDF",
+                text=get_text('btn_convert'),
                 command=self._start_conversion,
                 height=50,
                 font=ctk.CTkFont(size=18, weight="bold"),
@@ -703,7 +742,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             self.progress_title = ctk.CTkLabel(
                 title_frame,
-                text="Đang chuyển đổi...",
+                text=get_text('progress_converting'),
                 font=ctk.CTkFont(size=16, weight="bold")
             )
             self.progress_title.pack(side="left")
@@ -711,7 +750,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             # Status badge
             self.status_badge = ctk.CTkLabel(
                 header_inner,
-                text="ĐANG XỬ LÝ",
+                text=get_text('progress_status'),
                 font=ctk.CTkFont(size=11, weight="bold"),
                 fg_color="#3B82F6",
                 corner_radius=5,
@@ -738,7 +777,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             self.progress_label = ctk.CTkLabel(
                 percent_frame,
-                text="Đang xử lý 0/0 files",
+                text=get_text('progress_files').format(0, 0),
                 font=ctk.CTkFont(size=13),
                 text_color="#9CA3AF"
             )
@@ -773,7 +812,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             ctk.CTkLabel(
                 elapsed_card,
-                text="⏱️ Đã chạy",
+                text=get_text('time_elapsed'),
                 font=ctk.CTkFont(size=11),
                 text_color="#9CA3AF"
             ).pack(pady=(8, 2))
@@ -792,7 +831,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             ctk.CTkLabel(
                 est_card,
-                text="📊 Ước tính",
+                text=get_text('time_estimated'),
                 font=ctk.CTkFont(size=11),
                 text_color="#9CA3AF"
             ).pack(pady=(8, 2))
@@ -811,7 +850,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             ctk.CTkLabel(
                 remaining_card,
-                text="⏳ Còn lại",
+                text=get_text('time_remaining'),
                 font=ctk.CTkFont(size=11),
                 text_color="#9CA3AF"
             ).pack(pady=(8, 2))
@@ -839,7 +878,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
             self.current_file_label = ctk.CTkLabel(
                 file_inner,
-                text="Đang chờ...",
+                text=get_text('waiting'),
                 font=ctk.CTkFont(size=12),
                 text_color="#D1D5DB",
                 anchor="w"
@@ -866,7 +905,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             log_header = ctk.CTkFrame(log_frame, fg_color="transparent")
             log_header.pack(fill="x", padx=10, pady=(10, 5))
 
-            ctk.CTkLabel(log_header, text="📋 Log",
+            ctk.CTkLabel(log_header, text=get_text('log_label'),
                         font=ctk.CTkFont(weight="bold")).pack(side="left")
 
             # Language selector
@@ -892,10 +931,10 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             self.lang_dropdown.set(current_lang_name)
             self.lang_dropdown.pack(side="left")
 
-            ctk.CTkButton(log_header, text="🛠️ PDF Tools", width=100,
+            ctk.CTkButton(log_header, text=get_text('btn_pdf_tools'), width=100,
                          command=self._open_pdf_tools).pack(side="right", padx=5)
             
-            ctk.CTkButton(log_header, text="📂 File Tools", width=100,
+            ctk.CTkButton(log_header, text=get_text('btn_file_tools'), width=100,
                          command=self._open_file_tools).pack(side="right", padx=5)
 
             self.log_textbox = ctk.CTkTextbox(log_frame, height=80,
@@ -904,7 +943,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
 
         except Exception as e:
             logger.error(f"Create layout error: {e}")
-            messagebox.showerror("Lỗi", f"Không thể tạo giao diện: {e}")
+            messagebox.showerror(get_text('error'), get_text('layout_error').format(e))
 
     def _create_header(self):
         """Create header with title and controls."""
@@ -916,27 +955,42 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             title_frame = ctk.CTkFrame(header, fg_color="transparent")
             title_frame.pack(side="left")
 
-            ctk.CTkLabel(title_frame, text="📄 Office to PDF Converter Pro",
+            ctk.CTkLabel(title_frame, text=f"📄 {get_text('app_title')}",
                         font=ctk.CTkFont(size=22, weight="bold")).pack(side="left")
             ctk.CTkLabel(title_frame, text=f"v{self.VERSION}",
                         text_color="gray").pack(side="left", padx=10)
-            # Author info
-            ctk.CTkLabel(title_frame, text="| Tung Do - 0914665866",
-                        text_color="#4da6ff", font=ctk.CTkFont(size=12)).pack(side="left", padx=5)
+            # U7: Author in subtitle only (no phone in title bar)
+            ctk.CTkLabel(title_frame, text="by VNTime JSC",
+                        text_color="#6B7280", font=ctk.CTkFont(size=11)).pack(side="left", padx=5)
 
             # Controls
             controls = ctk.CTkFrame(header, fg_color="transparent")
             controls.pack(side="right")
 
-            ctk.CTkButton(controls, text="📊", width=35,
+            # U8: Icon buttons with tooltips
+            try:
+                from CTkToolTip import CTkToolTip
+                _has_tooltip = True
+            except ImportError:
+                _has_tooltip = False
+
+            btn_stats = ctk.CTkButton(controls, text="📊", width=35,
                          command=self._show_stats,
-                         fg_color="transparent", border_width=1).pack(side="left", padx=2)
-            ctk.CTkButton(controls, text="⚙️", width=35,
+                         fg_color="transparent", border_width=1)
+            btn_stats.pack(side="left", padx=2)
+            btn_settings = ctk.CTkButton(controls, text="⚙️", width=35,
                          command=self._show_settings,
-                         fg_color="transparent", border_width=1).pack(side="left", padx=2)
-            ctk.CTkButton(controls, text="❓", width=35,
+                         fg_color="transparent", border_width=1)
+            btn_settings.pack(side="left", padx=2)
+            btn_help = ctk.CTkButton(controls, text="❓", width=35,
                          command=self._show_shortcuts,
-                         fg_color="transparent", border_width=1).pack(side="left", padx=2)
+                         fg_color="transparent", border_width=1)
+            btn_help.pack(side="left", padx=2)
+
+            if _has_tooltip:
+                CTkToolTip(btn_stats, message=get_text('tooltip_stats'), delay=0.3)
+                CTkToolTip(btn_settings, message=get_text('tooltip_settings'), delay=0.3)
+                CTkToolTip(btn_help, message=get_text('tooltip_shortcuts'), delay=0.3)
 
             # Theme switch
             self.theme_switch = ctk.CTkSwitch(controls, text="🌙",
@@ -948,102 +1002,198 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             logger.error(f"Create header error: {e}")
 
     def _create_options_panel(self, parent):
-        """Create options panel."""
+        """Create options panel. U3: Wrapped in ScrollableFrame for small screens."""
         try:
-            options = ctk.CTkFrame(parent, fg_color="transparent")
-            options.pack(fill="x", padx=10, pady=5)
+            # U3: Scrollable container for options
+            scroll_container = ctk.CTkScrollableFrame(
+                parent, fg_color="transparent",
+                scrollbar_button_color="#4B5563"
+            )
+            scroll_container.pack(fill="both", expand=True, padx=5, pady=5)
+
+            options = ctk.CTkFrame(scroll_container, fg_color="transparent")
+            options.pack(fill="x", padx=5, pady=5)
+
+            # ══════════════════════════════════════════════════
+            # SECTION 1: Chất lượng
+            # ══════════════════════════════════════════════════
+            section1_label = ctk.CTkLabel(options, text=get_text('section_quality'),
+                                          font=ctk.CTkFont(size=11, weight="bold"),
+                                          text_color="gray")
+            section1_label.pack(fill="x", pady=(5, 2))
 
             # Output folder
             output_frame = ctk.CTkFrame(options, fg_color="transparent")
-            output_frame.pack(fill="x", pady=5)
+            output_frame.pack(fill="x", pady=3)
 
-            ctk.CTkLabel(output_frame, text="📂 Output:").pack(side="left")
-            # Show saved output folder or default
+            ctk.CTkLabel(output_frame, text=get_text('output_folder') + ":",
+                        font=ctk.CTkFont(size=12)).pack(side="left")
             saved_folder = self.config.get("output_folder", "")
             if saved_folder and os.path.exists(saved_folder):
                 self.output_folder = saved_folder
                 output_text = os.path.basename(saved_folder)
             else:
-                output_text = "Cùng folder gốc"
+                output_text = get_text('output_same_folder')
             self.output_label = ctk.CTkLabel(output_frame, text=output_text,
                                               text_color="gray" if not saved_folder else "#22C55E",
-                                              wraplength=150)
+                                              wraplength=220)
             self.output_label.pack(side="left", padx=5)
-            ctk.CTkButton(output_frame, text="Đổi", width=50, height=25,
+            ctk.CTkButton(output_frame, text=get_text('btn_change'), width=50, height=25,
                          command=self._select_output,
                          fg_color="transparent", border_width=1).pack(side="right")
 
-            # Quality
+            # Quality — 5-preset dropdown
             quality_frame = ctk.CTkFrame(options, fg_color="transparent")
-            quality_frame.pack(fill="x", pady=5)
+            quality_frame.pack(fill="x", pady=3)
 
-            ctk.CTkLabel(quality_frame, text="📊 Chất lượng:").pack(side="left")
-            ctk.CTkRadioButton(quality_frame, text="Cao", variable=self.var_quality,
-                              value=0, command=self._on_quality_change, width=60).pack(side="left", padx=2)
-            ctk.CTkRadioButton(quality_frame, text="Nhỏ", variable=self.var_quality,
-                              value=1, command=self._on_quality_change, width=60).pack(side="left", padx=2)
-            ctk.CTkRadioButton(quality_frame, text="DPI:", variable=self.var_quality,
-                              value=2, command=self._on_quality_change, width=55).pack(side="left", padx=2)
+            ctk.CTkLabel(quality_frame, text=get_text('quality_pdf_label'),
+                        font=ctk.CTkFont(size=12)).pack(side="left")
 
-            self.dpi_frame = ctk.CTkFrame(quality_frame, fg_color="transparent")
-            self.dpi_frame.pack(side="left")
+            self._quality_presets = [
+                get_text('quality_preset_0'),
+                get_text('quality_preset_1'),
+                get_text('quality_preset_2'),
+                get_text('quality_preset_3'),
+                get_text('quality_preset_4'),
+            ]
+            current_preset = self._quality_presets[min(self.var_quality.get(), 4)]
 
-            self.dpi_entry = ctk.CTkEntry(self.dpi_frame, width=45, textvariable=self.var_dpi)
-            self.dpi_entry.pack(side="left")
+            self.quality_dropdown = ctk.CTkComboBox(
+                quality_frame,
+                values=self._quality_presets,
+                width=200,
+                state="readonly",
+                command=self._on_quality_dropdown_change
+            )
+            self.quality_dropdown.set(current_preset)
+            self.quality_dropdown.pack(side="left", padx=5)
+
+            # Quality description hint
+            self._quality_hints = {
+                0: get_text('quality_hint_0'),
+                1: get_text('quality_hint_1'),
+                2: get_text('quality_hint_2'),
+                3: get_text('quality_hint_3'),
+                4: get_text('quality_hint_4'),
+            }
+            self.quality_hint = ctk.CTkLabel(
+                options, text=self._quality_hints.get(self.var_quality.get(), ""),
+                text_color="gray", font=ctk.CTkFont(size=10, slant="italic")
+            )
+            self.quality_hint.pack(fill="x", padx=15, pady=(0, 2))
+
+            # DPI entry row — shown only for Custom DPI
+            self.dpi_frame = ctk.CTkFrame(options, fg_color="transparent")
+
+            ctk.CTkLabel(self.dpi_frame, text=get_text('dpi_label'),
+                        font=ctk.CTkFont(size=12)).pack(side="left")
+            self.dpi_entry = ctk.CTkEntry(self.dpi_frame, width=60,
+                                          textvariable=self.var_dpi,
+                                          placeholder_text="300")
+            self.dpi_entry.pack(side="left", padx=5)
+            ctk.CTkLabel(self.dpi_frame, text=get_text('dpi_range'),
+                        text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
             
-            # Initial state
             self._on_quality_change()
 
+            # Auto-compress
+            self.compress_switch = ctk.CTkSwitch(
+                options, text=get_text('auto_compress'),
+                variable=self.var_auto_compress,
+                command=self._save_auto_compress
+            )
+            self.compress_switch.pack(fill="x", pady=3)
+
             # Scan mode
-            ctk.CTkSwitch(options, text="📷 Scan Mode",
+            ctk.CTkSwitch(options, text=get_text('scan_mode_label'),
                          variable=self.var_scan_mode,
-                         command=self._save_scan_mode).pack(fill="x", pady=5)
+                         command=self._save_scan_mode).pack(fill="x", pady=3)
 
-            # Password
+            # ══════════════════════════════════════════════════
+            # SECTION 2: Bảo mật
+            # ══════════════════════════════════════════════════
+            section2_label = ctk.CTkLabel(options, text=get_text('section_security'),
+                                          font=ctk.CTkFont(size=11, weight="bold"),
+                                          text_color="gray")
+            section2_label.pack(fill="x", pady=(8, 2))
+
             pw_frame = ctk.CTkFrame(options, fg_color="transparent")
-            pw_frame.pack(fill="x", pady=5)
+            pw_frame.pack(fill="x", pady=3)
 
-            ctk.CTkSwitch(pw_frame, text="🔒", variable=self.var_password_enabled,
+            ctk.CTkSwitch(pw_frame, text=get_text('password_pdf'),
+                         variable=self.var_password_enabled,
                          command=self._on_password_toggle).pack(side="left")
             self.password_entry = ctk.CTkEntry(pw_frame, textvariable=self.var_password,
                                                show="*", width=120, state="disabled",
-                                               placeholder_text="Mật khẩu")
+                                               placeholder_text=get_text('password_placeholder'))
             self.password_entry.pack(side="left", padx=5)
 
-            # Excel sheet selection
+            # ══════════════════════════════════════════════════
+            # SECTION 3: Excel
+            # ══════════════════════════════════════════════════
+            section3_label = ctk.CTkLabel(options, text=get_text('section_excel'),
+                                          font=ctk.CTkFont(size=11, weight="bold"),
+                                          text_color="gray")
+            section3_label.pack(fill="x", pady=(8, 2))
+
             sheet_frame = ctk.CTkFrame(options, fg_color="transparent")
-            sheet_frame.pack(fill="x", pady=5)
-            
-            ctk.CTkLabel(sheet_frame, text="📗 Sheet (Excel):").pack(side="left")
+            sheet_frame.pack(fill="x", pady=3)
+
+            ctk.CTkLabel(sheet_frame, text=get_text('sheet_label'),
+                        font=ctk.CTkFont(size=12)).pack(side="left")
             sheet_entry = ctk.CTkEntry(sheet_frame, textvariable=self.var_sheet_index,
                         width=80, placeholder_text="all")
             sheet_entry.pack(side="left", padx=5)
-            ctk.CTkLabel(sheet_frame, text="1-3, 5 hoặc trống=tất cả", 
+            ctk.CTkLabel(sheet_frame, text="VD: 1-3, 5", 
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
 
-            # Excel page range (renamed from PDF)
             page_frame = ctk.CTkFrame(options, fg_color="transparent")
-            page_frame.pack(fill="x", pady=5)
+            page_frame.pack(fill="x", pady=3)
 
-            ctk.CTkLabel(page_frame, text="📄 Trang Excel:").pack(side="left")
+            ctk.CTkLabel(page_frame, text=get_text('page_label'),
+                        font=ctk.CTkFont(size=12)).pack(side="left")
             page_entry = ctk.CTkEntry(page_frame, textvariable=self.var_page_range,
                         width=80, placeholder_text="all")
             page_entry.pack(side="left", padx=5)
-            ctk.CTkLabel(page_frame, text="Chỉ xuất các trang chỉ định", 
+            ctk.CTkLabel(page_frame, text=get_text('page_hint'), 
                         text_color="gray", font=ctk.CTkFont(size=10)).pack(side="left")
-            # Save page range on focus out
             page_entry.bind("<FocusOut>", lambda e: self._save_page_range())
         except Exception as e:
             logger.error(f"Create options error: {e}")
+
+    def _on_quality_dropdown_change(self, selected: str):
+        """Handle quality dropdown selection."""
+        try:
+            idx = self._quality_presets.index(selected)
+            self.var_quality.set(idx)
+            self._on_quality_change()
+        except (ValueError, Exception):
+            pass
 
     def _on_quality_change(self):
         """Handle quality selection change."""
         try:
             val = self.var_quality.get()
-            if val == 2:
+            if val == 4:  # Custom DPI
+                # Show DPI row below quality dropdown
                 self.dpi_entry.configure(state="normal")
+                self.dpi_frame.pack(fill="x", pady=3, before=self.compress_switch)
             else:
+                # Hide DPI row
+                self.dpi_frame.pack_forget()
                 self.dpi_entry.configure(state="disabled")
+            
+            # Update quality hint text
+            if hasattr(self, 'quality_hint') and hasattr(self, '_quality_hints'):
+                hint = self._quality_hints.get(val, "")
+                self.quality_hint.configure(text=hint)
+            
+            # Auto-enable compress for quality >= 1
+            if val >= 1 and val <= 3:
+                self.var_auto_compress.set(True)
+            elif val == 0:
+                self.var_auto_compress.set(False)
+            
             self._save_quality()
         except Exception:
             pass
@@ -1052,11 +1202,20 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
         """Save quality setting to config."""
         try:
             self.config.set("pdf_quality", self.var_quality.get())
-            if self.var_quality.get() == 2:
+            self.config.set("auto_compress", self.var_auto_compress.get())
+            if self.var_quality.get() == 4:
                 self.config.set("pdf_dpi", self.var_dpi.get())
             self.config.save()
         except Exception as e:
             logger.error(f"Save quality error: {e}")
+
+    def _save_auto_compress(self):
+        """Save auto-compress setting to config."""
+        try:
+            self.config.set("auto_compress", self.var_auto_compress.get())
+            self.config.save()
+        except Exception as e:
+            logger.error(f"Save auto_compress error: {e}")
 
     def _save_scan_mode(self):
         """Save scan mode setting to config."""
@@ -1097,11 +1256,12 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             logger.error(f"Password toggle error: {e}")
 
     def _toggle_theme(self):
-        """Toggle dark/light theme."""
+        """Toggle dark/light theme. R1: CTkTextbox auto-follows theme."""
         try:
             if self.theme_switch:
                 mode = "dark" if self.theme_switch.get() else "light"
                 ctk.set_appearance_mode(mode)
+                # R1: CTkTextbox auto-adapts to theme — no manual color update needed
         except Exception as e:
             logger.error(f"Toggle theme error: {e}")
 
@@ -1126,19 +1286,43 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             messagebox.showerror("Lỗi", f"Không thể thêm files: {e}")
 
     def _add_folder(self):
-        """Add files from folder."""
+        """Add files from folder. R4: Threaded scan with progress indicator."""
         try:
             folder = filedialog.askdirectory()
-            if folder and self.file_panel:
-                files = []
-                for f in os.listdir(folder):
-                    ext = Path(f).suffix.lower()
-                    if ext in ALL_EXTENSIONS:
-                        files.append(os.path.join(folder, f))
+            if not folder or not self.file_panel:
+                return
 
-                if files:
-                    added = self.file_panel.add_files(files)
-                    self._log(f"📁 Đã thêm {added} file(s) từ folder")
+            self._log(f"🔍 Đang quét folder: {os.path.basename(folder)}...")
+
+            # R4: Run folder scan in thread to avoid blocking UI
+            def _scan_folder():
+                try:
+                    files = []
+                    max_depth = 5  # R4: Depth limit to avoid scanning huge trees
+                    base_depth = folder.count(os.sep)
+                    for root, dirs, filenames in os.walk(folder):
+                        # Check depth
+                        current_depth = root.count(os.sep) - base_depth
+                        if current_depth >= max_depth:
+                            dirs.clear()  # Don't descend further
+                            continue
+                        for f in filenames:
+                            ext = Path(f).suffix.lower()
+                            if ext in ALL_EXTENSIONS:
+                                files.append(os.path.join(root, f))
+
+                    # Update UI on main thread
+                    def _update_ui():
+                        if files:
+                            added = self.file_panel.add_files(files)
+                            self._log(f"📁 Đã thêm {added} file(s) từ folder (recursive, max depth {max_depth})")
+                        else:
+                            self._log(f"⚠️ Không tìm thấy Office files trong folder")
+                    self.after(0, _update_ui)
+                except Exception as e:
+                    self.after(0, lambda: self._log(f"❌ Lỗi quét folder: {e}"))
+
+            threading.Thread(target=_scan_folder, daemon=True).start()
         except Exception as e:
             logger.error(f"Add folder error: {e}")
             messagebox.showerror("Lỗi", f"Không thể thêm folder: {e}")
@@ -1146,12 +1330,63 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
     # _show_recent() → DialogsMixin
 
     def _paste_files(self):
-        """Paste files from clipboard."""
-        # Future: implement clipboard paste
-        pass
+        """R5: Real Ctrl+V — paste file paths from Windows clipboard."""
+        try:
+            import ctypes
+
+            # Windows clipboard constants
+            CF_HDROP = 15
+            kernel32 = ctypes.windll.kernel32
+            user32 = ctypes.windll.user32
+            shell32 = ctypes.windll.shell32
+
+            if not user32.OpenClipboard(0):
+                self._log("ℹ️ Không thể truy cập clipboard. Dùng Ctrl+O hoặc kéo thả.")
+                return
+
+            try:
+                h_drop = user32.GetClipboardData(CF_HDROP)
+                if not h_drop:
+                    # Try text clipboard fallback
+                    CF_UNICODETEXT = 13
+                    h_text = user32.GetClipboardData(CF_UNICODETEXT)
+                    if h_text:
+                        text_ptr = kernel32.GlobalLock(h_text)
+                        if text_ptr:
+                            text = ctypes.wstring_at(text_ptr)
+                            kernel32.GlobalUnlock(h_text)
+                            # Parse as file paths (one per line)
+                            paths = [p.strip().strip('"') for p in text.splitlines() if p.strip()]
+                            valid = [p for p in paths if os.path.isfile(p)]
+                            if valid and self.file_panel:
+                                added = self.file_panel.add_files(valid)
+                                self._log(f"📋 Paste: thêm {added} file(s) từ clipboard")
+                                return
+                    self._log("ℹ️ Clipboard không chứa files. Copy files trong Explorer rồi thử lại.")
+                    return
+
+                # Extract file paths from HDROP
+                count = shell32.DragQueryFileW(h_drop, 0xFFFFFFFF, None, 0)
+                paths = []
+                for i in range(count):
+                    buf_size = shell32.DragQueryFileW(h_drop, i, None, 0) + 1
+                    buf = ctypes.create_unicode_buffer(buf_size)
+                    shell32.DragQueryFileW(h_drop, i, buf, buf_size)
+                    paths.append(buf.value)
+
+                if paths and self.file_panel:
+                    added = self.file_panel.add_files(paths)
+                    self._log(f"📋 Paste: thêm {added} file(s) từ clipboard")
+                else:
+                    self._log("ℹ️ Clipboard không chứa files hỗ trợ.")
+            finally:
+                user32.CloseClipboard()
+        except Exception as e:
+            logger.error(f"Paste files error: {e}")
+            self._log("ℹ️ Paste từ clipboard thất bại. Dùng Ctrl+O hoặc kéo thả.")
 
     def _change_language(self, selected_name: str):
-        """Change application language."""
+        """Change application language with instant hot-reload."""
         try:
             from office_converter.utils.localization import get_language_names, set_language
 
@@ -1169,24 +1404,71 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                 self.config.save()
                 set_language(lang_code)
 
-                # Notify user to restart
-                self._log(f"🌐 Ngôn ngữ: {selected_name}")
+                # Hot-reload: update all UI text instantly
+                self._apply_language()
 
-                # Show restart dialog
-                result = messagebox.askyesno(
-                    "Restart Required / Cần khởi động lại",
-                    f"Đã chuyển sang {selected_name}.\n"
-                    f"Changed to {selected_name}.\n\n"
-                    "Khởi động lại ứng dụng để áp dụng?\n"
-                    "Restart application to apply?"
-                )
-                if result:
-                    self.destroy()
-                    import sys
-                    import subprocess
-                    subprocess.Popen([sys.executable] + sys.argv)
+                self._log(get_text('lang_changed').format(selected_name))
         except Exception as e:
             logger.error(f"Change language error: {e}")
+
+    def _apply_language(self):
+        """Hot-reload: Re-apply all UI text from current language.
+        
+        Updates stored widget references with get_text() values.
+        No restart needed — instant language switching.
+        """
+        try:
+            # Window title
+            self.title(f"{get_text('app_title')} - v{self.VERSION}")
+
+            # Main convert button
+            if self.btn_convert:
+                self.btn_convert.configure(text=get_text('btn_convert'))
+
+            # Stop button
+            if self.btn_stop:
+                self.btn_stop.configure(text=get_text('btn_stop_convert'))
+
+            # Progress section (if visible)
+            if self.progress_title:
+                self.progress_title.configure(text=get_text('progress_converting'))
+            if self.status_badge:
+                self.status_badge.configure(text=get_text('progress_status'))
+            if self.current_file_label:
+                self.current_file_label.configure(text=get_text('waiting'))
+
+            # Quality presets (reload)
+            if hasattr(self, '_quality_presets') and hasattr(self, 'quality_dropdown'):
+                self._quality_presets = [
+                    get_text('quality_preset_0'),
+                    get_text('quality_preset_1'),
+                    get_text('quality_preset_2'),
+                    get_text('quality_preset_3'),
+                    get_text('quality_preset_4'),
+                ]
+                self.quality_dropdown.configure(values=self._quality_presets)
+                idx = self.var_quality.get()
+                self.quality_dropdown.set(self._quality_presets[min(idx, 4)])
+
+            # Quality hints (reload)
+            if hasattr(self, '_quality_hints') and hasattr(self, 'quality_hint'):
+                self._quality_hints = {
+                    0: get_text('quality_hint_0'),
+                    1: get_text('quality_hint_1'),
+                    2: get_text('quality_hint_2'),
+                    3: get_text('quality_hint_3'),
+                    4: get_text('quality_hint_4'),
+                }
+                val = self.var_quality.get()
+                self.quality_hint.configure(text=self._quality_hints.get(val, ""))
+
+            # Compress switch
+            if hasattr(self, 'compress_switch'):
+                self.compress_switch.configure(text=get_text('auto_compress'))
+
+            logger.info("Language hot-reload applied successfully")
+        except Exception as e:
+            logger.error(f"Apply language error: {e}")
 
     def _open_pdf_tools(self):
         """Open PDF Tools Pro dialog."""
@@ -1214,11 +1496,19 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             messagebox.showerror("Lỗi", f"Không thể mở Excel Tools: {e}")
 
     def _clear_files(self):
-        """Clear file list."""
+        """Clear file list. U6: Confirm before clearing >3 files."""
         try:
             if self.file_panel and self.file_panel.files:
+                count = len(self.file_panel.files)
+                # U6: Confirmation for large lists
+                if count > 3:
+                    if not messagebox.askyesno(
+                        "Xác nhận xóa",
+                        f"Xóa {count} files khỏi danh sách?"
+                    ):
+                        return
                 self.file_panel.clear()
-                self._log("🗑️ Đã xóa danh sách")
+                self._log(f"🗑️ Đã xóa {count} file(s) khỏi danh sách")
         except Exception as e:
             logger.error(f"Clear files error: {e}")
 

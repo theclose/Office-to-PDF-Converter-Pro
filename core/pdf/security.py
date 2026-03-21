@@ -4,11 +4,11 @@ Handles password protection, metadata manipulation, and rasterization (scan simu
 """
 
 import os
+import io
 import shutil
 import random
-from typing import Optional
 
-from .common import get_fitz, HAS_PYMUPDF, HAS_PIL, logger
+from .common import get_fitz, HAS_PIL, logger
 
 try:
     from PIL import Image, ImageFilter
@@ -21,7 +21,7 @@ def protect_pdf(input_path: str, output_path: str, password: str,
     Add password protection to a PDF file.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     if not os.path.exists(input_path):
@@ -63,7 +63,7 @@ def post_process_pdf(pdf_path: str, password: str = None,
     Apply password protection and/or metadata to PDF in-place.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     try:
@@ -122,7 +122,7 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
     Creates a true "scan-like" PDF.
     """
     fitz = get_fitz()
-    if not fitz or not HAS_PYMUPDF:
+    if not fitz:
         return False
 
     target_path = output_path if output_path else pdf_path
@@ -145,7 +145,6 @@ def rasterize_pdf(pdf_path: str, output_path: str = None, dpi: int = 150, simula
             if simulate_scan and HAS_PIL:
                 img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
                 img = _apply_scan_effects(img)
-                import io
                 buf = io.BytesIO()
                 img.save(buf, format="JPEG", quality=80)
                 img_data = buf.getvalue()

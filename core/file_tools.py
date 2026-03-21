@@ -212,7 +212,6 @@ import hashlib
 
 import stat
 import ctypes
-from datetime import datetime
 
 @dataclass
 class DuplicateGroup:

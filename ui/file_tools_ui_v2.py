@@ -5,18 +5,16 @@ Based on user reference design with:
 - Tab 2: Rename nâng cao (Advanced Rename)
 - Tab 3: Các chức năng khác (Other Functions)
 """
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import filedialog, messagebox
 import customtkinter as ctk
 import os
 import threading
-from typing import List, Optional
-from datetime import datetime
+from typing import List
 
 from office_converter.core.file_tools import (
     FileToolsEngine, CaseRule, ReplaceRule, RemoveAccentsRule,
     TrimRule, AddStringRule, SequenceRule, ExtensionRule, RenameRule,
-    DuplicateFinder, DuplicateGroup, EmptyFolderCleaner, AttributeManager
+    DuplicateFinder
 )
 
 import logging

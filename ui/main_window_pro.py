@@ -341,15 +341,11 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
                          command=self._add_folder,
                          fg_color="transparent", border_width=2)
             self.btn_add_folder.pack(side="left", padx=2)
-            # R2: Buttons with tooltips
-            self.btn_pdf = ctk.CTkButton(file_btn_frame, text=get_text('btn_pdf_tools'), width=90,
-                         command=self._open_pdf_tools,
-                         fg_color="#3B82F6", hover_color="#2563EB")
-            self.btn_pdf.pack(side="left", padx=2)
-            self.btn_excel = ctk.CTkButton(file_btn_frame, text=get_text('btn_excel_tools'), width=95,
-                         command=self._open_excel_tools,
-                         fg_color="#10B981", hover_color="#059669")
-            self.btn_excel.pack(side="left", padx=2)
+            # Paste from clipboard
+            self.btn_paste = ctk.CTkButton(file_btn_frame, text="📋", width=40,
+                         command=self._paste_from_clipboard,
+                         fg_color="transparent", border_width=2)
+            self.btn_paste.pack(side="left", padx=2)
             self.btn_clear = ctk.CTkButton(file_btn_frame, text="🗑️", width=40,
                          command=self._clear_files,
                          fg_color="transparent", border_width=2,
@@ -357,8 +353,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
             self.btn_clear.pack(side="right")
             try:
                 from CTkToolTip import CTkToolTip
-                CTkToolTip(self.btn_pdf, message=get_text('tooltip_pdf'), delay=0.3)
-                CTkToolTip(self.btn_excel, message=get_text('tooltip_excel'), delay=0.3)
+                CTkToolTip(self.btn_paste, message="Paste files (Ctrl+V)", delay=0.3)
                 CTkToolTip(self.btn_clear, message=get_text('tooltip_clear'), delay=0.3)
             except ImportError:
                 pass
@@ -1026,13 +1021,44 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
     # =========== EVENT HANDLERS ===========
 
     def _on_files_changed(self, files: List[ConversionFile]):
-        """Called when file list changes."""
+        """Called when file list changes. Updates convert button state + pulse animation."""
         try:
-            has_files = len(files) > 0
+            count = len(files)
+            has_files = count > 0
             if self.btn_convert:
-                self.btn_convert.configure(state="normal" if has_files else "disabled")
+                if has_files and not self.is_converting:
+                    # Show file count on button
+                    self.btn_convert.configure(
+                        state="normal",
+                        text=f"✏ {get_text('btn_convert')}  ({count})"
+                    )
+                    # Pulse animation: briefly brighten the button
+                    self._pulse_convert_button()
+                elif not has_files:
+                    self.btn_convert.configure(
+                        state="disabled",
+                        text=get_text('btn_convert')
+                    )
         except Exception as e:
             logger.error(f"On files changed error: {e}")
+
+    def _pulse_convert_button(self):
+        """Brief pulse animation on convert button when files change."""
+        try:
+            if not hasattr(self, '_pulse_job'):
+                self._pulse_job = None
+            # Cancel previous pulse
+            if self._pulse_job:
+                self.after_cancel(self._pulse_job)
+            # Brighten
+            self.btn_convert.configure(fg_color="#22C55E")
+            # Restore after 300ms
+            self._pulse_job = self.after(
+                300,
+                lambda: self.btn_convert.configure(fg_color="#16A34A")
+            )
+        except Exception:
+            pass
 
     def _on_password_toggle(self):
         """Toggle password entry state."""

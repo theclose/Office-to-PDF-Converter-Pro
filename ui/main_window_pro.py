@@ -92,7 +92,7 @@ class ConverterProApp(ConversionMixin, DialogsMixin, TkDnDWrapper):
     - ConverterProApp: UI layout, options, file actions, DnD
     """
 
-    VERSION = "4.2.109"
+    VERSION = "4.2.110"
 
     def __init__(self):
         super().__init__()

@@ -41,15 +41,16 @@ AUTO = "🔧 AUTO-FIXED"
 results = []
 fixes_applied = 0
 
-# --- Directories to scan (project source dirs, not tests/scripts/build) ---
+# --- Directories to scan for LOC / undocumented checks ---
 SOURCE_DIRS = ["converters", "core", "ui", "utils"]
 
+# --- ALL directories where architecture.md may reference files ---
+ALL_FILE_DIRS = ["converters", "core", "ui", "utils", "tests", "scripts"]
+
 # --- Files to EXCLUDE from "undocumented" check ---
+# (tests, scripts, and root-level files are documented separately)
 EXCLUDED_FILES = {
-    "conftest.py", "run_pro.py", "__init__.py", "setup.py",
-    "test_com_lifecycle.py", "test_converter_integration_v2.py",
-    "test_engine_threading.py", "test_core.py", "test_bug_fixes.py",
-    "test_fallback_chain.py", "verify_claude_md.py",
+    "__init__.py", "setup.py",
 }
 
 
@@ -177,7 +178,7 @@ def check_config_sync():
             for sub_k in v:
                 actual_keys.add(sub_k)
 
-    undocumented = [k for k in actual_keys if f'"{k}"' not in arch_text]
+    undocumented = [k for k in actual_keys if f'"{k}"' not in arch_text and f'`{k}`' not in arch_text and f'| {k} |' not in arch_text]
 
     if not undocumented:
         results.append((PASS, f"Config sync: all {len(actual_keys)} keys documented"))
@@ -197,8 +198,9 @@ def check_file_existence():
     for m in pattern.finditer(arch_text):
         mentioned.add(os.path.basename(m.group(1)))
 
+    # Scan all directories where files might live (including tests, scripts, root)
     actual_files = set()
-    for src_dir in SOURCE_DIRS:
+    for src_dir in ALL_FILE_DIRS:
         src_path = ROOT / src_dir
         if not src_path.exists():
             continue
@@ -206,6 +208,10 @@ def check_file_existence():
             for f in filenames:
                 if f.endswith(".py") and f != "__init__.py":
                     actual_files.add(f)
+    # Also check root-level .py files (run_pro.py etc.)
+    for f in os.listdir(ROOT):
+        if f.endswith(".py"):
+            actual_files.add(f)
 
     missing = mentioned - actual_files
     if not missing:

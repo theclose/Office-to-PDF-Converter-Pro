@@ -26,7 +26,8 @@ wheels/
 
 # PyInstaller
 *.manifest
-*.spec
+# Keep our build spec
+!OfficeToPDF_Pro.spec
 
 # Installer logs
 pip-log.txt
@@ -45,6 +46,8 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+test_results.xml
+.test_cache.json
 
 # Translations
 *.mo
@@ -70,9 +73,41 @@ venv.bak/
 logs/
 *.log
 
-# Config (can contain sensitive data)
+# Config (can contain user-specific data)
 config.json
 
-# Temp files
+# Temp / runtime files
 *.tmp
 *.bak
+out.txt
+
+# SQLite runtime files
+*.db
+*.db-shm
+*.db-wal
+conversion_history.json
+
+# Dev / test artifacts
+output_dir_test/
+output_path_test
+project_context.txt
+desktop_ui.png
+temp_verify.py
+take_screenshot.py
+test_all.py
+
+# Dead code / deprecated modules
+grid/
+generated_tests/
+.ai_assistant/
+.context/
+build_script.py
+build_exe.spec
+deploy_automation.py
+deploy_simple.py
+main.py
+run_grid.py
+run_reactor.py
+validate_core.py
+validate_shim.py
+pytest-benchmark.ini

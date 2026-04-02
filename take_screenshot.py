@@ -1,1 +1,0 @@
-import subprocess, time; from PIL import ImageGrab; p = subprocess.Popen(['python', 'run_pro.py']); time.sleep(15); ImageGrab.grab().save(r'C:\Users\Admin\.gemini\antigravity\brain\6bb9dd13-61f1-442a-bc33-09d19c825e94\browser\desktop_ui.png'); p.terminate()

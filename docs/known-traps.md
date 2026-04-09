@@ -133,3 +133,21 @@
 - **Fix:** Guard `release_com()` with `if not self._use_pool:` in all 3 converters. When pooled, cleanup only nulls local ref (`self._word = None`). Pool manages COM apartment lifetime.
 - **Rule:** NEVER call CoUninitialize when using COM pool. Pool owns the COM apartment.
 - **Lesson:** COM apartment is per-thread, not per-object. Uninitializing it kills ALL COM objects on that thread, not just the converter's.
+
+## 21. FileToolsEngine.preview() signature changed but UI not updated
+- **Bug:** "Preview" button in File Tools crashes with `TypeError: missing required argument 'rules'`
+- **Cause:** `preview()` was refactored to take explicit `(files, rules)` params, but `file_tools_ui_v2.py` still called `self.engine.preview(self.files)` without passing rules
+- **Fix:** Pass rules explicitly: `self.engine.preview(self.files, rules)`
+- **Rule:** After refactoring method signatures, grep ALL callers — not just tests
+
+## 22. UI calls non-existent method name after refactor
+- **Bug:** "Undo" button crashes with `AttributeError: 'FileToolsEngine' has no attribute 'undo'`
+- **Cause:** Method is `undo_last_transaction()` but UI called `undo()`
+- **Fix:** `self.engine.undo_last_transaction()`
+- **Rule:** When renaming methods, search for ALL references including UI files — not just core/tests
+
+## 23. SequenceRule constructed with invalid kwarg
+- **Bug:** Numbering prefix/suffix in File Tools crashes with `TypeError: unexpected keyword argument 'position'`
+- **Cause:** UI passed `SequenceRule(position="prefix")` but actual signature uses `at_start: bool`
+- **Fix:** `SequenceRule(at_start=True)` for prefix, `SequenceRule(at_start=False)` for suffix
+- **Rule:** Always check constructor signature before calling — don't assume param names

@@ -203,10 +203,10 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         btn_frame.pack(side="left", fill="y", padx=10)
         
         ctk.CTkButton(btn_frame, text=get_text("ft_clear_details"), width=150, command=self._clear_details).pack(pady=3)
-        ctk.CTkButton(btn_frame, text=get_text("ft_copy_to_title"), width=150).pack(pady=3)
-        ctk.CTkButton(btn_frame, text=get_text("ft_copy_from_title"), width=150).pack(pady=3)
-        ctk.CTkButton(btn_frame, text=get_text("ft_check_md5"), width=150, command=self._check_md5).pack(pady=3)
-        ctk.CTkButton(btn_frame, text=get_text("ft_compare_folders"), width=150).pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_copy_to_title"), width=150, state="disabled").pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_copy_from_title"), width=150, state="disabled").pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_check_md5"), width=150, state="disabled").pack(pady=3)
+        ctk.CTkButton(btn_frame, text=get_text("ft_compare_folders"), width=150, state="disabled").pack(pady=3)
         ctk.CTkButton(btn_frame, text=get_text("ft_find_dupes"), width=150, command=self._find_duplicates).pack(pady=3)
         
         # Right numbering options
@@ -357,9 +357,9 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         # Numbering
         num_mode = self.var_numbering.get()
         if num_mode == "prefix":
-            rules.append(SequenceRule(position="prefix"))
+            rules.append(SequenceRule(at_start=True))
         elif num_mode == "suffix":
-            rules.append(SequenceRule(position="suffix"))
+            rules.append(SequenceRule(at_start=False))
             
         return rules
         
@@ -372,7 +372,7 @@ class FileToolsDialogV2(ctk.CTkToplevel):
         rules = self._build_rules()
         self.engine.rules = rules
         
-        previews = self.engine.preview(self.files)
+        previews = self.engine.preview(self.files, rules)
         
         self.list_new.delete("1.0", "end")
         for p in previews:
@@ -402,7 +402,7 @@ class FileToolsDialogV2(ctk.CTkToplevel):
                 
     def _undo(self):
         """Undo last rename operation."""
-        results = self.engine.undo()
+        results = self.engine.undo_last_transaction()
         if results:
             success = sum(1 for _, s, _ in results if s)
             messagebox.showinfo("Undo", f"Đã hoàn tác {success} file")

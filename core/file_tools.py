@@ -197,7 +197,7 @@ class ExtensionRule(RenameRule):
         if self.mode == "lower":
             return name, extension.lower()
         elif self.mode == "upper":
-            return name.upper(), extension.upper()
+            return name, extension.upper()
         elif self.mode == "new":
             # Ensure dot
             ext = self.new_ext if self.new_ext.startswith(".") else f".{self.new_ext}"

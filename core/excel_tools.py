@@ -112,12 +112,12 @@ def split_excel(
                 
                 # Generate output path (sanitize sheet name for filename)
                 safe_sheet_name = _sanitize_filename(sheet_name)
-                output_path = output_dir / f"{safe_sheet_name}.xlsx"
+                output_path = output_dir / f"{base_name}_{safe_sheet_name}.xlsx"
                 
                 # Handle duplicate filenames
                 counter = 1
                 while output_path.exists():
-                    output_path = output_dir / f"{safe_sheet_name}_{counter}.xlsx"
+                    output_path = output_dir / f"{base_name}_{safe_sheet_name}_{counter}.xlsx"
                     counter += 1
                 
                 # Save
@@ -567,11 +567,13 @@ def csv_to_excel(
                 for row_idx, row in enumerate(reader, start=1):
                     for col_idx, value in enumerate(row, start=1):
                         # Try to convert to number if possible
+                        # Skip: leading zeros (001234), phone-like (12-34), dates, etc.
                         try:
-                            if '.' in value:
-                                value = float(value)
-                            else:
-                                value = int(value)
+                            if isinstance(value, str) and value and not value.startswith('0'):
+                                if '.' in value:
+                                    value = float(value)
+                                elif value.lstrip('-').isdigit():
+                                    value = int(value)
                         except (ValueError, TypeError):
                             pass
                         ws.cell(row=row_idx, column=col_idx, value=value)

@@ -3,8 +3,8 @@ name: converter-development
 description: |
   Guide for developing and modifying Office-to-PDF converters (Excel, Word, PPT).
   Covers COM STA threading model, quality mapping, fallback chains, pre-flight 
-  validation, and testing patterns. Use this skill when adding new converters,
-  modifying existing ones, or working with COM automation.
+  validation, COM pool lifecycle, and testing patterns. Use this skill when adding
+  new converters, modifying existing ones, or working with COM automation.
 ---
 
 # Converter Development Skill
@@ -14,16 +14,19 @@ description: |
 - Modifying fallback chain logic
 - Changing quality/export parameters
 - Fixing COM-related bugs
+- Working with COM pool lifecycle
 
 ## Architecture
 ```
 converters/
-├── base.py              → BaseConverter ABC (inherit from this)
-├── excel.py             → ExcelConverter (7 fallback methods)
-├── word.py              → WordConverter (3 fallback methods)
-├── ppt.py               → PPTConverter (3 fallback methods)
-├── libreoffice.py       → Headless fallback
-└── parallel_converter.py → Multi-process batch
+├── base.py           → BaseConverter ABC (inherit from this)
+├── excel.py          → ExcelConverter (7 fallback methods)
+├── word.py           → WordConverter (3 fallback methods)
+├── ppt.py            → PPTConverter (3 fallback methods)
+└── libreoffice.py    → LibreOffice headless fallback
+
+utils/
+└── parallel_converter.py → Multi-process batch conversion
 ```
 
 ## COM STA Rules (CRITICAL — read converters/CLAUDE.md)
@@ -39,6 +42,33 @@ def convert(self, input_path, output_path, **kwargs):
 
 # WRONG: COM object from different thread
 # NEVER do: self.shared_app = Dispatch(...)  # then use in another thread
+```
+
+## COM Pool Lifecycle (Traps #19-20)
+```python
+# COMPool manages COM apartment lifetime
+# NEVER call CoUninitialize when using pool (trap #20)
+
+# In converter cleanup():
+def cleanup(self):
+    if self._use_pool:
+        self._word = None  # Just null the ref, pool owns the apartment
+    else:
+        # Only uninitialize if NOT using pool
+        if self._word:
+            self._word.Quit()
+        pythoncom.CoUninitialize()
+```
+
+### Liveness Check Pattern (Trap #19)
+```python
+# COM proxy can be non-None but dead
+def _is_alive(self):
+    try:
+        _ = self._word.Name  # Actual COM call — will throw if dead
+        return True
+    except Exception:
+        return False
 ```
 
 ## Quality Mapping
@@ -68,6 +98,7 @@ class NewFormatConverter(BaseConverter):
     
     def cleanup(self):
         # Release COM objects ON THIS THREAD
+        # Guard with if not self._use_pool
         pass
 ```
 
@@ -110,11 +141,13 @@ def test_new_converter(mock_dispatch):
 ```
 
 ## Known Traps
-- PPT quality param was silently ignored (known-trap #3)
-- Never cache module availability in boolean (known-trap #2)
-- COM cleanup from wrong thread crashes (known-trap #5)
+- PPT quality param was silently ignored (trap #3)
+- Never cache module availability in boolean (trap #2)
+- COM cleanup from wrong thread crashes (trap #5)
+- COM proxy non-None but dead — use liveness probe (trap #19)
+- CoUninitialize kills ALL pooled COM on thread (trap #20)
 
 ## Reference Files
 - `converters/CLAUDE.md` — COM rules summary
 - `docs/converters-guide.md` — Full quality mapping + fallback chains
-- `docs/known-traps.md` — Bug patterns to avoid
+- `docs/known-traps.md` — Bug patterns to avoid (23 entries)

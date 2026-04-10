@@ -33,30 +33,37 @@ Audit each layer in dependency order:
 
 #### Layer 4 → utils/ (lowest risk, audit first)
 - [ ] Config singleton thread-safety
-- [ ] COMPool lifecycle (health-check, recycle)
+- [ ] COMPool lifecycle (health-check, recycle, zombie kill)
 - [ ] Logging setup (no print(), proper levels)
 - [ ] Error handling (no bare excepts)
+- [ ] Parallel converter process management
 
 #### Layer 1 → converters/ (highest risk)
 - [ ] COM STA compliance (CoInitialize per thread)
-- [ ] Quality parameter actually used (not ignored)
+- [ ] Quality parameter actually used (not ignored — trap #3)
 - [ ] Fallback chains complete and ordered
 - [ ] Pre-flight validation (file exists, size, lock)
 - [ ] Resource cleanup in finally blocks
 - [ ] PDF output validation after conversion
+- [ ] COM pool integration (no CoUninitialize when pooled — trap #20)
 
 #### Layer 2 → core/ (medium risk)
 - [ ] Engine stop/force-stop contract
 - [ ] Post-processing order correct
 - [ ] Auto-compress integration
-- [ ] get_fitz() used (not stale boolean)
+- [ ] get_fitz() used (not stale boolean — trap #2)
+- [ ] Excel Tools: split/merge/csv/protect all work
+- [ ] File Tools: preview/execute/undo API consistent
+- [ ] File Tools: all UI callers match core API signatures (traps #21-23)
 
 #### Layer 3 → ui/ (visual verification required)
-- [ ] pack_propagate(False) enforced
+- [ ] pack_propagate(False) enforced (trap #1)
 - [ ] Thread-safety (self.after for cross-thread)
 - [ ] All callbacks wrapped in try/except
-- [ ] after() callbacks cleaned up on destroy/language change
+- [ ] after() callbacks cleaned up on destroy
 - [ ] Visual verification (run app, check rendering)
+- [ ] MUST test: Excel Tools dialog open → all 7 operations
+- [ ] MUST test: File Tools dialog → preview → rename → undo
 - [ ] MUST run app and test: open → change language → close
 
 ### Phase 3: Cross-Cutting Concerns
@@ -65,6 +72,18 @@ Audit each layer in dependency order:
 - [ ] Thread safety: no cross-thread COM or widget access
 - [ ] File I/O: encoding specified (utf-8), error handling
 - [ ] Security: password handling, no hardcoded secrets
+- [ ] API consistency: UI callers match core method signatures
+
+### Phase 4: Cross-Caller Verification
+```bash
+# Verify all core API methods are called correctly from UI
+grep -rn "\.preview(" ui/ --include="*.py"
+grep -rn "\.execute(" ui/ --include="*.py"
+grep -rn "\.undo" ui/ --include="*.py"
+grep -rn "SequenceRule(" ui/ --include="*.py"
+grep -rn "split_excel(" ui/ --include="*.py"
+grep -rn "merge_excel(" ui/ --include="*.py"
+```
 
 ## Scoring Methodology
 
@@ -99,10 +118,12 @@ Audit each layer in dependency order:
 ```
 
 ## Pre-Release Checklist
-- [ ] All 107+ tests pass
-- [ ] verify_claude_md.py passes (0 fails)
+- [ ] All 188+ tests pass (4 COM-dependent may skip)
+- [ ] verify_claude_md.py passes (18/18, 0 fails)
 - [ ] Visual verification of main window
+- [ ] Excel Tools: test split + merge
+- [ ] File Tools: test preview + rename + undo
 - [ ] Quality presets all work (test each)
 - [ ] Force-stop works during conversion
-- [ ] .spec file up to date
+- [ ] .spec file up to date (dynamic SITE_PACKAGES)
 - [ ] Version number updated

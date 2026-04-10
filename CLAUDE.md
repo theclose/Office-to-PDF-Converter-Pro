@@ -1,6 +1,6 @@
 # CLAUDE.md — Office to PDF Converter Pro v4.2.x
 # Python 3.11+ | CustomTkinter | pywin32 COM | PyMuPDF
-# Last updated: 2026-03-21
+# Last updated: 2026-04-10
 #
 # PROGRESSIVE DISCLOSURE: This file is kept lean (< 150 lines).
 # Detailed docs are in docs/ and subdirectory CLAUDE.md files.
@@ -9,7 +9,7 @@
 ## Quick Commands
 ```bash
 python run_pro.py                    # Run app
-python -m pytest tests/ -v --tb=short  # Test (baseline: 107 passed, 2 skipped)
+python -m pytest tests/ -v --tb=short  # Test (baseline: 184 passed, 4 skipped)
 pyinstaller OfficeToPDF_Pro.spec     # Build EXE
 ruff check .                         # Lint
 ```
@@ -58,7 +58,7 @@ Details: see docs/converters-guide.md
 
 ### 6. Testing
 - ALL COM calls MUST be mocked — NO real Office processes
-- Baseline: 107 passed, 2 skipped
+- Baseline: 184 passed, 4 skipped
 - Mock: `sys.modules['pythoncom']` + `sys.modules['win32com.client']`
 
 ### 7. Pre-flight Validation
@@ -72,7 +72,7 @@ Details: see docs/converters-guide.md
 - Config: `config.set(key, val, auto_save=False)` when batching multiple sets.
 
 ## Verification Rules
-- Code changes → run pytest (107 baseline)
+- Code changes → run pytest (184 baseline)
 - UI changes → run app + verify visually + THEN run pytest
 - Bug fixes → add entry to docs/known-traps.md
 - Config changes → verify config.json keys match docs/architecture.md

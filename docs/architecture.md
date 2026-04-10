@@ -55,8 +55,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging, i18
 | pdf_tools_ops_mixin.py | 372 | PDF Tools operations |
 | excel_tools_ui.py | 600 | Excel Tools dialog |
 | excel_tools_ops_mixin.py | 297 | Excel Tools operations |
-| file_tools_ui_v2.py | 460 | File Tools dialog (current) |
-| file_tools_ui.py | 795 | File Tools dialog (legacy) |
+| file_tools_ui_v2.py | 460 | File Tools dialog |
 | dialogs.py | 153 | Legacy settings dialog |
 
 ### utils/ — Infrastructure
@@ -86,7 +85,7 @@ Layer 4: utils/         → Shared Infrastructure (COMPool, Config, Logging, i18
 | ja.json | 日本語 |
 | ko.json | 한국어 |
 
-### tests/ — Test Suite (baseline: 188+ passed, 4 skipped)
+### tests/ — Test Suite (baseline: 184 passed, 4 skipped)
 | File | Coverage | Purpose |
 |------|----------|---------|
 | test_integration_library.py | ~12 tests | PDF compression, merge/split |
